@@ -1,0 +1,111 @@
+.header {
+  text-align: center;
+  padding: 40rpx 0 30rpx;
+}
+
+.title {
+  font-size: 56rpx;
+  font-weight: 700;
+  color: #8B4513;
+  letter-spacing: 8rpx;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  color: #C19A6B;
+  margin-top: 8rpx;
+}
+
+.tagline {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 12rpx;
+}
+
+.form-card {
+  margin-bottom: 30rpx;
+}
+
+.form-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0ede8;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.form-label {
+  font-size: 28rpx;
+  color: #555;
+  width: 160rpx;
+  flex-shrink: 0;
+}
+
+.form-input {
+  flex: 1;
+  text-align: right;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.picker-value {
+  flex: 1;
+  text-align: right;
+  font-size: 28rpx;
+  color: #333;
+}
+
+/* 性别选择 */
+.gender-tabs {
+  display: flex;
+  gap: 16rpx;
+}
+
+.gender-tab {
+  padding: 12rpx 32rpx;
+  border-radius: 8rpx;
+  background: #f5f3f0;
+  color: #666;
+  font-size: 26rpx;
+}
+
+.gender-tab.active {
+  background: #8B4513;
+  color: #fff;
+}
+
+/* 字数选择 */
+.length-tabs {
+  display: flex;
+  gap: 16rpx;
+}
+
+.length-tab {
+  padding: 12rpx 32rpx;
+  border-radius: 8rpx;
+  background: #f5f3f0;
+  color: #666;
+  font-size: 26rpx;
+}
+
+.length-tab.active {
+  background: #8B4513;
+  color: #fff;
+}
+
+.footer-note {
+  text-align: center;
+  padding: 30rpx 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.footer-note text {
+  font-size: 22rpx;
+  color: #aaa;
+}

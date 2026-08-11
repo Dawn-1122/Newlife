@@ -1,0 +1,16 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/result/result",
+    "pages/detail/detail"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#8B4513",
+    "navigationBarTitleText": "美名集",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#FAF8F5"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

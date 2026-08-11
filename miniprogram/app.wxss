@@ -1,0 +1,60 @@
+/**app.wxss**/
+page {
+  background-color: #FAF8F5;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+  color: #333;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+.container {
+  padding: 30rpx;
+  box-sizing: border-box;
+}
+
+/* 古风配色变量 */
+.bg-primary { background-color: #8B4513; }
+.bg-secondary { background-color: #FAF8F5; }
+.bg-card { background-color: #fff; }
+.text-primary { color: #8B4513; }
+.text-secondary { color: #666; }
+.text-accent { color: #C19A6B; }
+.text-gold { color: #D4A017; }
+
+/* 卡片样式 */
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+}
+
+/* 按钮样式 */
+.btn-primary {
+  background: linear-gradient(135deg, #8B4513, #A0522D);
+  color: #fff;
+  border: none;
+  border-radius: 50rpx;
+  padding: 24rpx 0;
+  font-size: 32rpx;
+  font-weight: 500;
+  text-align: center;
+}
+
+.btn-primary:active {
+  opacity: 0.85;
+}
+
+/* 分数徽章 */
+.score-badge {
+  display: inline-block;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.score-high { background: #e8f5e9; color: #2e7d32; }
+.score-mid { background: #fff3e0; color: #e65100; }
+.score-low { background: #fce4ec; color: #c62828; }

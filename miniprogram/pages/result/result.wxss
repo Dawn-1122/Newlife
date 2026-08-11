@@ -1,0 +1,161 @@
+.bazi-summary {
+  text-align: center;
+}
+
+.bazi-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #8B4513;
+  margin-bottom: 20rpx;
+}
+
+.bazi-pillars {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20rpx;
+}
+
+.pillar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pillar-label {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.pillar-value {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #8B4513;
+  margin-top: 8rpx;
+}
+
+.bazi-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 20rpx;
+}
+
+.wuxing-bar {
+  display: flex;
+  justify-content: space-around;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #f0ede8;
+}
+
+.wuxing-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.wuxing-label {
+  font-size: 28rpx;
+  font-weight: 600;
+  width: 48rpx;
+  height: 48rpx;
+  line-height: 48rpx;
+  text-align: center;
+  border-radius: 50%;
+  color: #fff;
+}
+
+.wuxing-label.金 { background: #C4A21E; }
+.wuxing-label.木 { background: #4CAF50; }
+.wuxing-label.水 { background: #2196F3; }
+.wuxing-label.火 { background: #FF5722; }
+.wuxing-label.土 { background: #8D6E63; }
+
+.wuxing-percent {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 6rpx;
+}
+
+/* 名字卡片 */
+.name-card {
+  position: relative;
+}
+
+.name-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.name-text {
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #333;
+  letter-spacing: 4rpx;
+}
+
+.name-pinyin {
+  font-size: 24rpx;
+  color: #C19A6B;
+  margin-top: 8rpx;
+}
+
+.name-poetry {
+  margin-top: 16rpx;
+  padding: 16rpx;
+  background: #faf8f5;
+  border-radius: 8rpx;
+  border-left: 6rpx solid #C19A6B;
+}
+
+.poetry-source {
+  font-size: 24rpx;
+  color: #8B4513;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.poetry-text {
+  font-size: 26rpx;
+  color: #666;
+  display: block;
+}
+
+.name-scores {
+  display: flex;
+  gap: 30rpx;
+  margin-top: 16rpx;
+}
+
+.score-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.score-label {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.score-value {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #8B4513;
+}
+
+.name-meaning {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  color: #555;
+  line-height: 1.5;
+}
+
+.empty {
+  text-align: center;
+  padding: 100rpx 0;
+  color: #999;
+}

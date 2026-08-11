@@ -1,0 +1,75 @@
+<view class="container">
+  <!-- 八字摘要 -->
+  <view class="card bazi-summary" wx:if="{{bazi}}">
+    <view class="bazi-title">八字排盘</view>
+    <view class="bazi-pillars">
+      <view class="pillar">
+        <text class="pillar-label">年柱</text>
+        <text class="pillar-value">{{bazi.four_pillars.year}}</text>
+      </view>
+      <view class="pillar">
+        <text class="pillar-label">月柱</text>
+        <text class="pillar-value">{{bazi.four_pillars.month}}</text>
+      </view>
+      <view class="pillar">
+        <text class="pillar-label">日柱</text>
+        <text class="pillar-value">{{bazi.four_pillars.day}}</text>
+      </view>
+      <view class="pillar">
+        <text class="pillar-label">时柱</text>
+        <text class="pillar-value">{{bazi.four_pillars.hour}}</text>
+      </view>
+    </view>
+    <view class="bazi-info">
+      <text>日主: {{bazi.day_master}} ({{bazi.day_master_wuxing}})</text>
+      <text>{{bazi.xiyong.strength_label}} · 喜用神: {{xiyongText}}</text>
+    </view>
+    <view class="wuxing-bar">
+      <view class="wuxing-item" wx:for="{{wuxingList}}" wx:key="name">
+        <view class="wuxing-label {{item.name}}">{{item.name}}</view>
+        <view class="wuxing-percent">{{item.percent}}%</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 名字列表 -->
+  <view class="name-list">
+    <view class="card name-card" wx:for="{{names}}" wx:key="full_name" bindtap="onNameTap" data-index="{{index}}">
+      <view class="name-header">
+        <text class="name-text">{{item.full_name}}</text>
+        <view class="score-badge {{item.scores.overall >= 85 ? 'score-high' : item.scores.overall >= 70 ? 'score-mid' : 'score-low'}}">
+          {{item.scores.overall}}分
+        </view>
+      </view>
+
+      <view class="name-pinyin">{{item.phonetics.pinyins[0]}}<text wx:if="{{item.phonetics.pinyins.length > 1}} · {{item.phonetics.pinyins[1]}}</text><text wx:if="{{item.phonetics.pinyins.length > 2}} · {{item.phonetics.pinyins[2]}}</text></view>
+
+      <view class="name-poetry" wx:if="{{item.poetry}}">
+        <text class="poetry-source">「{{item.poetry.source}}·{{item.poetry.title}}」</text>
+        <text class="poetry-text">{{item.poetry.text}}</text>
+      </view>
+
+      <view class="name-scores">
+        <view class="score-item">
+          <text class="score-label">音律</text>
+          <text class="score-value">{{item.scores.phonetics}}</text>
+        </view>
+        <view class="score-item">
+          <text class="score-label">五格</text>
+          <text class="score-value">{{item.scores.wuge}}</text>
+        </view>
+        <view class="score-item">
+          <text class="score-label">八字</text>
+          <text class="score-value">{{item.scores.bazi}}</text>
+        </view>
+      </view>
+
+      <view class="name-meaning">{{item.meaning}}</view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:if="{{!names.length}}">
+    <text>暂无结果，请调整条件后重试</text>
+  </view>
+</view>

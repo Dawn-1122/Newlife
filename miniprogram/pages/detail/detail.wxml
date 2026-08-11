@@ -1,0 +1,101 @@
+<view class="container">
+  <!-- 名字展示区 -->
+  <view class="card name-display">
+    <view class="name-main">{{name.full_name}}</view>
+    <view class="name-pinyin">{{pinyinText}}</view>
+    <view class="name-score">
+      <text class="score-label">综合评分</text>
+      <text class="score-number">{{name.scores.overall}}</text>
+    </view>
+  </view>
+
+  <!-- 用字解析 -->
+  <view class="card">
+    <view class="section-title">用字解析</view>
+    <view class="char-item" wx:for="{{name.chars_info}}" wx:key="char">
+      <view class="char-display">
+        <text class="char-text">{{item.char}}</text>
+        <text class="char-pinyin">{{item.pinyin}}</text>
+      </view>
+      <view class="char-detail">
+        <view class="char-tags">
+          <text class="tag wuxing-tag {{item.wuxing}}">五行·{{item.wuxing}}</text>
+          <text class="tag">康熙·{{item.kangxi_strokes}}画</text>
+        </view>
+        <view class="char-meaning">{{item.meaning}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 诗词出处 -->
+  <view class="card" wx:if="{{name.poetry}}">
+    <view class="section-title">诗词出处</view>
+    <view class="poetry-block">
+      <view class="poetry-header">
+        <text class="poetry-source">「{{name.poetry.source}}·{{name.poetry.title}}」</text>
+        <text class="poetry-author">{{name.poetry.author}}（{{name.poetry.dynasty}}）</text>
+      </view>
+      <view class="poetry-text">{{name.poetry.text}}</view>
+    </view>
+  </view>
+
+  <!-- 音律分析 -->
+  <view class="card">
+    <view class="section-title">音律分析</view>
+    <view class="phonetics-info">
+      <view class="phon-row">
+        <text class="phon-label">声调搭配</text>
+        <text class="phon-value">{{name.phonetics.rhythm}}</text>
+      </view>
+      <view class="phon-row">
+        <text class="phon-label">音律评分</text>
+        <text class="phon-value">{{name.phonetics.score}}分</text>
+      </view>
+      <view class="phon-desc">{{name.phonetics.description}}</view>
+    </view>
+  </view>
+
+  <!-- 五格数理 -->
+  <view class="card">
+    <view class="section-title">五格数理</view>
+    <view class="wuge-grid">
+      <view class="wuge-item">
+        <text class="wuge-name">天格</text>
+        <text class="wuge-num">{{name.wuge.tian_ge.value}}</text>
+        <text class="wuge-luck {{name.wuge.tian_ge.luck}}">{{name.wuge.tian_ge.luck}}</text>
+      </view>
+      <view class="wuge-item">
+        <text class="wuge-name">人格</text>
+        <text class="wuge-num">{{name.wuge.ren_ge.value}}</text>
+        <text class="wuge-luck {{name.wuge.ren_ge.luck}}">{{name.wuge.ren_ge.luck}}</text>
+      </view>
+      <view class="wuge-item">
+        <text class="wuge-name">地格</text>
+        <text class="wuge-num">{{name.wuge.di_ge.value}}</text>
+        <text class="wuge-luck {{name.wuge.di_ge.luck}}">{{name.wuge.di_ge.luck}}</text>
+      </view>
+      <view class="wuge-item">
+        <text class="wuge-name">外格</text>
+        <text class="wuge-num">{{name.wuge.wai_ge.value}}</text>
+        <text class="wuge-luck {{name.wuge.wai_ge.luck}}">{{name.wuge.wai_ge.luck}}</text>
+      </view>
+      <view class="wuge-item">
+        <text class="wuge-name">总格</text>
+        <text class="wuge-num">{{name.wuge.zong_ge.value}}</text>
+        <text class="wuge-luck {{name.wuge.zong_ge.luck}}">{{name.wuge.zong_ge.luck}}</text>
+      </view>
+    </view>
+    <view class="wuge-desc">{{name.wuge.description}}</view>
+  </view>
+
+  <!-- 寓意 -->
+  <view class="card">
+    <view class="section-title">寓意解读</view>
+    <view class="meaning-text">{{name.meaning}}</view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="actions">
+    <button class="btn-primary" bindtap="onCopyTap">复制名字</button>
+  </view>
+</view>

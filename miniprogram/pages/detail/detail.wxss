@@ -1,0 +1,222 @@
+.name-display {
+  text-align: center;
+  padding: 50rpx 30rpx;
+}
+
+.name-main {
+  font-size: 64rpx;
+  font-weight: 700;
+  color: #8B4513;
+  letter-spacing: 12rpx;
+}
+
+.name-pinyin {
+  font-size: 28rpx;
+  color: #C19A6B;
+  margin-top: 12rpx;
+}
+
+.name-score {
+  margin-top: 24rpx;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 12rpx;
+}
+
+.score-label {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.score-number {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #8B4513;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #8B4513;
+  margin-bottom: 20rpx;
+  padding-left: 16rpx;
+  border-left: 6rpx solid #C19A6B;
+}
+
+/* 用字解析 */
+.char-item {
+  display: flex;
+  gap: 24rpx;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0ede8;
+}
+
+.char-item:last-child {
+  border-bottom: none;
+}
+
+.char-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100rpx;
+  flex-shrink: 0;
+}
+
+.char-text {
+  font-size: 48rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.char-pinyin {
+  font-size: 22rpx;
+  color: #C19A6B;
+  margin-top: 4rpx;
+}
+
+.char-detail {
+  flex: 1;
+}
+
+.char-tags {
+  display: flex;
+  gap: 12rpx;
+  margin-bottom: 8rpx;
+}
+
+.tag {
+  font-size: 20rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+  background: #f5f3f0;
+  color: #666;
+}
+
+.wuxing-tag.金 { background: #FFF8E1; color: #C4A21E; }
+.wuxing-tag.木 { background: #E8F5E9; color: #4CAF50; }
+.wuxing-tag.水 { background: #E3F2FD; color: #2196F3; }
+.wuxing-tag.火 { background: #FBE9E7; color: #FF5722; }
+.wuxing-tag.土 { background: #EFEBE9; color: #8D6E63; }
+
+.char-meaning {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* 诗词 */
+.poetry-block {
+  padding: 20rpx;
+  background: #faf8f5;
+  border-radius: 12rpx;
+  border-left: 6rpx solid #C19A6B;
+}
+
+.poetry-header {
+  margin-bottom: 12rpx;
+}
+
+.poetry-source {
+  font-size: 28rpx;
+  color: #8B4513;
+  font-weight: 500;
+  display: block;
+}
+
+.poetry-author {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 4rpx;
+  display: block;
+}
+
+.poetry-text {
+  font-size: 30rpx;
+  color: #555;
+  line-height: 1.8;
+  font-style: italic;
+}
+
+/* 音律 */
+.phonetics-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.phon-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.phon-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.phon-value {
+  font-size: 28rpx;
+  color: #8B4513;
+  font-weight: 500;
+}
+
+.phon-desc {
+  font-size: 26rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
+
+/* 五格 */
+.wuge-grid {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 16rpx;
+}
+
+.wuge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.wuge-name {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.wuge-num {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #8B4513;
+  margin-top: 4rpx;
+}
+
+.wuge-luck {
+  font-size: 22rpx;
+  margin-top: 4rpx;
+}
+
+.wuge-luck.大吉 { color: #4CAF50; }
+.wuge-luck.吉 { color: #8BC34A; }
+.wuge-luck.凶 { color: #e57373; }
+
+.wuge-desc {
+  font-size: 26rpx;
+  color: #666;
+  text-align: center;
+  padding-top: 12rpx;
+  border-top: 1rpx solid #f0ede8;
+}
+
+/* 寓意 */
+.meaning-text {
+  font-size: 28rpx;
+  color: #555;
+  line-height: 1.8;
+}
+
+.actions {
+  padding: 20rpx 0 60rpx;
+}

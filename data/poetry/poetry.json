@@ -1,0 +1,814 @@
+{
+  "version": "1.0",
+  "total": 42,
+  "source_distribution": {
+    "诗经": 12,
+    "楚辞": 8,
+    "唐诗": 10,
+    "宋词": 8,
+    "周易": 2,
+    "大学": 1,
+    "中庸": 1
+  },
+  "poems": [
+    {
+      "source": "诗经",
+      "title": "大雅·文王",
+      "author": "佚名",
+      "dynasty": "周",
+      "text": "周虽旧邦，其命维新",
+      "recommend_chars": [
+        "维",
+        "新"
+      ],
+      "imagery": [
+        "革新",
+        "承前启后"
+      ],
+      "gender": "男",
+      "scene": "寄托变革创新之志"
+    },
+    {
+      "source": "诗经",
+      "title": "小雅·鹿鸣",
+      "author": "佚名",
+      "dynasty": "周",
+      "text": "呦呦鹿鸣，食野之苹。我有嘉宾，鼓瑟吹笙。",
+      "recommend_chars": [
+        "苹",
+        "嘉",
+        "笙"
+      ],
+      "imagery": [
+        "和谐",
+        "宾客",
+        "欢乐"
+      ],
+      "gender": "女",
+      "scene": "寄意热情好客、和谐美好"
+    },
+    {
+      "source": "诗经",
+      "title": "周南·桃夭",
+      "author": "佚名",
+      "dynasty": "周",
+      "text": "桃之夭夭，灼灼其华",
+      "recommend_chars": [
+        "夭",
+        "灼",
+        "华"
+      ],
+      "imagery": [
+        "桃花",
+        "美丽",
+        "茂盛"
+      ],
+      "gender": "女",
+      "scene": "形容女子美丽如花"
+    },
+    {
+      "source": "诗经",
+      "title": "邶风·静女",
+      "author": "佚名",
+      "dynasty": "周",
+      "text": "静女其姝，俟我于城隅",
+      "recommend_chars": [
+        "静",
+        "姝"
+      ],
+      "imagery": [
+        "娴静",
+        "美丽"
+      ],
+      "gender": "女",
+      "scene": "寄意温柔娴静之美"
+    },
+    {
+      "source": "诗经",
+      "title": "秦风·蒹葭",
+      "author": "佚名",
+      "dynasty": "周",
+      "text": "蒹葭苍苍，白露为霜。所谓伊人，在水一方。",
+      "recommend_chars": [
+        "苍",
+        "露",
+        "伊"
+      ],
+      "imagery": [
+        "秋水",
+        "思念",
+        "清远"
+      ],
+      "gender": "女",
+      "scene": "寄意清雅脱俗、意境悠远"
+    },
+    {
+      "source": "诗经",
+      "title": "小雅·鹤鸣",
+      "author": "佚名",
+      "dynasty": "周",
+      "text": "鹤鸣于九皋，声闻于天",
+      "recommend_chars": [
+        "鹤",
+        "鸣",
+        "皋"
+      ],
+      "imagery": [
+        "高远",
+        "声名",
+        "志向"
+      ],
+      "gender": "男",
+      "scene": "寄托声名远播之志"
+    },
+    {
+      "source": "诗经",
+      "title": "大雅·旱麓",
+      "author": "佚名",
+      "dynasty": "周",
+      "text": "瑟彼玉瓒，黄流在中",
+      "recommend_chars": [
+        "瑟",
+        "玉",
+        "瓒"
+      ],
+      "imagery": [
+        "美玉",
+        "珍贵",
+        "庄重"
+      ],
+      "gender": "中",
+      "scene": "寄意品性如玉、温润珍贵"
+    },
+    {
+      "source": "诗经",
+      "title": "卫风·淇奥",
+      "author": "佚名",
+      "dynasty": "周",
+      "text": "瞻彼淇奥，绿竹猗猗。有匪君子，如切如磋，如琢如磨。",
+      "recommend_chars": [
+        "淇",
+        "竹",
+        "匪"
+      ],
+      "imagery": [
+        "竹",
+        "君子",
+        "修养"
+      ],
+      "gender": "男",
+      "scene": "寄意品行高洁、精益求精"
+    },
+    {
+      "source": "诗经",
+      "title": "王风·黍离",
+      "author": "佚名",
+      "dynasty": "周",
+      "text": "彼黍离离，彼稷之苗",
+      "recommend_chars": [
+        "离",
+        "稷"
+      ],
+      "imagery": [
+        "庄稼",
+        "感怀"
+      ],
+      "gender": "男",
+      "scene": "寄意思辨与感怀之情"
+    },
+    {
+      "source": "诗经",
+      "title": "周南·关雎",
+      "author": "佚名",
+      "dynasty": "周",
+      "text": "关关雎鸠，在河之洲。窈窕淑女，君子好逑。",
+      "recommend_chars": [
+        "雎",
+        "洲",
+        "窈",
+        "窕",
+        "淑"
+      ],
+      "imagery": [
+        "水鸟",
+        "爱情",
+        "美好"
+      ],
+      "gender": "女",
+      "scene": "寄意温柔美好、良缘天成"
+    },
+    {
+      "source": "诗经",
+      "title": "郑风·野有蔓草",
+      "author": "佚名",
+      "dynasty": "周",
+      "text": "野有蔓草，零露漙兮。有美一人，清扬婉兮。",
+      "recommend_chars": [
+        "蔓",
+        "露",
+        "清",
+        "扬",
+        "婉"
+      ],
+      "imagery": [
+        "晨露",
+        "美丽",
+        "清雅"
+      ],
+      "gender": "女",
+      "scene": "寄意清新自然、温婉美好"
+    },
+    {
+      "source": "诗经",
+      "title": "大雅·既醉",
+      "author": "佚名",
+      "dynasty": "周",
+      "text": "其告维何？笾豆静嘉。",
+      "recommend_chars": [
+        "静",
+        "嘉"
+      ],
+      "imagery": [
+        "宁静",
+        "美好"
+      ],
+      "gender": "女",
+      "scene": "寄意安宁美好"
+    },
+    {
+      "source": "楚辞",
+      "title": "离骚",
+      "author": "屈原",
+      "dynasty": "战国",
+      "text": "路漫漫其修远兮，吾将上下而求索",
+      "recommend_chars": [
+        "修",
+        "远",
+        "索"
+      ],
+      "imagery": [
+        "求索",
+        "远行",
+        "坚毅"
+      ],
+      "gender": "男",
+      "scene": "寄托追求真理、不懈探索"
+    },
+    {
+      "source": "楚辞",
+      "title": "离骚",
+      "author": "屈原",
+      "dynasty": "战国",
+      "text": "纷吾既有此内美兮，又重之以修能",
+      "recommend_chars": [
+        "内",
+        "美",
+        "修",
+        "能"
+      ],
+      "imagery": [
+        "内在美",
+        "才能",
+        "修养"
+      ],
+      "gender": "中",
+      "scene": "寄意内外兼修、才貌双全"
+    },
+    {
+      "source": "楚辞",
+      "title": "九歌·东皇太一",
+      "author": "屈原",
+      "dynasty": "战国",
+      "text": "吉日兮辰良，穆将愉兮上皇",
+      "recommend_chars": [
+        "辰",
+        "良",
+        "穆",
+        "愉"
+      ],
+      "imagery": [
+        "吉日",
+        "恭敬",
+        "欢愉"
+      ],
+      "gender": "男",
+      "scene": "寄意良辰吉日、恭敬欢愉"
+    },
+    {
+      "source": "楚辞",
+      "title": "九歌·云中君",
+      "author": "屈原",
+      "dynasty": "战国",
+      "text": "浴兰汤兮沐芳，华采衣兮若英",
+      "recommend_chars": [
+        "兰",
+        "芳",
+        "华",
+        "英"
+      ],
+      "imagery": [
+        "兰花",
+        "芬芳",
+        "华美"
+      ],
+      "gender": "女",
+      "scene": "寄意高洁芬芳、华美出众"
+    },
+    {
+      "source": "楚辞",
+      "title": "九歌·湘夫人",
+      "author": "屈原",
+      "dynasty": "战国",
+      "text": "沅有芷兮澧有兰，思公子兮未敢言",
+      "recommend_chars": [
+        "沅",
+        "芷",
+        "澧",
+        "兰"
+      ],
+      "imagery": [
+        "香草",
+        "思念",
+        "水畔"
+      ],
+      "gender": "女",
+      "scene": "寄意品行如香草般高洁"
+    },
+    {
+      "source": "楚辞",
+      "title": "九章·思美人",
+      "author": "屈原",
+      "dynasty": "战国",
+      "text": "芳与泽其杂糅兮，唯昭质其犹未亏",
+      "recommend_chars": [
+        "芳",
+        "泽",
+        "昭",
+        "质"
+      ],
+      "imagery": [
+        "芳香",
+        "光泽",
+        "明洁"
+      ],
+      "gender": "中",
+      "scene": "寄意品性光明纯洁"
+    },
+    {
+      "source": "楚辞",
+      "title": "远游",
+      "author": "屈原",
+      "dynasty": "战国",
+      "text": "音乐博衍无终极兮，焉乃逝以徘徊",
+      "recommend_chars": [
+        "博",
+        "衍"
+      ],
+      "imagery": [
+        "广阔",
+        "延展"
+      ],
+      "gender": "男",
+      "scene": "寄意学识广博、气度恢弘"
+    },
+    {
+      "source": "楚辞",
+      "title": "招魂",
+      "author": "屈原",
+      "dynasty": "战国",
+      "text": "光风转蕙，泛崇兰些",
+      "recommend_chars": [
+        "光",
+        "风",
+        "蕙",
+        "兰"
+      ],
+      "imagery": [
+        "和风",
+        "兰花",
+        "明媚"
+      ],
+      "gender": "女",
+      "scene": "寄意和煦明朗、品格如兰"
+    },
+    {
+      "source": "唐诗",
+      "title": "春望",
+      "author": "杜甫",
+      "dynasty": "唐",
+      "text": "国破山河在，城春草木深",
+      "recommend_chars": [
+        "山",
+        "河",
+        "春",
+        "木"
+      ],
+      "imagery": [
+        "山河",
+        "春天",
+        "家国"
+      ],
+      "gender": "男",
+      "scene": "寄托家国情怀与山河之志"
+    },
+    {
+      "source": "唐诗",
+      "title": "望岳",
+      "author": "杜甫",
+      "dynasty": "唐",
+      "text": "会当凌绝顶，一览众山小",
+      "recommend_chars": [
+        "凌",
+        "绝",
+        "峰"
+      ],
+      "imagery": [
+        "登山",
+        "壮志",
+        "超越"
+      ],
+      "gender": "男",
+      "scene": "寄托登高望远、志存高远"
+    },
+    {
+      "source": "唐诗",
+      "title": "静夜思",
+      "author": "李白",
+      "dynasty": "唐",
+      "text": "床前明月光，疑是地上霜",
+      "recommend_chars": [
+        "明",
+        "月",
+        "光"
+      ],
+      "imagery": [
+        "月光",
+        "思乡",
+        "清冷"
+      ],
+      "gender": "中",
+      "scene": "寄意清澈明朗"
+    },
+    {
+      "source": "唐诗",
+      "title": "将进酒",
+      "author": "李白",
+      "dynasty": "唐",
+      "text": "天生我材必有用，千金散尽还复来",
+      "recommend_chars": [
+        "材",
+        "千",
+        "金"
+      ],
+      "imagery": [
+        "自信",
+        "豪迈",
+        "才华"
+      ],
+      "gender": "男",
+      "scene": "寄托自信豪迈、才华必有用"
+    },
+    {
+      "source": "唐诗",
+      "title": "山居秋暝",
+      "author": "王维",
+      "dynasty": "唐",
+      "text": "明月松间照，清泉石上流",
+      "recommend_chars": [
+        "明",
+        "松",
+        "清",
+        "泉"
+      ],
+      "imagery": [
+        "月光",
+        "松林",
+        "清泉",
+        "隐逸"
+      ],
+      "gender": "中",
+      "scene": "寄意清雅脱俗、自然超然"
+    },
+    {
+      "source": "唐诗",
+      "title": "锦瑟",
+      "author": "李商隐",
+      "dynasty": "唐",
+      "text": "锦瑟无端五十弦，一弦一柱思华年",
+      "recommend_chars": [
+        "锦",
+        "瑟",
+        "华"
+      ],
+      "imagery": [
+        "锦瑟",
+        "追忆",
+        "华美"
+      ],
+      "gender": "女",
+      "scene": "寄意华美深情、追忆美好年华"
+    },
+    {
+      "source": "唐诗",
+      "title": "无题",
+      "author": "李商隐",
+      "dynasty": "唐",
+      "text": "春蚕到死丝方尽，蜡炬成灰泪始干",
+      "recommend_chars": [
+        "春",
+        "蚕",
+        "丝"
+      ],
+      "imagery": [
+        "坚贞",
+        "奉献",
+        "执着"
+      ],
+      "gender": "中",
+      "scene": "寄托坚贞不渝之情"
+    },
+    {
+      "source": "唐诗",
+      "title": "登科后",
+      "author": "孟郊",
+      "dynasty": "唐",
+      "text": "春风得意马蹄疾，一日看尽长安花",
+      "recommend_chars": [
+        "春",
+        "风",
+        "得意",
+        "花"
+      ],
+      "imagery": [
+        "春风",
+        "得意",
+        "繁花"
+      ],
+      "gender": "男",
+      "scene": "寄托功成名就之喜"
+    },
+    {
+      "source": "唐诗",
+      "title": "出塞",
+      "author": "王昌龄",
+      "dynasty": "唐",
+      "text": "秦时明月汉时关，万里长征人未还",
+      "recommend_chars": [
+        "明",
+        "月",
+        "关"
+      ],
+      "imagery": [
+        "边塞",
+        "明月",
+        "壮志"
+      ],
+      "gender": "男",
+      "scene": "寄托家国壮志与边塞豪情"
+    },
+    {
+      "source": "唐诗",
+      "title": "枫桥夜泊",
+      "author": "张继",
+      "dynasty": "唐",
+      "text": "月落乌啼霜满天，江枫渔火对愁眠",
+      "recommend_chars": [
+        "月",
+        "霜",
+        "枫"
+      ],
+      "imagery": [
+        "月夜",
+        "秋霜",
+        "枫叶"
+      ],
+      "gender": "女",
+      "scene": "寄意秋意清远"
+    },
+    {
+      "source": "宋词",
+      "title": "水调歌头·明月几时有",
+      "author": "苏轼",
+      "dynasty": "宋",
+      "text": "但愿人长久，千里共婵娟",
+      "recommend_chars": [
+        "长",
+        "久",
+        "婵",
+        "娟"
+      ],
+      "imagery": [
+        "明月",
+        "团圆",
+        "祝愿"
+      ],
+      "gender": "女",
+      "scene": "寄托团圆美好、长久平安"
+    },
+    {
+      "source": "宋词",
+      "title": "念奴娇·赤壁怀古",
+      "author": "苏轼",
+      "dynasty": "宋",
+      "text": "大江东去，浪淘尽，千古风流人物",
+      "recommend_chars": [
+        "江",
+        "浪",
+        "千",
+        "风"
+      ],
+      "imagery": [
+        "大江",
+        "浪涛",
+        "豪迈"
+      ],
+      "gender": "男",
+      "scene": "寄托豪迈壮阔之气"
+    },
+    {
+      "source": "宋词",
+      "title": "如梦令",
+      "author": "李清照",
+      "dynasty": "宋",
+      "text": "知否，知否？应是绿肥红瘦",
+      "recommend_chars": [
+        "知",
+        "绿",
+        "红"
+      ],
+      "imagery": [
+        "暮春",
+        "花叶",
+        "感怀"
+      ],
+      "gender": "女",
+      "scene": "寄意细腻感怀"
+    },
+    {
+      "source": "宋词",
+      "title": "声声慢",
+      "author": "李清照",
+      "dynasty": "宋",
+      "text": "寻寻觅觅，冷冷清清，凄凄惨惨戚戚",
+      "recommend_chars": [
+        "寻",
+        "清"
+      ],
+      "imagery": [
+        "寻觅",
+        "清冷",
+        "秋愁"
+      ],
+      "gender": "女",
+      "scene": "寄意清冷孤高"
+    },
+    {
+      "source": "宋词",
+      "title": "青玉案·元夕",
+      "author": "辛弃疾",
+      "dynasty": "宋",
+      "text": "众里寻他千百度，蓦然回首，那人却在，灯火阑珊处",
+      "recommend_chars": [
+        "寻",
+        "千",
+        "阑",
+        "珊"
+      ],
+      "imagery": [
+        "灯火",
+        "寻觅",
+        "超然"
+      ],
+      "gender": "女",
+      "scene": "寄意超然独立即美好"
+    },
+    {
+      "source": "宋词",
+      "title": "雨霖铃",
+      "author": "柳永",
+      "dynasty": "宋",
+      "text": "多情自古伤离别，更那堪，冷落清秋节",
+      "recommend_chars": [
+        "清",
+        "秋"
+      ],
+      "imagery": [
+        "秋日",
+        "离别",
+        "深情"
+      ],
+      "gender": "女",
+      "scene": "寄意秋日清远深情"
+    },
+    {
+      "source": "宋词",
+      "title": "满江红",
+      "author": "岳飞",
+      "dynasty": "宋",
+      "text": "莫等闲，白了少年头，空悲切",
+      "recommend_chars": [
+        "莫",
+        "少年"
+      ],
+      "imagery": [
+        "惜时",
+        "壮志"
+      ],
+      "gender": "男",
+      "scene": "寄托珍惜时光、奋发图强"
+    },
+    {
+      "source": "宋词",
+      "title": "卜算子·咏梅",
+      "author": "陆游",
+      "dynasty": "宋",
+      "text": "零落成泥碾作尘，只有香如故",
+      "recommend_chars": [
+        "香",
+        "故"
+      ],
+      "imagery": [
+        "梅花",
+        "坚贞",
+        "清香"
+      ],
+      "gender": "女",
+      "scene": "寄意品格坚贞、清香如故"
+    },
+    {
+      "source": "周易",
+      "title": "周易·乾卦",
+      "author": "佚名",
+      "dynasty": "周",
+      "text": "天行健，君子以自强不息",
+      "recommend_chars": [
+        "天",
+        "行",
+        "健",
+        "自强"
+      ],
+      "imagery": [
+        "天道",
+        "刚健",
+        "自强"
+      ],
+      "gender": "男",
+      "scene": "寄托刚健自强之精神"
+    },
+    {
+      "source": "周易",
+      "title": "周易·坤卦",
+      "author": "佚名",
+      "dynasty": "周",
+      "text": "地势坤，君子以厚德载物",
+      "recommend_chars": [
+        "坤",
+        "德"
+      ],
+      "imagery": [
+        "大地",
+        "厚德",
+        "承载"
+      ],
+      "gender": "男",
+      "scene": "寄托厚德包容之品格"
+    },
+    {
+      "source": "大学",
+      "title": "大学",
+      "author": "曾子",
+      "dynasty": "春秋",
+      "text": "大学之道，在明明德，在亲民，在止于至善",
+      "recommend_chars": [
+        "明",
+        "德",
+        "善"
+      ],
+      "imagery": [
+        "明德",
+        "至善",
+        "修身"
+      ],
+      "gender": "男",
+      "scene": "寄托明德至善之追求"
+    },
+    {
+      "source": "中庸",
+      "title": "中庸",
+      "author": "子思",
+      "dynasty": "春秋",
+      "text": "致中和，天地位焉，万物育焉",
+      "recommend_chars": [
+        "中",
+        "和"
+      ],
+      "imagery": [
+        "中和",
+        "和谐",
+        "中庸"
+      ],
+      "gender": "中",
+      "scene": "寄意中和和谐之道"
+    }
+  ]
+}
