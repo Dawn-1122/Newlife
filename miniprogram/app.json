@@ -2,7 +2,8 @@
   "pages": [
     "pages/index/index",
     "pages/result/result",
-    "pages/detail/detail"
+    "pages/detail/detail",
+    "pages/bazi/bazi"
   ],
   "window": {
     "backgroundTextStyle": "light",

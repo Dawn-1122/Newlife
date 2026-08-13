@@ -49,5 +49,11 @@ Page({
     wx.navigateTo({
       url: '/pages/detail/detail'
     })
+  },
+
+  onBaziTap() {
+    wx.navigateTo({
+      url: '/pages/bazi/bazi'
+    })
   }
 })

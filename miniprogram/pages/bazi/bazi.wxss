@@ -1,0 +1,285 @@
+/* 八字详解页样式 */
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #8B4513;
+  margin-bottom: 24rpx;
+  padding-left: 20rpx;
+  border-left: 8rpx solid #C19A6B;
+}
+
+/* 五行标签 */
+.wuxing-tag {
+  display: inline-block;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #fff;
+  width: 52rpx;
+  height: 52rpx;
+  line-height: 52rpx;
+  text-align: center;
+  border-radius: 12rpx;
+}
+.wuxing-tag.wx-jin { background: #C4A21E; }
+.wuxing-tag.wx-mu { background: #4CAF50; }
+.wuxing-tag.wx-shui { background: #2196F3; }
+.wuxing-tag.wx-huo { background: #FF5722; }
+.wuxing-tag.wx-tu { background: #8D6E63; }
+
+/* 头部总览 */
+.bazi-header {
+  text-align: center;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 20rpx;
+}
+
+.header-shengxiao {
+  color: #C19A6B;
+}
+
+.day-master {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+}
+
+.dm-label {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.dm-value {
+  font-size: 60rpx;
+  font-weight: 700;
+  color: #8B4513;
+}
+
+.header-note {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #bbb;
+}
+
+/* 四柱详解 */
+.pillar-detail {
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f0ede8;
+}
+.pillar-detail:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.pillar-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 16rpx;
+}
+
+.pillar-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #8B4513;
+}
+
+.pillar-ganzhi {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #333;
+  letter-spacing: 4rpx;
+}
+
+.gan-zhi-row {
+  display: flex;
+  gap: 24rpx;
+}
+
+.gz-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx;
+  background: #faf8f5;
+  border-radius: 12rpx;
+}
+
+.gz-char {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #8B4513;
+}
+
+.gz-tag {
+  display: inline-block;
+  margin-top: 8rpx;
+  padding: 2rpx 14rpx;
+  border-radius: 16rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #fff;
+}
+.gz-tag.wx-jin { background: #C4A21E; }
+.gz-tag.wx-mu { background: #4CAF50; }
+.gz-tag.wx-shui { background: #2196F3; }
+.gz-tag.wx-huo { background: #FF5722; }
+.gz-tag.wx-tu { background: #8D6E63; }
+
+.gz-brief {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #888;
+  text-align: center;
+}
+
+.canggan {
+  display: flex;
+  align-items: baseline;
+  gap: 12rpx;
+  margin-top: 16rpx;
+  font-size: 24rpx;
+}
+
+.canggan-label {
+  color: #999;
+  flex-shrink: 0;
+}
+
+.canggan-value {
+  color: #666;
+}
+
+.pillar-meaning {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  color: #555;
+  line-height: 1.5;
+}
+
+.gz-detail {
+  margin-top: 12rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.gz-detail-line {
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.5;
+}
+
+/* 五行详解 */
+.wuxing-detail {
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f0ede8;
+}
+.wuxing-detail:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.wuxing-head {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 12rpx;
+}
+
+.wuxing-name {
+  flex-shrink: 0;
+}
+
+.wuxing-percent {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #333;
+}
+
+.wuxing-brief {
+  font-size: 24rpx;
+  color: #C19A6B;
+}
+
+.wuxing-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-bottom: 12rpx;
+}
+
+.meta-item {
+  font-size: 22rpx;
+  color: #888;
+  padding: 4rpx 16rpx;
+  background: #faf8f5;
+  border-radius: 16rpx;
+}
+
+.wuxing-detail-text {
+  font-size: 26rpx;
+  color: #555;
+  line-height: 1.6;
+}
+
+/* 喜用神详解 */
+.xiyong-strength {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.strength-label {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #8B4513;
+}
+
+.strength-ratio {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.xiyong-list {
+  background: #faf8f5;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.xiyong-row {
+  display: flex;
+  align-items: baseline;
+  gap: 16rpx;
+  padding: 8rpx 0;
+}
+
+.xiyong-label {
+  font-size: 24rpx;
+  color: #999;
+  flex-shrink: 0;
+  width: 80rpx;
+}
+
+.xiyong-value {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #8B4513;
+}
+
+.xiyong-explanation {
+  font-size: 26rpx;
+  color: #555;
+  line-height: 1.7;
+}

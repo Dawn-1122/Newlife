@@ -6,8 +6,9 @@
 </wxs>
 <view class="container">
   <!-- 八字摘要 -->
-  <view class="card bazi-summary" wx:if="{{bazi}}">
+  <view class="card bazi-summary" wx:if="{{bazi}}" bindtap="onBaziTap">
     <view class="bazi-title">八字排盘</view>
+    <view class="bazi-more">查看详解 ›</view>
     <view class="bazi-pillars">
       <view class="pillar">
         <text class="pillar-label">年柱</text>

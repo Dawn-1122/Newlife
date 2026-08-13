@@ -18,6 +18,10 @@ from app.core.constants import (
     TIANGAN_YINYANG, DIZHI_CANGGAN,
     WUXING_SHENG, WUXING_KE, WUXING_LIST, DIZHI_SHENGXIAO,
 )
+from app.core.bazi_explanations import (
+    WUXING_EXPLANATIONS, TIANGAN_EXPLANATIONS, DIZHI_EXPLANATIONS,
+    PILLAR_EXPLANATIONS, CANGGAN_LEVELS, build_xiyong_explanation,
+)
 
 
 class BaziEngine:
@@ -212,10 +216,17 @@ class BaziEngine:
 
         # 喜用神判定
         xiyong = cls._determine_xiyong(day_master, wuxing_analysis)
+        xiyong["explanation"] = build_xiyong_explanation(xiyong)
 
         # 农历
         lunar = cls.solar_to_lunar(year, month, day)
         shengxiao = DIZHI_SHENGXIAO.get(year_gz[1], "")
+
+        # 四柱详解
+        pillars_detail = cls._build_pillars_detail(year_gz, month_gz, day_gz, hour_gz)
+
+        # 五行详解
+        wuxing_detail = cls._build_wuxing_detail(wuxing_analysis)
 
         return {
             "solar_date": f"{year}-{month:02d}-{day:02d} {hour:02d}:{minute:02d}",
@@ -228,11 +239,81 @@ class BaziEngine:
                 "day": day_gz,
                 "hour": hour_gz,
             },
+            "pillars_detail": pillars_detail,
             "day_master": day_master,
             "day_master_wuxing": day_master_wuxing,
             "wuxing": wuxing_analysis,
+            "wuxing_detail": wuxing_detail,
             "xiyong": xiyong,
         }
+
+    # ── 解释组装 ──
+
+    @staticmethod
+    def _build_pillars_detail(
+        year_gz: str, month_gz: str, day_gz: str, hour_gz: str
+    ) -> list[dict]:
+        """组装四柱详解（含天干地支五行、阴阳、藏干、柱位含义）"""
+        positions = ["year", "month", "day", "hour"]
+        ganzhis = [year_gz, month_gz, day_gz, hour_gz]
+        detail = []
+
+        for pos, gz in zip(positions, ganzhis):
+            gan, zhi = gz[0], gz[1]
+            gan_info = TIANGAN_EXPLANATIONS[gan]
+            zhi_info = DIZHI_EXPLANATIONS[zhi]
+            pillar_info = PILLAR_EXPLANATIONS[pos]
+
+            # 地支藏干（本气/中气/余气）
+            canggan = []
+            for i, (cg, weight) in enumerate(DIZHI_CANGGAN[zhi]):
+                level = CANGGAN_LEVELS[i] if i < len(CANGGAN_LEVELS) else ""
+                canggan.append({
+                    "gan": cg,
+                    "wuxing": TIANGAN_WUXING[cg],
+                    "level": level,
+                })
+
+            detail.append({
+                "position": pos,
+                "name": pillar_info["name"],
+                "meaning": pillar_info["meaning"],
+                "ganzhi": gz,
+                "tian_gan": gan,
+                "tian_gan_wuxing": gan_info["wuxing"],
+                "tian_gan_yinyang": gan_info["yinyang"],
+                "tian_gan_brief": gan_info["brief"],
+                "tian_gan_detail": gan_info["detail"],
+                "di_zhi": zhi,
+                "di_zhi_wuxing": zhi_info["wuxing"],
+                "di_zhi_yinyang": zhi_info["yinyang"],
+                "di_zhi_shengxiao": zhi_info["shengxiao"],
+                "di_zhi_brief": zhi_info["brief"],
+                "di_zhi_detail": zhi_info["detail"],
+                "canggan": canggan,
+            })
+
+        return detail
+
+    @staticmethod
+    def _build_wuxing_detail(wuxing_analysis: dict) -> list[dict]:
+        """组装五行详解（含占比、五德、方位、季节、颜色、脏腑、释义）"""
+        detail = []
+        for w in WUXING_LIST:
+            info = WUXING_EXPLANATIONS[w]
+            detail.append({
+                "name": w,
+                "percent": wuxing_analysis["percentages"].get(w, 0),
+                "count": round(wuxing_analysis["counts"].get(w, 0), 2),
+                "nature": info["nature"],
+                "direction": info["direction"],
+                "season": info["season"],
+                "color": info["color"],
+                "organ": info["organ"],
+                "brief": info["brief"],
+                "detail": info["detail"],
+            })
+        return detail
 
     # ── 五行分析 ──
 

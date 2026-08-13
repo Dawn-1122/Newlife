@@ -9,6 +9,18 @@
   margin-bottom: 20rpx;
 }
 
+.bazi-more {
+  position: absolute;
+  top: 30rpx;
+  right: 30rpx;
+  font-size: 24rpx;
+  color: #C19A6B;
+}
+
+.bazi-summary {
+  position: relative;
+}
+
 .bazi-pillars {
   display: flex;
   justify-content: space-around;

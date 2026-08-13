@@ -1,0 +1,100 @@
+<wxs module="m">
+  var wuxingMap = { '金': 'wx-jin', '木': 'wx-mu', '水': 'wx-shui', '火': 'wx-huo', '土': 'wx-tu' }
+  module.exports = {
+    wx: function(v) { return wuxingMap[v] || '' }
+  }
+</wxs>
+<view class="container">
+  <!-- 头部总览 -->
+  <view class="card bazi-header" wx:if="{{bazi}}">
+    <view class="header-row">
+      <text class="header-date">{{bazi.lunar_date}}</text>
+      <text class="header-shengxiao">生肖 · {{bazi.shengxiao}}</text>
+    </view>
+    <view class="day-master">
+      <text class="dm-label">日主</text>
+      <text class="dm-value">{{bazi.day_master}}</text>
+      <text class="wuxing-tag {{m.wx(bazi.day_master_wuxing)}}">{{bazi.day_master_wuxing}}</text>
+    </view>
+    <view class="header-note">日主即代表「自己」的天干，是八字命局的核心</view>
+  </view>
+
+  <!-- 四柱详解 -->
+  <view class="card">
+    <view class="section-title">四柱详解</view>
+    <view class="pillar-detail" wx:for="{{bazi.pillars_detail}}" wx:key="position">
+      <view class="pillar-head">
+        <text class="pillar-name">{{item.name}}</text>
+        <text class="pillar-ganzhi">{{item.ganzhi}}</text>
+      </view>
+
+      <view class="gan-zhi-row">
+        <view class="gz-block">
+          <text class="gz-char">{{item.tian_gan}}</text>
+          <text class="gz-tag {{m.wx(item.tian_gan_wuxing)}}">{{item.tian_gan_wuxing}} · {{item.tian_gan_yinyang}}</text>
+          <text class="gz-brief">{{item.tian_gan_brief}}</text>
+        </view>
+        <view class="gz-block">
+          <text class="gz-char">{{item.di_zhi}}</text>
+          <text class="gz-tag {{m.wx(item.di_zhi_wuxing)}}">{{item.di_zhi_wuxing}} · {{item.di_zhi_yinyang}}</text>
+          <text class="gz-brief">{{item.di_zhi_brief}}</text>
+        </view>
+      </view>
+
+      <view class="canggan" wx:if="{{item.cangganText}}">
+        <text class="canggan-label">藏干</text>
+        <text class="canggan-value">{{item.cangganText}}</text>
+      </view>
+
+      <view class="pillar-meaning">{{item.meaning}}</view>
+      <view class="gz-detail">
+        <text class="gz-detail-line">{{item.tian_gan_detail}}</text>
+        <text class="gz-detail-line">{{item.di_zhi_detail}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 五行详解 -->
+  <view class="card">
+    <view class="section-title">五行详解</view>
+    <view class="wuxing-detail" wx:for="{{bazi.wuxing_detail}}" wx:key="name">
+      <view class="wuxing-head">
+        <text class="wuxing-name wuxing-tag {{m.wx(item.name)}}">{{item.name}}</text>
+        <text class="wuxing-percent">{{item.percent}}%</text>
+        <text class="wuxing-brief">{{item.brief}}</text>
+      </view>
+      <view class="wuxing-meta">
+        <text class="meta-item">五德 · {{item.nature}}</text>
+        <text class="meta-item">方位 · {{item.direction}}</text>
+        <text class="meta-item">季节 · {{item.season}}</text>
+        <text class="meta-item">颜色 · {{item.color}}</text>
+        <text class="meta-item">脏腑 · {{item.organ}}</text>
+      </view>
+      <view class="wuxing-detail-text">{{item.detail}}</view>
+    </view>
+  </view>
+
+  <!-- 喜用神详解 -->
+  <view class="card">
+    <view class="section-title">喜用神详解</view>
+    <view class="xiyong-strength">
+      <text class="strength-label">{{bazi.xiyong.strength_label}}</text>
+      <text class="strength-ratio">日主力量占比 {{bazi.xiyong.strength_ratio}}%</text>
+    </view>
+    <view class="xiyong-list">
+      <view class="xiyong-row">
+        <text class="xiyong-label">喜神</text>
+        <text class="xiyong-value">{{xiyongText}}</text>
+      </view>
+      <view class="xiyong-row">
+        <text class="xiyong-label">用神</text>
+        <text class="xiyong-value">{{bazi.xiyong.yong_wuxing}}</text>
+      </view>
+      <view class="xiyong-row" wx:if="{{jiyongText}}">
+        <text class="xiyong-label">忌神</text>
+        <text class="xiyong-value">{{jiyongText}}</text>
+      </view>
+    </view>
+    <view class="xiyong-explanation">{{bazi.xiyong.explanation}}</view>
+  </view>
+</view>
