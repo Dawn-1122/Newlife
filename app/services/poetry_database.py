@@ -39,12 +39,13 @@ class PoetryDatabase:
         return [p for p in self._poems if p["source"] == source]
 
     def get_by_gender(self, gender: str) -> list[dict]:
-        """按适合性别查找"""
-        if gender == "中":
+        """按适合性别查找（兼容 male/female 与 男/女）"""
+        g = {"male": "男", "female": "女"}.get(gender, gender)
+        if g == "中":
             return self._poems
         return [
             p for p in self._poems
-            if p["gender"] in (gender, "中")
+            if p["gender"] in (g, "中")
         ]
 
     def filter(
@@ -63,7 +64,8 @@ class PoetryDatabase:
         if source:
             result = [p for p in result if p["source"] == source]
         if gender and gender != "中":
-            result = [p for p in result if p["gender"] in (gender, "中")]
+            g = {"male": "男", "female": "女"}.get(gender, gender)
+            result = [p for p in result if p["gender"] in (g, "中")]
         return result
 
     def get_all(self) -> list[dict]:

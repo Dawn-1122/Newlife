@@ -152,21 +152,50 @@ class NamingEngine:
     def _match_poetry(
         self, xiyong_wuxing: list[str] = None, gender: str = "male"
     ) -> list[dict]:
-        """匹配诗词典故"""
+        """
+        匹配诗词典故
+
+        返回去重后的诗词列表（每首只返回一次），保留所有有可用推荐字的诗。
+        喜用神匹配不再硬性过滤，而是交由评分排序（_evaluate_name 的 bazi_score 已占权重），
+        这样同源组名能覆盖足够多的诗词，含义连贯的名字不会被八字偏好误伤。
+        """
         poems = self.poetry_db.get_by_gender(gender)
 
-        # 如果有喜用神，优先匹配推荐用字五行匹配的诗词
         matched = []
+        seen = set()
         for poem in poems:
-            for char in poem["recommend_chars"]:
-                char_info = self.char_db.get_char(char)
-                if char_info:
-                    if xiyong_wuxing and char_info["wuxing"] in xiyong_wuxing:
-                        matched.append({**poem, "matched_char": char})
-                    elif not xiyong_wuxing:
-                        matched.append({**poem, "matched_char": char})
+            key = (poem["source"], poem["title"])
+            if key in seen:
+                continue
+            seen.add(key)
+
+            # 只要有可用字（字库中存在）就纳入
+            available = [c for c in poem["recommend_chars"] if self.char_db.get_char(c)]
+            if not available:
+                continue
+
+            matched.append(poem)
 
         return matched
+
+    def _get_valid_poem_chars(
+        self, poem: dict, gender: str, xiyong_wuxing: list[str] = None
+    ) -> list[dict]:
+        """从一首诗词的推荐字里筛选出可用字（字库存在 + 符合性别），喜用神匹配的字排前"""
+        valid = []
+        for char in poem["recommend_chars"]:
+            ci = self.char_db.get_char(char)
+            if not ci:
+                continue
+            if gender == "male" and ci["gender"] not in ("男", "中"):
+                continue
+            if gender == "female" and ci["gender"] not in ("女", "中"):
+                continue
+            valid.append(ci)
+        # 喜用神匹配的字排前面，这样同源组名时优先用补益八字的字
+        if xiyong_wuxing:
+            valid.sort(key=lambda c: 0 if c["wuxing"] in xiyong_wuxing else 1)
+        return valid
 
     def _compose_names(
         self,
@@ -181,41 +210,40 @@ class NamingEngine:
         names = []
         seen_names = set()
 
-        # 策略1：诗词优先——用诗词推荐字组名
-        for pm in poetry_matches:
-            char = pm["matched_char"]
-            char_info = self.char_db.get_char(char)
-            if not char_info:
-                continue
+        # 喜用神（用于同源组名时优先取补益八字的字）
+        xiyong_wuxing = None
+        if bazi_result:
+            xiyong_wuxing = bazi_result["xiyong"]["xi_wuxing"]
+
+        # 策略1：同源组名——名字的两个字出自同一首诗词，含义完整连贯
+        for poem in poetry_matches:
+            valid_chars = self._get_valid_poem_chars(poem, gender, xiyong_wuxing)
 
             if name_length == 1:
-                given_name = char
-            else:
-                # 双名：诗词字 + 另一个候选字
-                # 从候选字中找一个搭配
-                for other in candidate_chars:
-                    if other["char"] == char:
-                        continue
-                    given_name = char + other["char"]
+                for ci in valid_chars:
+                    given_name = ci["char"]
                     if given_name in seen_names:
                         continue
                     seen_names.add(given_name)
                     name_data = self._evaluate_name(
-                        surname, given_name, [char_info, other],
-                        pm, bazi_result
+                        surname, given_name, [ci], poem, bazi_result
                     )
                     if name_data:
                         names.append(name_data)
-                    break  # 每个诗词字只配一个
-
-            if name_length == 1 and given_name not in seen_names:
-                seen_names.add(given_name)
-                name_data = self._evaluate_name(
-                    surname, given_name, [char_info],
-                    pm, bazi_result
-                )
-                if name_data:
-                    names.append(name_data)
+            else:
+                # 双名：从同一首诗词里取两个字
+                for i in range(len(valid_chars)):
+                    for j in range(i + 1, len(valid_chars)):
+                        c1, c2 = valid_chars[i], valid_chars[j]
+                        given_name = c1["char"] + c2["char"]
+                        if given_name in seen_names:
+                            continue
+                        seen_names.add(given_name)
+                        name_data = self._evaluate_name(
+                            surname, given_name, [c1, c2], poem, bazi_result
+                        )
+                        if name_data:
+                            names.append(name_data)
 
         # 策略2：随机组合候选字（补充数量）
         if len(names) < 15:
@@ -287,18 +315,24 @@ class NamingEngine:
                     matched += 1
             bazi_score = 60 + int(matched / len(chars_info) * 40)
 
-        # 诗词加分
+        # 诗词加分（同源 > 单字出处 > 无）
         poetry_score = 0
         if poetry_data:
-            poetry_score = 15  # 有诗词出处加分
+            rec_chars = poetry_data.get("recommend_chars", [])
+            name_chars = [ci["char"] for ci in chars_info]
+            if name_chars and all(c in rec_chars for c in name_chars):
+                poetry_score = 25  # 同源：名字的字都出自同一首诗词
+            else:
+                poetry_score = 10  # 单字出处
 
         # 综合评分
-        # 音律30% + 五格25% + 八字25% + 诗词10% + 基础10%
+        # 音律25% + 五格20% + 八字25% + 诗词20% + 基础10%
+        poetry_component = poetry_score / 25 * 100  # 同源100 / 单字40 / 无0
         overall = (
-            phonetics["score"] * 0.30
-            + wuge.get("total_score", 60) * 0.25
+            phonetics["score"] * 0.25
+            + wuge.get("total_score", 60) * 0.20
             + bazi_score * 0.25
-            + (70 + poetry_score) * 0.10
+            + poetry_component * 0.20
             + 70 * 0.10
         )
         overall = round(overall)

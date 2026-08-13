@@ -43,8 +43,9 @@ class CharDatabase:
         """按五行筛选"""
         result = [c for c in self._chars if c["wuxing"] == wuxing]
         if gender and gender != "中":
-            # 优先匹配性别，但也包含中性
-            result = [c for c in result if c["gender"] in (gender, "中")]
+            # 优先匹配性别，但也包含中性（兼容 male/female 与 男/女）
+            g = {"male": "男", "female": "女"}.get(gender, gender)
+            result = [c for c in result if c["gender"] in (g, "中")]
         return result
 
     def get_by_strokes(self, min_strokes: int = 1, max_strokes: int = 30) -> list[dict]:
@@ -67,7 +68,8 @@ class CharDatabase:
         if wuxing:
             result = [c for c in result if c["wuxing"] == wuxing]
         if gender and gender != "中":
-            result = [c for c in result if c["gender"] in (gender, "中")]
+            g = {"male": "男", "female": "女"}.get(gender, gender)
+            result = [c for c in result if c["gender"] in (g, "中")]
         if min_strokes is not None:
             result = [c for c in result if c["kangxi_strokes"] >= min_strokes]
         if max_strokes is not None:
