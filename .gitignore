@@ -34,3 +34,4 @@ output/
 
 # 微信小程序
 miniprogram/miniprogram_npm/
+miniprogram/project.private.config.json

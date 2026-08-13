@@ -1,9 +1,9 @@
 /**
  * 网络请求工具
  */
-const app = getApp()
 
 function request(url, method = 'GET', data = {}) {
+  const app = getApp()
   return new Promise((resolve, reject) => {
     wx.request({
       url: app.globalData.apiBase + url,

@@ -28,9 +28,15 @@ Page({
       ? result.bazi.xiyong.xi_wuxing.join('、')
       : ''
 
+    // 给每个名字加上拼音展示文本
+    const names = (result.names || []).map(function(n) {
+      n.pinyinText = (n.phonetics && n.phonetics.pinyins) ? n.phonetics.pinyins.join(' · ') : ''
+      return n
+    })
+
     this.setData({
       bazi: result.bazi,
-      names: result.names,
+      names: names,
       xiyongText,
       wuxingList
     })

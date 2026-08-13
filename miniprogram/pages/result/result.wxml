@@ -1,3 +1,9 @@
+<wxs module="m">
+  var wuxingMap = { '金': 'wx-jin', '木': 'wx-mu', '水': 'wx-shui', '火': 'wx-huo', '土': 'wx-tu' }
+  module.exports = {
+    wx: function(v) { return wuxingMap[v] || '' }
+  }
+</wxs>
 <view class="container">
   <!-- 八字摘要 -->
   <view class="card bazi-summary" wx:if="{{bazi}}">
@@ -26,7 +32,7 @@
     </view>
     <view class="wuxing-bar">
       <view class="wuxing-item" wx:for="{{wuxingList}}" wx:key="name">
-        <view class="wuxing-label {{item.name}}">{{item.name}}</view>
+        <view class="wuxing-label {{m.wx(item.name)}}">{{item.name}}</view>
         <view class="wuxing-percent">{{item.percent}}%</view>
       </view>
     </view>
@@ -42,7 +48,7 @@
         </view>
       </view>
 
-      <view class="name-pinyin">{{item.phonetics.pinyins[0]}}<text wx:if="{{item.phonetics.pinyins.length > 1}} · {{item.phonetics.pinyins[1]}}</text><text wx:if="{{item.phonetics.pinyins.length > 2}} · {{item.phonetics.pinyins[2]}}</text></view>
+      <view class="name-pinyin">{{item.pinyinText}}</view>
 
       <view class="name-poetry" wx:if="{{item.poetry}}">
         <text class="poetry-source">「{{item.poetry.source}}·{{item.poetry.title}}」</text>

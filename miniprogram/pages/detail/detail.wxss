@@ -94,16 +94,57 @@
   color: #666;
 }
 
-.wuxing-tag.金 { background: #FFF8E1; color: #C4A21E; }
-.wuxing-tag.木 { background: #E8F5E9; color: #4CAF50; }
-.wuxing-tag.水 { background: #E3F2FD; color: #2196F3; }
-.wuxing-tag.火 { background: #FBE9E7; color: #FF5722; }
-.wuxing-tag.土 { background: #EFEBE9; color: #8D6E63; }
+.wuxing-tag.wx-jin { background: #FFF8E1; color: #C4A21E; }
+.wuxing-tag.wx-mu { background: #E8F5E9; color: #4CAF50; }
+.wuxing-tag.wx-shui { background: #E3F2FD; color: #2196F3; }
+.wuxing-tag.wx-huo { background: #FBE9E7; color: #FF5722; }
+.wuxing-tag.wx-tu { background: #EFEBE9; color: #8D6E63; }
 
 .char-meaning {
   font-size: 26rpx;
   color: #666;
   line-height: 1.5;
+}
+
+/* 说文解字 */
+.char-shuowen {
+  margin-top: 12rpx;
+  padding: 16rpx 20rpx;
+  background: #faf8f5;
+  border-radius: 10rpx;
+  border-left: 4rpx solid #C19A6B;
+}
+
+.shuowen-label {
+  display: block;
+  font-size: 22rpx;
+  color: #C19A6B;
+  font-weight: 500;
+  margin-bottom: 6rpx;
+}
+
+.shuowen-text {
+  font-size: 26rpx;
+  color: #7a6a55;
+  line-height: 1.7;
+}
+
+/* 字源释义 */
+.char-detail-text {
+  margin-top: 10rpx;
+}
+
+.detail-label {
+  display: block;
+  font-size: 22rpx;
+  color: #999;
+  margin-bottom: 6rpx;
+}
+
+.detail-text {
+  font-size: 26rpx;
+  color: #555;
+  line-height: 1.7;
 }
 
 /* 诗词 */
@@ -198,9 +239,9 @@
   margin-top: 4rpx;
 }
 
-.wuge-luck.大吉 { color: #4CAF50; }
-.wuge-luck.吉 { color: #8BC34A; }
-.wuge-luck.凶 { color: #e57373; }
+.wuge-luck.luck-daji { color: #4CAF50; }
+.wuge-luck.luck-ji { color: #8BC34A; }
+.wuge-luck.luck-xiong { color: #e57373; }
 
 .wuge-desc {
   font-size: 26rpx;

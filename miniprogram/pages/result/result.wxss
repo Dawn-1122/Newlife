@@ -66,11 +66,11 @@
   color: #fff;
 }
 
-.wuxing-label.金 { background: #C4A21E; }
-.wuxing-label.木 { background: #4CAF50; }
-.wuxing-label.水 { background: #2196F3; }
-.wuxing-label.火 { background: #FF5722; }
-.wuxing-label.土 { background: #8D6E63; }
+.wuxing-label.wx-jin { background: #C4A21E; }
+.wuxing-label.wx-mu { background: #4CAF50; }
+.wuxing-label.wx-shui { background: #2196F3; }
+.wuxing-label.wx-huo { background: #FF5722; }
+.wuxing-label.wx-tu { background: #8D6E63; }
 
 .wuxing-percent {
   font-size: 22rpx;

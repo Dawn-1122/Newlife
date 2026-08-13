@@ -101,6 +101,8 @@ async def analyze_name(request: NameAnalysisRequest):
                 "wuxing": info["wuxing"],
                 "kangxi_strokes": info["kangxi_strokes"],
                 "meaning": info["meaning"],
+                "shuowen": info.get("shuowen", ""),
+                "detail": info.get("detail", ""),
             })
         else:
             chars_info.append({

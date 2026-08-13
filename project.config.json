@@ -1,0 +1,41 @@
+{
+  "description": "美名集 - 有据可循的起名工具",
+  "miniprogramRoot": "miniprogram/",
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "newFeature": true,
+    "autoAudits": false,
+    "checkInvalidKey": true,
+    "checkSiteMap": true,
+    "uploadWithSourceMap": true,
+    "useMultiFrameRuntime": true,
+    "useApiHook": true,
+    "useApiHostProcess": true,
+    "showShadowRootInWxmlPanel": true,
+    "compileHotReLoad": true,
+    "lazyloadPlaceholderEnable": false,
+    "useStaticServer": true,
+    "bundle": false,
+    "userConfirmedBundleSwitch": false,
+    "scopeDataCheck": false,
+    "coverView": true,
+    "uglifyFileName": false,
+    "packNpmManually": false,
+    "enableEngineNative": false,
+    "nodeModules": false,
+    "useIsolateContext": true
+  },
+  "compileType": "miniprogram",
+  "libVersion": "3.3.4",
+  "appid": "",
+  "projectname": "meimingji",
+  "condition": {}
+}

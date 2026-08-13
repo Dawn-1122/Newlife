@@ -15,6 +15,12 @@
 
 数据来源：康熙字典 + 公开起名字库整理
 注意：康熙笔画与简体笔画不同，五格数理计算必须用康熙笔画
+
+增强字段（由 enrich_char_db.py 添加）：
+- shuowen: 说文解字原文
+- detail: 详细释义（字源、本义、引申义、起名寓意）
+
+生成后请执行: python scripts/enrich_char_db.py
 """
 
 import json

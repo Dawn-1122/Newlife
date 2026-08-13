@@ -316,6 +316,8 @@ class NamingEngine:
                     "wuxing": ci["wuxing"],
                     "kangxi_strokes": ci["kangxi_strokes"],
                     "meaning": ci["meaning"],
+                    "shuowen": ci.get("shuowen", ""),
+                    "detail": ci.get("detail", ""),
                 }
                 for ci in chars_info
             ],
