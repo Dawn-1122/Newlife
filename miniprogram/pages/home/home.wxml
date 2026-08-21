@@ -1,0 +1,53 @@
+<view class="container">
+  <!-- 头部 -->
+  <view class="header">
+    <view class="title">美名集</view>
+    <view class="subtitle">有据可循的起名工具</view>
+    <view class="tagline">诗词典故 · 五行音律 · 每个名字都有出处</view>
+  </view>
+
+  <!-- 主入口卡片 -->
+  <view class="entry-grid">
+    <view
+      class="entry-card {{item.available ? '' : 'disabled'}}"
+      wx:for="{{entries}}"
+      wx:key="key"
+      bindtap="onEntryTap"
+      data-key="{{item.key}}"
+      data-url="{{item.url}}"
+      data-available="{{item.available}}"
+    >
+      <view class="entry-icon">{{item.icon}}</view>
+      <view class="entry-title">{{item.title}}</view>
+      <view class="entry-desc">{{item.desc}}</view>
+      <view class="entry-badge" wx:if="{{!item.available}}">即将上线</view>
+    </view>
+  </view>
+
+  <!-- 更多入口（折叠） -->
+  <view class="more-section">
+    <view class="more-toggle" bindtap="onToggleMore">
+      <text>更多</text>
+      <text class="more-arrow">{{moreExpanded ? '收起' : '展开'}} ›</text>
+    </view>
+
+    <view class="more-grid" wx:if="{{moreExpanded}}">
+      <view
+        class="entry-card more-card disabled"
+        wx:for="{{moreEntries}}"
+        wx:key="key"
+        bindtap="onMoreEntryTap"
+      >
+        <view class="entry-icon">{{item.icon}}</view>
+        <view class="entry-title">{{item.title}}</view>
+        <view class="entry-badge">即将上线</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部说明 -->
+  <view class="footer-note">
+    <text>每个名字附诗词出处、五行分析、音律评分</text>
+    <text>数据仅供参考，起名是一件慎重的事</text>
+  </view>
+</view>

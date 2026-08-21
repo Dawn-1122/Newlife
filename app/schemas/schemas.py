@@ -19,6 +19,10 @@ class NamingRequest(BaseModel):
     max_results: int = Field(20, ge=1, le=50, description="最大返回数量")
     use_bazi: bool = Field(True, description="是否使用八字分析")
     use_poetry: bool = Field(True, description="是否使用诗词典故")
+    style: Optional[str] = Field(None, description="风格偏好: classic|modern|grand|fresh")
+    meanings: Optional[list[str]] = Field(None, max_length=3, description="期望寓意，最多3个")
+    avoid_chars: Optional[list[str]] = Field(None, description="避讳字（单个汉字列表）")
+    industry: Optional[str] = Field(None, description="行业 code，映射五行（P1 启用）")
 
 
 class NameAnalysisRequest(BaseModel):
@@ -30,6 +34,23 @@ class NameAnalysisRequest(BaseModel):
     hour: Optional[int] = Field(12, ge=0, le=23)
     minute: Optional[int] = Field(0, ge=0, le=59)
     gender: Optional[str] = Field(None, pattern="^(male|female)$")
+
+
+class PrenatalRequest(BaseModel):
+    """预产期起名请求（孕期参考/范围建议）"""
+    due_date: str = Field(..., description="预产期 YYYY-MM-DD")
+    range_days: int = Field(7, description="预产期前后浮动天数，取值 0|3|7|14")
+    gender: Optional[str] = Field("male", pattern="^(male|female)$", description="性别，用于候选字推荐")
+
+
+class PrenatalResponse(BaseModel):
+    """预产期起名响应"""
+    due_date: str
+    range_days: int
+    range: dict
+    certain: dict
+    probabilistic: dict
+    suggestion: dict
 
 
 class CharInfoResponse(BaseModel):

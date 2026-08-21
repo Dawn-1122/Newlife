@@ -1,9 +1,14 @@
 {
   "pages": [
-    "pages/index/index",
+    "pages/home/home",
+    "pages/name/name",
+    "pages/prenatal-result/prenatal-result",
+    "pages/analyze/analyze",
+    "pages/analyze-result/analyze-result",
     "pages/result/result",
     "pages/detail/detail",
-    "pages/bazi/bazi"
+    "pages/bazi/bazi",
+    "pages/index/index"
   ],
   "window": {
     "backgroundTextStyle": "light",

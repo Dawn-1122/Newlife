@@ -1,0 +1,107 @@
+<wxs module="m">
+  var wuxingMap = { '金': 'wx-jin', '木': 'wx-mu', '水': 'wx-shui', '火': 'wx-huo', '土': 'wx-tu' }
+  var luckMap = { '大吉': 'luck-daji', '吉': 'luck-ji', '凶': 'luck-xiong' }
+  module.exports = {
+    wx: function(v) { return wuxingMap[v] || '' },
+    luck: function(v) { return luckMap[v] || '' }
+  }
+</wxs>
+<view class="container">
+  <!-- 名字展示 -->
+  <view class="card name-display">
+    <view class="name-main">{{result.full_name}}</view>
+    <view class="name-pinyin">{{pinyinText}}</view>
+  </view>
+
+  <!-- 用字解析 -->
+  <view class="card">
+    <view class="section-title">用字解析</view>
+    <view class="char-item" wx:for="{{result.chars_info}}" wx:key="char">
+      <view class="char-display">
+        <text class="char-text">{{item.char}}</text>
+        <text class="char-pinyin">{{item.pinyin}}</text>
+      </view>
+      <view class="char-detail">
+        <view class="char-tags">
+          <text class="tag wuxing-tag {{m.wx(item.wuxing)}}">五行·{{item.wuxing}}</text>
+          <text class="tag">康熙·{{item.kangxi_strokes}}画</text>
+        </view>
+        <view class="char-meaning">{{item.meaning}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 音律分析 -->
+  <view class="card">
+    <view class="section-title">音律分析</view>
+    <view class="phon-row">
+      <text class="phon-label">声调搭配</text>
+      <text class="phon-value">{{result.phonetics.rhythm}}</text>
+    </view>
+    <view class="phon-row">
+      <text class="phon-label">音律评分</text>
+      <text class="phon-value">{{result.phonetics.score}}分</text>
+    </view>
+    <view class="phon-desc">{{result.phonetics.description}}</view>
+  </view>
+
+  <!-- 五格数理 -->
+  <view class="card">
+    <view class="section-title">五格数理</view>
+    <view class="wuge-grid">
+      <view class="wuge-item">
+        <text class="wuge-name">天格</text>
+        <text class="wuge-num">{{result.wuge.tian_ge.value}}</text>
+        <text class="wuge-luck {{m.luck(result.wuge.tian_ge.luck)}}">{{result.wuge.tian_ge.luck}}</text>
+      </view>
+      <view class="wuge-item">
+        <text class="wuge-name">人格</text>
+        <text class="wuge-num">{{result.wuge.ren_ge.value}}</text>
+        <text class="wuge-luck {{m.luck(result.wuge.ren_ge.luck)}}">{{result.wuge.ren_ge.luck}}</text>
+      </view>
+      <view class="wuge-item">
+        <text class="wuge-name">地格</text>
+        <text class="wuge-num">{{result.wuge.di_ge.value}}</text>
+        <text class="wuge-luck {{m.luck(result.wuge.di_ge.luck)}}">{{result.wuge.di_ge.luck}}</text>
+      </view>
+      <view class="wuge-item">
+        <text class="wuge-name">外格</text>
+        <text class="wuge-num">{{result.wuge.wai_ge.value}}</text>
+        <text class="wuge-luck {{m.luck(result.wuge.wai_ge.luck)}}">{{result.wuge.wai_ge.luck}}</text>
+      </view>
+      <view class="wuge-item">
+        <text class="wuge-name">总格</text>
+        <text class="wuge-num">{{result.wuge.zong_ge.value}}</text>
+        <text class="wuge-luck {{m.luck(result.wuge.zong_ge.luck)}}">{{result.wuge.zong_ge.luck}}</text>
+      </view>
+    </view>
+    <view class="wuge-desc">{{result.wuge.description}}</view>
+  </view>
+
+  <!-- 八字匹配 -->
+  <view class="card" wx:if="{{result.bazi_match}}">
+    <view class="section-title">八字匹配</view>
+    <view class="phon-row">
+      <text class="phon-label">匹配评分</text>
+      <text class="phon-value">{{result.bazi_match.match_score}}分</text>
+    </view>
+    <view class="phon-row" wx:if="{{matchedWuxingText}}">
+      <text class="phon-label">喜用神补益</text>
+      <text class="phon-value">{{matchedWuxingText}}</text>
+    </view>
+  </view>
+
+  <!-- 诗词出处（多条） -->
+  <view class="card" wx:if="{{poetryList.length}}">
+    <view class="section-title">诗词出处</view>
+    <view class="poetry-block" wx:for="{{poetryList}}" wx:key="title">
+      <view class="poetry-header">
+        <text class="poetry-source">「{{item.source}}·{{item.title}}」</text>
+        <text class="poetry-author">{{item.author}}（{{item.dynasty}}）</text>
+      </view>
+      <view class="poetry-text">{{item.text}}</view>
+    </view>
+  </view>
+
+  <button class="btn-primary home-btn" bindtap="onBackHome">返回首页</button>
+</view>

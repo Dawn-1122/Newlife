@@ -55,5 +55,16 @@ Page({
     wx.navigateTo({
       url: '/pages/bazi/bazi'
     })
+  },
+
+  onBackHome() {
+    wx.reLaunch({ url: '/pages/home/home' })
+  },
+
+  onShareAppMessage() {
+    return {
+      title: '美名集 · 有据可循的起名工具',
+      path: '/pages/home/home'
+    }
   }
 })

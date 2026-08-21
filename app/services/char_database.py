@@ -48,6 +48,19 @@ class CharDatabase:
             result = [c for c in result if c["gender"] in (g, "中")]
         return result
 
+    def get_lucky_by_wuxing(
+        self, wuxing: str, gender: str = None, limit: int = 6
+    ) -> list[dict]:
+        """按五行筛选「吉」字（用于产前安全字推荐等）"""
+        result = [
+            c for c in self._chars
+            if c["wuxing"] == wuxing and c["luck"] == "吉"
+        ]
+        if gender and gender != "中":
+            g = {"male": "男", "female": "女"}.get(gender, gender)
+            result = [c for c in result if c["gender"] in (g, "中")]
+        return result[:limit]
+
     def get_by_strokes(self, min_strokes: int = 1, max_strokes: int = 30) -> list[dict]:
         """按康熙笔画范围筛选"""
         return [

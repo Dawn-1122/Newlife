@@ -79,4 +79,7 @@
   <view class="empty" wx:if="{{!names.length}}">
     <text>暂无结果，请调整条件后重试</text>
   </view>
+
+  <!-- 底部操作 -->
+  <button class="btn-primary home-btn" bindtap="onBackHome">返回首页</button>
 </view>

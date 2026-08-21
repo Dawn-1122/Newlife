@@ -39,7 +39,7 @@ Page({
     const name = this.data.name
     return {
       title: `「${name.full_name}」综合评分${name.scores.overall}分`,
-      path: '/pages/index/index'
+      path: '/pages/home/home'
     }
   }
 })

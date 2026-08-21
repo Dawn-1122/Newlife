@@ -1,0 +1,67 @@
+classDiagram
+    class NamingRequest {
+        +str surname
+        +str gender
+        +int year
+        +int month
+        +int day
+        +int hour
+        +int minute
+        +int name_length
+        +int max_results
+        +bool use_bazi
+        +bool use_poetry
+        +str style
+        +list[str] meanings
+        +list[str] avoid_chars
+        +str industry
+    }
+    class PrenatalRequest {
+        +str due_date
+        +int range_days
+        +str gender
+    }
+    class PrenatalResponse {
+        +str due_date
+        +int range_days
+        +dict range
+        +dict certain
+        +dict probabilistic
+        +dict suggestion
+    }
+    class PrenatalEngine {
+        -BaziEngine bazi
+        -CharDatabase char_db
+        +dict generate(due_date, range_days, gender)
+        -list _sample_dates(due_date, range_days)
+        -dict _aggregate(samples)
+        -dict _build_suggestion(dist, gender)
+    }
+    class BaziEngine {
+        +dict generate_bazi(year, month, day, hour, minute, gender)
+    }
+    class NamingEngine {
+        -CharDatabase char_db
+        -PoetryDatabase poetry_db
+        +dict generate_names(..., style, meanings, avoid_chars, industry)
+        -list _match_poetry(...)
+        -list _filter_by_style(...)
+        -list _filter_by_meanings(...)
+        -list _apply_avoid_chars(...)
+        -dict _evaluate_name(...)
+    }
+    class CharDatabase {
+        +dict get_char(char)
+        +list get_by_wuxing(wuxing, gender)
+        +list get_lucky_by_wuxing(wuxing, gender, limit)
+        +list filter(...)
+    }
+    class PoetryDatabase {
+        +list get_by_gender(gender)
+        +list get_by_char(char)
+        +list filter(...)
+    }
+    PrenatalEngine --> BaziEngine : 采样调用
+    PrenatalEngine --> CharDatabase : 选安全字
+    NamingEngine --> CharDatabase : 选字/校验
+    NamingEngine --> PoetryDatabase : 诗词匹配

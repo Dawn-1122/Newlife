@@ -1,0 +1,46 @@
+<view class="container">
+  <view class="header">
+    <view class="title">名字测评</view>
+    <view class="subtitle">用字 · 音律 · 五格 · 诗词出处</view>
+  </view>
+
+  <view class="card form-card">
+    <view class="form-item">
+      <text class="form-label">姓名</text>
+      <input class="form-input" placeholder="请输入完整姓名" value="{{fullName}}" bindinput="onNameInput" maxlength="10" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">性别</text>
+      <view class="chip-row">
+        <view class="chip {{gender === 'male' ? 'active' : ''}}" bindtap="onGenderTap" data-gender="male">男</view>
+        <view class="chip {{gender === 'female' ? 'active' : ''}}" bindtap="onGenderTap" data-gender="female">女</view>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">补充生辰</text>
+      <switch checked="{{useBazi}}" bindchange="onBaziSwitch" color="#8B4513" />
+    </view>
+
+    <view class="form-item" wx:if="{{useBazi}}">
+      <text class="form-label">出生日期</text>
+      <picker mode="date" value="{{birthDate}}" start="1900-01-01" end="2100-12-31" bindchange="onDateChange">
+        <view class="picker-value">{{birthDate || '请选择日期'}}</view>
+      </picker>
+    </view>
+
+    <view class="form-item" wx:if="{{useBazi}}">
+      <text class="form-label">出生时辰</text>
+      <picker mode="selector" range="{{hourOptions}}" value="{{hourIndex}}" bindchange="onHourChange">
+        <view class="picker-value">{{hourOptions[hourIndex]}}</view>
+      </picker>
+    </view>
+  </view>
+
+  <button class="btn-primary" bindtap="onSubmit" loading="{{loading}}">开始测评</button>
+
+  <view class="footer-note">
+    <text>生辰为可选，提供后可分析八字匹配度</text>
+  </view>
+</view>

@@ -1,0 +1,84 @@
+.header {
+  text-align: center;
+  padding: 30rpx 0 20rpx;
+}
+
+.title {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #8B4513;
+  letter-spacing: 4rpx;
+}
+
+.subtitle {
+  font-size: 24rpx;
+  color: #C19A6B;
+  margin-top: 8rpx;
+}
+
+.form-card {
+  margin-bottom: 30rpx;
+}
+
+.form-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0ede8;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.form-label {
+  font-size: 28rpx;
+  color: #555;
+  width: 160rpx;
+  flex-shrink: 0;
+}
+
+.form-input {
+  flex: 1;
+  text-align: right;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.picker-value {
+  flex: 1;
+  text-align: right;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.chip-row {
+  display: flex;
+  gap: 16rpx;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.chip {
+  padding: 12rpx 28rpx;
+  border-radius: 8rpx;
+  background: #f5f3f0;
+  color: #666;
+  font-size: 26rpx;
+}
+
+.chip.active {
+  background: #8B4513;
+  color: #fff;
+}
+
+.footer-note {
+  text-align: center;
+  padding: 20rpx 0 40rpx;
+}
+
+.footer-note text {
+  font-size: 22rpx;
+  color: #aaa;
+}

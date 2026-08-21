@@ -1,0 +1,133 @@
+<view class="container">
+  <!-- 标题 -->
+  <view class="header">
+    <view class="title">给宝宝起名</view>
+    <view class="subtitle">产前参考 · 产后精确</view>
+  </view>
+
+  <!-- 产前/产后 tab -->
+  <view class="tab-bar">
+    <view class="tab {{tab === 'postnatal' ? 'active' : ''}}" bindtap="onTabTap" data-tab="postnatal">产后 · 精确生辰</view>
+    <view class="tab {{tab === 'prenatal' ? 'active' : ''}}" bindtap="onTabTap" data-tab="prenatal">产前 · 预产期</view>
+  </view>
+
+  <view class="card form-card">
+    <!-- 性别（共享） -->
+    <view class="form-item">
+      <text class="form-label">宝宝性别</text>
+      <view class="chip-row">
+        <view class="chip {{gender === 'male' ? 'active' : ''}}" bindtap="onGenderTap" data-gender="male">男孩</view>
+        <view class="chip {{gender === 'female' ? 'active' : ''}}" bindtap="onGenderTap" data-gender="female">女孩</view>
+      </view>
+    </view>
+
+    <!-- 产后表单 -->
+    <block wx:if="{{tab === 'postnatal'}}">
+      <view class="form-item">
+        <text class="form-label">姓氏</text>
+        <input class="form-input" placeholder="请输入姓氏" value="{{surname}}" bindinput="onSurnameInput" maxlength="4" />
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">八字分析</text>
+        <switch checked="{{useBazi}}" bindchange="onBaziSwitch" color="#8B4513" />
+      </view>
+
+      <view class="form-item" wx:if="{{useBazi}}">
+        <text class="form-label">出生日期</text>
+        <picker mode="date" value="{{birthDate}}" start="1900-01-01" end="2100-12-31" bindchange="onDateChange">
+          <view class="picker-value">{{birthDate || '请选择日期'}}</view>
+        </picker>
+      </view>
+
+      <view class="form-item" wx:if="{{useBazi}}">
+        <text class="form-label">出生时辰</text>
+        <picker mode="selector" range="{{hourOptions}}" value="{{hourIndex}}" bindchange="onHourChange">
+          <view class="picker-value">{{hourOptions[hourIndex]}}</view>
+        </picker>
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">名字字数</text>
+        <view class="chip-row">
+          <view class="chip {{nameLength === 1 ? 'active' : ''}}" bindtap="onLengthTap" data-length="1">单字名</view>
+          <view class="chip {{nameLength === 2 ? 'active' : ''}}" bindtap="onLengthTap" data-length="2">双字名</view>
+        </view>
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">行业</text>
+        <picker mode="selector" range="{{industryOptions}}" range-key="name" bindchange="onIndustryChange">
+          <view class="picker-value">{{industryName}}</view>
+        </picker>
+      </view>
+    </block>
+
+    <!-- 产前表单 -->
+    <block wx:if="{{tab === 'prenatal'}}">
+      <view class="form-item">
+        <text class="form-label">预产期</text>
+        <picker mode="date" value="{{dueDate}}" start="2020-01-01" end="2100-12-31" bindchange="onDueDateChange">
+          <view class="picker-value">{{dueDate || '请选择日期'}}</view>
+        </picker>
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">浮动范围</text>
+        <view class="chip-row wrap">
+          <view
+            class="chip {{rangeDays === item ? 'active' : ''}}"
+            wx:for="{{rangeOptions}}"
+            wx:key="*this"
+            bindtap="onRangeTap"
+            data-range="{{item}}"
+          >±{{item}}天</view>
+        </view>
+      </view>
+    </block>
+
+    <!-- 风格偏好（共享） -->
+    <view class="form-item column">
+      <text class="form-label">风格偏好</text>
+      <view class="chip-row wrap">
+        <view
+          class="chip {{item.selected ? 'active' : ''}}"
+          wx:for="{{styleOptions}}"
+          wx:key="code"
+          bindtap="onStyleTap"
+          data-code="{{item.code}}"
+        >{{item.name}}</view>
+      </view>
+    </view>
+
+    <!-- 期望寓意（共享，最多3个） -->
+    <view class="form-item column">
+      <text class="form-label">期望寓意</text>
+      <view class="chip-row wrap">
+        <view
+          class="chip {{item.selected ? 'active' : ''}}"
+          wx:for="{{meaningOptions}}"
+          wx:key="code"
+          bindtap="onMeaningTap"
+          data-code="{{item.code}}"
+        >{{item.name}}</view>
+      </view>
+    </view>
+
+    <!-- 避讳字（共享） -->
+    <view class="form-item">
+      <text class="form-label">避讳字</text>
+      <input class="form-input" placeholder="多个用逗号分隔，如：伟,强" value="{{avoidChars}}" bindinput="onAvoidInput" />
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <button class="btn-primary" bindtap="onSubmit" loading="{{loading}}">
+    {{tab === 'postnatal' ? '开始起名' : '查看孕期建议'}}
+  </button>
+
+  <view class="footer-note">
+    <text wx:if="{{tab === 'postnatal'}}">每个名字附诗词出处、五行分析、音律评分</text>
+    <text wx:if="{{tab === 'prenatal'}}">产前为孕期范围参考，出生后可精确起名复核</text>
+  </view>
+</view>

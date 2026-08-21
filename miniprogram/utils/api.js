@@ -1,6 +1,34 @@
 /**
- * 网络请求工具
+ * 网络请求工具 + 前端枚举镜像
+ *
+ * 枚举单一事实来源在后端 app/core/naming_options.py，
+ * 小程序无共享包，需在此手工同步，改动时两处一起改。
  */
+
+// 风格枚举（与后端 STYLE_OPTIONS 镜像）
+const STYLE_OPTIONS = [
+  { code: 'classic', name: '古风雅致' },
+  { code: 'modern', name: '现代简约' },
+  { code: 'grand', name: '大气沉稳' },
+  { code: 'fresh', name: '清新灵动' }
+]
+
+// 寓意枚举（与后端 MEANING_OPTIONS 镜像）
+const MEANING_OPTIONS = [
+  { code: 'wisdom', name: '智慧' },
+  { code: 'health', name: '健康' },
+  { code: 'bravery', name: '勇敢' },
+  { code: 'gentle', name: '温婉' },
+  { code: 'wealth', name: '富贵' },
+  { code: 'peace', name: '平安' },
+  { code: 'talent', name: '才华' },
+  { code: 'virtue', name: '品德' }
+]
+
+// 预产期浮动档位（与后端 RANGE_OPTIONS 镜像）
+const RANGE_OPTIONS = [0, 3, 7, 14]
+const DEFAULT_RANGE_DAYS = 7
+const MEANING_MAX_SELECT = 3
 
 function request(url, method = 'GET', data = {}) {
   const app = getApp()
@@ -27,14 +55,21 @@ function request(url, method = 'GET', data = {}) {
 }
 
 /**
- * 生成名字
+ * 生成名字（产后精确起名）
  */
 function generateNames(params) {
   return request('/generate', 'POST', params)
 }
 
 /**
- * 解析名字
+ * 预产期起名（孕期范围参考）
+ */
+function prenatal(params) {
+  return request('/prenatal', 'POST', params)
+}
+
+/**
+ * 解析名字（名字测评）
  */
 function analyzeName(params) {
   return request('/analyze', 'POST', params)
@@ -54,6 +89,12 @@ function queryBazi(params) {
 module.exports = {
   request,
   generateNames,
+  prenatal,
   analyzeName,
-  queryBazi
+  queryBazi,
+  STYLE_OPTIONS,
+  MEANING_OPTIONS,
+  RANGE_OPTIONS,
+  DEFAULT_RANGE_DAYS,
+  MEANING_MAX_SELECT
 }

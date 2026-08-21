@@ -23,6 +23,7 @@ from app.services.phonetics import PhoneticsScorer
 from app.services.wuge import WugeScorer
 from app.core.config import settings
 from app.core.constants import NEGATIVE_CHARS, SAD_POETRY_TITLES
+from app.core.naming_options import STYLE_OPTIONS, MEANING_OPTIONS
 
 
 class NamingEngine:
@@ -48,6 +49,10 @@ class NamingEngine:
         max_results: int = 30,
         use_bazi: bool = True,
         use_poetry: bool = True,
+        style: Optional[str] = None,
+        meanings: Optional[list[str]] = None,
+        avoid_chars: Optional[list[str]] = None,
+        industry: Optional[str] = None,
     ) -> dict:
         """
         生成名字候选列表
@@ -60,6 +65,10 @@ class NamingEngine:
             max_results: 最大返回数量
             use_bazi: 是否使用八字分析
             use_poetry: 是否使用诗词典故
+            style: 风格偏好 code（classic|modern|grand|fresh），仅排序加权
+            meanings: 期望寓意 code 列表（最多3个），仅排序加权
+            avoid_chars: 避讳字列表，硬剔除（并入会话黑名单）
+            industry: 行业 code，P0 仅透传不参与打分
 
         Returns:
             {
@@ -93,20 +102,29 @@ class NamingEngine:
             )
             xiyong_wuxing = bazi_result["xiyong"]["xi_wuxing"]
 
+        # 0. 会话黑名单 = 负面字 + 用户避讳字（硬过滤，候选与组合阶段都剔除）
+        blacklist = set(NEGATIVE_CHARS)
+        if avoid_chars:
+            for item in avoid_chars:
+                if item:
+                    blacklist.update(list(item))
+
         # 2. 候选字筛选
         candidate_chars = self._select_candidate_chars(
-            xiyong_wuxing, gender, name_length
+            xiyong_wuxing, gender, name_length, blacklist, meanings
         )
 
         # 3. 诗词匹配（优先用诗词出处的字）
         poetry_matches = []
         if use_poetry:
-            poetry_matches = self._match_poetry(xiyong_wuxing, gender)
+            poetry_matches = self._match_poetry(
+                xiyong_wuxing, gender, style, meanings, blacklist
+            )
 
         # 4. 生成名字组合
         names = self._compose_names(
             surname, candidate_chars, poetry_matches,
-            gender, name_length, bazi_result
+            gender, name_length, bazi_result, blacklist, meanings
         )
 
         # 5. 排序并截取
@@ -124,8 +142,11 @@ class NamingEngine:
         xiyong_wuxing: list[str] = None,
         gender: str = "male",
         name_length: int = 2,
+        blacklist: set = None,
+        meanings: Optional[list[str]] = None,
     ) -> list[dict]:
-        """筛选候选字"""
+        """筛选候选字（并做黑名单硬过滤 + 寓意关键词排序）"""
+        blacklist = blacklist or set()
         if xiyong_wuxing:
             # 优先选喜用神五行
             chars = []
@@ -148,10 +169,25 @@ class NamingEngine:
             # 无八字分析，按性别选字
             chars = self.char_db.filter(gender=gender)
 
+        # 硬剔除负面字与避讳字
+        chars = [c for c in chars if c["char"] not in blacklist]
+
+        # 寓意关键词命中排序（软排序，不硬删）
+        if meanings:
+            chars.sort(
+                key=lambda c: self._meanings_match_score(c.get("meaning", ""), meanings),
+                reverse=True,
+            )
+
         return chars
 
     def _match_poetry(
-        self, xiyong_wuxing: list[str] = None, gender: str = "male"
+        self,
+        xiyong_wuxing: list[str] = None,
+        gender: str = "male",
+        style: Optional[str] = None,
+        meanings: Optional[list[str]] = None,
+        blacklist: set = None,
     ) -> list[dict]:
         """
         匹配诗词典故
@@ -159,8 +195,10 @@ class NamingEngine:
         返回去重后的诗词列表（每首只返回一次），保留所有有可用推荐字的诗。
         喜用神匹配不再硬性过滤，而是交由评分排序（_evaluate_name 的 bazi_score 已占权重），
         这样同源组名能覆盖足够多的诗词，含义连贯的名字不会被八字偏好误伤。
+        风格/寓意为排序加权（软过滤），不硬删，保证候选量充足。
         """
         poems = self.poetry_db.get_by_gender(gender)
+        blacklist = blacklist or set()
 
         matched = []
         seen = set()
@@ -174,14 +212,56 @@ class NamingEngine:
             if NamingEngine._is_sad_poem(poem):
                 continue
 
-            # 只要有可用字（字库中存在）就纳入
-            available = [c for c in poem["recommend_chars"] if self.char_db.get_char(c)]
+            # 只要有可用字（字库中存在且非黑名单）就纳入
+            available = [
+                c for c in poem["recommend_chars"]
+                if self.char_db.get_char(c) and c not in blacklist
+            ]
             if not available:
                 continue
 
             matched.append(poem)
 
-        return matched
+        # 风格/寓意排序加权
+        return self._rank_poems(matched, style, meanings)
+
+    @staticmethod
+    def _rank_poems(
+        poems: list[dict],
+        style: Optional[str] = None,
+        meanings: Optional[list[str]] = None,
+    ) -> list[dict]:
+        """按风格优先来源 + 意象关键词 + 寓意关键词对诗词做软排序"""
+        if not style and not meanings:
+            return poems
+
+        def score(poem: dict) -> int:
+            total = 0
+            imagery = " ".join(poem.get("imagery", []))
+            scene = poem.get("scene", "")
+            text = poem.get("text", "")
+            blob = f"{imagery} {scene} {text}"
+
+            if style and style in STYLE_OPTIONS:
+                opt = STYLE_OPTIONS[style]
+                if poem.get("source", "") in opt.get("source_preference", []):
+                    total += 100
+                for kw in opt.get("imagery_keywords", []):
+                    if kw in blob:
+                        total += 10
+
+            if meanings:
+                for m in meanings:
+                    opt = MEANING_OPTIONS.get(m)
+                    if not opt:
+                        continue
+                    for kw in opt.get("keywords", []):
+                        if kw in blob:
+                            total += 5
+
+            return total
+
+        return sorted(poems, key=score, reverse=True)
 
     @staticmethod
     def _is_sad_poem(poem: dict) -> bool:
@@ -193,26 +273,54 @@ class NamingEngine:
                 return True
         return False
 
+    @staticmethod
+    def _meanings_match_score(text: str, meanings: Optional[list[str]]) -> int:
+        """计算文本命中寓意关键词的次数（用于候选字/诗词软排序）"""
+        if not meanings or not text:
+            return 0
+        score = 0
+        for m in meanings:
+            opt = MEANING_OPTIONS.get(m)
+            if not opt:
+                continue
+            for kw in opt.get("keywords", []):
+                if kw in text:
+                    score += 1
+        return score
+
     def _get_valid_poem_chars(
-        self, poem: dict, gender: str, xiyong_wuxing: list[str] = None
+        self,
+        poem: dict,
+        gender: str,
+        xiyong_wuxing: list[str] = None,
+        blacklist: set = None,
+        meanings: Optional[list[str]] = None,
     ) -> list[dict]:
-        """从一首诗词的推荐字里筛选出可用字（字库存在 + 符合性别 + 非负面字），喜用神匹配的字排前"""
+        """从一首诗词的推荐字里筛选出可用字（字库存在 + 符合性别 + 非黑名单），喜用神/寓意匹配的字排前"""
+        # 缺省时默认使用负面字黑名单，保持向后兼容（外部直接调用不传 blacklist 也能过滤）
+        blacklist = set(NEGATIVE_CHARS) if blacklist is None else set(blacklist)
         valid = []
         for char in poem["recommend_chars"]:
             ci = self.char_db.get_char(char)
             if not ci:
                 continue
-            # 过滤负面字黑名单
-            if ci["char"] in NEGATIVE_CHARS:
+            # 过滤负面字/避讳字黑名单
+            if ci["char"] in blacklist:
                 continue
             if gender == "male" and ci["gender"] not in ("男", "中"):
                 continue
             if gender == "female" and ci["gender"] not in ("女", "中"):
                 continue
             valid.append(ci)
-        # 喜用神匹配的字排前面，这样同源组名时优先用补益八字的字
-        if xiyong_wuxing:
-            valid.sort(key=lambda c: 0 if c["wuxing"] in xiyong_wuxing else 1)
+        # 喜用神匹配的字排前面；同优先级内再按寓意关键词命中排序
+        def sort_key(c: dict) -> tuple:
+            xiyong_rank = 0 if (xiyong_wuxing and c["wuxing"] in xiyong_wuxing) else 1
+            meaning_score = -NamingEngine._meanings_match_score(
+                c.get("meaning", ""), meanings
+            )
+            return (xiyong_rank, meaning_score)
+
+        valid.sort(key=sort_key)
         return valid
 
     def _compose_names(
@@ -223,24 +331,29 @@ class NamingEngine:
         gender: str,
         name_length: int,
         bazi_result: dict = None,
+        blacklist: set = None,
+        meanings: Optional[list[str]] = None,
     ) -> list[dict]:
         """组合生成名字"""
         names = []
         seen_names = set()
+        blacklist = blacklist or set()
 
         # 喜用神（用于同源组名时优先取补益八字的字）
         xiyong_wuxing = None
         if bazi_result:
             xiyong_wuxing = bazi_result["xiyong"]["xi_wuxing"]
 
-        # 过滤负面字黑名单（策略2随机组合的候选字来源）
+        # 过滤负面字/避讳字黑名单（策略2随机组合的候选字来源）
         candidate_chars = [
-            c for c in candidate_chars if c["char"] not in NEGATIVE_CHARS
+            c for c in candidate_chars if c["char"] not in blacklist
         ]
 
         # 策略1：同源组名——名字的两个字出自同一首诗词，含义完整连贯
         for poem in poetry_matches:
-            valid_chars = self._get_valid_poem_chars(poem, gender, xiyong_wuxing)
+            valid_chars = self._get_valid_poem_chars(
+                poem, gender, xiyong_wuxing, blacklist, meanings
+            )
 
             if name_length == 1:
                 for ci in valid_chars:
@@ -269,7 +382,7 @@ class NamingEngine:
                             names.append(name_data)
 
         # 策略2：随机组合候选字（补充数量）
-        if len(names) < 15:
+        if len(names) < 15 and candidate_chars:
             for _ in range(50):
                 if name_length == 1:
                     char_info = random.choice(candidate_chars)

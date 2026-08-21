@@ -1,0 +1,39 @@
+sequenceDiagram
+    participant H as pages/home
+    participant N as pages/name
+    participant R as pages/result
+    participant P as pages/prenatal-result
+    participant API as utils/api.js
+    participant RT as routes.py
+    participant NE as NamingEngine
+    participant PE as PrenatalEngine
+    participant BE as BaziEngine
+    participant CD as CharDatabase
+
+    H->>N: 点击「宝宝起名」navigateTo
+    Note over N: 产前/产后双 tab
+
+    alt 产后（精确生辰）
+        N->>API: POST /generate(surname,生辰,style,meanings,avoid_chars)
+        API->>RT: generate_names()
+        RT->>NE: generate_names(..., style, meanings, avoid_chars)
+        NE->>CD: 候选字筛选(五行+性别+避讳字)
+        NE->>NE: 风格/寓意排序 + 组合评分
+        NE-->>RT: NamingResponse{bazi, names}
+        RT-->>API: response
+        API-->>N: 成功 → navigateTo result
+    else 产前（预产期）
+        N->>API: POST /prenatal(due_date, range_days, gender)
+        API->>RT: prenatal()
+        RT->>PE: generate(due_date, range_days, gender)
+        loop 采样 [due-range .. due+range] 每天
+            PE->>BE: generate_bazi(y,m,d,hour=12)
+            BE-->>PE: {day_master_wuxing, xiyong.xi_wuxing}
+        end
+        PE->>PE: 聚合日主/喜用神概率分布
+        PE->>CD: 按 stable_wuxing 选吉字
+        CD-->>PE: safe_chars
+        PE-->>RT: PrenatalResponse
+        RT-->>API: response
+        API-->>N: 成功 → navigateTo prenatal-result
+    end

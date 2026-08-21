@@ -8,6 +8,7 @@ from fastapi import APIRouter, HTTPException
 from app.schemas.schemas import (
     NamingRequest, NamingResponse,
     NameAnalysisRequest, ApiResponse,
+    PrenatalRequest, PrenatalResponse,
 )
 from app.services.naming_engine import NamingEngine
 from app.services.char_database import CharDatabase
@@ -15,6 +16,8 @@ from app.services.poetry_database import PoetryDatabase
 from app.services.bazi_engine import BaziEngine
 from app.services.phonetics import PhoneticsScorer
 from app.services.wuge import WugeScorer
+from app.services.prenatal_engine import PrenatalEngine
+from app.core.constants import RANGE_OPTIONS
 
 router = APIRouter()
 
@@ -54,9 +57,40 @@ async def generate_names(request: NamingRequest):
         max_results=request.max_results,
         use_bazi=request.use_bazi,
         use_poetry=request.use_poetry,
+        style=request.style,
+        meanings=request.meanings,
+        avoid_chars=request.avoid_chars,
+        industry=request.industry,
     )
 
     return NamingResponse(**result)
+
+
+@router.post("/prenatal", response_model=PrenatalResponse)
+async def prenatal(request: PrenatalRequest):
+    """
+    预产期起名（孕期参考 / 范围建议）
+
+    以预产期为中心 ±range_days 采样，聚合日主/喜用神五行概率分布，
+    返回确定性结果（生肖/月柱）+ 概率分布 + 起名建议（稳定五行 + 安全字）。
+    """
+    if request.range_days not in RANGE_OPTIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"range_days 仅支持 {RANGE_OPTIONS}",
+        )
+
+    engine = PrenatalEngine()
+    try:
+        result = engine.generate(
+            due_date=request.due_date,
+            range_days=request.range_days,
+            gender=request.gender or "male",
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    return PrenatalResponse(**result)
 
 
 @router.post("/analyze")
@@ -157,6 +191,7 @@ async def analyze_name(request: NameAnalysisRequest):
         "wuge": wuge_result,
         "bazi_match": bazi_match,
         "poetry": poetry_matches[0] if poetry_matches else None,
+        "poetry_list": poetry_matches[:3],
     }
 
 

@@ -1,0 +1,82 @@
+<wxs module="m">
+  var wuxingMap = { '金': 'wx-jin', '木': 'wx-mu', '水': 'wx-shui', '火': 'wx-huo', '土': 'wx-tu' }
+  module.exports = {
+    wx: function(v) { return wuxingMap[v] || '' }
+  }
+</wxs>
+<view class="container">
+  <!-- 范围与确定性结果 -->
+  <view class="card">
+    <view class="section-title">孕期范围参考</view>
+    <view class="range-row">
+      <text class="range-label">预产期</text>
+      <text class="range-value">{{result.due_date}}</text>
+    </view>
+    <view class="range-row">
+      <text class="range-label">浮动范围</text>
+      <text class="range-value">{{result.range.start}} ~ {{result.range.end}}</text>
+    </view>
+    <view class="certain-row">
+      <view class="certain-item">
+        <text class="certain-label">生肖</text>
+        <text class="certain-value">{{result.certain.shengxiao}}</text>
+      </view>
+      <view class="certain-item">
+        <text class="certain-label">月柱</text>
+        <text class="certain-value">{{result.certain.month_ganzhi}}</text>
+      </view>
+      <view class="certain-item">
+        <text class="certain-label">月柱五行</text>
+        <text class="certain-value wuxing-text {{m.wx(result.certain.month_wuxing)}}">{{result.certain.month_wuxing}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 日主五行概率分布 -->
+  <view class="card">
+    <view class="section-title">日主五行概率分布</view>
+    <view class="bar-row" wx:for="{{dayMasterDist}}" wx:key="name">
+      <text class="bar-name wuxing-text {{m.wx(item.name)}}">{{item.name}}</text>
+      <view class="bar-track">
+        <view class="bar-fill {{m.wx(item.name)}}" style="width: {{item.percent}}%;"></view>
+      </view>
+      <text class="bar-percent">{{item.percent}}%</text>
+    </view>
+  </view>
+
+  <!-- 喜用神五行概率分布 -->
+  <view class="card">
+    <view class="section-title">喜用神五行概率分布</view>
+    <view class="bar-row" wx:for="{{xiyongDist}}" wx:key="name">
+      <text class="bar-name wuxing-text {{m.wx(item.name)}}">{{item.name}}</text>
+      <view class="bar-track">
+        <view class="bar-fill {{m.wx(item.name)}}" style="width: {{item.percent}}%;"></view>
+      </view>
+      <text class="bar-percent">{{item.percent}}%</text>
+    </view>
+  </view>
+
+  <!-- 起名建议 -->
+  <view class="card">
+    <view class="section-title">起名建议</view>
+    <view class="stable-row">
+      <text class="stable-label">稳定五行</text>
+      <text class="stable-value">{{stableWuxingText || '暂无明显倾向'}}</text>
+    </view>
+
+    <view class="safe-chars" wx:if="{{safeChars.length}}">
+      <text class="safe-label">安全候选字</text>
+      <view class="safe-grid">
+        <view class="safe-item" wx:for="{{safeChars}}" wx:key="char">
+          <text class="safe-char">{{item.char}}</text>
+          <text class="safe-meta">{{item.pinyin}} · {{item.wuxing}} · {{item.kangxi_strokes}}画</text>
+          <text class="safe-meaning">{{item.meaning}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="note">{{note}}</view>
+  </view>
+
+  <button class="btn-primary" bindtap="onBackHome">返回首页</button>
+</view>
