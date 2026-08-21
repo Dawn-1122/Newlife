@@ -10,7 +10,7 @@
 参考：基于传统命理学规则，非简单"缺什么补什么"。
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 from lunardate import LunarDate
 from app.core.constants import (
@@ -201,10 +201,14 @@ class BaziEngine:
         """
         dt = datetime(year, month, day, hour, minute)
 
+        # 晚子时（23点）按次日排盘：日柱、时柱时干、年/月柱均以次日为基准
+        bazi_dt = dt + timedelta(days=1) if hour == 23 else dt
+
         # 四柱
-        year_gz = cls._get_year_ganzhi_precise(dt)
-        month_gz = cls._get_month_ganzhi(dt, year_gz)
-        day_gz = cls._get_day_ganzhi(dt)
+        year_gz = cls._get_year_ganzhi_precise(bazi_dt)
+        month_gz = cls._get_month_ganzhi(bazi_dt, year_gz)
+        day_gz = cls._get_day_ganzhi(bazi_dt)
+        # 时支仍由原始时刻确定（23点为子时），时干按次日日干起算
         hour_gz = cls._get_hour_ganzhi(dt, day_gz)
 
         # 日主（日干）

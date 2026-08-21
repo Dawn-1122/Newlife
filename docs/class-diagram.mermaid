@@ -1,0 +1,52 @@
+classDiagram
+    class PoetryEntry {
+        +str id
+        +str source
+        +str title
+        +str author
+        +str dynasty
+        +str text
+        +str|None original_text
+        +str citation
+        +list[str] recommend_chars
+        +str emotion
+        +list[str] imagery
+        +str gender
+        +str scene
+        +list[str] tags
+        +str provenance
+    }
+    class PoetryDatabase {
+        -list _poems
+        +list get_by_char(char)
+        +list get_by_imagery(imagery)
+        +list get_by_source(source)
+        +list get_by_gender(gender)
+        +list filter(...)
+        +list get_all()
+        +int total
+    }
+    class CharDatabase {
+        -dict _char_map
+        +dict|None get_char(char)
+        +list get_by_wuxing(wuxing, gender)
+        +list filter(...)
+    }
+    class NamingEngine {
+        -CharDatabase char_db
+        -PoetryDatabase poetry_db
+        +dict generate_names(...)
+        -list _match_poetry(...)
+        -dict _evaluate_name(...)
+    }
+    class LLMService {
+        +str provider
+        +str api_key
+        +dict generate_meaning(...)
+        +dict chat(...)
+        -dict _call_llm(prompt)
+    }
+    PoetryDatabase --> PoetryEntry : 管理
+    NamingEngine --> PoetryDatabase : 读取
+    NamingEngine --> CharDatabase : 校验字
+    LLMService --> PoetryEntry : 标注产出

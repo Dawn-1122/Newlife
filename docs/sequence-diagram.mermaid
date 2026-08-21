@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant FE as fetch_corpus.py
+    participant RAW as raw_corpus.jsonl
+    participant AN as llm_annotator.py
+    participant LLM as LLMService(chat)
+    participant VD as validate_poetry.py
+    participant MG as merge_poetry.py
+    participant DB as poetry.json(v2)
+
+    FE->>RAW: 拉取+繁转简+统一字段(800~1000条)
+    loop 每批50~100条(断点续跑)
+        AN->>LLM: annotate_poem(诗句+字库候选集)
+        LLM-->>AN: {recommend_chars,emotion,gender,imagery,scene}
+        AN->>AN: JSON解析容错+重试/限流
+        AN-->>RAW: annotated.jsonl / failed.jsonl
+    end
+    VD->>RAW: 校验 R1-R11(字库/吉凶/黑名单/枚举/哀伤/去重)
+    VD-->>MG: 通过集 / 失败集
+    MG->>DB: 合并元数据+标注→poetry.json v2(400-500首)

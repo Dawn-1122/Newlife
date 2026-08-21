@@ -22,6 +22,7 @@ from app.services.poetry_database import PoetryDatabase
 from app.services.phonetics import PhoneticsScorer
 from app.services.wuge import WugeScorer
 from app.core.config import settings
+from app.core.constants import NEGATIVE_CHARS, SAD_POETRY_TITLES
 
 
 class NamingEngine:
@@ -169,6 +170,10 @@ class NamingEngine:
                 continue
             seen.add(key)
 
+            # 过滤哀伤类诗词（避免「国破山河在」等负面意境出处）
+            if NamingEngine._is_sad_poem(poem):
+                continue
+
             # 只要有可用字（字库中存在）就纳入
             available = [c for c in poem["recommend_chars"] if self.char_db.get_char(c)]
             if not available:
@@ -178,14 +183,27 @@ class NamingEngine:
 
         return matched
 
+    @staticmethod
+    def _is_sad_poem(poem: dict) -> bool:
+        """判断诗词是否为哀伤类（标题命中黑名单）"""
+        title = poem.get("title", "")
+        source_title = f'{poem.get("source", "")}·{title}'
+        for sad in SAD_POETRY_TITLES:
+            if sad in title or sad in source_title:
+                return True
+        return False
+
     def _get_valid_poem_chars(
         self, poem: dict, gender: str, xiyong_wuxing: list[str] = None
     ) -> list[dict]:
-        """从一首诗词的推荐字里筛选出可用字（字库存在 + 符合性别），喜用神匹配的字排前"""
+        """从一首诗词的推荐字里筛选出可用字（字库存在 + 符合性别 + 非负面字），喜用神匹配的字排前"""
         valid = []
         for char in poem["recommend_chars"]:
             ci = self.char_db.get_char(char)
             if not ci:
+                continue
+            # 过滤负面字黑名单
+            if ci["char"] in NEGATIVE_CHARS:
                 continue
             if gender == "male" and ci["gender"] not in ("男", "中"):
                 continue
@@ -214,6 +232,11 @@ class NamingEngine:
         xiyong_wuxing = None
         if bazi_result:
             xiyong_wuxing = bazi_result["xiyong"]["xi_wuxing"]
+
+        # 过滤负面字黑名单（策略2随机组合的候选字来源）
+        candidate_chars = [
+            c for c in candidate_chars if c["char"] not in NEGATIVE_CHARS
+        ]
 
         # 策略1：同源组名——名字的两个字出自同一首诗词，含义完整连贯
         for poem in poetry_matches:

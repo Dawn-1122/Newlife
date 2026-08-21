@@ -48,8 +48,8 @@ async def generate_names(request: NamingRequest):
         year=request.year,
         month=request.month,
         day=request.day,
-        hour=request.hour or 12,
-        minute=request.minute or 0,
+        hour=request.hour if request.hour is not None else 12,
+        minute=request.minute if request.minute is not None else 0,
         name_length=request.name_length,
         max_results=request.max_results,
         use_bazi=request.use_bazi,
@@ -127,7 +127,8 @@ async def analyze_name(request: NameAnalysisRequest):
     if request.year and request.month and request.day:
         bazi = BaziEngine.generate_bazi(
             request.year, request.month, request.day,
-            request.hour or 12, request.minute or 0,
+            request.hour if request.hour is not None else 12,
+            request.minute if request.minute is not None else 0,
             request.gender or "male"
         )
         xiyong = bazi["xiyong"]["xi_wuxing"]
