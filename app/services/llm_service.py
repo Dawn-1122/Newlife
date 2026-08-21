@@ -51,9 +51,10 @@ class LLMService:
     def __init__(self, provider: str = None, api_key: str = None):
         self.provider = provider or settings.LLM_PROVIDER
         self.api_key = api_key or settings.LLM_API_KEY
-        self.config = self.PROVIDERS.get(self.provider, self.PROVIDERS["deepseek"])
-        self.base_url = self.config["base_url"]
-        self.model = self.config["model"]
+        self.config = self.PROVIDERS.get(self.provider, {})
+        # 优先使用 .env 配置的 base_url/model（支持 OpenRouter 等 OpenAI 兼容服务），否则用内置 PROVIDERS 默认值
+        self.base_url = settings.LLM_BASE_URL or self.config.get("base_url", "")
+        self.model = settings.LLM_MODEL or self.config.get("model", "")
 
     async def generate_meaning(
         self,
