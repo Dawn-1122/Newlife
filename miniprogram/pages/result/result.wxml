@@ -39,6 +39,34 @@
     </view>
   </view>
 
+  <!-- 筛选栏 -->
+  <view class="filter-bar">
+    <view class="filter-row">
+      <text class="filter-label">五行</text>
+      <view class="filter-chips">
+        <view
+          class="chip {{wuxingFilter === item.code ? 'chip-active' : ''}}"
+          wx:for="{{wuxingFilters}}"
+          wx:key="code"
+          data-code="{{item.code}}"
+          bindtap="onWuxingFilterTap"
+        >{{item.name}}</view>
+      </view>
+    </view>
+    <view class="filter-row">
+      <text class="filter-label">风格</text>
+      <view class="filter-chips">
+        <view
+          class="chip {{styleFilter === item.code ? 'chip-active' : ''}}"
+          wx:for="{{styleFilters}}"
+          wx:key="code"
+          data-code="{{item.code}}"
+          bindtap="onStyleFilterTap"
+        >{{item.name}}</view>
+      </view>
+    </view>
+  </view>
+
   <!-- 名字列表 -->
   <view class="name-list">
     <view class="card name-card" wx:for="{{names}}" wx:key="full_name" bindtap="onNameTap" data-index="{{index}}">
@@ -77,9 +105,12 @@
 
   <!-- 空状态 -->
   <view class="empty" wx:if="{{!names.length}}">
-    <text>暂无结果，请调整条件后重试</text>
+    <text>{{loading ? '加载中…' : '暂无结果，请调整筛选条件后重试'}}</text>
   </view>
 
   <!-- 底部操作 -->
-  <button class="btn-primary home-btn" bindtap="onBackHome">返回首页</button>
+  <view class="footer-actions">
+    <button class="btn-primary refresh-btn" bindtap="onRefresh" loading="{{loading}}" disabled="{{loading}}">换一批</button>
+    <button class="btn-primary home-btn" bindtap="onBackHome">返回首页</button>
+  </view>
 </view>

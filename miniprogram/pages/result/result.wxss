@@ -172,6 +172,68 @@
   color: #999;
 }
 
-.home-btn {
+/* 筛选栏 */
+.filter-bar {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.filter-row {
+  display: flex;
+  align-items: flex-start;
+  padding: 10rpx 0;
+}
+
+.filter-row + .filter-row {
+  border-top: 1rpx solid #f0ede8;
+}
+
+.filter-label {
+  flex-shrink: 0;
+  width: 80rpx;
+  font-size: 26rpx;
+  color: #8B4513;
+  font-weight: 600;
+  padding-top: 8rpx;
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  flex: 1;
+}
+
+.chip {
+  padding: 8rpx 24rpx;
+  border-radius: 30rpx;
+  font-size: 26rpx;
+  color: #666;
+  background: #f5f0e8;
+  line-height: 1.4;
+}
+
+.chip-active {
+  background: linear-gradient(135deg, #8B4513, #A0522D);
+  color: #fff;
+  font-weight: 500;
+}
+
+/* 底部操作 */
+.footer-actions {
+  display: flex;
+  gap: 20rpx;
   margin-top: 10rpx;
+}
+
+.refresh-btn,
+.home-btn {
+  flex: 1;
+}
+
+.home-btn {
+  margin-top: 0;
 }

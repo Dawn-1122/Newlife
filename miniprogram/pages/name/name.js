@@ -214,7 +214,7 @@ Page({
       surname: surname,
       gender: this.data.gender,
       name_length: this.data.nameLength,
-      max_results: 20,
+      max_results: 50,
       use_bazi: this.data.useBazi,
       use_poetry: true
     }
@@ -242,7 +242,8 @@ Page({
       const result = await api.generateNames(params)
       const app = getApp()
       app.globalData.lastResult = result
-      app.globalData.lastParams = { surname, gender: this.data.gender, useBazi: this.data.useBazi }
+      // 保存完整请求参数，结果页「换一批」复用同一份参数重新请求
+      app.globalData.lastParams = params
       wx.navigateTo({ url: '/pages/result/result' })
     } catch (err) {
       wx.showToast({ title: (err && err.message) || '起名失败，请重试', icon: 'none' })

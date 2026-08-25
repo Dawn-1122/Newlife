@@ -127,8 +127,9 @@ class NamingEngine:
             gender, name_length, bazi_result, blacklist, meanings
         )
 
-        # 5. 排序并截取
+        # 5. 排序 → 多样性重排 → 截取
         names.sort(key=lambda n: n["scores"]["overall"], reverse=True)
+        names = self._diversify(names, max_same_char=2)
         names = names[:max_results]
 
         return {
@@ -136,6 +137,43 @@ class NamingEngine:
             "names": names,
             "total": len(names),
         }
+
+    @staticmethod
+    def _diversify(names: list[dict], max_same_char: int = 2) -> list[dict]:
+        """
+        多样性重排：限制同一个字（尤其名字首字）在结果中反复出现。
+
+        采用贪心策略——按 overall 降序遍历（调用方已排序），维护每个字已出现的次数：
+        - 若某名字的首字已出现 >= max_same_char 次，则暂时跳过并放入 deferred；
+        - 否则纳入结果，并累加该名字所有字的出现次数。
+        被跳过的 deferred 仍按 overall 降序补到末尾。
+
+        注意：本方法只改变排序顺序，不删除任何名字。
+        """
+        if not names or max_same_char < 1:
+            return names
+
+        counts: dict[str, int] = {}
+        kept: list[dict] = []
+        deferred: list[dict] = []
+
+        for name in names:
+            given_name = name.get("given_name", "")
+            first_char = given_name[0] if given_name else ""
+
+            # 首字已出现达到上限则暂缓，避免「海存/海深/海涯」同字扎堆
+            if first_char and counts.get(first_char, 0) >= max_same_char:
+                deferred.append(name)
+                continue
+
+            kept.append(name)
+            # 累加名字所有字的出现次数（含首字）
+            for ch in given_name:
+                counts[ch] = counts.get(ch, 0) + 1
+
+        # 暂缓的名字按 overall 降序补到末尾
+        deferred.sort(key=lambda n: n["scores"]["overall"], reverse=True)
+        return kept + deferred
 
     def _select_candidate_chars(
         self,
