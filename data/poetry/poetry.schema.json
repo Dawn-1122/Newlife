@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "data/poetry/poetry.schema.json",
+  "title": "美名集诗词典故库 v2",
+  "description": "诗词库数据结构定义（v2）。顶层保留 version/total/source_distribution/poems；poems 内每条为 PoetryEntry。",
+  "type": "object",
+  "required": ["version", "total", "source_distribution", "poems"],
+  "properties": {
+    "version": { "type": "string", "const": "2.0" },
+    "total": { "type": "integer", "minimum": 0 },
+    "source_distribution": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "poems": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/PoetryEntry" }
+    }
+  },
+  "$defs": {
+    "PoetryEntry": {
+      "type": "object",
+      "required": [
+        "id", "source", "title", "author", "dynasty", "text",
+        "citation", "recommend_chars", "emotion", "imagery", "gender", "scene"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "稳定唯一主键，格式 poem_0001",
+          "pattern": "^poem_\\d{4}$"
+        },
+        "source": {
+          "type": "string",
+          "description": "6 大类枚举",
+          "enum": ["诗经", "楚辞", "唐诗", "宋词", "汉魏古诗", "经史子集"]
+        },
+        "title": { "type": "string", "minLength": 1 },
+        "author": { "type": "string", "minLength": 1 },
+        "dynasty": { "type": "string", "minLength": 1 },
+        "text": {
+          "type": "string",
+          "description": "摘句（起名引用句），4~24 字",
+          "minLength": 2,
+          "maxLength": 30
+        },
+        "original_text": {
+          "type": ["string", "null"],
+          "description": "完整原文/章段，可空"
+        },
+        "citation": {
+          "type": "string",
+          "description": "出处标注，格式《典籍名·篇目》"
+        },
+        "recommend_chars": {
+          "type": "array",
+          "description": "推荐起名用字，每个字必须 ∈ chars.json 且 luck=吉",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "emotion": {
+          "type": "string",
+          "description": "情感枚举；哀伤不进起名候选",
+          "enum": ["喜庆", "中性", "哀伤"]
+        },
+        "imagery": {
+          "type": "array",
+          "description": "意象标签",
+          "items": { "type": "string" }
+        },
+        "gender": {
+          "type": "string",
+          "enum": ["男", "女", "中"]
+        },
+        "scene": { "type": "string", "description": "寓意/场景一句话" },
+        "tags": {
+          "type": "array",
+          "description": "扩展标签",
+          "items": { "type": "string" }
+        },
+        "provenance": {
+          "type": "string",
+          "description": "数据溯源（来源数据集 + 相对路径）"
+        }
+      }
+    }
+  }
+}

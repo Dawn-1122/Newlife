@@ -12,11 +12,12 @@ LLM 寓意解读模块
 使用方式：
     from app.services.llm_service import LLMService
     llm = LLMService(provider="deepseek", api_key="sk-xxx")
-    result = await llm.generate_meaning(
-        full_name="王鑫瑞",
-        chars_info=[...],
-        poetry_data={...},
-        bazi_data={...},
+    result = await llm.generate_meaning(...)
+
+    # 通用对话（诗词批量标注也复用它）
+    result = await llm.chat(
+        messages=[{"role": "user", "content": "..."}],
+        temperature=0.2, max_tokens=500, json_mode=True,
     )
 """
 
@@ -24,6 +25,10 @@ import httpx
 import json
 from typing import Optional
 from app.core.config import settings
+
+
+class LLMError(Exception):
+    """LLM 调用/解析异常（供调用方重试）。"""
 
 
 class LLMService:
@@ -48,13 +53,95 @@ class LLMService:
         },
     }
 
-    def __init__(self, provider: str = None, api_key: str = None):
+    def __init__(self, provider: str = None, api_key: str = None,
+                 base_url: str = None, model: str = None, timeout: float = 60.0):
         self.provider = provider or settings.LLM_PROVIDER
         self.api_key = api_key or settings.LLM_API_KEY
         self.config = self.PROVIDERS.get(self.provider, {})
-        # 优先使用 .env 配置的 base_url/model（支持 OpenRouter 等 OpenAI 兼容服务），否则用内置 PROVIDERS 默认值
-        self.base_url = settings.LLM_BASE_URL or self.config.get("base_url", "")
-        self.model = settings.LLM_MODEL or self.config.get("model", "")
+        # 优先使用显式参数 / .env 配置的 base_url/model（支持 OpenRouter 等 OpenAI 兼容服务）
+        self.base_url = (base_url or settings.LLM_BASE_URL
+                         or self.config.get("base_url", ""))
+        self.model = model or settings.LLM_MODEL or self.config.get("model", "")
+        self.timeout = timeout
+
+    async def chat(
+        self,
+        messages: list[dict],
+        temperature: float = 0.7,
+        max_tokens: int = 1000,
+        json_mode: bool = False,
+    ) -> dict:
+        """
+        通用对话接口（OpenAI 兼容）。
+
+        Args:
+            messages: [{"role": "system"/"user"/"assistant", "content": "..."}]
+            temperature: 采样温度
+            max_tokens: 最大生成 token 数
+            json_mode: 是否开启 JSON 输出模式（response_format=json_object）
+
+        Returns:
+            解析后的 dict（json_mode 或内容本身为 JSON 时）；否则 {"content": "..."}。
+
+        Raises:
+            LLMError: HTTP 错误 / JSON 解析失败（供调用方重试）。
+        """
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+        payload = {
+            "model": self.model,
+            "messages": messages,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+        }
+        if json_mode:
+            payload["response_format"] = {"type": "json_object"}
+
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    f"{self.base_url}/chat/completions",
+                    headers=headers,
+                    json=payload,
+                )
+                response.raise_for_status()
+                data = response.json()
+        except httpx.HTTPStatusError as e:
+            detail = ""
+            try:
+                detail = e.response.text[:300]
+            except Exception:
+                pass
+            raise LLMError(
+                f"HTTP {e.response.status_code}: {detail}"
+            ) from e
+        except Exception as e:
+            raise LLMError(str(e)) from e
+
+        try:
+            content = data["choices"][0]["message"]["content"]
+        except (KeyError, IndexError, TypeError) as e:
+            raise LLMError(f"响应结构异常: {data}") from e
+
+        return self._parse_content(content, json_mode)
+
+    @staticmethod
+    def _parse_content(content: str, json_mode: bool) -> dict:
+        """解析 LLM 返回内容：剥掉 markdown 代码块，尝试 JSON。"""
+        content = (content or "").strip()
+        if content.startswith("```"):
+            content = content.split("\n", 1)[1] if "\n" in content else content
+            content = content.rsplit("```", 1)[0]
+        content = content.strip()
+
+        try:
+            return json.loads(content)
+        except (json.JSONDecodeError, TypeError):
+            if json_mode:
+                raise LLMError(f"JSON 解析失败: {content[:200]}")
+            return {"content": content}
 
     async def generate_meaning(
         self,
@@ -88,13 +175,31 @@ class LLMService:
             full_name, chars_info, poetry_data, bazi_data, gender
         )
 
-        response = await self._call_llm(prompt)
-
-        return {
-            **response,
-            "provider": self.provider,
-            "model": self.model,
-        }
+        try:
+            response = await self.chat(
+                messages=[
+                    {"role": "system",
+                     "content": "你是一位中国传统文化和姓名学专家。"},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.7,
+                max_tokens=1000,
+            )
+            return {
+                **response,
+                "provider": self.provider,
+                "model": self.model,
+            }
+        except LLMError as e:
+            return {
+                "meaning": f"解读生成失败: {str(e)}",
+                "poetry_note": "",
+                "wuxing_note": "",
+                "overall_note": "",
+                "provider": self.provider,
+                "model": self.model,
+                "error": str(e),
+            }
 
     def _build_prompt(
         self,
@@ -171,54 +276,3 @@ class LLMService:
 """
 
         return prompt
-
-    async def _call_llm(self, prompt: str) -> dict:
-        """调用LLM API（OpenAI兼容格式）"""
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-        }
-        payload = {
-            "model": self.model,
-            "messages": [
-                {"role": "system", "content": "你是一位中国传统文化和姓名学专家。"},
-                {"role": "user", "content": prompt},
-            ],
-            "temperature": 0.7,
-            "max_tokens": 1000,
-        }
-
-        try:
-            async with httpx.AsyncClient(timeout=30) as client:
-                response = await client.post(
-                    f"{self.base_url}/chat/completions",
-                    headers=headers,
-                    json=payload,
-                )
-                response.raise_for_status()
-                data = response.json()
-                content = data["choices"][0]["message"]["content"]
-
-                # 尝试解析JSON
-                try:
-                    # 去除可能的markdown代码块标记
-                    content = content.strip()
-                    if content.startswith("```"):
-                        content = content.split("\n", 1)[1] if "\n" in content else content
-                        content = content.rsplit("```", 1)[0]
-                    return json.loads(content)
-                except json.JSONDecodeError:
-                    return {
-                        "meaning": content,
-                        "poetry_note": "",
-                        "wuxing_note": "",
-                        "overall_note": "",
-                    }
-        except Exception as e:
-            return {
-                "meaning": f"解读生成失败: {str(e)}",
-                "poetry_note": "",
-                "wuxing_note": "",
-                "overall_note": "",
-                "error": str(e),
-            }

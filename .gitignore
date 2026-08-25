@@ -32,6 +32,15 @@ Thumbs.db
 output/
 *.log
 
+# 诗词库扩充：语料 clone（不提交进 git）与临时状态
+.corpus/
+data/poetry/done_ids.json
+data/poetry/failed.jsonl
+# 语料预处理中间产物（可从 chinese-poetry 免费重新生成）
+data/poetry/raw_corpus.jsonl
+data/poetry/full_corpus.jsonl
+data/poetry/pilot_corpus.jsonl
+
 # 微信小程序
 miniprogram/miniprogram_npm/
 miniprogram/project.private.config.json

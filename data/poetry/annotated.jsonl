@@ -1,0 +1,470 @@
+{"id": "raw_0176", "recommend_chars": ["乐", "饮"], "emotion": "喜庆", "gender": "男", "imagery": ["豪放", "畅快", "欢聚"], "scene": "寄托豪迈乐观、享受生活之志"}
+{"id": "raw_0327", "recommend_chars": ["明", "月", "青", "天"], "emotion": "中性", "gender": "中", "imagery": ["明月", "青天", "问天", "豪迈"], "scene": "寄托对宇宙人生的哲思与豁达情怀"}
+{"id": "raw_0121", "recommend_chars": ["玉", "英", "光"], "emotion": "喜庆", "gender": "中", "imagery": ["美玉", "英才", "光明"], "scene": "寄托高洁品质与光明前程"}
+{"id": "raw_0446", "recommend_chars": ["日", "月", "中"], "emotion": "中性", "gender": "中", "imagery": ["浩瀚", "包容", "宏大"], "scene": "寄托胸怀宽广、包容万物之志"}
+{"id": "raw_0486", "recommend_chars": ["敏", "慎", "安", "正"], "emotion": "中性", "gender": "中", "imagery": ["勤勉", "谨慎", "安宁", "正道"], "scene": "寄托修身养性、勤勉谨慎、追求正道之志"}
+{"id": "raw_0001", "recommend_chars": ["秀", "莹", "星"], "emotion": "喜庆", "gender": "男", "imagery": ["俊美", "光彩", "星辰"], "scene": "寄托才德出众、光彩照人之意"}
+{"id": "raw_0177", "recommend_chars": ["天", "材", "金", "复", "来"], "emotion": "喜庆", "gender": "男", "imagery": ["天生我才", "千金散尽", "复来"], "scene": "寄托自信豪迈、积极进取之意"}
+{"id": "raw_0328", "recommend_chars": ["灯", "珊"], "emotion": "中性", "gender": "中", "imagery": ["灯火", "阑珊", "寻觅", "惊喜"], "scene": "寓意在人生旅途中终得所愿，或于平凡处发现美好"}
+{"id": "raw_0122", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["期盼", "徘徊", "孤寂"], "scene": "表达等待与期盼中的孤独与忧伤"}
+{"id": "raw_0447", "recommend_chars": ["山", "高", "海", "深"], "emotion": "中性", "gender": "中", "imagery": ["高山", "大海", "博大", "深邃"], "scene": "寄托胸怀宽广、志向高远之意"}
+{"id": "raw_0487", "recommend_chars": ["明", "德", "善"], "emotion": "中性", "gender": "中", "imagery": ["光明", "品德", "至善"], "scene": "寄托修身养性、追求卓越之志"}
+{"id": "raw_0002", "recommend_chars": ["君", "赫"], "emotion": "喜庆", "gender": "男", "imagery": ["君子", "光明"], "scene": "寄托君子修身立德、光明显赫之志"}
+{"id": "raw_0178", "recommend_chars": ["明", "清", "泉", "松"], "emotion": "中性", "gender": "中", "imagery": ["清朗", "高洁", "静谧", "自然"], "scene": "寄托淡泊明志、宁静致远之怀"}
+{"id": "raw_0329", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["强乐无味", "对酒当歌"], "scene": "表达借酒浇愁却更添愁绪的无奈与感伤"}
+{"id": "raw_0123", "recommend_chars": ["芳", "泽", "昭", "质"], "emotion": "中性", "gender": "中", "imagery": ["高洁", "坚守", "纯净"], "scene": "寄托保持高洁品质、坚守本真之志"}
+{"id": "raw_0448", "recommend_chars": ["星", "灿", "汉"], "emotion": "喜庆", "gender": "男", "imagery": ["星辰", "光辉", "壮阔"], "scene": "寄托胸怀宽广、前程辉煌之志"}
+{"id": "raw_0490", "recommend_chars": ["博", "志", "思", "仁"], "emotion": "中性", "gender": "中", "imagery": ["博学", "笃志", "深思", "仁德"], "scene": "寄托勤学修身、追求仁德之志"}
+{"id": "raw_0003", "recommend_chars": ["金", "锡", "璧"], "emotion": "喜庆", "gender": "男", "imagery": ["君子", "德才", "珍贵"], "scene": "寄托君子德才兼备、如金锡圭璧般珍贵高洁之志"}
+{"id": "raw_0179", "recommend_chars": ["明", "月", "天", "涯"], "emotion": "中性", "gender": "中", "imagery": ["明月", "天涯", "共时"], "scene": "寄托思念远方、珍惜当下之情"}
+{"id": "raw_0330", "recommend_chars": ["愿", "长", "娟"], "emotion": "喜庆", "gender": "中", "imagery": ["长久", "团圆", "美好"], "scene": "寄托对亲人朋友的美好祝愿与长久思念"}
+{"id": "raw_0124", "recommend_chars": ["修", "远"], "emotion": "中性", "gender": "男", "imagery": ["求索", "远大"], "scene": "寄托追求真理、不懈奋斗之志"}
+{"id": "raw_0449", "recommend_chars": ["天", "归", "心"], "emotion": "中性", "gender": "中", "imagery": ["天下归心", "贤才汇聚", "宏图大志"], "scene": "寄托招贤纳士、天下归心的宏伟抱负"}
+{"id": "raw_0491", "recommend_chars": ["中", "和", "育"], "emotion": "喜庆", "gender": "中", "imagery": ["中和", "天地", "化育"], "scene": "寄托和谐中正、万物化育之愿景"}
+{"id": "raw_0004", "recommend_chars": ["维", "新"], "emotion": "喜庆", "gender": "男", "imagery": ["革新", "承前启后"], "scene": "寄托变革创新之志"}
+{"id": "raw_0180", "recommend_chars": ["凌", "览", "山"], "emotion": "中性", "gender": "男", "imagery": ["登高望远", "壮志凌云", "胸怀宽广"], "scene": "寄托奋发向上、胸怀大志的寓意"}
+{"id": "raw_0331", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["孤寂", "无奈"], "scene": "表达强作欢颜却难掩内心愁绪的意境"}
+{"id": "raw_0125", "recommend_chars": ["兰", "芳", "华", "英"], "emotion": "喜庆", "gender": "女", "imagery": ["高洁", "芬芳", "华美", "英才"], "scene": "寄托美好品德与才华出众之愿"}
+{"id": "raw_0450", "recommend_chars": ["歌", "生"], "emotion": "中性", "gender": "中", "imagery": ["人生", "豪情"], "scene": "寄托对人生的感慨与豪迈之情"}
+{"id": "raw_0492", "recommend_chars": ["贤", "思", "齐"], "emotion": "中性", "gender": "中", "imagery": ["自省", "向善", "修身"], "scene": "寄托修身自省、见贤思齐之志"}
+{"id": "raw_0005", "recommend_chars": ["玉", "瓒", "黄", "流"], "emotion": "喜庆", "gender": "中", "imagery": ["温润如玉", "华美尊贵", "源远流长"], "scene": "寄托温润如玉、华美尊贵、源远流长之寓意"}
+{"id": "raw_0181", "recommend_chars": ["海", "存", "知", "天", "涯"], "emotion": "中性", "gender": "中", "imagery": ["知己", "天涯", "比邻"], "scene": "寄托友谊长存、心意相通之愿"}
+{"id": "raw_0332", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["执着", "无悔"], "scene": "表达对理想或爱情的坚定执着，虽苦无悔"}
+{"id": "raw_0126", "recommend_chars": ["美", "修"], "emotion": "中性", "gender": "中", "imagery": ["内美", "修能"], "scene": "寄托内外兼修、德才兼备之志"}
+{"id": "raw_0451", "recommend_chars": ["壮", "心", "烈"], "emotion": "中性", "gender": "男", "imagery": ["壮志", "雄心", "刚烈"], "scene": "寄托老当益壮、奋发有为的志向"}
+{"id": "raw_0494", "recommend_chars": ["君", "琢"], "emotion": "中性", "gender": "男", "imagery": ["君子", "修身"], "scene": "寄托修身养性、精益求精之志"}
+{"id": "raw_0006", "recommend_chars": ["淑", "乐"], "emotion": "喜庆", "gender": "女", "imagery": ["贤淑", "和乐"], "scene": "寄托贤良淑德、生活美满之愿"}
+{"id": "raw_0183", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["思念", "离别", "遥远"], "scene": "寄托思念远方之人的离愁别绪"}
+{"id": "raw_0333", "recommend_chars": [], "emotion": "中性", "gender": "中", "imagery": ["寻觅", "执着"], "scene": "寄托对理想或真爱的执着追求"}
+{"id": "raw_0127", "recommend_chars": ["修", "远", "高", "厉"], "emotion": "中性", "gender": "男", "imagery": ["修身", "远志", "高洁", "励精"], "scene": "寄托修身养性、志存高远、砥砺前行之意"}
+{"id": "raw_0452", "recommend_chars": ["志", "在", "里"], "emotion": "中性", "gender": "男", "imagery": ["雄心壮志", "远大前程", "老当益壮"], "scene": "寄托奋发有为、志存高远之寓意"}
+{"id": "raw_0496", "recommend_chars": ["敦", "厚", "崇", "礼"], "emotion": "中性", "gender": "男", "imagery": ["敦厚", "崇礼", "温故知新"], "scene": "寄托修身立德、尊崇礼义之志"}
+{"id": "raw_0007", "recommend_chars": ["清", "婉"], "emotion": "喜庆", "gender": "女", "imagery": ["清扬婉约", "美好相遇"], "scene": "寄托对美好女子温婉清丽之姿的赞美与倾慕"}
+{"id": "raw_0184", "recommend_chars": ["川", "月", "风"], "emotion": "中性", "gender": "中", "imagery": ["壮阔", "豪迈", "自然之力"], "scene": "寄托胸怀壮阔、坚韧不拔之志"}
+{"id": "raw_0334", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["登临怀远", "离愁别绪", "黯然销魂"], "scene": "寄托羁旅思乡、离愁别恨之情"}
+{"id": "raw_0128", "recommend_chars": ["芳", "华"], "emotion": "中性", "gender": "中", "imagery": ["芬芳", "光华"], "scene": "寄托内在美好自然流露之意"}
+{"id": "raw_0453", "recommend_chars": ["鹿", "鸣", "苹"], "emotion": "喜庆", "gender": "中", "imagery": ["自然和谐", "生机勃勃", "欢快祥和"], "scene": "寄托对自然和谐、生活安乐的向往"}
+{"id": "raw_0497", "recommend_chars": ["知", "新"], "emotion": "中性", "gender": "中", "imagery": ["温故知新", "承前启后"], "scene": "寓意在继承中创新，适合寄托学识与智慧"}
+{"id": "raw_0008", "recommend_chars": ["鹤", "鸣", "天"], "emotion": "喜庆", "gender": "男", "imagery": ["高远", "声名远扬", "志向远大"], "scene": "寄托才德出众、声名远播之志"}
+{"id": "raw_0185", "recommend_chars": ["翰", "达", "秋", "江"], "emotion": "中性", "gender": "男", "imagery": ["旷达", "思乡", "秋风", "远行"], "scene": "寄托旷达超逸、思乡怀远之情"}
+{"id": "raw_0335", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["黄昏", "孤寂", "飘零"], "scene": "表达孤寂与漂泊之感"}
+{"id": "raw_0129", "recommend_chars": ["光", "蕙", "兰"], "emotion": "喜庆", "gender": "中", "imagery": ["光明", "芬芳", "高洁"], "scene": "寄托光明磊落、品德高洁之志"}
+{"id": "raw_0454", "recommend_chars": ["玉", "芝", "堂", "金"], "emotion": "喜庆", "gender": "中", "imagery": ["华贵", "仙境", "祥瑞"], "scene": "寄托富贵吉祥、高雅脱俗之愿"}
+{"id": "raw_0498", "recommend_chars": ["学", "时"], "emotion": "喜庆", "gender": "中", "imagery": ["勤学", "悦乐"], "scene": "寄托勤学不辍、乐在其中的进取精神"}
+{"id": "raw_0009", "recommend_chars": ["伊", "方"], "emotion": "中性", "gender": "女", "imagery": ["美好", "思念", "远方"], "scene": "寄托对美好事物的向往与追求"}
+{"id": "raw_0186", "recommend_chars": ["翰", "达", "秋", "江"], "emotion": "中性", "gender": "男", "imagery": ["旷达", "思乡", "秋风", "远行"], "scene": "寄托超然物外、随性洒脱之志"}
+{"id": "raw_0336", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["华发", "星霜"], "scene": "感叹时光流逝，华发如星"}
+{"id": "raw_0130", "recommend_chars": ["吉", "辰", "良", "穆", "愉"], "emotion": "喜庆", "gender": "男", "imagery": ["吉日良辰", "和穆愉悦", "尊崇上皇"], "scene": "寄托对美好时光的珍视与对尊贵人物的敬仰，寓意吉祥、和顺、愉悦。"}
+{"id": "raw_0455", "recommend_chars": ["临", "观", "知"], "emotion": "中性", "gender": "中", "imagery": ["明辨", "审慎", "智慧"], "scene": "寓意在抉择中保持清醒与智慧，适合寄托明辨慎思之志"}
+{"id": "raw_0501", "recommend_chars": ["贤", "俊", "庆"], "emotion": "喜庆", "gender": "男", "imagery": ["尊贤重才", "治国安邦", "喜庆祥瑞"], "scene": "寄托尊贤任能、国泰民安之愿"}
+{"id": "raw_0010", "recommend_chars": ["德"], "emotion": "喜庆", "gender": "男", "imagery": ["美德", "丰足"], "scene": "寄托品德高尚、生活丰足之愿"}
+{"id": "raw_0187", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["逝去", "萧瑟"], "scene": "感叹时光流逝，物是人非"}
+{"id": "raw_0337", "recommend_chars": ["映", "归", "雪"], "emotion": "中性", "gender": "中", "imagery": ["映照", "归途", "高洁"], "scene": "寄托高洁志向与归隐之思"}
+{"id": "raw_0131", "recommend_chars": ["廉", "洁", "正", "直", "清"], "emotion": "中性", "gender": "中", "imagery": ["廉洁", "正直", "清白"], "scene": "寄托坚守廉洁正直、清白自守之志"}
+{"id": "raw_0456", "recommend_chars": ["松", "道", "精"], "emotion": "中性", "gender": "中", "imagery": ["高洁长寿", "修身养性", "精神专注"], "scene": "寄托追求精神修养与长寿之道"}
+{"id": "raw_0503", "recommend_chars": ["德", "明", "中", "庸"], "emotion": "中性", "gender": "男", "imagery": ["尊德性", "道问学", "致广大", "尽精微"], "scene": "寄托修身治学、追求中庸之道的志向"}
+{"id": "raw_0011", "recommend_chars": ["淇", "竹", "青"], "emotion": "喜庆", "gender": "中", "imagery": ["绿竹", "生机", "清雅"], "scene": "寄托生机勃勃、清雅高洁之志"}
+{"id": "raw_0188", "recommend_chars": ["川", "天"], "emotion": "中性", "gender": "男", "imagery": ["辽阔", "壮美"], "scene": "寄托胸怀宽广、志向高远之意"}
+{"id": "raw_0338", "recommend_chars": ["琼", "玉", "明", "霞"], "emotion": "喜庆", "gender": "中", "imagery": ["美好相遇", "光彩照人", "温润如玉"], "scene": "寄托美好相遇、光彩照人之意"}
+{"id": "raw_0132", "recommend_chars": ["宁", "超", "真"], "emotion": "中性", "gender": "男", "imagery": ["高洁", "坚守", "超然"], "scene": "寄托坚守本真、超然物外之志"}
+{"id": "raw_0457", "recommend_chars": ["游", "泉"], "emotion": "中性", "gender": "男", "imagery": ["遨游", "清泉"], "scene": "寄托超然物外、志在四方之志"}
+{"id": "raw_0504", "recommend_chars": ["山", "广", "木", "宝", "兴"], "emotion": "中性", "gender": "中", "imagery": ["山岳广大", "草木繁盛", "宝藏兴焉"], "scene": "寓意胸怀宽广、根基深厚、内藏珍宝、兴旺发达"}
+{"id": "raw_0012", "recommend_chars": ["淑", "琴", "友"], "emotion": "喜庆", "gender": "女", "imagery": ["贤淑", "琴瑟和鸣", "友善"], "scene": "寄托女子贤淑温婉、婚姻和谐美满之愿"}
+{"id": "raw_0189", "recommend_chars": ["天", "海", "流"], "emotion": "中性", "gender": "男", "imagery": ["壮阔", "奔流", "永恒"], "scene": "寄托胸怀宽广、志向远大之意"}
+{"id": "raw_0340", "recommend_chars": ["南", "玉", "素", "秋"], "emotion": "中性", "gender": "中", "imagery": ["高远", "清朗", "雅致"], "scene": "寄托高洁清雅、胸怀旷达之志"}
+{"id": "raw_0133", "recommend_chars": ["宁", "成"], "emotion": "中性", "gender": "男", "imagery": ["坚守", "进取"], "scene": "表达在人生抉择中坚守本心、追求成就的志向"}
+{"id": "raw_0458", "recommend_chars": ["东", "蓬", "莱", "天"], "emotion": "中性", "gender": "中", "imagery": ["远行", "登仙", "天门"], "scene": "寄托追求高远境界、超脱尘世之志"}
+{"id": "raw_0505", "recommend_chars": ["惠", "善", "忠", "仁"], "emotion": "喜庆", "gender": "中", "imagery": ["仁德", "教化", "忠善"], "scene": "寄托仁德教化、忠善传家之志"}
+{"id": "raw_0013", "recommend_chars": ["静", "姝"], "emotion": "喜庆", "gender": "女", "imagery": ["娴静", "美好"], "scene": "寄托女子娴静美好之德"}
+{"id": "raw_0190", "recommend_chars": ["龙", "川", "高", "标"], "emotion": "中性", "gender": "男", "imagery": ["高远", "壮阔", "坚韧"], "scene": "寄寓志向高远、胸怀壮阔、不畏艰险之意"}
+{"id": "raw_0341", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["怀旧", "物是人非"], "scene": "感叹时光流逝，昔日不再"}
+{"id": "raw_0134", "recommend_chars": ["兰", "英"], "emotion": "中性", "gender": "女", "imagery": ["高洁", "清雅"], "scene": "寄托高洁清雅之志"}
+{"id": "raw_0459", "recommend_chars": ["明", "民"], "emotion": "中性", "gender": "中", "imagery": ["光明", "仁爱"], "scene": "寄托光明磊落、仁爱待人之志"}
+{"id": "raw_0507", "recommend_chars": ["仁", "实"], "emotion": "中性", "gender": "中", "imagery": ["仁德", "务实"], "scene": "寄托坚守仁德、务实去名之志"}
+{"id": "raw_0014", "recommend_chars": ["淑", "君"], "emotion": "喜庆", "gender": "男", "imagery": ["贤淑", "君子", "美好姻缘"], "scene": "寄托对美好品德与和谐婚姻的向往"}
+{"id": "raw_0191", "recommend_chars": ["明", "秋", "月", "春"], "emotion": "中性", "gender": "中", "imagery": ["光明", "秋月", "春风", "时光"], "scene": "寄托珍惜时光、追求光明与美好之意"}
+{"id": "raw_0342", "recommend_chars": ["春", "芳", "香", "娇"], "emotion": "喜庆", "gender": "女", "imagery": ["春意", "芬芳", "娇美"], "scene": "赞美早春清新柔美之景，寓意美好与生机"}
+{"id": "raw_0136", "recommend_chars": ["光", "明", "文", "耀", "玉"], "emotion": "喜庆", "gender": "中", "imagery": ["光明", "文采", "美玉"], "scene": "寄托才华横溢、光彩照人之意"}
+{"id": "raw_0460", "recommend_chars": ["景", "南", "山"], "emotion": "喜庆", "gender": "男", "imagery": ["长寿", "南山", "景行"], "scene": "寄托健康长寿、德行高尚之愿"}
+{"id": "raw_0510", "recommend_chars": ["恭", "宽", "信", "敏", "惠"], "emotion": "喜庆", "gender": "中", "imagery": ["恭敬", "宽厚", "诚信", "勤敏"], "scene": "寄托修身立德、仁政爱民之志"}
+{"id": "raw_0015", "recommend_chars": ["既", "醉"], "emotion": "喜庆", "gender": "中", "imagery": ["宴饮", "欢愉"], "scene": "寄托宴饮欢愉、生活富足之愿"}
+{"id": "raw_0192", "recommend_chars": ["明", "堂", "基"], "emotion": "中性", "gender": "男", "imagery": ["光明", "基业", "传承"], "scene": "寓意光明磊落、基业长青，承前启后"}
+{"id": "raw_0343", "recommend_chars": ["明", "晓", "流", "霞"], "emotion": "中性", "gender": "中", "imagery": ["光明", "拂晓", "流水", "彩霞"], "scene": "寄托对美好时光的珍惜与豁达情怀"}
+{"id": "raw_0137", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["乱世", "贤者不遇"], "scene": "感叹贤者生不逢时，寄托怀才不遇之悲"}
+{"id": "raw_0461", "recommend_chars": ["芝", "英", "桂", "兰"], "emotion": "中性", "gender": "中", "imagery": ["仙逸", "高洁", "自然"], "scene": "寄托高洁脱俗、自然清雅之志"}
+{"id": "raw_0511", "recommend_chars": ["善", "树", "导", "子"], "emotion": "中性", "gender": "中", "imagery": ["善养", "教化", "传承"], "scene": "寄托仁爱教化、传承美德之志"}
+{"id": "raw_0016", "recommend_chars": ["淇", "竹"], "emotion": "中性", "gender": "中", "imagery": ["清雅", "坚韧"], "scene": "寄托清雅坚韧之志"}
+{"id": "raw_0193", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["荒芜", "战乱", "民生凋敝"], "scene": "描绘战乱后田园荒芜、民生凋敝的惨状"}
+{"id": "raw_0344", "recommend_chars": ["晓", "新", "莺"], "emotion": "喜庆", "gender": "中", "imagery": ["迎新", "生机", "欢愉"], "scene": "寄托辞旧迎新、充满希望与欢乐的寓意"}
+{"id": "raw_0138", "recommend_chars": ["芳", "松", "柏"], "emotion": "中性", "gender": "中", "imagery": ["高洁", "坚贞", "隐逸"], "scene": "寄托高洁坚贞、隐逸脱俗之志"}
+{"id": "raw_0462", "recommend_chars": ["泰", "华", "远", "游"], "emotion": "中性", "gender": "男", "imagery": ["登高望远", "神游太虚", "超然物外"], "scene": "寄托高远志向与超脱尘世之愿"}
+{"id": "raw_0512", "recommend_chars": ["水", "生", "足"], "emotion": "中性", "gender": "中", "imagery": ["生命之源", "互助", "满足"], "scene": "寓意生活富足、互助共济"}
+{"id": "raw_0017", "recommend_chars": ["赫", "君"], "emotion": "喜庆", "gender": "男", "imagery": ["光明", "君子", "美德"], "scene": "寄托光明磊落、君子之德的期望"}
+{"id": "raw_0195", "recommend_chars": ["新", "安", "丽"], "emotion": "喜庆", "gender": "女", "imagery": ["春日", "丽人", "长安"], "scene": "寄托对美好春光的赞美和对女子优雅风姿的向往"}
+{"id": "raw_0346", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["离别", "暗夜", "流水"], "scene": "描绘送别时黯淡烛光与流水般的眼波，寄托离愁别绪"}
+{"id": "raw_0140", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["悲凉", "无奈"], "scene": "表达命运不济、生命短暂的哀叹"}
+{"id": "raw_0463", "recommend_chars": ["明", "光", "昭"], "emotion": "喜庆", "gender": "中", "imagery": ["光明普照", "辉煌灿烂", "希望"], "scene": "寄托光明磊落、前程似锦之愿"}
+{"id": "raw_0513", "recommend_chars": ["山", "木", "美"], "emotion": "中性", "gender": "中", "imagery": ["自然之美", "坚韧质朴", "美好愿景"], "scene": "寄托对自然与美好品质的珍视，警示保护与珍惜"}
+{"id": "raw_0018", "recommend_chars": ["君", "子"], "emotion": "中性", "gender": "男", "imagery": ["君子", "品德"], "scene": "寄托对高尚品德与君子风范的仰慕与赞美"}
+{"id": "raw_0198", "recommend_chars": ["景", "逢", "君"], "emotion": "中性", "gender": "中", "imagery": ["重逢", "美好时光", "君子之交"], "scene": "寄托对美好重逢的珍视与对友情的怀念"}
+{"id": "raw_0347", "recommend_chars": ["春", "光", "笙", "箫"], "emotion": "喜庆", "gender": "中", "imagery": ["春意盎然", "光明璀璨", "音乐雅韵"], "scene": "寄托对美好生活的向往与欢庆之情"}
+{"id": "raw_0141", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["幽暗", "迟暮", "困顿"], "scene": "表达身处困境、时光流逝的哀愁"}
+{"id": "raw_0464", "recommend_chars": ["天", "赐", "神"], "emotion": "喜庆", "gender": "中", "imagery": ["天赐", "神佑", "祥瑞"], "scene": "寄托天赐神佑、福寿安康之愿"}
+{"id": "raw_0514", "recommend_chars": ["文", "望", "宜"], "emotion": "中性", "gender": "男", "imagery": ["文脉传承", "贤才辈出", "知遇之志"], "scene": "寄托传承文化、见贤思齐之志"}
+{"id": "raw_0019", "recommend_chars": ["淇", "竹"], "emotion": "喜庆", "gender": "中", "imagery": ["绿竹猗猗", "淇水之畔"], "scene": "寄托君子如竹、清雅高洁之志"}
+{"id": "raw_0200", "recommend_chars": ["秋", "玉"], "emotion": "中性", "gender": "中", "imagery": ["秋水", "玉堂"], "scene": "寄托高洁清雅、才德如玉之志"}
+{"id": "raw_0348", "recommend_chars": ["明", "月"], "emotion": "中性", "gender": "中", "imagery": ["明月", "清辉"], "scene": "寄托清雅高洁之志"}
+{"id": "raw_0143", "recommend_chars": ["灵", "吉", "占", "历"], "emotion": "中性", "gender": "中", "imagery": ["吉兆", "远行", "抉择", "顺时"], "scene": "寓意顺应天时、把握良机，开启新的征程。"}
+{"id": "raw_0466", "recommend_chars": ["济", "天", "汉", "昆", "君"], "emotion": "中性", "gender": "男", "imagery": ["远行", "登临", "求仙", "拜谒"], "scene": "寄托胸怀壮志、追寻高远境界之寓意"}
+{"id": "raw_0515", "recommend_chars": ["天", "地", "日", "月"], "emotion": "中性", "gender": "中", "imagery": ["广博", "恒久", "包容"], "scene": "寄托胸怀宽广、包容万物之志"}
+{"id": "raw_0020", "recommend_chars": ["淑", "窈"], "emotion": "喜庆", "gender": "女", "imagery": ["贤淑", "美好"], "scene": "寄托对美好女子的赞美与追求"}
+{"id": "raw_0201", "recommend_chars": ["文", "清", "安"], "emotion": "中性", "gender": "中", "imagery": ["文采", "清俊", "安宁"], "scene": "寄托文采风流、清雅安宁之愿"}
+{"id": "raw_0349", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["孤寂", "离别", "思念"], "scene": "寄托对远方伴侣的思念与离愁"}
+{"id": "raw_0145", "recommend_chars": ["成", "知", "信"], "emotion": "中性", "gender": "中", "imagery": ["坚韧", "智慧", "诚信"], "scene": "历经磨难而终获真知，寓意坚韧不拔、智慧通达、诚信立身"}
+{"id": "raw_0467", "recommend_chars": ["贤", "明", "忠", "良"], "emotion": "喜庆", "gender": "男", "imagery": ["贤明", "忠良", "治国安邦"], "scene": "寄托贤明忠良、辅国为民之志"}
+{"id": "raw_0517", "recommend_chars": ["信", "义"], "emotion": "中性", "gender": "中", "imagery": ["诚信", "道义"], "scene": "寄托坚守信义、不慕权贵之志"}
+{"id": "raw_0021", "recommend_chars": ["鹿", "鸣", "苹"], "emotion": "喜庆", "gender": "中", "imagery": ["祥和", "自然", "欢聚"], "scene": "象征和谐欢愉、自然生机，寓意生活美好、人际和睦"}
+{"id": "raw_0203", "recommend_chars": ["静", "清", "松", "露"], "emotion": "中性", "gender": "中", "imagery": ["宁静致远", "清雅高洁", "自然和谐"], "scene": "寄托淡泊明志、修身养性之愿"}
+{"id": "raw_0350", "recommend_chars": ["金", "波", "玉"], "emotion": "中性", "gender": "中", "imagery": ["月光如水", "夜深静谧", "星河低转"], "scene": "寄托宁静致远、淡泊明志之怀"}
+{"id": "raw_0147", "recommend_chars": ["信", "直"], "emotion": "中性", "gender": "中", "imagery": ["诚信", "正直"], "scene": "寄托坚守信念、正直不阿之志"}
+{"id": "raw_0468", "recommend_chars": ["赤", "松", "正", "煌"], "emotion": "喜庆", "gender": "男", "imagery": ["赤松高洁", "正大光明", "辉煌灿烂"], "scene": "寄托光明磊落、功业辉煌之志"}
+{"id": "raw_0518", "recommend_chars": ["修", "文", "德", "安"], "emotion": "中性", "gender": "男", "imagery": ["修养文德", "安抚归顺"], "scene": "寄托以德服人、安定和谐之志"}
+{"id": "raw_0022", "recommend_chars": ["苍", "白", "露", "霜"], "emotion": "中性", "gender": "中", "imagery": ["苍茫", "清冷", "秋意"], "scene": "寄托清雅高洁、淡泊宁静之志"}
+{"id": "raw_0206", "recommend_chars": ["承", "恩", "泽"], "emotion": "喜庆", "gender": "女", "imagery": ["承恩", "受宠", "娇柔"], "scene": "寄托受宠承恩、娇美柔顺之寓意"}
+{"id": "raw_0351", "recommend_chars": ["素", "星", "河", "汉"], "emotion": "中性", "gender": "中", "imagery": ["静谧", "星河", "携手"], "scene": "寄托宁静致远、携手共度美好时光之意"}
+{"id": "raw_0148", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["时光易逝", "忧思难解"], "scene": "感叹人生短暂，寄托对生命无常的哀思"}
+{"id": "raw_0469", "recommend_chars": ["歌", "乐", "诚"], "emotion": "喜庆", "gender": "中", "imagery": ["欢歌", "快乐", "真诚"], "scene": "寄托欢乐真诚、乐观开朗之愿"}
+{"id": "raw_0519", "recommend_chars": ["贤", "才"], "emotion": "中性", "gender": "中", "imagery": ["贤才", "取舍"], "scene": "寓意明辨贤愚、重视人才"}
+{"id": "raw_0023", "recommend_chars": ["鹿", "鸣"], "emotion": "喜庆", "gender": "中", "imagery": ["祥和", "欢聚", "自然"], "scene": "寄托和谐欢愉、自然生机之寓意"}
+{"id": "raw_0207", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["边塞苦寒", "风雪苍茫"], "scene": "此句描绘边塞八月飞雪的奇寒景象，意境苍凉，不宜用于起名。"}
+{"id": "raw_0352", "recommend_chars": ["春", "翠", "金"], "emotion": "喜庆", "gender": "女", "imagery": ["春意盎然", "华美绚丽", "生机勃勃"], "scene": "寄托对美好春光的赞美与对青春活力的向往"}
+{"id": "raw_0149", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["幽险", "远路"], "scene": "表达对前路艰险、故国难归的哀伤与无奈"}
+{"id": "raw_0470", "recommend_chars": ["延", "年", "寿", "秋"], "emotion": "喜庆", "gender": "中", "imagery": ["长寿", "延年", "秋实"], "scene": "寄托健康长寿、福寿绵长之愿"}
+{"id": "raw_0520", "recommend_chars": ["仁", "爱"], "emotion": "中性", "gender": "中", "imagery": ["仁爱", "推己及人"], "scene": "寄托仁爱之心，推己及人，以德化人"}
+{"id": "raw_0024", "recommend_chars": ["鹿", "鸣"], "emotion": "喜庆", "gender": "中", "imagery": ["祥和", "欢聚", "自然"], "scene": "寄托和谐欢愉、亲近自然之愿"}
+{"id": "raw_0210", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["离愁", "秋夜", "归期未定"], "scene": "寄托思念与期盼归期之情"}
+{"id": "raw_0353", "recommend_chars": ["嘉", "清", "梅"], "emotion": "喜庆", "gender": "中", "imagery": ["美好", "清新", "成长"], "scene": "寄托对美好成长与清新品格的祝愿"}
+{"id": "raw_0150", "recommend_chars": ["皓", "白"], "emotion": "中性", "gender": "中", "imagery": ["高洁", "清白"], "scene": "寄托坚守高洁品格、不染世俗之志"}
+{"id": "raw_0471", "recommend_chars": ["民", "恩"], "emotion": "中性", "gender": "中", "imagery": ["民本", "恩泽"], "scene": "寄托惠民感恩之德"}
+{"id": "raw_0521", "recommend_chars": ["德", "诚", "悦"], "emotion": "中性", "gender": "中", "imagery": ["以德服人", "心悦诚服", "教化育人"], "scene": "寄托以德服人、真诚感化、令人心悦诚服的寓意"}
+{"id": "raw_0025", "recommend_chars": ["清", "扬", "婉"], "emotion": "喜庆", "gender": "女", "imagery": ["清扬婉约", "美好灵动", "温婉秀丽"], "scene": "寄托女子清丽温婉、灵动美好之寓意"}
+{"id": "raw_0211", "recommend_chars": ["峰", "月", "城", "雪"], "emotion": "中性", "gender": "中", "imagery": ["边塞", "清冷", "壮阔"], "scene": "寄托坚毅清正、胸怀壮阔之志"}
+{"id": "raw_0354", "recommend_chars": ["清", "光", "幽", "笛"], "emotion": "中性", "gender": "中", "imagery": ["清光", "幽窗", "夜笛"], "scene": "寄托清幽雅致、宁静致远之志"}
+{"id": "raw_0152", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["香草", "高洁", "怀才不遇"], "scene": "感叹世人不识芬芳，寄托高洁自守之志"}
+{"id": "raw_0472", "recommend_chars": ["远", "扬"], "emotion": "中性", "gender": "中", "imagery": ["远行", "飞扬"], "scene": "寄托志在四方、奋发向上之意"}
+{"id": "raw_0522", "recommend_chars": ["信", "如", "君", "子"], "emotion": "中性", "gender": "中", "imagery": ["诚信", "秩序", "仁德"], "scene": "寄托对诚信与伦理秩序的重视"}
+{"id": "raw_0026", "recommend_chars": ["静", "嘉"], "emotion": "喜庆", "gender": "中", "imagery": ["宁静美好", "嘉祥如意"], "scene": "寄托宁静致远、嘉美和顺之愿"}
+{"id": "raw_0212", "recommend_chars": ["乐", "峰", "城", "月", "霜"], "emotion": "中性", "gender": "中", "imagery": ["边塞", "清冷", "壮阔"], "scene": "寄托坚韧清远之志"}
+{"id": "raw_0355", "recommend_chars": ["静", "秋", "明", "月"], "emotion": "中性", "gender": "中", "imagery": ["宁静", "秋光", "明月", "湖光"], "scene": "寄托宁静致远、明澈高洁之志"}
+{"id": "raw_0153", "recommend_chars": ["光", "景", "诚", "信"], "emotion": "中性", "gender": "中", "imagery": ["光明", "诚信", "幽隐", "自省"], "scene": "寄托坚守诚信、光明磊落之志"}
+{"id": "raw_0473", "recommend_chars": ["志", "登", "泰", "华"], "emotion": "中性", "gender": "男", "imagery": ["登高望远", "志向远大", "泰山之志"], "scene": "寄托胸怀大志、追求高远境界的寓意"}
+{"id": "raw_0523", "recommend_chars": ["治", "厚"], "emotion": "中性", "gender": "中", "imagery": ["治理", "敦厚"], "scene": "强调根本与厚薄之理，寓意治本与厚德"}
+{"id": "raw_0027", "recommend_chars": ["河", "洲"], "emotion": "喜庆", "gender": "中", "imagery": ["河流", "小岛", "自然和谐"], "scene": "寄托对美好自然与和谐生活的向往"}
+{"id": "raw_0213", "recommend_chars": ["雪", "山", "路"], "emotion": "中性", "gender": "中", "imagery": ["雪中行迹", "离别", "苍茫"], "scene": "寄托离别之情与对远行者的思念"}
+{"id": "raw_0356", "recommend_chars": ["清", "晴", "知"], "emotion": "中性", "gender": "中", "imagery": ["清朗", "光明", "智慧"], "scene": "寄托对未来的美好期许与豁达心境"}
+{"id": "raw_0154", "recommend_chars": ["远", "识"], "emotion": "中性", "gender": "中", "imagery": ["远志", "卓识"], "scene": "寄托高远志向与独立见识"}
+{"id": "raw_0474", "recommend_chars": ["玉", "正", "兴", "道"], "emotion": "喜庆", "gender": "男", "imagery": ["美玉", "正气", "兴盛", "大道"], "scene": "寄托胸怀正气、事业兴盛、前途光明之志"}
+{"id": "raw_0525", "recommend_chars": ["远", "洁"], "emotion": "中性", "gender": "中", "imagery": ["高远", "纯洁"], "scene": "寄托高洁自守、志向远大之意"}
+{"id": "raw_0028", "recommend_chars": ["钟", "孝", "祝", "神", "皇"], "emotion": "喜庆", "gender": "中", "imagery": ["钟鼓齐鸣", "孝思不匮", "神佑安康", "皇皇盛典"], "scene": "描绘祭祀盛典，钟鼓齐备，孝孙主祭，神享其诚，皇尸受礼，寓意庄重祥和、福泽绵长。"}
+{"id": "raw_0215", "recommend_chars": ["春", "江", "花", "月", "秋"], "emotion": "中性", "gender": "中", "imagery": ["春江", "花月", "秋夜", "独酌"], "scene": "寄托对美好时光的珍惜与独处时的宁静情怀"}
+{"id": "raw_0357", "recommend_chars": ["明", "月", "清", "景"], "emotion": "中性", "gender": "中", "imagery": ["清雅", "宁静", "美好"], "scene": "寄托对美好宁静生活的向往"}
+{"id": "raw_0155", "recommend_chars": ["清", "达"], "emotion": "中性", "gender": "中", "imagery": ["清澈", "通达"], "scene": "寓意内心清澈、通达无碍"}
+{"id": "raw_0475", "recommend_chars": ["游", "元", "风", "翩"], "emotion": "中性", "gender": "中", "imagery": ["遨游", "自然", "飘逸", "自由"], "scene": "寄托超脱世俗、追求自由与自然之趣"}
+{"id": "raw_0529", "recommend_chars": ["仁", "智", "敬"], "emotion": "中性", "gender": "中", "imagery": ["自省", "修身", "仁德"], "scene": "寄托反求诸己、修身立德之志"}
+{"id": "raw_0029", "recommend_chars": ["宇", "月"], "emotion": "中性", "gender": "中", "imagery": ["宇宙", "月华"], "scene": "寄寓天地广阔、时光流转之意"}
+{"id": "raw_0216", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["时光流逝", "物是人非", "悲欢离合"], "scene": "感叹美好时光易逝，世事无常，不宜用于起名"}
+{"id": "raw_0358", "recommend_chars": ["清", "溪", "玉", "疏", "篱"], "emotion": "中性", "gender": "中", "imagery": ["清溪", "玉堂", "茅舍", "疏篱"], "scene": "寄托淡泊宁静、归隐田园之志"}
+{"id": "raw_0156", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["悲愤", "决绝"], "scene": "表达理想受挫、宁死不屈的悲壮情怀"}
+{"id": "raw_0476", "recommend_chars": ["耕", "储", "盈"], "emotion": "喜庆", "gender": "中", "imagery": ["丰收", "富足", "积累"], "scene": "寄托勤劳致富、仓廪充实之愿"}
+{"id": "raw_0530", "recommend_chars": ["居", "同"], "emotion": "中性", "gender": "中", "imagery": ["居养气", "和同"], "scene": "寄寓环境塑造品格、追求内外和谐之意"}
+{"id": "raw_0030", "recommend_chars": ["明", "德"], "emotion": "中性", "gender": "中", "imagery": ["明德", "怀德"], "scene": "寄托修身明德、弘扬美德的志向"}
+{"id": "raw_0217", "recommend_chars": ["阳", "远", "天"], "emotion": "中性", "gender": "中", "imagery": ["夕阳", "远志", "高远"], "scene": "寄托高远志向与开阔胸襟"}
+{"id": "raw_0359", "recommend_chars": ["华", "新"], "emotion": "喜庆", "gender": "中", "imagery": ["焕然一新", "年华美好"], "scene": "寄托辞旧迎新、焕发新生的美好寓意"}
+{"id": "raw_0157", "recommend_chars": ["明", "兰", "芷", "芳"], "emotion": "中性", "gender": "中", "imagery": ["光明", "高洁", "芬芳"], "scene": "寄托品行高洁、才华内蕴之志"}
+{"id": "raw_0477", "recommend_chars": ["赦", "原", "征", "伐"], "emotion": "中性", "gender": "男", "imagery": ["宽宥", "征伐", "开拓"], "scene": "寄托宽仁与进取之志"}
+{"id": "raw_0531", "recommend_chars": ["圣", "远"], "emotion": "中性", "gender": "中", "imagery": ["承前启后", "任重道远"], "scene": "寄托传承圣贤之道、志向远大的寓意"}
+{"id": "raw_0031", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["国势衰微", "今昔对比"], "scene": "感叹国运日蹙，寄托忧国忧民之思"}
+{"id": "raw_0218", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["沧海遗珠", "暖玉生烟"], "scene": "寄托对逝去美好事物的追忆与哀思"}
+{"id": "raw_0360", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["追忆", "孤寂", "秋千空悬"], "scene": "寄托对往昔游伴的深切怀念与孤寂之情"}
+{"id": "raw_0158", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["时序变迁", "严酷考验"], "scene": "感叹时光流逝与人生多艰"}
+{"id": "raw_0478", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["艰难", "徘徊"], "scene": "表达困境中的迷茫与坚持"}
+{"id": "raw_0532", "recommend_chars": ["知", "道"], "emotion": "中性", "gender": "中", "imagery": ["智慧", "明理"], "scene": "寄托追求真理、明辨是非之志"}
+{"id": "raw_0032", "recommend_chars": ["明", "文", "德"], "emotion": "喜庆", "gender": "男", "imagery": ["光明", "文德", "四方安定"], "scene": "寄托弘扬文德、安定四方之志"}
+{"id": "raw_0220", "recommend_chars": ["渔", "舟", "春", "桃", "津"], "emotion": "喜庆", "gender": "中", "imagery": ["春意盎然", "山水之乐", "桃花流水", "渔舟唱晚"], "scene": "寄托对自然美景的喜爱与闲适自在的生活情趣"}
+{"id": "raw_0362", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["倦怠", "愁绪"], "scene": "表达内心愁苦与倦怠之情"}
+{"id": "raw_0159", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["正直", "真实"], "scene": "寄托坚守正道、追求本真的志向"}
+{"id": "raw_0480", "recommend_chars": ["仁", "义", "礼", "乐", "荣"], "emotion": "喜庆", "gender": "中", "imagery": ["仁德", "礼乐", "荣光"], "scene": "寄托修身立德、崇尚礼乐、追求荣华的美好愿景"}
+{"id": "raw_0533", "recommend_chars": ["天", "高", "星", "辰", "远"], "emotion": "中性", "gender": "中", "imagery": ["高远", "星辰", "求索", "恒久"], "scene": "寄托追求高远、探索真理、持之以恒之志"}
+{"id": "raw_0033", "recommend_chars": ["琼", "华"], "emotion": "喜庆", "gender": "中", "imagery": ["华美", "尊贵"], "scene": "寄托美好华贵之愿"}
+{"id": "raw_0221", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["月夜怀人", "魂归无依"], "scene": "寄托对故人的深切怀念与哀思"}
+{"id": "raw_0363", "recommend_chars": ["春", "山"], "emotion": "中性", "gender": "中", "imagery": ["春山", "远行"], "scene": "寄托对远方亲人的思念与祝福"}
+{"id": "raw_0160", "recommend_chars": ["清", "承", "松"], "emotion": "中性", "gender": "中", "imagery": ["高洁", "传承", "超脱"], "scene": "寄托追慕先贤、传承高洁之志的寓意"}
+{"id": "raw_0481", "recommend_chars": ["仙", "风", "雨"], "emotion": "中性", "gender": "中", "imagery": ["飘逸", "自然", "灵动"], "scene": "寄托超凡脱俗、自由灵动之志"}
+{"id": "raw_0534", "recommend_chars": ["俊", "杰", "贤", "悦", "立"], "emotion": "喜庆", "gender": "男", "imagery": ["尊贤使能", "俊杰在位", "天下归心", "立志朝堂"], "scene": "寄托招贤纳士、人才济济、天下归心之志"}
+{"id": "raw_0034", "recommend_chars": ["阳", "乐"], "emotion": "喜庆", "gender": "男", "imagery": ["阳光", "快乐"], "scene": "寄托乐观开朗、生活美满之愿"}
+{"id": "raw_0222", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["离别", "风雪", "征途"], "scene": "表达送别友人时的离愁与对前路的关切"}
+{"id": "raw_0364", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["思乡", "离愁"], "scene": "寄托对故土的深切思念与无奈"}
+{"id": "raw_0161", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["思慕", "悲愤"], "scene": "表达对忠贞之志的坚守与对理想不得实现的哀叹"}
+{"id": "raw_0482", "recommend_chars": ["南", "春", "翔"], "emotion": "中性", "gender": "中", "imagery": ["南国", "春日", "翱翔"], "scene": "寄托志在四方、自由翱翔之愿"}
+{"id": "raw_0537", "recommend_chars": ["仁", "义", "礼", "智", "思"], "emotion": "中性", "gender": "中", "imagery": ["仁义", "礼智", "内省", "固有"], "scene": "寄托修身养性、内求本善之德"}
+{"id": "raw_0035", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["远嫁", "思亲", "离别"], "scene": "寄托远嫁思亲、离别伤感之意"}
+{"id": "raw_0223", "recommend_chars": ["玉", "和", "春"], "emotion": "喜庆", "gender": "女", "imagery": ["华贵", "温婉", "生机"], "scene": "寄托富贵吉祥、和谐美满之愿"}
+{"id": "raw_0365", "recommend_chars": ["驰", "林", "初", "约"], "emotion": "中性", "gender": "中", "imagery": ["驰骋", "携手", "初心", "约定"], "scene": "追忆往昔同游之乐，寄托对美好情谊的怀念与珍视"}
+{"id": "raw_0162", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["孤芳", "自守"], "scene": "寄托怀才不遇、孤芳自赏之慨"}
+{"id": "raw_0483", "recommend_chars": [], "emotion": "哀伤", "gender": "男", "imagery": ["艰难", "巍峨"], "scene": "感叹行路艰难，山势巍峨，不宜用于人名"}
+{"id": "raw_0539", "recommend_chars": ["端", "知", "泉", "达"], "emotion": "中性", "gender": "中", "imagery": ["开端", "智慧", "源泉", "通达"], "scene": "寄托修身养性、扩充善端、智慧通达之志"}
+{"id": "raw_0036", "recommend_chars": ["桑", "淇"], "emotion": "中性", "gender": "女", "imagery": ["桑中幽会", "淇水送别"], "scene": "寄托对美好情感的追忆与向往"}
+{"id": "raw_0225", "recommend_chars": ["菱", "桂", "香"], "emotion": "中性", "gender": "女", "imagery": ["坚韧", "芬芳", "高洁"], "scene": "寄托女子坚韧高洁、内美外芳之寓意"}
+{"id": "raw_0366", "recommend_chars": ["梅", "雪", "春", "碧"], "emotion": "中性", "gender": "中", "imagery": ["清雅", "高洁", "生机"], "scene": "寄托清雅高洁、生机盎然之志"}
+{"id": "raw_0163", "recommend_chars": ["介", "山", "德", "优"], "emotion": "中性", "gender": "男", "imagery": ["高洁", "仁德", "优游"], "scene": "寄托高洁仁德、从容自得之志"}
+{"id": "raw_0484", "recommend_chars": [], "emotion": "哀伤", "gender": "男", "imagery": ["征途", "漂泊", "无奈"], "scene": "寄托羁旅思乡、身不由己之慨"}
+{"id": "raw_0540", "recommend_chars": ["知", "大"], "emotion": "中性", "gender": "男", "imagery": ["智慧", "担当"], "scene": "寓意智慧与担当，适合寄托培养大器之才的期望"}
+{"id": "raw_0037", "recommend_chars": ["琼", "英"], "emotion": "喜庆", "gender": "中", "imagery": ["美玉", "英才"], "scene": "寄托美好品质与才华"}
+{"id": "raw_0226", "recommend_chars": ["平", "安"], "emotion": "中性", "gender": "中", "imagery": ["平安", "传语"], "scene": "寄托平安顺遂、传递佳音之愿"}
+{"id": "raw_0367", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["露水", "西风", "凋零"], "scene": "寄托对美好事物易逝的哀叹与无奈"}
+{"id": "raw_0165", "recommend_chars": ["南", "星"], "emotion": "中性", "gender": "中", "imagery": ["方向", "星辰"], "scene": "寄托坚定方向、追求光明之意"}
+{"id": "raw_0485", "recommend_chars": ["歌", "平", "时"], "emotion": "喜庆", "gender": "中", "imagery": ["太平", "欢歌", "祥和"], "scene": "寄托对太平盛世、安居乐业的向往"}
+{"id": "raw_0541", "recommend_chars": ["坚", "城"], "emotion": "中性", "gender": "男", "imagery": ["坚固", "稳固"], "scene": "寄托坚不可摧、稳固如山之意"}
+{"id": "raw_0038", "recommend_chars": ["琼", "莹"], "emotion": "喜庆", "gender": "中", "imagery": ["美玉", "华贵", "清亮"], "scene": "寄托温润华美、光彩照人之意"}
+{"id": "raw_0227", "recommend_chars": ["远", "道"], "emotion": "中性", "gender": "中", "imagery": ["远行", "求索"], "scene": "寄托不畏艰险、追求远大前程之志"}
+{"id": "raw_0368", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["离别", "荒凉", "风沙"], "scene": "寄托对故国沦亡的哀思与离愁"}
+{"id": "raw_0166", "recommend_chars": ["修", "常"], "emotion": "中性", "gender": "中", "imagery": ["修身", "恒常"], "scene": "寄托坚守本心、恒久修养之志"}
+{"id": "raw_0542", "recommend_chars": ["信", "赤"], "emotion": "中性", "gender": "中", "imagery": ["诚信", "赤诚"], "scene": "寄托诚信与赤子之心"}
+{"id": "raw_0039", "recommend_chars": ["思", "齐", "文", "京"], "emotion": "喜庆", "gender": "女", "imagery": ["贤德", "端庄", "文雅", "尊贵"], "scene": "赞颂贤德端庄的女性，寄托对美好品德的向往"}
+{"id": "raw_0228", "recommend_chars": ["远", "明"], "emotion": "中性", "gender": "中", "imagery": ["高远", "澄明"], "scene": "寄托宁静致远、内心澄明之志"}
+{"id": "raw_0369", "recommend_chars": ["俊", "晴", "平"], "emotion": "中性", "gender": "男", "imagery": ["俊逸", "晴朗", "平和"], "scene": "寄托才俊清朗、平安顺遂之愿"}
+{"id": "raw_0167", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["日暮", "月缺", "衰败"], "scene": "感叹时光流逝，美好事物消减"}
+{"id": "raw_0546", "recommend_chars": ["安", "成"], "emotion": "中性", "gender": "中", "imagery": ["安定", "成功"], "scene": "寄托安定平和、终获成功之意"}
+{"id": "raw_0040", "recommend_chars": ["文", "世"], "emotion": "喜庆", "gender": "男", "imagery": ["文王德泽", "百世传承"], "scene": "寄托家族昌盛、文脉绵延之愿"}
+{"id": "raw_0229", "recommend_chars": ["静", "星"], "emotion": "中性", "gender": "中", "imagery": ["宁静致远", "星光璀璨"], "scene": "寓意在静谧中闪耀，追求内心的宁静与高远"}
+{"id": "raw_0371", "recommend_chars": ["晴", "春", "树"], "emotion": "中性", "gender": "中", "imagery": ["晴空", "春意", "生机"], "scene": "历经风雨后迎来晴和春景，寓意坚韧与希望"}
+{"id": "raw_0168", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["自免", "颓流", "日远"], "scene": "抒发自我解脱无望、时光流逝的哀伤之情"}
+{"id": "raw_0547", "recommend_chars": ["子", "问"], "emotion": "中性", "gender": "中", "imagery": ["求知", "问学"], "scene": "寄托勤学好问、追求真理之志"}
+{"id": "raw_0041", "recommend_chars": ["乔", "松", "龙"], "emotion": "中性", "gender": "男", "imagery": ["高洁", "长寿", "腾达"], "scene": "寄托高洁坚毅、前程远大之志"}
+{"id": "raw_0230", "recommend_chars": ["乐", "东", "流"], "emotion": "中性", "gender": "中", "imagery": ["乐天知命", "逝水东流", "豁达超然"], "scene": "寄托超脱豁达、顺应自然的人生观"}
+{"id": "raw_0372", "recommend_chars": ["梦", "香", "音", "信"], "emotion": "中性", "gender": "中", "imagery": ["梦境", "余香", "音信"], "scene": "寄托对远方之人的思念与期盼"}
+{"id": "raw_0169", "recommend_chars": ["中", "情", "好", "修"], "emotion": "中性", "gender": "中", "imagery": ["坚守本心", "自我修养"], "scene": "寄托坚守内心美好、注重自我修养的志向"}
+{"id": "raw_0548", "recommend_chars": ["择", "善", "中", "庸"], "emotion": "中性", "gender": "中", "imagery": ["择善固执", "中庸之道", "拳拳服膺"], "scene": "寓意坚守正道、择善而从，体现儒家修身之志"}
+{"id": "raw_0042", "recommend_chars": ["文", "登"], "emotion": "中性", "gender": "男", "imagery": ["文治", "登高"], "scene": "寄托文治武功、登高望远的志向"}
+{"id": "raw_0231", "recommend_chars": ["春", "乔"], "emotion": "中性", "gender": "女", "imagery": ["春深", "铜雀台", "东风"], "scene": "寄托对历史变迁的感慨与对美好事物的追忆"}
+{"id": "raw_0373", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["孤寂", "幽怨"], "scene": "表达孤独幽怨之情"}
+{"id": "raw_0170", "recommend_chars": ["博", "衍"], "emotion": "中性", "gender": "中", "imagery": ["广博", "悠远"], "scene": "寄托学识渊博、生命绵延不绝之愿景"}
+{"id": "raw_0549", "recommend_chars": ["中", "庸"], "emotion": "中性", "gender": "中", "imagery": ["中庸", "不偏不倚"], "scene": "寓意持守中道、不偏不倚的处世哲学"}
+{"id": "raw_0043", "recommend_chars": ["仲", "山", "甫", "保"], "emotion": "中性", "gender": "男", "imagery": ["辅弼", "守护", "承继"], "scene": "寄托辅佐君王、承继祖业、保家卫国之志"}
+{"id": "raw_0232", "recommend_chars": ["雪", "真", "花"], "emotion": "中性", "gender": "女", "imagery": ["雪肤花貌", "仙姿玉质", "纯真自然"], "scene": "寄托对美好容颜与纯真气质的赞美"}
+{"id": "raw_0374", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["京华旧梦", "疏林小聚", "欢聚难再"], "scene": "追忆往昔京城欢聚，寄托对旧日时光的怀念与感伤"}
+{"id": "raw_0171", "recommend_chars": ["伊", "伦"], "emotion": "中性", "gender": "中", "imagery": ["贤才", "典范"], "scene": "寄托对贤才的向往与敬仰"}
+{"id": "raw_0550", "recommend_chars": ["博", "文", "礼", "循"], "emotion": "中性", "gender": "中", "imagery": ["博学", "文雅", "礼仪", "循循善诱"], "scene": "寄托于学问与礼仪的修养，追求循循善诱的教化之道"}
+{"id": "raw_0044", "recommend_chars": ["文", "武", "绪", "天", "牧"], "emotion": "中性", "gender": "男", "imagery": ["文治武功", "承前启后", "天命所归"], "scene": "寄托继承先业、文武兼备、顺应天命的宏图大志"}
+{"id": "raw_0233", "recommend_chars": ["晓", "林"], "emotion": "喜庆", "gender": "中", "imagery": ["春晓", "生机", "紫气东来"], "scene": "寄托朝气蓬勃、前程似锦之意"}
+{"id": "raw_0375", "recommend_chars": ["翠", "玲", "月"], "emotion": "中性", "gender": "女", "imagery": ["翠色", "玲珑", "望月"], "scene": "寄托清雅闲适、玲珑剔透之怀"}
+{"id": "raw_0172", "recommend_chars": ["凤", "翔"], "emotion": "中性", "gender": "中", "imagery": ["高远", "自由", "超脱"], "scene": "寄托独立不群、志向高远之志"}
+{"id": "raw_0551", "recommend_chars": ["丘", "民", "天", "子", "侯"], "emotion": "中性", "gender": "中", "imagery": ["尊贵", "功业", "社稷"], "scene": "寄托建功立业、名垂青史之志"}
+{"id": "raw_0045", "recommend_chars": ["宣", "理"], "emotion": "喜庆", "gender": "男", "imagery": ["开拓", "治理"], "scene": "寄托开拓进取、治国安邦之志"}
+{"id": "raw_0236", "recommend_chars": ["知", "春", "暖", "新", "绿"], "emotion": "喜庆", "gender": "中", "imagery": ["春意盎然", "生机勃勃", "温暖清新"], "scene": "寄托对新生与温暖的期待，寓意生活充满希望与活力"}
+{"id": "raw_0376", "recommend_chars": ["采", "华"], "emotion": "中性", "gender": "中", "imagery": ["采撷", "光华"], "scene": "寄托采撷芳华、珍惜时光之意"}
+{"id": "raw_0173", "recommend_chars": [], "emotion": "哀伤", "gender": "男", "imagery": ["坚守正道", "孤寂悲壮"], "scene": "表达坚守理想、不惧困厄的悲壮情怀"}
+{"id": "raw_0552", "recommend_chars": ["诚", "明", "著"], "emotion": "中性", "gender": "中", "imagery": ["真诚", "光明", "显达"], "scene": "寓意由内而外、逐步彰显的成长与升华"}
+{"id": "raw_0046", "recommend_chars": ["时", "语"], "emotion": "喜庆", "gender": "中", "imagery": ["安居乐业", "和谐欢愉"], "scene": "寄托生活安定、言语欢畅的美好愿景"}
+{"id": "raw_0237", "recommend_chars": ["信", "心"], "emotion": "中性", "gender": "中", "imagery": ["诚信", "心意"], "scene": "寄托真诚与内心情感的表达"}
+{"id": "raw_0377", "recommend_chars": ["深", "飞", "绿"], "emotion": "中性", "gender": "中", "imagery": ["幽深", "灵动", "生机"], "scene": "寄托幽深雅致、灵动自然之趣"}
+{"id": "raw_0174", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["困顿", "无依"], "scene": "抒发有志难伸、无法高飞的哀伤"}
+{"id": "raw_0553", "recommend_chars": ["成", "洁", "时"], "emotion": "中性", "gender": "中", "imagery": ["成就", "纯洁", "守时"], "scene": "寓意成就与纯洁，强调顺应天时、坚守本分"}
+{"id": "raw_0047", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["养育之恩", "反哺之情"], "scene": "感念父母养育辛劳，寄托哀思与追怀"}
+{"id": "raw_0238", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["离散", "乡愁"], "scene": "寄托对离散亲人的思念与团聚的渴望"}
+{"id": "raw_0378", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["春逝", "人憔悴"], "scene": "感叹美好易逝，人生憔悴"}
+{"id": "raw_0175", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["路途遥远", "忧思难解"], "scene": "表达对前路漫漫、时运不济的忧思与感慨"}
+{"id": "raw_0554", "recommend_chars": ["中", "天", "立", "定", "海"], "emotion": "中性", "gender": "男", "imagery": ["中正", "立身", "安定", "君子"], "scene": "寄托君子立身、安定天下的志向"}
+{"id": "raw_0048", "recommend_chars": ["享", "景", "福"], "emotion": "喜庆", "gender": "中", "imagery": ["祭祀祈福", "丰年安乐", "福泽绵长"], "scene": "寄托家庭和睦、福寿安康之愿"}
+{"id": "raw_0239", "recommend_chars": ["山", "水", "辞", "长", "衍"], "emotion": "中性", "gender": "中", "imagery": ["山水", "远游", "辞家", "绵长"], "scene": "寄托远游求索、生生不息之志"}
+{"id": "raw_0379", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["旧时巢燕", "前度莓墙", "金屋尘封", "土花缭绕"], "scene": "感叹物是人非，昔日繁华不再，寄托怀旧与时光流逝之思"}
+{"id": "raw_0555", "recommend_chars": ["才", "情"], "emotion": "中性", "gender": "中", "imagery": ["才情", "本性"], "scene": "寄托对天赋才情与真实本性的珍视"}
+{"id": "raw_0049", "recommend_chars": ["维", "翰"], "emotion": "中性", "gender": "男", "imagery": ["藩篱", "栋梁"], "scene": "寄托家国屏障、栋梁之才的寓意"}
+{"id": "raw_0240", "recommend_chars": ["晓", "君"], "emotion": "中性", "gender": "中", "imagery": ["晨光", "期盼"], "scene": "寄托对美好未来的向往与等待"}
+{"id": "raw_0380", "recommend_chars": ["翠", "竹", "笑", "语"], "emotion": "喜庆", "gender": "中", "imagery": ["翠竹", "笑语", "闲适"], "scene": "寄托闲适自得、欢愉祥和之趣"}
+{"id": "raw_0556", "recommend_chars": ["兆", "年"], "emotion": "中性", "gender": "中", "imagery": ["征兆", "持久"], "scene": "寓意把握时机、持之以恒"}
+{"id": "raw_0050", "recommend_chars": ["修", "戎", "兵"], "emotion": "中性", "gender": "男", "imagery": ["修治", "武备", "警戒"], "scene": "寄托整军经武、防患未然之志"}
+{"id": "raw_0241", "recommend_chars": ["春", "林", "新"], "emotion": "喜庆", "gender": "中", "imagery": ["春意盎然", "繁花似锦", "焕然一新"], "scene": "寄托生机勃勃、焕然一新之志"}
+{"id": "raw_0381", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["繁华落尽", "追忆往昔", "物是人非"], "scene": "寄托对逝去繁华的追忆与感慨"}
+{"id": "raw_0558", "recommend_chars": ["义", "礼", "信", "成"], "emotion": "中性", "gender": "男", "imagery": ["道义", "礼行", "诚信", "成就"], "scene": "寄托君子修身立德、言行信成之志"}
+{"id": "raw_0051", "recommend_chars": ["坚", "均", "贤"], "emotion": "喜庆", "gender": "男", "imagery": ["坚毅", "均衡", "贤能"], "scene": "赞颂射艺精湛与礼贤之风，寓意刚毅、公正与贤德"}
+{"id": "raw_0242", "recommend_chars": ["杉", "松", "鹤", "村"], "emotion": "中性", "gender": "中", "imagery": ["高洁", "长寿", "自然", "乡情"], "scene": "寄托高洁长寿与田园乡情之志"}
+{"id": "raw_0382", "recommend_chars": ["融", "和", "天", "佳"], "emotion": "中性", "gender": "中", "imagery": ["融和", "天时", "佳节"], "scene": "寄托对美好时光的珍惜与对人生无常的感慨"}
+{"id": "raw_0559", "recommend_chars": ["乔", "木"], "emotion": "中性", "gender": "中", "imagery": ["向上", "进取"], "scene": "寓意追求进步，从低处迁往高处"}
+{"id": "raw_0052", "recommend_chars": ["陶", "乐"], "emotion": "喜庆", "gender": "中", "imagery": ["快乐", "逍遥"], "scene": "寄托乐观逍遥、自得其乐之志"}
+{"id": "raw_0243", "recommend_chars": ["君", "家", "重"], "emotion": "中性", "gender": "男", "imagery": ["礼贤下士", "信任", "尊贵"], "scene": "寄托尊重贤才、诚信待人之意"}
+{"id": "raw_0383", "recommend_chars": ["玉", "雪", "柳", "舞"], "emotion": "中性", "gender": "中", "imagery": ["玉尊", "回雪", "细柳"], "scene": "寄托清雅高洁、柔美灵动之姿"}
+{"id": "raw_0560", "recommend_chars": ["公", "侯", "伯"], "emotion": "中性", "gender": "男", "imagery": ["尊贵", "等级", "秩序"], "scene": "寓意尊贵显达、恪守本分，或寄托建功立业、封侯拜相之志"}
+{"id": "raw_0053", "recommend_chars": ["山", "川", "增"], "emotion": "喜庆", "gender": "男", "imagery": ["如山如阜", "如川方至", "福泽绵长"], "scene": "寄托福寿绵长、事业蒸蒸日上之愿"}
+{"id": "raw_0244", "recommend_chars": ["君", "家", "重"], "emotion": "中性", "gender": "男", "imagery": ["尊贤重士", "礼贤下士"], "scene": "寄托尊重人才、谦逊待士之志"}
+{"id": "raw_0384", "recommend_chars": ["梅", "柳"], "emotion": "中性", "gender": "中", "imagery": ["春意", "生机"], "scene": "寄托对自然生机与闲适生活的向往"}
+{"id": "raw_0568", "recommend_chars": ["德", "谨", "勉"], "emotion": "中性", "gender": "中", "imagery": ["修身", "自省", "勤勉"], "scene": "寄托修身养性、谨言慎行、自强不息之志"}
+{"id": "raw_0054", "recommend_chars": ["斯", "翼", "飞", "君"], "emotion": "喜庆", "gender": "男", "imagery": ["奋发向上", "君子风范", "华美壮丽"], "scene": "寄托君子昂扬进取、事业腾达之志"}
+{"id": "raw_0245", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["生离死别", "血泪交织", "无奈悲歌"], "scene": "此句描绘生离死别之痛，血泪相和，悲怆至极，不宜用于起名。"}
+{"id": "raw_0385", "recommend_chars": ["清", "文"], "emotion": "中性", "gender": "中", "imagery": ["清雅", "文采"], "scene": "寄托清雅文采、知音相惜之意"}
+{"id": "raw_0569", "recommend_chars": ["绰", "裕"], "emotion": "中性", "gender": "中", "imagery": ["从容", "宽裕"], "scene": "寄托从容自得、进退有度的人生境界"}
+{"id": "raw_0055", "recommend_chars": ["蔼", "吉", "维", "君"], "emotion": "喜庆", "gender": "男", "imagery": ["和蔼", "吉祥", "君子", "贤才"], "scene": "寄托对贤才君子、吉祥和美的祝愿"}
+{"id": "raw_0246", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["离别", "感伤"], "scene": "表达离别之痛与无奈之情"}
+{"id": "raw_0386", "recommend_chars": ["清", "露", "月"], "emotion": "中性", "gender": "中", "imagery": ["清雅", "静谧", "高洁"], "scene": "寄托清雅高洁、宁静致远之志"}
+{"id": "raw_0570", "recommend_chars": ["知", "穆"], "emotion": "中性", "gender": "男", "imagery": ["智慧", "明达", "肃穆"], "scene": "寄托明智通达、庄重沉稳之德"}
+{"id": "raw_0056", "recommend_chars": ["维", "吉", "君"], "emotion": "喜庆", "gender": "男", "imagery": ["贤才汇聚", "君子受用", "吉祥如意"], "scene": "寄寓才德兼备、得遇明主、吉祥顺遂之意"}
+{"id": "raw_0247", "recommend_chars": ["南", "桐", "长"], "emotion": "中性", "gender": "中", "imagery": ["南风", "梧桐", "长久"], "scene": "寄托温润长久、生机绵延之意"}
+{"id": "raw_0387", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["风雨", "夜泪"], "scene": "表达孤寂哀愁之情"}
+{"id": "raw_0573", "recommend_chars": ["明", "恩"], "emotion": "中性", "gender": "中", "imagery": ["明察", "仁爱"], "scene": "寓意明辨是非、心怀仁德"}
+{"id": "raw_0057", "recommend_chars": ["祖", "年"], "emotion": "喜庆", "gender": "男", "imagery": ["承继祖德", "万寿无疆"], "scene": "寄托承继祖业、福寿绵长之愿"}
+{"id": "raw_0248", "recommend_chars": ["雪", "海", "山", "动"], "emotion": "中性", "gender": "男", "imagery": ["壮阔", "雄浑", "动感"], "scene": "寄托胸怀壮阔、志向高远之意"}
+{"id": "raw_0388", "recommend_chars": ["海", "初"], "emotion": "中性", "gender": "中", "imagery": ["辽阔", "初心"], "scene": "寄托胸怀宽广、不忘初心之志"}
+{"id": "raw_0574", "recommend_chars": ["道", "远", "君"], "emotion": "中性", "gender": "男", "imagery": ["道义", "远志", "君子"], "scene": "寄托坚守正道、志向远大、君子有所不为的品格"}
+{"id": "raw_0058", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["盟誓", "怨怼"], "scene": "表达对背信弃义之人的怨愤与决绝"}
+{"id": "raw_0250", "recommend_chars": ["华", "繁"], "emotion": "中性", "gender": "中", "imagery": ["繁华", "富贵"], "scene": "描绘都市繁华与贵族交游，寓意富贵荣华、生活丰盛"}
+{"id": "raw_0389", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["离别", "无奈", "孤帆远影"], "scene": "寄托离愁别绪与身世飘零之感"}
+{"id": "raw_0575", "recommend_chars": ["圣", "人"], "emotion": "中性", "gender": "中", "imagery": ["圣贤", "仁德"], "scene": "寄托仰慕圣贤、修身立德之志"}
+{"id": "raw_0059", "recommend_chars": ["江", "汉", "方", "疆"], "emotion": "喜庆", "gender": "男", "imagery": ["开拓疆土", "四方安定", "王命威严"], "scene": "寄托建功立业、开拓进取之志"}
+{"id": "raw_0251", "recommend_chars": ["柏", "柯", "青", "根"], "emotion": "中性", "gender": "男", "imagery": ["坚贞", "长青", "根基稳固"], "scene": "象征坚毅不拔、根基深厚，寓意人如古柏般正直长青"}
+{"id": "raw_0392", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["梦忆", "惊觉"], "scene": "寄托对逝去之物的追忆与惊醒后的失落"}
+{"id": "raw_0576", "recommend_chars": ["远", "平", "居"], "emotion": "中性", "gender": "中", "imagery": ["平安", "安居", "远大"], "scene": "寄托平安顺遂、安居乐业之愿"}
+{"id": "raw_0060", "recommend_chars": ["信", "思"], "emotion": "中性", "gender": "中", "imagery": ["诚信", "思念"], "scene": "寄托诚信与深思之意"}
+{"id": "raw_0252", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["明月", "思念"], "scene": "寄托思念远方之情"}
+{"id": "raw_0394", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["离别", "音信断绝", "思念无着"], "scene": "寄托对远方亲人的深切思念与音信难通的惆怅"}
+{"id": "raw_0582", "recommend_chars": ["美", "富"], "emotion": "中性", "gender": "中", "imagery": ["美好", "富足"], "scene": "寓意追求内在美好与丰盛，或表达对学识、境界的向往"}
+{"id": "raw_0061", "recommend_chars": ["维", "牧"], "emotion": "中性", "gender": "中", "imagery": ["牧野", "梦兆"], "scene": "寄托对丰收与吉祥的期盼"}
+{"id": "raw_0253", "recommend_chars": ["明", "月"], "emotion": "中性", "gender": "中", "imagery": ["明月", "思念"], "scene": "寄托思念远方、心随明月之情"}
+{"id": "raw_0395", "recommend_chars": ["清", "明", "晴", "冉"], "emotion": "中性", "gender": "中", "imagery": ["清明时节", "晴空烟柳", "吴宫古树"], "scene": "寄托对时光流转、自然美景的感怀与追忆"}
+{"id": "raw_0587", "recommend_chars": ["善", "任", "地"], "emotion": "中性", "gender": "中", "imagery": ["仁善", "担当", "厚土"], "scene": "寄托仁善担当、脚踏实地之志"}
+{"id": "raw_0062", "recommend_chars": ["眉", "寿", "繁", "文"], "emotion": "喜庆", "gender": "中", "imagery": ["长寿", "福泽", "文德"], "scene": "祝福长辈福寿绵长，文德昭彰"}
+{"id": "raw_0254", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["边塞", "战乱", "苍凉"], "scene": "描绘边地荒凉与战事惨烈，不宜用于起名"}
+{"id": "raw_0396", "recommend_chars": ["月", "风"], "emotion": "中性", "gender": "中", "imagery": ["月下歌舞", "风姿绰约"], "scene": "寄托风雅才情与美好意境"}
+{"id": "raw_0589", "recommend_chars": ["悠", "远", "博", "厚", "明"], "emotion": "中性", "gender": "中", "imagery": ["悠远", "博厚", "高明"], "scene": "寄托修身进德、追求高远境界之志"}
+{"id": "raw_0063", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["今昔对比", "忧时伤怀"], "scene": "感叹时世衰微，寄托忧国忧民之思"}
+{"id": "raw_0255", "recommend_chars": ["明", "烛", "美", "声"], "emotion": "喜庆", "gender": "中", "imagery": ["光明", "欢庆", "美好", "音乐"], "scene": "寄托对美好生活的热爱与欢庆之情"}
+{"id": "raw_0398", "recommend_chars": ["华", "春"], "emotion": "中性", "gender": "中", "imagery": ["年华", "春意"], "scene": "感叹时光流转，珍惜美好相遇"}
+{"id": "raw_0590", "recommend_chars": ["仁", "胜"], "emotion": "中性", "gender": "中", "imagery": ["仁德", "克己复礼"], "scene": "寓意坚守仁德，以善胜恶"}
+{"id": "raw_0064", "recommend_chars": ["淑", "君", "正"], "emotion": "喜庆", "gender": "中", "imagery": ["贤淑", "君子", "端正"], "scene": "寄托贤良端正、治国安邦之志"}
+{"id": "raw_0256", "recommend_chars": ["承", "恩", "南", "熏"], "emotion": "中性", "gender": "中", "imagery": ["承恩", "南熏", "荣耀"], "scene": "寄托感恩与荣耀，寓意承蒙恩泽、如沐南风"}
+{"id": "raw_0399", "recommend_chars": ["绿", "映", "秋", "聚"], "emotion": "喜庆", "gender": "女", "imagery": ["绿水", "秋千", "斗草", "游女"], "scene": "描绘春日水边女子嬉戏的欢快场景，寓意青春活力与美好相聚"}
+{"id": "raw_0592", "recommend_chars": ["希", "君", "存"], "emotion": "中性", "gender": "男", "imagery": ["君子之道", "存养本心", "希圣希贤"], "scene": "寄托修身养性、坚守善性之志"}
+{"id": "raw_0065", "recommend_chars": ["冰", "凌"], "emotion": "中性", "gender": "中", "imagery": ["冰清玉洁", "凌霜傲雪"], "scene": "寄托高洁坚韧之志"}
+{"id": "raw_0258", "recommend_chars": ["流", "激", "风"], "emotion": "中性", "gender": "中", "imagery": ["流水", "激荡", "风"], "scene": "寄寓自然洒脱、超然物外之志"}
+{"id": "raw_0400", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["月缺人离", "中秋怀远"], "scene": "感叹中秋月圆而人不得团圆，寄托离愁别绪"}
+{"id": "raw_0593", "recommend_chars": ["善", "水"], "emotion": "中性", "gender": "中", "imagery": ["如水之性", "本善之德"], "scene": "寄托人性本善、随性自然之寓意"}
+{"id": "raw_0067", "recommend_chars": ["温", "恭", "朝", "顾", "汤"], "emotion": "喜庆", "gender": "男", "imagery": ["温恭", "勤勉", "承继", "光耀"], "scene": "寄托温良恭敬、勤勉守业、承继祖德之志"}
+{"id": "raw_0259", "recommend_chars": ["新", "华", "天", "东"], "emotion": "喜庆", "gender": "男", "imagery": ["华丽", "宏大", "东方"], "scene": "寄托辉煌前程与进取之志"}
+{"id": "raw_0401", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["孤寂", "等待", "失望"], "scene": "表达等待无果、孤寂失望之情"}
+{"id": "raw_0594", "recommend_chars": ["乘", "国", "举"], "emotion": "中性", "gender": "男", "imagery": ["雄浑", "壮阔", "功业"], "scene": "寄托建功立业、气吞山河之志"}
+{"id": "raw_0068", "recommend_chars": ["仪", "成", "正", "展"], "emotion": "喜庆", "gender": "男", "imagery": ["仪态端庄", "成就非凡", "正直不阿", "前程舒展"], "scene": "寄托对男子仪表堂堂、技艺精湛、品行端正、前程远大的赞美与祝福"}
+{"id": "raw_0260", "recommend_chars": ["春", "花", "开"], "emotion": "喜庆", "gender": "中", "imagery": ["春意盎然", "繁花似锦", "生机勃勃"], "scene": "寄托对美好未来的期待与喜悦之情"}
+{"id": "raw_0402", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["离愁", "故国之思", "苍茫"], "scene": "寄托对故土家园的深切怀念与无奈"}
+{"id": "raw_0596", "recommend_chars": ["刚", "直", "养", "天"], "emotion": "中性", "gender": "男", "imagery": ["至大至刚", "直养无害", "塞于天地"], "scene": "寄托培养浩然正气、顶天立地的君子之志"}
+{"id": "raw_0069", "recommend_chars": ["维", "哲", "顺", "德"], "emotion": "中性", "gender": "中", "imagery": ["智慧", "德行", "顺遂"], "scene": "寄托智慧与德行兼备、顺道而行的美好寓意"}
+{"id": "raw_0261", "recommend_chars": ["淑", "真", "匀"], "emotion": "喜庆", "gender": "女", "imagery": ["贤淑", "纯真", "匀称"], "scene": "寄托女子端庄贤淑、纯真自然之美"}
+{"id": "raw_0403", "recommend_chars": ["安", "锦", "月", "明", "江"], "emotion": "中性", "gender": "中", "imagery": ["安稳", "锦绣", "明月", "江湖"], "scene": "寄托安稳宁静、心怀远方之意"}
+{"id": "raw_0597", "recommend_chars": ["善", "推"], "emotion": "中性", "gender": "中", "imagery": ["推己及人", "仁爱", "智慧"], "scene": "寄托以善心推及他人、成就大业的志向"}
+{"id": "raw_0070", "recommend_chars": ["君", "子", "弥", "性"], "emotion": "喜庆", "gender": "男", "imagery": ["君子之德", "福泽绵长", "天命所归"], "scene": "寄托对君子贤德、福寿绵长、承天命而安邦的赞美与祝福"}
+{"id": "raw_0262", "recommend_chars": ["承", "欢", "春", "游"], "emotion": "喜庆", "gender": "中", "imagery": ["承欢", "春游", "专夜"], "scene": "寓意享受美好时光，生活充实快乐"}
+{"id": "raw_0404", "recommend_chars": ["明", "月", "君"], "emotion": "中性", "gender": "中", "imagery": ["光明", "团圆", "君子"], "scene": "寄托对重逢与诚信的期待，寓意光明磊落、情谊长久"}
+{"id": "raw_0598", "recommend_chars": ["君", "道", "志", "仁"], "emotion": "中性", "gender": "男", "imagery": ["君子", "正道", "仁德"], "scene": "寄托辅佐明君、志于仁道的理想"}
+{"id": "raw_0071", "recommend_chars": ["维", "天"], "emotion": "喜庆", "gender": "男", "imagery": ["祭祀", "敬天", "祈福"], "scene": "表达对上天庇佑的感恩与祈求，寓意承天之佑、福泽绵长"}
+{"id": "raw_0263", "recommend_chars": ["锦", "帆"], "emotion": "中性", "gender": "中", "imagery": ["锦绣", "远航"], "scene": "寓意前程似锦、扬帆远航"}
+{"id": "raw_0405", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["物是人非", "时光流逝", "故园之思"], "scene": "寄托对往昔繁华消逝的感慨与怀念"}
+{"id": "raw_0599", "recommend_chars": ["博", "文", "礼"], "emotion": "中性", "gender": "中", "imagery": ["博学", "约礼", "君子"], "scene": "寄托修身治学、内外兼修之志"}
+{"id": "raw_0073", "recommend_chars": ["茅", "谷"], "emotion": "中性", "gender": "中", "imagery": ["农耕", "勤劳"], "scene": "寄托勤勉耕耘、安居乐业之志"}
+{"id": "raw_0264", "recommend_chars": ["春", "扬", "珠", "如"], "emotion": "中性", "gender": "女", "imagery": ["春意", "扬帆", "珠玉", "如意"], "scene": "寄托美好、珍贵与顺遂之意"}
+{"id": "raw_0406", "recommend_chars": ["归", "心", "期"], "emotion": "中性", "gender": "中", "imagery": ["归心", "期盼", "细问"], "scene": "寄托对重逢与心愿的细腻期盼"}
+{"id": "raw_0600", "recommend_chars": ["仁", "沛"], "emotion": "中性", "gender": "中", "imagery": ["仁德", "充沛"], "scene": "寄托坚守仁德、精力充沛之意"}
+{"id": "raw_0074", "recommend_chars": ["维", "祈"], "emotion": "喜庆", "gender": "男", "imagery": ["维系", "祈福"], "scene": "寄托家族昌盛、福寿绵长之愿"}
+{"id": "raw_0265", "recommend_chars": ["星", "辰", "风", "桂", "东"], "emotion": "中性", "gender": "中", "imagery": ["星辰", "良辰", "风雅", "桂香"], "scene": "寄托对美好时光的珍惜与对未来的憧憬"}
+{"id": "raw_0407", "recommend_chars": [], "emotion": "哀伤", "gender": "男", "imagery": ["孤愤", "报国无门"], "scene": "抒发壮志难酬、无人理解的悲慨"}
+{"id": "raw_0601", "recommend_chars": ["爱", "悦"], "emotion": "中性", "gender": "中", "imagery": ["仁爱", "悦纳"], "scene": "寄托仁爱之心与内心喜悦"}
+{"id": "raw_0075", "recommend_chars": ["燕", "宗", "福", "禄"], "emotion": "喜庆", "gender": "中", "imagery": ["宴饮欢聚", "福禄双全", "宗族和睦"], "scene": "寄托家庭和睦、福禄绵长之愿"}
+{"id": "raw_0266", "recommend_chars": ["风", "月", "桃"], "emotion": "喜庆", "gender": "中", "imagery": ["春风得意", "花好月圆", "前程似锦"], "scene": "寄托美好前程与圆满人生之愿"}
+{"id": "raw_0408", "recommend_chars": ["梅", "英", "华"], "emotion": "中性", "gender": "中", "imagery": ["时光流转", "自然更迭", "才华焕发"], "scene": "寓意珍惜时光、焕发才华，或寄托对岁月变迁的感慨与期待。"}
+{"id": "raw_0602", "recommend_chars": ["仁", "心", "月"], "emotion": "中性", "gender": "中", "imagery": ["仁德", "恒心", "明净"], "scene": "寄托修身养性、持之以恒之志"}
+{"id": "raw_0076", "recommend_chars": ["光", "明", "熙"], "emotion": "喜庆", "gender": "男", "imagery": ["光明", "进取", "积累"], "scene": "寄托勤学不辍、日积月累而达光明的志向"}
+{"id": "raw_0267", "recommend_chars": ["月", "影", "水", "银", "河"], "emotion": "中性", "gender": "中", "imagery": ["月夜", "银河", "静谧"], "scene": "寄托清幽高远之志"}
+{"id": "raw_0409", "recommend_chars": ["清", "秋", "楚", "天"], "emotion": "中性", "gender": "中", "imagery": ["清朗高远", "辽阔无际", "澄澈明净"], "scene": "寄托胸怀开阔、志向高远之意"}
+{"id": "raw_0603", "recommend_chars": ["固", "朝", "闻", "王", "命"], "emotion": "中性", "gender": "中", "imagery": ["坚守", "朝见", "闻命", "果决"], "scene": "表达坚守礼制、顺应王命、果决行事之意"}
+{"id": "raw_0077", "recommend_chars": ["承", "舒"], "emotion": "中性", "gender": "男", "imagery": ["承继", "舒展"], "scene": "寓意承前启后、舒展抱负"}
+{"id": "raw_0268", "recommend_chars": ["清", "溪", "流", "水"], "emotion": "中性", "gender": "中", "imagery": ["清澈", "源远流长", "自然"], "scene": "寄托清雅淡泊、随性自然之志"}
+{"id": "raw_0410", "recommend_chars": ["青", "秋"], "emotion": "中性", "gender": "中", "imagery": ["澄澈", "宁静"], "scene": "寄托宁静致远、心境澄明之意"}
+{"id": "raw_0604", "recommend_chars": ["居", "善"], "emotion": "中性", "gender": "中", "imagery": ["居仁由义", "与人为善"], "scene": "寄托修身向善、居善地之志"}
+{"id": "raw_0078", "recommend_chars": ["文", "武", "宪"], "emotion": "喜庆", "gender": "男", "imagery": ["文武兼备", "典范", "尊贵"], "scene": "寄托才德兼备、成为典范的期望"}
+{"id": "raw_0269", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["艰难", "阻隔"], "scene": "表达人生道路上的艰难险阻与壮志难酬的悲慨"}
+{"id": "raw_0411", "recommend_chars": ["素", "辉", "明", "澄", "澈"], "emotion": "中性", "gender": "中", "imagery": ["澄澈", "明净", "清辉"], "scene": "寄托高洁澄明、内外兼修之志"}
+{"id": "raw_0605", "recommend_chars": ["卿", "元", "士"], "emotion": "中性", "gender": "男", "imagery": ["尊贵", "贤才", "礼制"], "scene": "寄托对贤才高位、礼制有序的向往"}
+{"id": "raw_0080", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["今昔对比", "落魄失意"], "scene": "感叹昔日盛况不再，今日困顿无余"}
+{"id": "raw_0270", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["怀古伤今", "忠而见弃"], "scene": "寄托对历史人物遭遇的同情与自身怀才不遇的感慨"}
+{"id": "raw_0412", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["追忆", "物是人非", "期盼重逢"], "scene": "寄托对往昔美好时光的怀念与对重逢的期盼"}
+{"id": "raw_0607", "recommend_chars": ["仁", "悦"], "emotion": "喜庆", "gender": "男", "imagery": ["仁政", "解民倒悬"], "scene": "寄托施行仁政、使民喜悦的抱负"}
+{"id": "raw_0081", "recommend_chars": ["德", "民"], "emotion": "中性", "gender": "中", "imagery": ["德行", "民众"], "scene": "寄托对德行与民众的重视"}
+{"id": "raw_0271", "recommend_chars": ["江", "月", "星"], "emotion": "中性", "gender": "中", "imagery": ["江月", "星火", "夜泊"], "scene": "寄托宁静悠远、心怀希望之意"}
+{"id": "raw_0413", "recommend_chars": ["春", "安", "金"], "emotion": "中性", "gender": "中", "imagery": ["春意", "安宁", "珍贵"], "scene": "寄托对美好生活的珍视与安稳的期盼"}
+{"id": "raw_0608", "recommend_chars": ["禹", "耕"], "emotion": "中性", "gender": "男", "imagery": ["勤勉", "奉献"], "scene": "寄托勤勉奉献、公而忘私之志"}
+{"id": "raw_0082", "recommend_chars": ["盈", "宁"], "emotion": "喜庆", "gender": "中", "imagery": ["丰收", "安宁"], "scene": "寄托家庭富足、安宁祥和之愿"}
+{"id": "raw_0273", "recommend_chars": ["贤", "德"], "emotion": "中性", "gender": "男", "imagery": ["贤德", "北服"], "scene": "寄托贤德服众、安定四方之志"}
+{"id": "raw_0414", "recommend_chars": ["兰", "梅", "镜"], "emotion": "中性", "gender": "中", "imagery": ["幽兰", "梅雨", "明镜"], "scene": "寄托清雅高洁、明净自守之志"}
+{"id": "raw_0609", "recommend_chars": ["知", "学"], "emotion": "中性", "gender": "中", "imagery": ["求知", "明理"], "scene": "寄托勤学善思、追求真知之意"}
+{"id": "raw_0083", "recommend_chars": ["明", "方"], "emotion": "喜庆", "gender": "中", "imagery": ["光明", "端正", "祭祀祈福"], "scene": "寄托光明磊落、方正贤良之德"}
+{"id": "raw_0274", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["历史兴亡", "凭吊"], "scene": "感叹历史兴亡，不宜用于人名"}
+{"id": "raw_0415", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["焚信断念", "决绝离愁"], "scene": "表达断绝旧情、决意放下之意"}
+{"id": "raw_0610", "recommend_chars": ["诚", "仁", "孝", "道"], "emotion": "中性", "gender": "中", "imagery": ["真诚", "仁爱", "孝道", "礼义"], "scene": "寄托为人真诚、仁孝守礼之德"}
+{"id": "raw_0084", "recommend_chars": ["祈", "甘", "雨", "稷", "谷"], "emotion": "喜庆", "gender": "中", "imagery": ["祈雨丰收", "五谷丰登", "养育万民"], "scene": "寄托风调雨顺、国泰民安之愿"}
+{"id": "raw_0275", "recommend_chars": ["凝", "竹", "君"], "emotion": "中性", "gender": "中", "imagery": ["凝神", "高洁", "君子"], "scene": "寄托专注高雅、君子之风"}
+{"id": "raw_0416", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["孤寂", "怀人", "月夜"], "scene": "寄托月夜怀人之思"}
+{"id": "raw_0611", "recommend_chars": ["教", "多", "术"], "emotion": "中性", "gender": "中", "imagery": ["教化", "智慧", "包容"], "scene": "寓意以多种方式启迪他人，包容不同教诲之道"}
+{"id": "raw_0085", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["忧惧", "失位"], "scene": "表达对处境不安、地位贬损的忧虑"}
+{"id": "raw_0276", "recommend_chars": ["安", "长", "白"], "emotion": "中性", "gender": "中", "imagery": ["安定", "长久", "清白"], "scene": "寄托安泰长久、清白自守之志"}
+{"id": "raw_0417", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["离别", "无奈", "挽留"], "scene": "寄托离别难舍之情"}
+{"id": "raw_0612", "recommend_chars": ["修", "时"], "emotion": "中性", "gender": "中", "imagery": ["修身", "顺时"], "scene": "寄托修身养性、顺应天时之意"}
+{"id": "raw_0086", "recommend_chars": ["天", "休"], "emotion": "喜庆", "gender": "中", "imagery": ["天命", "福泽"], "scene": "寄托承天之佑、福泽绵长之意"}
+{"id": "raw_0278", "recommend_chars": ["春", "水", "鸥"], "emotion": "喜庆", "gender": "中", "imagery": ["春水", "群鸥", "生机"], "scene": "寄托宁静祥和、生机盎然之意"}
+{"id": "raw_0418", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["南归", "盼归"], "scene": "寄托思念与期盼归乡之情"}
+{"id": "raw_0613", "recommend_chars": ["德", "人", "土", "财", "用"], "emotion": "中性", "gender": "中", "imagery": ["德行", "人才", "土地", "财富"], "scene": "强调德行与人才、土地、财富的因果关系，寓意以德为本，方能聚人、立业、生财。"}
+{"id": "raw_0087", "recommend_chars": ["玄", "殷", "芒"], "emotion": "喜庆", "gender": "中", "imagery": ["天命", "祥瑞", "宏大"], "scene": "寄托天命所归、事业宏大之志"}
+{"id": "raw_0279", "recommend_chars": ["文", "彩", "风", "流", "尚"], "emotion": "中性", "gender": "中", "imagery": ["文采风流", "英雄气概", "传承不灭"], "scene": "寄托对才华与风骨的追慕，以及文化传承不息的愿景"}
+{"id": "raw_0419", "recommend_chars": ["盛", "日", "中"], "emotion": "中性", "gender": "中", "imagery": ["盛世", "光明", "中正"], "scene": "追忆往昔繁华，寄托对美好时光的怀念与珍视"}
+{"id": "raw_0614", "recommend_chars": ["仁", "义", "君"], "emotion": "中性", "gender": "中", "imagery": ["仁德", "忠义", "君子"], "scene": "寄托仁德忠义、君子风范之志"}
+{"id": "raw_0088", "recommend_chars": ["君", "歌", "音"], "emotion": "喜庆", "gender": "男", "imagery": ["君子", "欢歌", "雅音"], "scene": "寄托君子和乐、才德彰显之愿"}
+{"id": "raw_0280", "recommend_chars": ["江", "青"], "emotion": "中性", "gender": "中", "imagery": ["江水", "青山"], "scene": "寄托对自然美景的眷恋与恒久情感"}
+{"id": "raw_0420", "recommend_chars": ["君", "阳", "花", "照"], "emotion": "中性", "gender": "中", "imagery": ["惜时", "美好", "温暖"], "scene": "寄托珍惜时光、留住美好之意"}
+{"id": "raw_0615", "recommend_chars": ["悦", "遇"], "emotion": "中性", "gender": "男", "imagery": ["喜悦", "机遇"], "scene": "寄托积极进取、把握机遇之志"}
+{"id": "raw_0089", "recommend_chars": ["怀", "柔", "允", "维"], "emotion": "喜庆", "gender": "男", "imagery": ["怀柔百神", "和顺四方", "允王维后"], "scene": "寄托怀柔天下、和顺万邦、承前启后的君王气度与仁德之志"}
+{"id": "raw_0281", "recommend_chars": ["庭", "花", "玉"], "emotion": "中性", "gender": "女", "imagery": ["庭院", "花朵", "玉簪"], "scene": "描绘春日庭院中女子赏花、蜻蜓飞上玉簪的闲适雅致景象，适合寄托温婉柔美、自然灵动之意。"}
+{"id": "raw_0421", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["离愁", "阻隔", "漂泊"], "scene": "寄托离别相思与羁旅之愁"}
+{"id": "raw_0616", "recommend_chars": ["兼", "取"], "emotion": "中性", "gender": "中", "imagery": ["取舍", "抉择"], "scene": "寓意在人生重要关头善于权衡取舍，勇于追求更高价值"}
+{"id": "raw_0090", "recommend_chars": ["慎", "嘉"], "emotion": "中性", "gender": "中", "imagery": ["谨慎", "美好"], "scene": "寄托修身养性、言行美好之愿"}
+{"id": "raw_0284", "recommend_chars": ["金", "玉", "清", "珍"], "emotion": "喜庆", "gender": "中", "imagery": ["富贵", "珍美", "清雅"], "scene": "象征富贵吉祥、珍美清雅，寄托对美好生活的向往"}
+{"id": "raw_0422", "recommend_chars": ["晨", "映", "盈", "笑", "语"], "emotion": "喜庆", "gender": "女", "imagery": ["晨光", "映照", "盈盈笑语"], "scene": "寄托明媚欢欣、温婉灵动之美"}
+{"id": "raw_0617", "recommend_chars": ["仁", "君"], "emotion": "中性", "gender": "男", "imagery": ["仁德", "君子"], "scene": "寄托仁德君子之志"}
+{"id": "raw_0091", "recommend_chars": ["敬", "维", "显", "思"], "emotion": "中性", "gender": "中", "imagery": ["敬畏天命", "明察秋毫", "深思远虑"], "scene": "寓意敬畏天道、明理深思，适合寄托谨慎自持、勤勉修德之志"}
+{"id": "raw_0285", "recommend_chars": ["长", "乐", "钟", "声", "花"], "emotion": "中性", "gender": "中", "imagery": ["钟声悠远", "柳色深翠", "雨中春景"], "scene": "寄托对宁静美好时光的向往与珍惜"}
+{"id": "raw_0423", "recommend_chars": ["春", "青", "浦"], "emotion": "中性", "gender": "中", "imagery": ["春意", "青门", "南浦"], "scene": "寄托对春景与远方的向往"}
+{"id": "raw_0618", "recommend_chars": ["天", "易"], "emotion": "中性", "gender": "中", "imagery": ["天下大同", "易牙知味"], "scene": "寄托对普遍真理与和谐共通的追求"}
+{"id": "raw_0092", "recommend_chars": ["景", "阳", "流", "泉"], "emotion": "中性", "gender": "中", "imagery": ["自然", "和谐", "生机"], "scene": "寄寓顺应自然、和谐共生之意"}
+{"id": "raw_0286", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["白头乌", "夜飞", "延秋门"], "scene": "哀叹国运衰微，寄托忧国忧民之思"}
+{"id": "raw_0424", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["流水", "沙鸥", "旧日"], "scene": "寄托对旧日时光的怀念与物是人非的感慨"}
+{"id": "raw_0619", "recommend_chars": ["明", "贤"], "emotion": "中性", "gender": "中", "imagery": ["明辨", "贤德"], "scene": "寄托明理修身、贤德自持之志"}
+{"id": "raw_0093", "recommend_chars": ["时", "邦", "天", "子", "周"], "emotion": "喜庆", "gender": "男", "imagery": ["天命所归", "邦国昌盛", "承继大统"], "scene": "寄托国家兴盛、天命眷顾之志"}
+{"id": "raw_0287", "recommend_chars": ["长", "风", "秋", "雁", "高"], "emotion": "中性", "gender": "中", "imagery": ["长风万里", "秋雁高飞", "酣饮高楼"], "scene": "寄托胸怀开阔、志向高远之意"}
+{"id": "raw_0425", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["春初", "相思", "夜长"], "scene": "寄托对远方之人的深切思念与无奈"}
+{"id": "raw_0620", "recommend_chars": ["仁", "义", "美"], "emotion": "中性", "gender": "中", "imagery": ["仁义", "美德"], "scene": "寄托坚守仁义、追求美德之志"}
+{"id": "raw_0094", "recommend_chars": ["翼", "德"], "emotion": "喜庆", "gender": "男", "imagery": ["辅佐", "德行"], "scene": "寄托贤才辅佐、德行兼备之愿"}
+{"id": "raw_0288", "recommend_chars": ["青", "天", "水", "洲"], "emotion": "中性", "gender": "中", "imagery": ["高远", "清朗", "自然"], "scene": "寄托开阔胸襟与高远志向"}
+{"id": "raw_0426", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["朦胧月色", "销魂离愁"], "scene": "寄托对往昔美好时光的追忆与离愁别绪"}
+{"id": "raw_0621", "recommend_chars": ["仁", "天"], "emotion": "中性", "gender": "中", "imagery": ["仁德", "天下"], "scene": "寄托以仁德治理天下的理想"}
+{"id": "raw_0096", "recommend_chars": ["达", "国"], "emotion": "喜庆", "gender": "男", "imagery": ["通达", "治国"], "scene": "寄托治国安邦、通达有为的志向"}
+{"id": "raw_0291", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["恩爱断绝", "长恨绵绵"], "scene": "感叹情缘已逝，徒留长恨"}
+{"id": "raw_0427", "recommend_chars": ["时", "欢", "太", "平"], "emotion": "喜庆", "gender": "中", "imagery": ["盛世", "欢庆", "太平"], "scene": "寄托对太平盛世、欢乐祥和的美好祝愿"}
+{"id": "raw_0622", "recommend_chars": ["牧", "求"], "emotion": "中性", "gender": "中", "imagery": ["尽职", "求索"], "scene": "寄托勤勉尽责、追求完善之意"}
+{"id": "raw_0097", "recommend_chars": ["礼"], "emotion": "中性", "gender": "中", "imagery": ["礼仪", "规范"], "scene": "强调礼仪规范，寓意知礼守礼"}
+{"id": "raw_0292", "recommend_chars": ["明", "楚", "山"], "emotion": "中性", "gender": "中", "imagery": ["光明", "坚韧", "稳重"], "scene": "寄托光明磊落、坚韧不拔、稳重如山之志"}
+{"id": "raw_0428", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["芳草萋萋", "登高望远", "天涯阻隔"], "scene": "寄托思念远方、感怀离别之情"}
+{"id": "raw_0624", "recommend_chars": ["敬", "恭", "礼", "海"], "emotion": "喜庆", "gender": "男", "imagery": ["恭敬有礼", "胸怀宽广", "兄弟情谊"], "scene": "寄托谦和处世、广交良友之愿"}
+{"id": "raw_0098", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["民生疾苦", "忧国忧民"], "scene": "表达对百姓苦难的深切同情与忧虑"}
+{"id": "raw_0294", "recommend_chars": ["玉", "笙", "歌", "和"], "emotion": "喜庆", "gender": "女", "imagery": ["玉楼笙歌", "笑语和乐", "风送欢声"], "scene": "寄托生活美满、欢乐和谐之愿"}
+{"id": "raw_0429", "recommend_chars": ["安", "和", "芳", "景"], "emotion": "中性", "gender": "中", "imagery": ["安定", "和谐", "美好", "怀旧"], "scene": "寄托对往昔美好时光的怀念与对安定和谐的向往"}
+{"id": "raw_0625", "recommend_chars": ["思", "君", "道"], "emotion": "中性", "gender": "中", "imagery": ["思辨", "君子", "正道"], "scene": "寄托修身明理、坚守正道之志"}
+{"id": "raw_0099", "recommend_chars": ["皇", "彭"], "emotion": "喜庆", "gender": "男", "imagery": ["骏马", "雄壮", "辉煌"], "scene": "寄托事业兴旺、气势恢宏之志"}
+{"id": "raw_0295", "recommend_chars": ["青", "山", "夏", "水", "君"], "emotion": "喜庆", "gender": "中", "imagery": ["青翠", "山水", "夏日", "君子"], "scene": "寄托对自然美景的赞美与君子之志的向往"}
+{"id": "raw_0430", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["梨花落尽", "秋色萧瑟"], "scene": "感叹时光流逝，美好易逝"}
+{"id": "raw_0627", "recommend_chars": ["庄", "岳"], "emotion": "中性", "gender": "中", "imagery": ["庄重", "岳峙"], "scene": "寄托稳重坚毅、志向高远之意"}
+{"id": "raw_0100", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["离别", "追思"], "scene": "寄托对故人离去的哀思与怀念"}
