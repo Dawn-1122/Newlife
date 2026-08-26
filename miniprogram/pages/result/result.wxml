@@ -5,6 +5,11 @@
   }
 </wxs>
 <view class="container">
+  <!-- 强加权降级提示 -->
+  <view class="fallback-note" wx:if="{{fallbackNote}}">
+    <text>{{fallbackNote}}</text>
+  </view>
+
   <!-- 八字摘要 -->
   <view class="card bazi-summary" wx:if="{{bazi}}" bindtap="onBaziTap">
     <view class="bazi-title">八字排盘</view>
@@ -65,6 +70,12 @@
         >{{item.name}}</view>
       </view>
     </view>
+  </view>
+
+  <!-- 调整偏好 -->
+  <view class="adjust-bar" bindtap="onAdjustPref">
+    <text class="adjust-text">调整偏好</text>
+    <text class="adjust-more">›</text>
   </view>
 
   <!-- 名字列表 -->

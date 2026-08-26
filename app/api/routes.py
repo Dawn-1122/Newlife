@@ -86,6 +86,9 @@ async def prenatal(request: PrenatalRequest):
             due_date=request.due_date,
             range_days=request.range_days,
             gender=request.gender or "male",
+            style=request.style,
+            meanings=request.meanings,
+            avoid_chars=request.avoid_chars,
         )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))

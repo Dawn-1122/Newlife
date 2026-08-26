@@ -41,6 +41,9 @@ class PrenatalRequest(BaseModel):
     due_date: str = Field(..., description="预产期 YYYY-MM-DD")
     range_days: int = Field(7, description="预产期前后浮动天数，取值 0|3|7|14")
     gender: Optional[str] = Field("male", pattern="^(male|female)$", description="性别，用于候选字推荐")
+    style: Optional[str] = Field(None, description="风格偏好: classic|modern|grand|fresh")
+    meanings: Optional[list[str]] = Field(None, max_length=3, description="期望寓意，最多3个")
+    avoid_chars: Optional[list[str]] = Field(None, description="避讳字（单个汉字列表）")
 
 
 class PrenatalResponse(BaseModel):
@@ -104,6 +107,7 @@ class NamingResponse(BaseModel):
     bazi: Optional[dict] = None
     names: list[NameResult]
     total: int
+    fallback_note: Optional[str] = None
 
 
 class ApiResponse(BaseModel):

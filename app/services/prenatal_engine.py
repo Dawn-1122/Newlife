@@ -17,6 +17,12 @@ from app.core.constants import (
     DEFAULT_RANGE_DAYS,
     DIZHI_WUXING,
 )
+from app.core.naming_options import (
+    STYLE_OPTIONS,
+    MEANING_OPTIONS,
+    MEANING_KEYWORD_WEIGHT,
+    IMAGERY_WEIGHT,
+)
 from app.services.bazi_engine import BaziEngine
 from app.services.char_database import CharDatabase
 
@@ -38,6 +44,9 @@ class PrenatalEngine:
         due_date: str,
         range_days: int = DEFAULT_RANGE_DAYS,
         gender: str = "male",
+        style: Optional[str] = None,
+        meanings: Optional[list[str]] = None,
+        avoid_chars: Optional[list[str]] = None,
     ) -> dict:
         """
         生成预产期起名建议
@@ -46,6 +55,9 @@ class PrenatalEngine:
             due_date: 预产期，格式 YYYY-MM-DD
             range_days: 前后浮动天数，取值 0|3|7|14
             gender: male / female
+            style: 风格偏好 code（影响 safe_chars 字筛选排序）
+            meanings: 期望寓意 code 列表（影响 safe_chars 字筛选排序）
+            avoid_chars: 避讳字列表，硬剔除
 
         Returns:
             {
@@ -71,7 +83,9 @@ class PrenatalEngine:
 
         certain = self._build_certain(due)
         stable_wuxing = self._pick_stable_wuxing(xiyong_dist)
-        safe_chars = self._build_safe_chars(stable_wuxing, gender)
+        safe_chars = self._build_safe_chars(
+            stable_wuxing, gender, style, meanings, avoid_chars
+        )
         note = self._build_note(
             due, range_days, certain, xiyong_dist, stable_wuxing
         )
@@ -162,16 +176,39 @@ class PrenatalEngine:
         stable = [w for w, p in ranked if p >= self.STABLE_WUXING_THRESHOLD]
         return stable[:2]
 
-    def _build_safe_chars(self, stable_wuxing: list[str], gender: str) -> list[dict]:
-        """稳定五行对应的吉字候选（每个五行取 <=6 个，luck==吉 且性别匹配、非负面字）"""
+    def _build_safe_chars(
+        self,
+        stable_wuxing: list[str],
+        gender: str,
+        style: Optional[str] = None,
+        meanings: Optional[list[str]] = None,
+        avoid_chars: Optional[list[str]] = None,
+    ) -> list[dict]:
+        """
+        稳定五行对应的吉字候选（每个五行取 <=6 个，luck==吉 且性别匹配、非负面字）。
+
+        偏好强加权：寓意/风格命中的字排前（寓意命中权重大于意象命中），避讳字硬剔除。
+        """
+        blacklist = set(NEGATIVE_CHARS)
+        if avoid_chars:
+            for item in avoid_chars:
+                if item:
+                    blacklist.update(list(item))
+
         safe_chars = []
         for wuxing in stable_wuxing:
-            chars = self.char_db.get_lucky_by_wuxing(
-                wuxing, gender, limit=self.SAFE_CHARS_PER_WUXING
-            )
-            for c in chars:
-                if c["char"] in NEGATIVE_CHARS:
+            # 取足量候选池，偏好排序后再截取上限，保证偏好能影响最终推荐
+            pool = self.char_db.get_lucky_by_wuxing(wuxing, gender, limit=50)
+            scored = []
+            for c in pool:
+                if c["char"] in blacklist:
                     continue
+                score = self._pref_score(
+                    c.get("meaning", "") or "", style, meanings
+                )
+                scored.append((c, score))
+            scored.sort(key=lambda x: -x[1])
+            for c, _score in scored[: self.SAFE_CHARS_PER_WUXING]:
                 safe_chars.append({
                     "char": c["char"],
                     "pinyin": c["pinyin"],
@@ -181,6 +218,29 @@ class PrenatalEngine:
                     "luck": c.get("luck", ""),
                 })
         return safe_chars
+
+    @staticmethod
+    def _pref_score(
+        text: str, style: Optional[str], meanings: Optional[list[str]]
+    ) -> int:
+        """按寓意/风格关键词对文本（字义）打分；寓意命中权重 > 意象命中权重"""
+        if not text:
+            return 0
+        score = 0
+        if meanings:
+            for m in meanings:
+                opt = MEANING_OPTIONS.get(m)
+                if not opt:
+                    continue
+                for kw in opt.get("keywords", []):
+                    if kw in text:
+                        score += MEANING_KEYWORD_WEIGHT
+        if style and style in STYLE_OPTIONS:
+            opt = STYLE_OPTIONS[style]
+            for kw in opt.get("imagery_keywords", []):
+                if kw in text:
+                    score += IMAGERY_WEIGHT
+        return score
 
     def _build_note(
         self,

@@ -1,0 +1,195 @@
+.progress-wrap {
+  margin-bottom: 24rpx;
+}
+
+.progress-track {
+  height: 10rpx;
+  background: #efe9e1;
+  border-radius: 10rpx;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8B4513, #C19A6B);
+  border-radius: 10rpx;
+  transition: width 0.25s ease;
+}
+
+.step-indicator {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 16rpx;
+}
+
+.step-current {
+  font-size: 26rpx;
+  color: #C19A6B;
+  font-weight: 600;
+}
+
+.step-title {
+  font-size: 30rpx;
+  color: #8B4513;
+  font-weight: 600;
+}
+
+.step-hint {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 20rpx;
+}
+
+/* 风格卡片 */
+.style-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.style-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 26rpx 30rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+  border: 2rpx solid transparent;
+}
+
+.style-card.active {
+  border-color: #8B4513;
+  background: #fdf8f3;
+}
+
+.style-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #8B4513;
+}
+
+.style-feeling {
+  font-size: 24rpx;
+  color: #C19A6B;
+  margin-top: 6rpx;
+}
+
+.style-examples {
+  font-size: 26rpx;
+  color: #666;
+  margin-top: 12rpx;
+  line-height: 1.6;
+}
+
+/* 寓意卡片 */
+.meaning-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+}
+
+.meaning-card {
+  width: calc(50% - 10rpx);
+  box-sizing: border-box;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+  border: 2rpx solid transparent;
+}
+
+.meaning-card.active {
+  border-color: #8B4513;
+  background: #fdf8f3;
+}
+
+.meaning-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #8B4513;
+}
+
+.meaning-feeling {
+  font-size: 22rpx;
+  color: #C19A6B;
+  margin-top: 6rpx;
+}
+
+.meaning-examples {
+  font-size: 24rpx;
+  color: #666;
+  margin-top: 10rpx;
+}
+
+/* 避讳字 */
+.avoid-card {
+  padding-top: 30rpx;
+}
+
+.avoid-input {
+  border: 1rpx solid #e6dfd5;
+  border-radius: 12rpx;
+  padding: 20rpx 24rpx;
+  font-size: 28rpx;
+  background: #faf8f5;
+}
+
+.avoid-tip {
+  font-size: 22rpx;
+  color: #aaa;
+  margin-top: 16rpx;
+  line-height: 1.6;
+}
+
+/* 确认汇总 */
+.summary-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #8B4513;
+  margin-bottom: 12rpx;
+}
+
+.summary-row {
+  display: flex;
+  align-items: center;
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid #f0ede8;
+}
+
+.summary-row:last-child {
+  border-bottom: none;
+}
+
+.summary-label {
+  width: 150rpx;
+  flex-shrink: 0;
+  font-size: 26rpx;
+  color: #999;
+}
+
+.summary-value {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+  text-align: right;
+}
+
+.summary-edit {
+  margin-left: 16rpx;
+  font-size: 24rpx;
+  color: #C19A6B;
+}
+
+.tap-row:active {
+  background: #faf8f5;
+}
+
+/* 底部导航 */
+.wizard-nav {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 20rpx;
+}
+
+.nav-btn {
+  flex: 1;
+}

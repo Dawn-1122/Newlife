@@ -41,6 +41,20 @@ Page({
     })
   },
 
+  onAdjustPref() {
+    const app = getApp()
+    const params = app.globalData.lastParams
+
+    if (!params) {
+      wx.showToast({ title: '请求参数已失效，请重新起名', icon: 'none' })
+      return
+    }
+
+    app.globalData.draftParams = params
+    app.globalData.draftTab = 'prenatal'
+    wx.navigateTo({ url: '/pages/wizard/wizard' })
+  },
+
   onBackHome() {
     wx.reLaunch({ url: '/pages/home/home' })
   }

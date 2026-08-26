@@ -78,5 +78,10 @@
     <view class="note">{{note}}</view>
   </view>
 
+  <view class="adjust-bar" bindtap="onAdjustPref">
+    <text class="adjust-text">调整偏好</text>
+    <text class="adjust-more">›</text>
+  </view>
+
   <button class="btn-primary" bindtap="onBackHome">返回首页</button>
 </view>

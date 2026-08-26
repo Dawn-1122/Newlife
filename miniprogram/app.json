@@ -2,6 +2,7 @@
   "pages": [
     "pages/home/home",
     "pages/name/name",
+    "pages/wizard/wizard",
     "pages/prenatal-result/prenatal-result",
     "pages/analyze/analyze",
     "pages/analyze-result/analyze-result",

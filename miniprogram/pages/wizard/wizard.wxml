@@ -1,0 +1,120 @@
+<view class="container">
+  <!-- 进度条 + 步数指示 -->
+  <view class="progress-wrap">
+    <view class="progress-track">
+      <view class="progress-fill" style="width: {{progress}}%;"></view>
+    </view>
+    <view class="step-indicator">
+      <text class="step-current">{{step}}/4</text>
+      <text class="step-title">{{stepTitle}}</text>
+    </view>
+  </view>
+
+  <!-- Step1 风格 -->
+  <block wx:if="{{step === 1}}">
+    <view class="step-hint">选一种偏好的名字风格（可跳过）</view>
+    <view class="style-grid">
+      <view
+        class="style-card {{item.selected ? 'active' : ''}}"
+        wx:for="{{styles}}"
+        wx:key="code"
+        bindtap="onStyleTap"
+        data-code="{{item.code}}"
+      >
+        <view class="style-name">{{item.name}}</view>
+        <view class="style-feeling">{{item.feeling}}</view>
+        <view class="style-examples">{{item.examplesText}}</view>
+      </view>
+    </view>
+  </block>
+
+  <!-- Step2 寓意 -->
+  <block wx:if="{{step === 2}}">
+    <view class="step-hint">选期望寓意（最多 3 个，可跳过）</view>
+    <view class="meaning-grid">
+      <view
+        class="meaning-card {{item.selected ? 'active' : ''}}"
+        wx:for="{{meanings}}"
+        wx:key="code"
+        bindtap="onMeaningTap"
+        data-code="{{item.code}}"
+      >
+        <view class="meaning-name">{{item.name}}</view>
+        <view class="meaning-feeling">{{item.feeling}}</view>
+        <view class="meaning-examples">{{item.examplesText}}</view>
+      </view>
+    </view>
+  </block>
+
+  <!-- Step3 避讳字 -->
+  <block wx:if="{{step === 3}}">
+    <view class="card avoid-card">
+      <view class="step-hint">填写需要避开的名字用字（可跳过）</view>
+      <input
+        class="avoid-input"
+        placeholder="多个字用逗号、顿号或空格分隔，如：伟,强"
+        value="{{avoidChars}}"
+        bindinput="onAvoidInput"
+      />
+      <view class="avoid-tip">避讳字会从候选与组合阶段被硬剔除，例如家族长辈用字。</view>
+    </view>
+  </block>
+
+  <!-- Step4 确认 -->
+  <block wx:if="{{step === 4}}">
+    <view class="card summary-card">
+      <view class="summary-title">确认起名信息</view>
+
+      <view class="summary-row" wx:for="{{baseLines}}" wx:key="label">
+        <text class="summary-label">{{item.label}}</text>
+        <text class="summary-value">{{item.value}}</text>
+      </view>
+
+      <view class="summary-row tap-row" bindtap="onJumpStep" data-step="1">
+        <text class="summary-label">风格</text>
+        <text class="summary-value">{{selectedStyleName || '不限'}}</text>
+        <text class="summary-edit">修改</text>
+      </view>
+
+      <view class="summary-row tap-row" bindtap="onJumpStep" data-step="2">
+        <text class="summary-label">寓意</text>
+        <text class="summary-value">{{selectedMeaningText || '不限'}}</text>
+        <text class="summary-edit">修改</text>
+      </view>
+
+      <view class="summary-row tap-row" bindtap="onJumpStep" data-step="3">
+        <text class="summary-label">避讳字</text>
+        <text class="summary-value">{{avoidChars || '无'}}</text>
+        <text class="summary-edit">修改</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- 底部导航 -->
+  <view class="wizard-nav">
+    <button
+      class="btn-secondary nav-btn"
+      wx:if="{{step !== 1}}"
+      bindtap="onPrev"
+    >上一步</button>
+
+    <button
+      class="btn-primary nav-btn"
+      wx:if="{{step !== 4}}"
+      bindtap="onNext"
+    >下一步</button>
+
+    <button
+      class="btn-secondary nav-btn"
+      wx:if="{{step !== 4}}"
+      bindtap="onSkip"
+    >跳过</button>
+
+    <button
+      class="btn-primary nav-btn"
+      wx:if="{{step === 4}}"
+      bindtap="onSubmit"
+      loading="{{loading}}"
+    >{{tab === 'prenatal' ? '查看孕期建议' : '开始起名'}}</button>
+  </view>
+</view>

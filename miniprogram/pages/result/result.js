@@ -19,6 +19,7 @@ Page({
     wuxingFilter: '',
     styleFilter: '',
     loading: false,
+    fallbackNote: '',
 
     wuxingFilters: [
       { code: '', name: '全部' },
@@ -72,7 +73,8 @@ Page({
       bazi: result.bazi,
       allNames: allNames,
       xiyongText: xiyongText,
-      wuxingList: wuxingList
+      wuxingList: wuxingList,
+      fallbackNote: result.fallback_note || ''
     })
     this.applyFilter()
   },
@@ -154,6 +156,21 @@ Page({
     wx.navigateTo({
       url: '/pages/bazi/bazi'
     })
+  },
+
+  onAdjustPref() {
+    const app = getApp()
+    const params = app.globalData.lastParams
+
+    if (!params) {
+      wx.showToast({ title: '请求参数已失效，请重新起名', icon: 'none' })
+      return
+    }
+
+    // 携带上次完整参数回跳 wizard 并回填
+    app.globalData.draftParams = params
+    app.globalData.draftTab = params.due_date ? 'prenatal' : 'postnatal'
+    wx.navigateTo({ url: '/pages/wizard/wizard' })
   },
 
   onBackHome() {

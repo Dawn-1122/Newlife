@@ -46,6 +46,22 @@ page {
   opacity: 0.85;
 }
 
+/* 次级按钮 */
+.btn-secondary {
+  background: #fff;
+  color: #8B4513;
+  border: 1rpx solid #8B4513;
+  border-radius: 50rpx;
+  padding: 24rpx 0;
+  font-size: 32rpx;
+  font-weight: 500;
+  text-align: center;
+}
+
+.btn-secondary:active {
+  background: #faf3ec;
+}
+
 /* 分数徽章 */
 .score-badge {
   display: inline-block;

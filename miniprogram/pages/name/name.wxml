@@ -86,44 +86,11 @@
       </view>
     </block>
 
-    <!-- 风格偏好（共享） -->
-    <view class="form-item column">
-      <text class="form-label">风格偏好</text>
-      <view class="chip-row wrap">
-        <view
-          class="chip {{item.selected ? 'active' : ''}}"
-          wx:for="{{styleOptions}}"
-          wx:key="code"
-          bindtap="onStyleTap"
-          data-code="{{item.code}}"
-        >{{item.name}}</view>
-      </view>
-    </view>
-
-    <!-- 期望寓意（共享，最多3个） -->
-    <view class="form-item column">
-      <text class="form-label">期望寓意</text>
-      <view class="chip-row wrap">
-        <view
-          class="chip {{item.selected ? 'active' : ''}}"
-          wx:for="{{meaningOptions}}"
-          wx:key="code"
-          bindtap="onMeaningTap"
-          data-code="{{item.code}}"
-        >{{item.name}}</view>
-      </view>
-    </view>
-
-    <!-- 避讳字（共享） -->
-    <view class="form-item">
-      <text class="form-label">避讳字</text>
-      <input class="form-input" placeholder="多个用逗号分隔，如：伟,强" value="{{avoidChars}}" bindinput="onAvoidInput" />
-    </view>
   </view>
 
-  <!-- 提交按钮 -->
-  <button class="btn-primary" bindtap="onSubmit" loading="{{loading}}">
-    {{tab === 'postnatal' ? '开始起名' : '查看孕期建议'}}
+  <!-- 下一步：进入偏好引导 -->
+  <button class="btn-primary" bindtap="onNext" loading="{{loading}}">
+    下一步 · 选择偏好
   </button>
 
   <view class="footer-note">

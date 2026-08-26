@@ -1,3 +1,25 @@
+.adjust-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 22rpx 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.adjust-text {
+  font-size: 28rpx;
+  color: #8B4513;
+  font-weight: 500;
+}
+
+.adjust-more {
+  font-size: 30rpx;
+  color: #C19A6B;
+}
+
 .section-title {
   font-size: 30rpx;
   font-weight: 600;

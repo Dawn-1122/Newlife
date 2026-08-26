@@ -52,6 +52,13 @@ MEANING_OPTIONS = {
 # 寓意最多选择个数
 MEANING_MAX_SELECT = 3
 
+# ── 强加权权重常量（单一事实来源，避免魔法数字散落） ──
+# 分层：风格来源(Tier A) 1000 > 寓意命中 50 > 意象命中 20
+STYLE_TIER_A_WEIGHT = 1000   # 诗词 source 命中风格 source_preference 的权重
+MEANING_KEYWORD_WEIGHT = 50  # 诗词/候选字命中寓意 keyword 的权重
+IMAGERY_WEIGHT = 20          # 诗词命中风格 imagery_keywords 的权重（Tier B）
+TARGET_MIN = 20              # 强加权同源组名目标最小数量（不足则引入下一 tier / 随机兜底）
+
 # 行业 code -> 五行（成人改名/品牌店名 P1 使用，P0 仅定义常量并透传 industry 字段）
 INDUSTRY_WUXING = {
     "tech":          "火",  # 互联网/科技/IT
