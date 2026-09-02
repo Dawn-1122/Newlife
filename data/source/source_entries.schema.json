@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "美名集 · 字源条目 Schema",
+  "type": "object",
+  "required": ["version", "total", "entries"],
+  "properties": {
+    "version": {"type": "string"},
+    "total": {"type": "integer"},
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "source", "source_class", "category", "title", "citation", "emotion", "gender"],
+        "properties": {
+          "id": {"type": "string", "description": "全局唯一，如 src_0001"},
+          "source": {"type": "string", "enum": ["周易", "本草纲目", "神农本草经", "山海经"]},
+          "source_class": {"type": "string", "const": "经史子集"},
+          "category": {"type": "string", "enum": ["中药名", "神兽", "植物", "地名", "典籍章句"]},
+          "title": {"type": "string"},
+          "author": {"type": "string", "default": "佚名"},
+          "dynasty": {"type": "string"},
+          "text": {"type": "string", "description": "条目摘录，可短可空"},
+          "original_text": {"type": ["string", "null"], "description": "完整段落，可空"},
+          "citation": {"type": "string", "description": "含书名号，如《本草纲目·草部·徐长卿》"},
+          "recommend_chars": {"type": "array", "items": {"type": "string"}, "description": "起名用字，必须 ∈ chars.json 且非负面"},
+          "emotion": {"type": "string", "enum": ["喜庆", "中性", "哀伤"]},
+          "imagery": {"type": "array", "items": {"type": "string"}},
+          "gender": {"type": "string", "enum": ["男", "女", "中"]},
+          "scene": {"type": "string"},
+          "tags": {"type": "array", "items": {"type": "string"}},
+          "provenance": {"type": "string"}
+        }
+      }
+    }
+  }
+}

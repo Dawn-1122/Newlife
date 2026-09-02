@@ -161,6 +161,17 @@ class WugeScorer:
 
         return result
 
+    @classmethod
+    def is_bad(cls, result: dict) -> bool:
+        """
+        五格门槛：人格、总格双凶才硬排除（大凶），单凶不硬排。
+
+        返回 True 表示应排除。
+        """
+        ren_luck = result.get("ren_ge", {}).get("luck", "")
+        zong_luck = result.get("zong_ge", {}).get("luck", "")
+        return ren_luck == "凶" and zong_luck == "凶"
+
     @staticmethod
     def _describe(result: dict, score: float) -> str:
         """生成五格描述"""

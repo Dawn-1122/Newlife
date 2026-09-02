@@ -115,3 +115,30 @@ class ApiResponse(BaseModel):
     success: bool = True
     data: dict = None
     message: str = ""
+
+
+class MeaningRequest(BaseModel):
+    """名字寓意懒加载请求（详情页）"""
+    full_name: str = Field(..., min_length=2, max_length=10, description="完整姓名")
+    gender: str = Field("male", pattern="^(male|female)$", description="性别")
+    year: Optional[int] = Field(None, ge=1900, le=2100, description="出生年")
+    month: Optional[int] = Field(None, ge=1, le=12, description="出生月")
+    day: Optional[int] = Field(None, ge=1, le=31, description="出生日")
+    hour: Optional[int] = Field(12, ge=0, le=23, description="出生时")
+    minute: Optional[int] = Field(0, ge=0, le=59, description="出生分")
+
+
+class MeaningResponse(BaseModel):
+    """名字寓意懒加载响应（多层余味）"""
+    full_name: str
+    given_name: Optional[str] = None
+    surname: Optional[str] = None
+    citation: Optional[str] = None
+    layers: list[dict] = Field(default_factory=list, description="多层余味（字面/出处/余味）")
+    meaning: str
+    poetry_note: Optional[str] = None
+    wuxing_note: Optional[str] = None
+    overall_note: Optional[str] = None
+    meaning_source: str = "template"
+    provider: Optional[str] = None
+    model: Optional[str] = None

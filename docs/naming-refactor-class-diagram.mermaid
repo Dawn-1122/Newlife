@@ -1,0 +1,91 @@
+classDiagram
+    class NamingEngine {
+        +char_db: CharDatabase
+        +poetry_db: PoetryDatabase
+        +source_db: SourceDatabase
+        +surname_db: SurnameDatabase
+        +yunwei: YunWeiScorer
+        +phonetics: PhoneticsScorer
+        +wuge: WugeScorer
+        +bazi: BaziEngine
+        +llm: LLMService
+        +cache: MeaningCache
+        +generate_names(surname, gender, year, ...) dict
+        -_build_names(...) tuple
+        -_select_candidate_chars(xiyong_wuxing, gender, ...) list
+        -_match_provenance(xiyong_wuxing, gender, style, meanings, blacklist) list
+        -_compose_names(...) list
+        -_evaluate_name(surname, given_name, chars_info, entry, bazi_result) dict
+        -_pass_gate(phonetics, wuge, bazi, chars_info) bool
+        -_rank_by_yunwei(names, meanings, style) list
+        -_diversify(names, max_same_char) list
+    }
+    class YunWeiScorer {
+        +score(surname, chars_info, entry) dict
+        -_provenance_score(chars_info, entry) int
+        -_imagery_score(chars_info, entry) int
+        -_aftertaste_score(chars_info) int
+        -_coherence_score(chars_info) int
+        -_surname_coherence_score(surname, chars_info, entry) dict
+        +match_keywords(text, keywords) int
+    }
+    class SourceDatabase {
+        -_entries: list
+        -_fullname_ngram: dict
+        +normalize(entry) dict
+        +get_by_char(char) list
+        +get_by_source(source) list
+        +get_by_gender(gender) list
+        +get_by_fullname_ngram(surname, given_name) dict
+        +get_all() list
+    }
+    class SurnameDatabase {
+        -_surnames: dict
+        +get_surname(char) dict
+    }
+    class PoetryDatabase {
+        -_poems: list
+        +normalize(poem) dict
+        +get_by_char(char) list
+        +get_by_source(source) list
+        +get_by_gender(gender) list
+        +get_by_fullname_ngram(surname, given_name) dict
+    }
+    class CharDatabase {
+        -_chars: list
+        -_char_map: dict
+        +get_char(char) dict
+        +get_by_wuxing(wx, gender) list
+        +get_all() list
+    }
+    class WugeScorer {
+        +calculate(surname, given_name) dict
+        +is_bad(result) bool
+    }
+    class PhoneticsScorer {
+        +analyze(name) dict
+        +is_cacophonous(result) bool
+    }
+    class BaziEngine {
+        +generate_bazi(year, month, day, hour, minute, gender) dict
+    }
+    class LLMService {
+        +chat(messages, temperature, max_tokens, json_mode) dict
+        +generate_meaning(full_name, chars_info, entry, bazi_data, gender) dict
+    }
+    class MeaningCache {
+        +get(key) dict
+        +set(key, value) None
+    }
+
+    NamingEngine --> CharDatabase
+    NamingEngine --> PoetryDatabase
+    NamingEngine --> SourceDatabase
+    NamingEngine --> SurnameDatabase
+    NamingEngine --> YunWeiScorer
+    NamingEngine --> WugeScorer
+    NamingEngine --> PhoneticsScorer
+    NamingEngine --> BaziEngine
+    NamingEngine --> LLMService
+    NamingEngine --> MeaningCache
+    YunWeiScorer --> SurnameDatabase

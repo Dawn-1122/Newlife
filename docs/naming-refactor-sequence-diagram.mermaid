@@ -1,0 +1,57 @@
+sequenceDiagram
+    participant C as Client
+    participant API as routes.py
+    participant NE as NamingEngine
+    participant BC as BaziEngine
+    participant CD as CharDatabase
+    participant PD as PoetryDatabase
+    participant SD as SourceDatabase
+    participant SU as SurnameDatabase
+    participant YW as YunWeiScorer
+    participant PH as PhoneticsScorer
+    participant WG as WugeScorer
+    participant MC as MeaningCache
+    participant LLM as LLMService
+
+    C->>API: POST /generate
+    API->>NE: generate_names(surname, gender, 生辰, style, meanings, ...)
+    NE->>BC: generate_bazi(生辰)
+    BC-->>NE: bazi_result(喜用神/忌神)
+    NE->>CD: 选候选字（负面黑名单+避讳字硬过滤）
+    CD-->>NE: candidate_chars
+    NE->>PD: _match_provenance → 诗词出处
+    NE->>SD: _match_provenance → 字源出处
+    PD-->>NE: poetry_entries
+    SD-->>NE: source_entries
+    NE->>NE: _compose_names（同源优先→随机兜底，预算式）
+    loop 每个候选名
+        NE->>PH: analyze(full_name)
+        NE->>WG: calculate(surname, given_name)
+        NE->>NE: _pass_gate(音律/五格/八字门槛)
+        alt 未过门槛（严重拗口/人格总格双凶/全忌神）
+            NE->>NE: 丢弃该名
+        else 过门槛
+            NE->>SU: get_surname(surname) → 姓字义/意象（S2 用）
+            SU-->>YW: 姓氏数据
+            NE->>YW: score(surname, chars_info, entry)
+            YW-->>NE: 韵味分 + yunwei_detail(含 surname_coherence)
+        end
+    end
+    NE->>NE: _rank_by_yunwei（韵味降序→喜用神→寓意→风格 tie-break）
+    NE->>NE: _diversify（基于韵味分）→ 截取 max_results
+    NE-->>API: names（含韵味分/出处/模板寓意兜底）
+    API-->>C: NamingResponse
+
+    Note over C,LLM: 用户点进某个名字详情
+    C->>API: POST /name/meaning (full_name + 生辰)
+    API->>NE: 懒加载寓意
+    NE->>MC: get(full_name+性别+生辰签名+citation)
+    alt 缓存命中
+        MC-->>NE: 缓存寓意
+    else 未命中
+        NE->>LLM: generate_meaning(多层余味)
+        LLM-->>NE: layers + meaning + poetry_note + wuxing_note + overall_note
+        NE->>MC: set(key, 寓意)
+    end
+    NE-->>API: 寓意（多层余味）
+    API-->>C: MeaningResponse

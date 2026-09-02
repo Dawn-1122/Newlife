@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 from typing import Optional
 from app.core.config import settings
+from app.services.source_database import extract_cjk_ngrams
 
 
 class PoetryDatabase:
@@ -25,6 +26,16 @@ class PoetryDatabase:
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
         self._poems = [self.normalize(p) for p in data["poems"]]
+        self._build_fullname_index()
+
+    def _build_fullname_index(self):
+        """预构建「姓+名 连词索引」：对 text/original_text/title/citation 抽 2~3 字 CJK n-gram。"""
+        self._fullname_index: dict[str, dict] = {}
+        for poem in self._poems:
+            for field in ("text", "original_text", "title", "citation"):
+                text = poem.get(field) or ""
+                for gram in extract_cjk_ngrams(text, 2, 3):
+                    self._fullname_index.setdefault(gram, poem)
 
     @staticmethod
     def normalize(poem: dict) -> dict:
@@ -32,6 +43,8 @@ class PoetryDatabase:
         return {
             "id": poem.get("id", ""),
             "source": poem.get("source", ""),
+            # 现有诗词按 source 直接作为 source_class（6 大类即其大类）
+            "source_class": poem.get("source_class", poem.get("source", "")),
             "title": poem.get("title", ""),
             "author": poem.get("author", "佚名"),
             "dynasty": poem.get("dynasty", ""),
@@ -46,6 +59,11 @@ class PoetryDatabase:
             "tags": poem.get("tags", []),
             "provenance": poem.get("provenance", ""),
         }
+
+    def get_by_fullname_ngram(self, surname: str, given_name: str) -> Optional[dict]:
+        """按「姓+名」连续子串查找条目（供 S1 成词成典），未命中返回 None。"""
+        full = surname + given_name
+        return self._fullname_index.get(full)
 
     @staticmethod
     def _exclude_sad(poems: list[dict], include_sad: bool) -> list[dict]:

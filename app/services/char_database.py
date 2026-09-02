@@ -31,6 +31,9 @@ class CharDatabase:
         self._chars = data["chars"]
         self._char_map = {}
         for c in self._chars:
+            # 读层兜底：补 level/imagery 默认值（新旧数据混用不抛 KeyError）
+            c.setdefault("level", "一")
+            c.setdefault("imagery", [])
             key = c["char"]
             if key not in self._char_map:
                 self._char_map[key] = c
@@ -90,6 +93,10 @@ class CharDatabase:
         if luck:
             result = [c for c in result if c["luck"] == luck]
         return result
+
+    def get_by_level(self, level: str) -> list[dict]:
+        """按生僻度等级筛选（level ∈ 一/二/扩展，仅数据治理用途）。"""
+        return [c for c in self._chars if c.get("level") == level]
 
     def get_all(self) -> list[dict]:
         """获取全部字库"""

@@ -10,6 +10,9 @@ from pypinyin import pinyin, Style
 class PhoneticsScorer:
     """音律评分器"""
 
+    # 音律门槛：score 低于该值视为严重拗口（硬排除）
+    CACOPHONOUS_MIN_SCORE = 55
+
     # 声调分类：1声2声为平，3声4声为仄
     TONE_TYPES = {
         1: "平", 2: "平",
@@ -123,6 +126,20 @@ class PhoneticsScorer:
                 score -= 3
 
         return max(0, min(100, score))
+
+    @classmethod
+    def is_cacophonous(cls, result: dict) -> bool:
+        """
+        音律门槛：严重拗口则硬排除（不参与打分）。
+
+        排除条件（任一命中即 True）：
+        - rhythm 全平「平平平」或全仄「仄仄仄」（仅三字名；二字名不因平仄同调排除）
+        - score < 55（连续同调/严重拗口）
+        """
+        rhythm = result.get("rhythm", "")
+        if rhythm in ("平平平", "仄仄仄"):
+            return True
+        return result.get("score", 100) < cls.CACOPHONOUS_MIN_SCORE
 
     @staticmethod
     def _describe(tone_types: list[str], score: int) -> str:

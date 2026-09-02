@@ -175,6 +175,18 @@ class BaziEngine:
 
     # ── 排盘主入口 ──
 
+    @staticmethod
+    def is_ji_wuxing_conflict(chars_wuxing: list[str], ji_wuxing: list[str]) -> bool:
+        """
+        八字门槛：名字所有字五行都落在忌神 → 「忌神严重冲突」，硬排除。
+
+        - 双名：两字都属忌神；单名：该字属忌神。
+        - 未提供八字 / 忌神为空时，本方法不应被调用（引擎内已兜底）。
+        """
+        if not chars_wuxing or not ji_wuxing:
+            return False
+        return all(w in ji_wuxing for w in chars_wuxing)
+
     @classmethod
     def generate_bazi(
         cls,

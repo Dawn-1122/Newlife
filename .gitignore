@@ -41,6 +41,11 @@ data/poetry/raw_corpus.jsonl
 data/poetry/full_corpus.jsonl
 data/poetry/pilot_corpus.jsonl
 
+# LLM 寓意缓存（运行时生成，不提交）
+data/meaning_cache/
+data/dict/rare_enriched.jsonl
+data/dict/rare_enriched_done.json
+
 # 微信小程序
 miniprogram/miniprogram_npm/
 miniprogram/project.private.config.json

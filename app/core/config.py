@@ -24,10 +24,14 @@ class Settings(BaseSettings):
     DATA_DIR: Path = BASE_DIR / "data"
     DICT_DIR: Path = DATA_DIR / "dict"
     POETRY_DIR: Path = DATA_DIR / "poetry"
+    SOURCE_DIR: Path = DATA_DIR / "source"
+    MEANING_CACHE_DIR: Path = DATA_DIR / "meaning_cache"
 
     # 字库文件
     CHAR_DB_FILE: str = "chars.json"
     POETRY_DB_FILE: str = "poetry.json"
+    SOURCE_ENTRIES_FILE: str = "source_entries.json"
+    SURNAME_DB_FILE: str = "surnames.json"
 
     # LLM 配置（后续按对比测试结果填入）
     LLM_PROVIDER: str = ""  # deepseek / qwen / zhipu

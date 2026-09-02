@@ -245,6 +245,178 @@ def test_poem_chars_blacklist_filtered():
     assert "淇" in valid_chars or "竹" in valid_chars
 
 
+# ── 韵味评分回归 ──
+
+def test_yunwei_surname_coherence_15_gap():
+    """韵味评分：杜若配杜 vs 配张，S 姓氏协调维度差 15 分（S1 成词成典 + S2 字义呼应）"""
+    engine = NamingEngine()
+    duruo_entry = None
+    for e in engine.source_db.get_all():
+        if e["title"] == "杜若":
+            duruo_entry = e
+            break
+    assert duruo_entry is not None
+
+    ruo = engine.char_db.get_char("若")
+    s_du = engine.yunwei.score("杜", [ruo], duruo_entry)
+    s_zhang = engine.yunwei.score("张", [ruo], duruo_entry)
+
+    # 姓杜：S1=10（杜若为 text 连续子串）+ S2=5（草木↔香草 呼应）= 15
+    assert s_du["surname_coherence"]["s1"] == 10
+    assert s_du["surname_coherence"]["s2"] == 5
+    assert s_du["surname_coherence"]["total"] == 15
+    # 姓张：无成词成典、无字义呼应
+    assert s_zhang["surname_coherence"]["total"] == 0
+    # 名部分完全相同，唯一差异是 S 的 15 分
+    assert s_du["total"] - s_zhang["total"] == 15
+    # 名部分各维度一致
+    for key in ("provenance", "imagery", "aftertaste", "coherence"):
+        assert s_du[key] == s_zhang[key]
+
+
+def test_yunwei_full_dimension_range():
+    """韵味五维分数均在合法区间内且可解释"""
+    engine = NamingEngine()
+    ruo = engine.char_db.get_char("若")
+    duruo_entry = None
+    for e in engine.source_db.get_all():
+        if e["title"] == "杜若":
+            duruo_entry = e
+            break
+    detail = engine.yunwei.score("杜", [ruo], duruo_entry)
+    assert 0 <= detail["provenance"] <= 35
+    assert 0 <= detail["imagery"] <= 25
+    assert 0 <= detail["aftertaste"] <= 15
+    assert 0 <= detail["coherence"] <= 10
+    assert 0 <= detail["surname_coherence"]["total"] <= 15
+    assert detail["total"] == sum([
+        detail["provenance"], detail["imagery"], detail["aftertaste"],
+        detail["coherence"], detail["surname_coherence"]["total"],
+    ])
+
+
+def test_generate_returns_yunwei_fields():
+    """/generate 返回 scores.yunwei + yunwei_detail，overall 平滑过渡为韵味分"""
+    engine = NamingEngine()
+    result = engine.generate_names(
+        surname="杜",
+        gender="female",
+        name_length=1,
+        max_results=10,
+        use_bazi=False,
+    )
+    assert result["total"] > 0
+    for name in result["names"]:
+        assert "yunwei" in name["scores"]
+        assert "yunwei_detail" in name["scores"]
+        assert name["scores"]["overall"] == name["scores"]["yunwei"]
+        assert "surname_coherence" in name["scores"]["yunwei_detail"]
+
+
+def test_source_entries_in_provenance():
+    """字源扩展实测：_match_provenance 统一返回诗词 + 字源条目"""
+    engine = NamingEngine()
+    matches = engine._match_provenance(
+        None, "female", None, None, None, use_poetry=True
+    )
+    entries = [e for e, _tier in matches]
+    sources = {e["source"] for e in entries}
+    titles = {e["title"] for e in entries}
+    # 字源（本草纲目/周易/山海经）与诗词（诗经/楚辞等）并存
+    assert "本草纲目" in sources
+    assert "周易" in sources
+    assert "诗经" in sources
+    # 杜若字源条目被纳入统一出处
+    assert "杜若" in titles
+
+
+# ── 漏斗门槛回归 ──
+
+def test_gate_cacophonous():
+    """音律门槛：全平/全仄（三字名）或 score<55 硬排除；二字名不因平仄同调排除"""
+    assert PhoneticsScorer.is_cacophonous({"rhythm": "平平平", "score": 85}) is True
+    assert PhoneticsScorer.is_cacophonous({"rhythm": "仄仄仄", "score": 90}) is True
+    assert PhoneticsScorer.is_cacophonous({"rhythm": "平仄平", "score": 40}) is True
+    assert PhoneticsScorer.is_cacophonous({"rhythm": "平仄平", "score": 85}) is False
+    # 二字名「仄仄」（如杜若）不因平仄同调硬排
+    assert PhoneticsScorer.is_cacophonous({"rhythm": "仄仄", "score": 67}) is False
+    assert PhoneticsScorer.is_cacophonous({"rhythm": "平平", "score": 80}) is False
+
+
+def test_gate_wuge_bad():
+    """五格门槛：人格+总格双凶才硬排除，单凶放行"""
+    assert WugeScorer.is_bad({"ren_ge": {"luck": "凶"}, "zong_ge": {"luck": "凶"}}) is True
+    assert WugeScorer.is_bad({"ren_ge": {"luck": "凶"}, "zong_ge": {"luck": "吉"}}) is False
+    assert WugeScorer.is_bad({"ren_ge": {"luck": "大吉"}, "zong_ge": {"luck": "凶"}}) is False
+    assert WugeScorer.is_bad({"ren_ge": {"luck": "吉"}, "zong_ge": {"luck": "吉"}}) is False
+
+
+def test_gate_bazi_ji_conflict():
+    """八字门槛：名字所有字五行都落在忌神才硬排除"""
+    assert BaziEngine.is_ji_wuxing_conflict(["水", "水"], ["水", "火"]) is True
+    assert BaziEngine.is_ji_wuxing_conflict(["水"], ["水"]) is True
+    assert BaziEngine.is_ji_wuxing_conflict(["水", "木"], ["水", "火"]) is False
+    assert BaziEngine.is_ji_wuxing_conflict([], ["水"]) is False
+    assert BaziEngine.is_ji_wuxing_conflict(["水"], []) is False
+
+
+# ── LLM 寓意懒加载回归 ──
+
+def test_name_meaning_fallback_to_template(monkeypatch, tmp_path):
+    """/name/meaning：LLM 失败回退模板 + meaning_source=template"""
+    import asyncio
+    from app.services.llm_service import LLMError
+
+    async def fake_generate_meaning(*args, **kwargs):
+        return {
+            "error": "mock fail",
+            "meaning": "",
+            "poetry_note": "",
+            "wuxing_note": "",
+            "overall_note": "",
+        }
+
+    engine = NamingEngine()
+    # 隔离缓存目录，避免污染真实 data/meaning_cache
+    monkeypatch.setattr(engine.cache, "_cache_dir", tmp_path)
+    engine.cache.clear()
+    monkeypatch.setattr(engine.llm, "generate_meaning", fake_generate_meaning)
+    result = asyncio.run(engine.generate_meaning_detail("杜若", "female"))
+    assert result["meaning_source"] == "template"
+    assert result["full_name"] == "杜若"
+    assert result["layers"]
+    assert result["meaning"]
+
+
+def test_name_meaning_llm_success_path(monkeypatch, tmp_path):
+    """/name/meaning：LLM 成功返回多层 layers + meaning_source=llm"""
+    import asyncio
+
+    async def fake_generate_meaning(*args, **kwargs):
+        return {
+            "layers": [
+                {"level": "字面", "text": "第一层"},
+                {"level": "出处", "text": "第二层"},
+                {"level": "余味", "text": "第三层"},
+            ],
+            "meaning": "整体解读",
+            "poetry_note": "出处意境",
+            "wuxing_note": "五行分析",
+            "overall_note": "点睛",
+            "provider": "deepseek",
+            "model": "deepseek-chat",
+        }
+
+    engine = NamingEngine()
+    monkeypatch.setattr(engine.cache, "_cache_dir", tmp_path)
+    engine.cache.clear()
+    monkeypatch.setattr(engine.llm, "generate_meaning", fake_generate_meaning)
+    result = asyncio.run(engine.generate_meaning_detail("徐长卿", "male"))
+    assert result["meaning_source"] == "llm"
+    assert len(result["layers"]) == 3
+    assert result["meaning"] == "整体解读"
+
+
 if __name__ == "__main__":
     import pytest
 

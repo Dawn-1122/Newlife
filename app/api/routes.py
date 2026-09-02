@@ -9,6 +9,7 @@ from app.schemas.schemas import (
     NamingRequest, NamingResponse,
     NameAnalysisRequest, ApiResponse,
     PrenatalRequest, PrenatalResponse,
+    MeaningRequest, MeaningResponse,
 )
 from app.services.naming_engine import NamingEngine
 from app.services.char_database import CharDatabase
@@ -30,12 +31,6 @@ async def health_check():
 
 @router.post("/generate", response_model=NamingResponse)
 async def generate_names(request: NamingRequest):
-    """
-    生成名字
-
-    输入姓氏、性别、生辰（可选），返回候选名字列表。
-    每个名字包含八字分析、诗词出处、音律评分、五格数理。
-    """
     engine = NamingEngine()
 
     # 如果使用八字但未提供完整日期
@@ -64,6 +59,27 @@ async def generate_names(request: NamingRequest):
     )
 
     return NamingResponse(**result)
+
+
+@router.post("/name/meaning", response_model=MeaningResponse)
+async def name_meaning(request: MeaningRequest):
+    """
+    名字寓意懒加载（详情页，讲余味）
+
+    对单个名字调一次 LLM 生成多层余味寓意（layers: 字面/出处/余味），
+    LLM 失败回退模板，并标记 meaning_source=llm/template。结果带缓存。
+    """
+    engine = NamingEngine()
+    result = await engine.generate_meaning_detail(
+        full_name=request.full_name,
+        gender=request.gender,
+        year=request.year,
+        month=request.month,
+        day=request.day,
+        hour=request.hour if request.hour is not None else 12,
+        minute=request.minute if request.minute is not None else 0,
+    )
+    return MeaningResponse(**result)
 
 
 @router.post("/prenatal", response_model=PrenatalResponse)

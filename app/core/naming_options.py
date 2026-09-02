@@ -59,6 +59,29 @@ MEANING_KEYWORD_WEIGHT = 50  # 诗词/候选字命中寓意 keyword 的权重
 IMAGERY_WEIGHT = 20          # 诗词命中风格 imagery_keywords 的权重（Tier B）
 TARGET_MIN = 20              # 强加权同源组名目标最小数量（不足则引入下一 tier / 随机兜底）
 
+# ── 韵味五维权重（满分 100：P出处35 + I意象25 + L余味15 + C名内呼应10 + S姓氏协调15） ──
+YUNWEI_WEIGHTS = {
+    "provenance": 35,        # P 出处分
+    "imagery": 25,           # I 意象分
+    "aftertaste": 15,        # L 余味分
+    "coherence": 10,         # C 名内呼应分
+    "surname_coherence": 15,  # S 姓氏协调分
+}
+
+# ── 韵味各维度计算参数 ──
+PROVENANCE_SAME_SOURCE = 35   # 同源：名所有字 ∈ 同一条出处 recommend_chars
+PROVENANCE_SINGLE_CHAR = 20   # 单字有出处：名至少一字命中任意出处 recommend_chars
+IMAGERY_BASE = 8              # I = min(25, 8 + 4*K)
+IMAGERY_PER_HIT = 4
+IMAGERY_MAX = 25
+AFTERTASTE_PER_SENSE = 4      # L = min(15, 4*N)
+AFTERTASTE_MAX = 15
+S1_MAX = 10                   # S1 成词成典分
+S2_MAX = 5                    # S2 字义/意象呼应分
+
+# ── 漏斗门槛阈值（硬排除，不打分） ──
+GATE_PHONETICS_MIN_SCORE = 55  # 音律 score < 55 硬排除
+
 # 行业 code -> 五行（成人改名/品牌店名 P1 使用，P0 仅定义常量并透传 industry 字段）
 INDUSTRY_WUXING = {
     "tech":          "火",  # 互联网/科技/IT
