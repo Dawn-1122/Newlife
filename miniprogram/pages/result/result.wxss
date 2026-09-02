@@ -1,18 +1,18 @@
 .fallback-note {
   padding: 20rpx 24rpx;
-  background: #fff8e1;
+  background: #F6EFDF;
   border-radius: 12rpx;
-  border-left: 6rpx solid #D4A017;
+  border-left: 6rpx solid #A93226;
   margin-bottom: 20rpx;
   font-size: 24rpx;
-  color: #8a6d3b;
+  color: #7A6A45;
 }
 
 .adjust-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #fff;
+  background: #FCFAF5;
   border-radius: 16rpx;
   padding: 22rpx 24rpx;
   margin-bottom: 20rpx;
@@ -21,13 +21,13 @@
 
 .adjust-text {
   font-size: 28rpx;
-  color: #8B4513;
+  color: #1F1F1F;
   font-weight: 500;
 }
 
 .adjust-more {
   font-size: 30rpx;
-  color: #C19A6B;
+  color: #5E7A73;
 }
 
 .bazi-summary {
@@ -37,7 +37,7 @@
 .bazi-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #8B4513;
+  color: #1F1F1F;
   margin-bottom: 20rpx;
 }
 
@@ -46,7 +46,7 @@
   top: 30rpx;
   right: 30rpx;
   font-size: 24rpx;
-  color: #C19A6B;
+  color: #5E7A73;
 }
 
 .bazi-summary {
@@ -67,13 +67,13 @@
 
 .pillar-label {
   font-size: 24rpx;
-  color: #999;
+  color: #9C9A92;
 }
 
 .pillar-value {
   font-size: 36rpx;
   font-weight: 600;
-  color: #8B4513;
+  color: #1F1F1F;
   margin-top: 8rpx;
 }
 
@@ -82,7 +82,7 @@
   flex-direction: column;
   gap: 8rpx;
   font-size: 26rpx;
-  color: #666;
+  color: #5C5C5C;
   margin-bottom: 20rpx;
 }
 
@@ -90,7 +90,7 @@
   display: flex;
   justify-content: space-around;
   padding-top: 16rpx;
-  border-top: 1rpx solid #f0ede8;
+  border-top: 1rpx solid #E2DED5;
 }
 
 .wuxing-item {
@@ -118,7 +118,7 @@
 
 .wuxing-percent {
   font-size: 22rpx;
-  color: #999;
+  color: #9C9A92;
   margin-top: 6rpx;
 }
 
@@ -142,21 +142,21 @@
 
 .name-pinyin {
   font-size: 24rpx;
-  color: #C19A6B;
+  color: #5E7A73;
   margin-top: 8rpx;
 }
 
 .name-poetry {
   margin-top: 16rpx;
   padding: 16rpx;
-  background: #faf8f5;
+  background: #F4F0E7;
   border-radius: 8rpx;
-  border-left: 6rpx solid #C19A6B;
+  border-left: 6rpx solid #5E7A73;
 }
 
 .poetry-source {
   font-size: 24rpx;
-  color: #8B4513;
+  color: #1F1F1F;
   font-weight: 500;
   display: block;
   margin-bottom: 4rpx;
@@ -164,7 +164,7 @@
 
 .poetry-text {
   font-size: 26rpx;
-  color: #666;
+  color: #5C5C5C;
   display: block;
 }
 
@@ -182,31 +182,31 @@
 
 .score-label {
   font-size: 22rpx;
-  color: #999;
+  color: #9C9A92;
 }
 
 .score-value {
   font-size: 28rpx;
   font-weight: 600;
-  color: #8B4513;
+  color: #1F1F1F;
 }
 
 .name-meaning {
   margin-top: 16rpx;
   font-size: 26rpx;
-  color: #555;
+  color: #5C5C5C;
   line-height: 1.5;
 }
 
 .empty {
   text-align: center;
   padding: 100rpx 0;
-  color: #999;
+  color: #9C9A92;
 }
 
 /* 筛选栏 */
 .filter-bar {
-  background: #fff;
+  background: #FCFAF5;
   border-radius: 16rpx;
   padding: 20rpx 24rpx;
   margin-bottom: 20rpx;
@@ -220,14 +220,14 @@
 }
 
 .filter-row + .filter-row {
-  border-top: 1rpx solid #f0ede8;
+  border-top: 1rpx solid #E2DED5;
 }
 
 .filter-label {
   flex-shrink: 0;
   width: 80rpx;
   font-size: 26rpx;
-  color: #8B4513;
+  color: #1F1F1F;
   font-weight: 600;
   padding-top: 8rpx;
 }
@@ -243,13 +243,13 @@
   padding: 8rpx 24rpx;
   border-radius: 30rpx;
   font-size: 26rpx;
-  color: #666;
-  background: #f5f0e8;
+  color: #5C5C5C;
+  background: #ECE8DE;
   line-height: 1.4;
 }
 
 .chip-active {
-  background: linear-gradient(135deg, #8B4513, #A0522D);
+  background: linear-gradient(135deg, #1F1F1F, #3A3A3A);
   color: #fff;
   font-weight: 500;
 }

@@ -1,6 +1,7 @@
 <view class="container">
   <!-- 头部 -->
   <view class="header">
+    <view class="seal header-seal">名</view>
     <view class="title">美名集</view>
     <view class="subtitle">有据可循的起名工具</view>
     <view class="tagline">诗词典故 · 五行音律 · 每个名字都有出处</view>

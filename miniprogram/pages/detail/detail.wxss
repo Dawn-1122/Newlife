@@ -6,13 +6,13 @@
 .name-main {
   font-size: 64rpx;
   font-weight: 700;
-  color: #8B4513;
+  color: #1F1F1F;
   letter-spacing: 12rpx;
 }
 
 .name-pinyin {
   font-size: 28rpx;
-  color: #C19A6B;
+  color: #5E7A73;
   margin-top: 12rpx;
 }
 
@@ -26,22 +26,22 @@
 
 .score-label {
   font-size: 26rpx;
-  color: #999;
+  color: #9C9A92;
 }
 
 .score-number {
   font-size: 48rpx;
   font-weight: 700;
-  color: #8B4513;
+  color: #1F1F1F;
 }
 
 .section-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #8B4513;
+  color: #1F1F1F;
   margin-bottom: 20rpx;
   padding-left: 16rpx;
-  border-left: 6rpx solid #C19A6B;
+  border-left: 6rpx solid #5E7A73;
 }
 
 /* 用字解析 */
@@ -49,7 +49,7 @@
   display: flex;
   gap: 24rpx;
   padding: 20rpx 0;
-  border-bottom: 1rpx solid #f0ede8;
+  border-bottom: 1rpx solid #E2DED5;
 }
 
 .char-item:last-child {
@@ -72,7 +72,7 @@
 
 .char-pinyin {
   font-size: 22rpx;
-  color: #C19A6B;
+  color: #5E7A73;
   margin-top: 4rpx;
 }
 
@@ -90,8 +90,8 @@
   font-size: 20rpx;
   padding: 4rpx 12rpx;
   border-radius: 6rpx;
-  background: #f5f3f0;
-  color: #666;
+  background: #ECE8DE;
+  color: #5C5C5C;
 }
 
 .wuxing-tag.wx-jin { background: #FFF8E1; color: #C4A21E; }
@@ -102,7 +102,7 @@
 
 .char-meaning {
   font-size: 26rpx;
-  color: #666;
+  color: #5C5C5C;
   line-height: 1.5;
 }
 
@@ -110,22 +110,22 @@
 .char-shuowen {
   margin-top: 12rpx;
   padding: 16rpx 20rpx;
-  background: #faf8f5;
+  background: #F4F0E7;
   border-radius: 10rpx;
-  border-left: 4rpx solid #C19A6B;
+  border-left: 4rpx solid #5E7A73;
 }
 
 .shuowen-label {
   display: block;
   font-size: 22rpx;
-  color: #C19A6B;
+  color: #5E7A73;
   font-weight: 500;
   margin-bottom: 6rpx;
 }
 
 .shuowen-text {
   font-size: 26rpx;
-  color: #7a6a55;
+  color: #6B6658;
   line-height: 1.7;
 }
 
@@ -137,22 +137,22 @@
 .detail-label {
   display: block;
   font-size: 22rpx;
-  color: #999;
+  color: #9C9A92;
   margin-bottom: 6rpx;
 }
 
 .detail-text {
   font-size: 26rpx;
-  color: #555;
+  color: #5C5C5C;
   line-height: 1.7;
 }
 
 /* 诗词 */
 .poetry-block {
   padding: 20rpx;
-  background: #faf8f5;
+  background: #F4F0E7;
   border-radius: 12rpx;
-  border-left: 6rpx solid #C19A6B;
+  border-left: 6rpx solid #5E7A73;
 }
 
 .poetry-header {
@@ -161,21 +161,21 @@
 
 .poetry-source {
   font-size: 28rpx;
-  color: #8B4513;
+  color: #1F1F1F;
   font-weight: 500;
   display: block;
 }
 
 .poetry-author {
   font-size: 24rpx;
-  color: #999;
+  color: #9C9A92;
   margin-top: 4rpx;
   display: block;
 }
 
 .poetry-text {
   font-size: 30rpx;
-  color: #555;
+  color: #5C5C5C;
   line-height: 1.8;
   font-style: italic;
 }
@@ -194,18 +194,18 @@
 
 .phon-label {
   font-size: 28rpx;
-  color: #666;
+  color: #5C5C5C;
 }
 
 .phon-value {
   font-size: 28rpx;
-  color: #8B4513;
+  color: #1F1F1F;
   font-weight: 500;
 }
 
 .phon-desc {
   font-size: 26rpx;
-  color: #999;
+  color: #9C9A92;
   margin-top: 8rpx;
 }
 
@@ -224,13 +224,13 @@
 
 .wuge-name {
   font-size: 24rpx;
-  color: #999;
+  color: #9C9A92;
 }
 
 .wuge-num {
   font-size: 36rpx;
   font-weight: 600;
-  color: #8B4513;
+  color: #1F1F1F;
   margin-top: 4rpx;
 }
 
@@ -245,16 +245,16 @@
 
 .wuge-desc {
   font-size: 26rpx;
-  color: #666;
+  color: #5C5C5C;
   text-align: center;
   padding-top: 12rpx;
-  border-top: 1rpx solid #f0ede8;
+  border-top: 1rpx solid #E2DED5;
 }
 
 /* 寓意 */
 .meaning-text {
   font-size: 28rpx;
-  color: #555;
+  color: #5C5C5C;
   line-height: 1.8;
 }
 

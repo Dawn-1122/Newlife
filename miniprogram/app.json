@@ -12,11 +12,11 @@
     "pages/index/index"
   ],
   "window": {
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#8B4513",
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#F4F0E7",
     "navigationBarTitleText": "美名集",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#FAF8F5"
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F4F0E7"
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json"

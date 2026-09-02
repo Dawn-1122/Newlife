@@ -1,6 +1,6 @@
 /**app.wxss**/
 page {
-  background-color: #FAF8F5;
+  background-color: #F4F0E7;
   font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
   color: #333;
   font-size: 28rpx;
@@ -12,27 +12,28 @@ page {
   box-sizing: border-box;
 }
 
-/* 古风配色变量 */
-.bg-primary { background-color: #8B4513; }
-.bg-secondary { background-color: #FAF8F5; }
-.bg-card { background-color: #fff; }
-.text-primary { color: #8B4513; }
-.text-secondary { color: #666; }
-.text-accent { color: #C19A6B; }
-.text-gold { color: #D4A017; }
+/* 水墨配色变量 */
+.bg-primary { background-color: #1F1F1F; }
+.bg-secondary { background-color: #F4F0E7; }
+.bg-card { background-color: #FCFAF5; }
+.text-primary { color: #1F1F1F; }
+.text-secondary { color: #5C5C5C; }
+.text-accent { color: #5E7A73; }
+.text-gold { color: #A93226; }
 
 /* 卡片样式 */
 .card {
-  background: #fff;
+  background: #FCFAF5;
+  border: 1rpx solid #E2DED5;
   border-radius: 16rpx;
   padding: 30rpx;
   margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+  box-shadow: 0 1rpx 4rpx rgba(0,0,0,0.03);
 }
 
 /* 按钮样式 */
 .btn-primary {
-  background: linear-gradient(135deg, #8B4513, #A0522D);
+  background: #1F1F1F;
   color: #fff;
   border: none;
   border-radius: 50rpx;
@@ -48,9 +49,9 @@ page {
 
 /* 次级按钮 */
 .btn-secondary {
-  background: #fff;
-  color: #8B4513;
-  border: 1rpx solid #8B4513;
+  background: #FCFAF5;
+  color: #1F1F1F;
+  border: 1rpx solid #1F1F1F;
   border-radius: 50rpx;
   padding: 24rpx 0;
   font-size: 32rpx;
@@ -59,7 +60,7 @@ page {
 }
 
 .btn-secondary:active {
-  background: #faf3ec;
+  background: #F0EDE4;
 }
 
 /* 分数徽章 */
@@ -71,6 +72,24 @@ page {
   font-weight: 600;
 }
 
-.score-high { background: #e8f5e9; color: #2e7d32; }
-.score-mid { background: #fff3e0; color: #e65100; }
-.score-low { background: #fce4ec; color: #c62828; }
+.score-high { background: #F5E4E1; color: #A93226; }
+.score-mid { background: #E7ECE9; color: #5E7A73; }
+.score-low { background: #ECEAE3; color: #8A867C; }
+
+/* 水墨点睛：朱砂印章 + 书法标题 */
+.seal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 88rpx;
+  height: 88rpx;
+  background: #A93226;
+  color: #F4F0E7;
+  border-radius: 10rpx;
+  font-family: "Kaiti SC", "STKaiti", "KaiTi", "楷体", serif;
+  font-size: 44rpx;
+}
+
+.serif {
+  font-family: "Kaiti SC", "STKaiti", "KaiTi", "楷体", "Noto Serif SC", serif;
+}

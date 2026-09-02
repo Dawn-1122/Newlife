@@ -30,7 +30,7 @@
 
       <view class="form-item">
         <text class="form-label">八字分析</text>
-        <switch checked="{{useBazi}}" bindchange="onBaziSwitch" color="#8B4513" />
+        <switch checked="{{useBazi}}" bindchange="onBaziSwitch" color="#1F1F1F" />
       </view>
 
       <view class="form-item" wx:if="{{useBazi}}">

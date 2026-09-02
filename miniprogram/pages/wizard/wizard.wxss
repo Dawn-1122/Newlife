@@ -4,14 +4,14 @@
 
 .progress-track {
   height: 10rpx;
-  background: #efe9e1;
+  background: #E2DED5;
   border-radius: 10rpx;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #8B4513, #C19A6B);
+  background: linear-gradient(90deg, #1F1F1F, #5E7A73);
   border-radius: 10rpx;
   transition: width 0.25s ease;
 }
@@ -25,19 +25,19 @@
 
 .step-current {
   font-size: 26rpx;
-  color: #C19A6B;
+  color: #5E7A73;
   font-weight: 600;
 }
 
 .step-title {
   font-size: 30rpx;
-  color: #8B4513;
+  color: #1F1F1F;
   font-weight: 600;
 }
 
 .step-hint {
   font-size: 24rpx;
-  color: #999;
+  color: #9C9A92;
   margin-bottom: 20rpx;
 }
 
@@ -49,7 +49,7 @@
 }
 
 .style-card {
-  background: #fff;
+  background: #FCFAF5;
   border-radius: 16rpx;
   padding: 26rpx 30rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
@@ -57,25 +57,25 @@
 }
 
 .style-card.active {
-  border-color: #8B4513;
-  background: #fdf8f3;
+  border-color: #1F1F1F;
+  background: #F0EDE4;
 }
 
 .style-name {
   font-size: 32rpx;
   font-weight: 600;
-  color: #8B4513;
+  color: #1F1F1F;
 }
 
 .style-feeling {
   font-size: 24rpx;
-  color: #C19A6B;
+  color: #5E7A73;
   margin-top: 6rpx;
 }
 
 .style-examples {
   font-size: 26rpx;
-  color: #666;
+  color: #5C5C5C;
   margin-top: 12rpx;
   line-height: 1.6;
 }
@@ -90,7 +90,7 @@
 .meaning-card {
   width: calc(50% - 10rpx);
   box-sizing: border-box;
-  background: #fff;
+  background: #FCFAF5;
   border-radius: 16rpx;
   padding: 24rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
@@ -98,25 +98,25 @@
 }
 
 .meaning-card.active {
-  border-color: #8B4513;
-  background: #fdf8f3;
+  border-color: #1F1F1F;
+  background: #F0EDE4;
 }
 
 .meaning-name {
   font-size: 30rpx;
   font-weight: 600;
-  color: #8B4513;
+  color: #1F1F1F;
 }
 
 .meaning-feeling {
   font-size: 22rpx;
-  color: #C19A6B;
+  color: #5E7A73;
   margin-top: 6rpx;
 }
 
 .meaning-examples {
   font-size: 24rpx;
-  color: #666;
+  color: #5C5C5C;
   margin-top: 10rpx;
 }
 
@@ -126,16 +126,16 @@
 }
 
 .avoid-input {
-  border: 1rpx solid #e6dfd5;
+  border: 1rpx solid #D8D2C6;
   border-radius: 12rpx;
   padding: 20rpx 24rpx;
   font-size: 28rpx;
-  background: #faf8f5;
+  background: #F4F0E7;
 }
 
 .avoid-tip {
   font-size: 22rpx;
-  color: #aaa;
+  color: #B2B0A8;
   margin-top: 16rpx;
   line-height: 1.6;
 }
@@ -144,7 +144,7 @@
 .summary-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #8B4513;
+  color: #1F1F1F;
   margin-bottom: 12rpx;
 }
 
@@ -152,7 +152,7 @@
   display: flex;
   align-items: center;
   padding: 22rpx 0;
-  border-bottom: 1rpx solid #f0ede8;
+  border-bottom: 1rpx solid #E2DED5;
 }
 
 .summary-row:last-child {
@@ -163,7 +163,7 @@
   width: 150rpx;
   flex-shrink: 0;
   font-size: 26rpx;
-  color: #999;
+  color: #9C9A92;
 }
 
 .summary-value {
@@ -176,11 +176,11 @@
 .summary-edit {
   margin-left: 16rpx;
   font-size: 24rpx;
-  color: #C19A6B;
+  color: #5E7A73;
 }
 
 .tap-row:active {
-  background: #faf8f5;
+  background: #F4F0E7;
 }
 
 /* 底部导航 */

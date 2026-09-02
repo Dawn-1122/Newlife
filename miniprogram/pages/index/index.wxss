@@ -6,19 +6,19 @@
 .title {
   font-size: 56rpx;
   font-weight: 700;
-  color: #8B4513;
+  color: #1F1F1F;
   letter-spacing: 8rpx;
 }
 
 .subtitle {
   font-size: 28rpx;
-  color: #C19A6B;
+  color: #5E7A73;
   margin-top: 8rpx;
 }
 
 .tagline {
   font-size: 24rpx;
-  color: #999;
+  color: #9C9A92;
   margin-top: 12rpx;
 }
 
@@ -31,7 +31,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 20rpx 0;
-  border-bottom: 1rpx solid #f0ede8;
+  border-bottom: 1rpx solid #E2DED5;
 }
 
 .form-item:last-child {
@@ -40,7 +40,7 @@
 
 .form-label {
   font-size: 28rpx;
-  color: #555;
+  color: #5C5C5C;
   width: 160rpx;
   flex-shrink: 0;
 }
@@ -68,13 +68,13 @@
 .gender-tab {
   padding: 12rpx 32rpx;
   border-radius: 8rpx;
-  background: #f5f3f0;
-  color: #666;
+  background: #ECE8DE;
+  color: #5C5C5C;
   font-size: 26rpx;
 }
 
 .gender-tab.active {
-  background: #8B4513;
+  background: #1F1F1F;
   color: #fff;
 }
 
@@ -87,13 +87,13 @@
 .length-tab {
   padding: 12rpx 32rpx;
   border-radius: 8rpx;
-  background: #f5f3f0;
-  color: #666;
+  background: #ECE8DE;
+  color: #5C5C5C;
   font-size: 26rpx;
 }
 
 .length-tab.active {
-  background: #8B4513;
+  background: #1F1F1F;
   color: #fff;
 }
 
@@ -107,5 +107,5 @@
 
 .footer-note text {
   font-size: 22rpx;
-  color: #aaa;
+  color: #B2B0A8;
 }

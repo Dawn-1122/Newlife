@@ -3,10 +3,10 @@
 .section-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #8B4513;
+  color: #1F1F1F;
   margin-bottom: 24rpx;
   padding-left: 20rpx;
-  border-left: 8rpx solid #C19A6B;
+  border-left: 8rpx solid #5E7A73;
 }
 
 /* 五行标签 */
@@ -37,12 +37,12 @@
   justify-content: space-between;
   align-items: center;
   font-size: 24rpx;
-  color: #999;
+  color: #9C9A92;
   margin-bottom: 20rpx;
 }
 
 .header-shengxiao {
-  color: #C19A6B;
+  color: #5E7A73;
 }
 
 .day-master {
@@ -54,25 +54,25 @@
 
 .dm-label {
   font-size: 26rpx;
-  color: #999;
+  color: #9C9A92;
 }
 
 .dm-value {
   font-size: 60rpx;
   font-weight: 700;
-  color: #8B4513;
+  color: #1F1F1F;
 }
 
 .header-note {
   margin-top: 16rpx;
   font-size: 24rpx;
-  color: #bbb;
+  color: #B2B0A8;
 }
 
 /* 四柱详解 */
 .pillar-detail {
   padding: 24rpx 0;
-  border-bottom: 1rpx solid #f0ede8;
+  border-bottom: 1rpx solid #E2DED5;
 }
 .pillar-detail:last-child {
   border-bottom: none;
@@ -89,7 +89,7 @@
 .pillar-name {
   font-size: 28rpx;
   font-weight: 600;
-  color: #8B4513;
+  color: #1F1F1F;
 }
 
 .pillar-ganzhi {
@@ -110,14 +110,14 @@
   flex-direction: column;
   align-items: center;
   padding: 20rpx;
-  background: #faf8f5;
+  background: #F4F0E7;
   border-radius: 12rpx;
 }
 
 .gz-char {
   font-size: 48rpx;
   font-weight: 700;
-  color: #8B4513;
+  color: #1F1F1F;
 }
 
 .gz-tag {
@@ -138,7 +138,7 @@
 .gz-brief {
   margin-top: 8rpx;
   font-size: 24rpx;
-  color: #888;
+  color: #6E6E6B;
   text-align: center;
 }
 
@@ -151,18 +151,18 @@
 }
 
 .canggan-label {
-  color: #999;
+  color: #9C9A92;
   flex-shrink: 0;
 }
 
 .canggan-value {
-  color: #666;
+  color: #5C5C5C;
 }
 
 .pillar-meaning {
   margin-top: 16rpx;
   font-size: 26rpx;
-  color: #555;
+  color: #5C5C5C;
   line-height: 1.5;
 }
 
@@ -175,14 +175,14 @@
 
 .gz-detail-line {
   font-size: 24rpx;
-  color: #999;
+  color: #9C9A92;
   line-height: 1.5;
 }
 
 /* 五行详解 */
 .wuxing-detail {
   padding: 24rpx 0;
-  border-bottom: 1rpx solid #f0ede8;
+  border-bottom: 1rpx solid #E2DED5;
 }
 .wuxing-detail:last-child {
   border-bottom: none;
@@ -208,7 +208,7 @@
 
 .wuxing-brief {
   font-size: 24rpx;
-  color: #C19A6B;
+  color: #5E7A73;
 }
 
 .wuxing-meta {
@@ -220,15 +220,15 @@
 
 .meta-item {
   font-size: 22rpx;
-  color: #888;
+  color: #6E6E6B;
   padding: 4rpx 16rpx;
-  background: #faf8f5;
+  background: #F4F0E7;
   border-radius: 16rpx;
 }
 
 .wuxing-detail-text {
   font-size: 26rpx;
-  color: #555;
+  color: #5C5C5C;
   line-height: 1.6;
 }
 
@@ -243,16 +243,16 @@
 .strength-label {
   font-size: 34rpx;
   font-weight: 700;
-  color: #8B4513;
+  color: #1F1F1F;
 }
 
 .strength-ratio {
   font-size: 24rpx;
-  color: #999;
+  color: #9C9A92;
 }
 
 .xiyong-list {
-  background: #faf8f5;
+  background: #F4F0E7;
   border-radius: 12rpx;
   padding: 20rpx;
   margin-bottom: 20rpx;
@@ -267,7 +267,7 @@
 
 .xiyong-label {
   font-size: 24rpx;
-  color: #999;
+  color: #9C9A92;
   flex-shrink: 0;
   width: 80rpx;
 }
@@ -275,11 +275,11 @@
 .xiyong-value {
   font-size: 28rpx;
   font-weight: 600;
-  color: #8B4513;
+  color: #1F1F1F;
 }
 
 .xiyong-explanation {
   font-size: 26rpx;
-  color: #555;
+  color: #5C5C5C;
   line-height: 1.7;
 }
