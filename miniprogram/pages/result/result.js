@@ -132,6 +132,8 @@ Page({
       // 复用原始请求参数重新调用；后端无固定 seed，天然得到不同候选
       const result = await api.generateNames(params)
       app.globalData.lastResult = result
+      // 换一批 = 新批次，深度寓意需重新解锁
+      app.globalData.lastBatchId = Date.now()
       // 换一批后重置筛选，展示全新候选
       this.setData({ wuxingFilter: '', styleFilter: '' })
       this.renderResult(result)
@@ -179,7 +181,7 @@ Page({
 
   onShareAppMessage() {
     return {
-      title: '美名集 · 有据可循的起名工具',
+      title: '名堂 · 有据可循的起名工具',
       path: '/pages/home/home'
     }
   }

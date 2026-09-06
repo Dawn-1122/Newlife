@@ -1,4 +1,4 @@
-# 美名集 · 起名逻辑重构技术设计
+# 名堂 · 起名逻辑重构技术设计
 
 > 架构师：高见远
 > 项目：/Users/dongxuhui/Newlife/Newlife/

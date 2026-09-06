@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     """全局配置"""
 
     # 应用信息
-    APP_NAME: str = "美名集"
+    APP_NAME: str = "名堂"
     APP_VERSION: str = "0.1.0"
     APP_DESCRIPTION: str = "有据可循的起名工具"
 
@@ -32,6 +32,8 @@ class Settings(BaseSettings):
     POETRY_DB_FILE: str = "poetry.json"
     SOURCE_ENTRIES_FILE: str = "source_entries.json"
     SURNAME_DB_FILE: str = "surnames.json"
+    SURNAME_TABOO_FILE: str = "surname_taboo.json"
+    HOMOPHONE_BOOST_FILE: str = "homophone_boost.json"
 
     # LLM 配置（后续按对比测试结果填入）
     LLM_PROVIDER: str = ""  # deepseek / qwen / zhipu

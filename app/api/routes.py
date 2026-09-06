@@ -10,6 +10,9 @@ from app.schemas.schemas import (
     NameAnalysisRequest, ApiResponse,
     PrenatalRequest, PrenatalResponse,
     MeaningRequest, MeaningResponse,
+    RecommendCharsRequest, RecommendCharsResponse,
+    RecommendSourcesRequest, RecommendSourcesResponse,
+    SourceCharsRequest, SourceCharsResponse,
 )
 from app.services.naming_engine import NamingEngine
 from app.services.char_database import CharDatabase
@@ -26,7 +29,7 @@ router = APIRouter()
 @router.get("/health")
 async def health_check():
     """健康检查"""
-    return {"status": "ok", "service": "美名集 API"}
+    return {"status": "ok", "service": "名堂 API"}
 
 
 @router.post("/generate", response_model=NamingResponse)
@@ -56,9 +59,78 @@ async def generate_names(request: NamingRequest):
         meanings=request.meanings,
         avoid_chars=request.avoid_chars,
         industry=request.industry,
+        selected_chars=request.selected_chars,
     )
 
     return NamingResponse(**result)
+
+
+@router.post("/recommend-chars", response_model=RecommendCharsResponse)
+async def recommend_chars(request: RecommendCharsRequest):
+    """
+    两阶段流程第一步：推荐选字范围。
+
+    根据生辰八字算喜用神，返回按五行分组（喜用神优先）的推荐字，
+    用户点选后，将所选字作为 selected_chars 传给 /generate 生成名字。
+    """
+    engine = NamingEngine()
+    result = engine.recommend_chars(
+        surname=request.surname,
+        gender=request.gender,
+        year=request.year,
+        month=request.month,
+        day=request.day,
+        hour=request.hour if request.hour is not None else 12,
+        minute=request.minute if request.minute is not None else 0,
+        style=request.style,
+        meanings=request.meanings,
+        avoid_chars=request.avoid_chars,
+        limit_per_group=request.limit_per_group,
+    )
+    return RecommendCharsResponse(**result)
+
+
+@router.post("/recommend-sources", response_model=RecommendSourcesResponse)
+async def recommend_sources(request: RecommendSourcesRequest):
+    """
+    两模式流程第一步：推荐「来源」（诗句/古文），先不确定字。
+
+    mode="meaning_first"：按寓意匹配度排序（八字仅作忌神避让提示）；
+    mode="bazi_first"：先返回八字解释 + 起名方向，来源按喜用神倾向排序。
+    """
+    engine = NamingEngine()
+    result = engine.recommend_sources(
+        surname=request.surname,
+        gender=request.gender,
+        year=request.year,
+        month=request.month,
+        day=request.day,
+        hour=request.hour if request.hour is not None else 12,
+        minute=request.minute if request.minute is not None else 0,
+        mode=request.mode,
+        meanings=request.meanings,
+        avoid_chars=request.avoid_chars,
+        limit=request.limit,
+    )
+    return RecommendSourcesResponse(**result)
+
+
+@router.post("/source-chars", response_model=SourceCharsResponse)
+async def source_chars(request: SourceCharsRequest):
+    """两模式流程第二步：用户选定来源后，在该来源内按八字喜用神推荐字。"""
+    engine = NamingEngine()
+    result = engine.source_chars(
+        surname=request.surname,
+        gender=request.gender,
+        year=request.year,
+        month=request.month,
+        day=request.day,
+        hour=request.hour if request.hour is not None else 12,
+        minute=request.minute if request.minute is not None else 0,
+        source_ids=request.source_ids,
+        limit_per_source=request.limit_per_source,
+    )
+    return SourceCharsResponse(**result)
 
 
 @router.post("/name/meaning", response_model=MeaningResponse)

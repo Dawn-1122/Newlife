@@ -71,6 +71,7 @@ YUNWEI_WEIGHTS = {
 # ── 韵味各维度计算参数 ──
 PROVENANCE_SAME_SOURCE = 35   # 同源：名所有字 ∈ 同一条出处 recommend_chars
 PROVENANCE_SINGLE_CHAR = 20   # 单字有出处：名至少一字命中任意出处 recommend_chars
+PROVENANCE_FAMOUS_PENALTY = 7  # 名句直取扣分（出处命中烂大街名句，稀缺度降档）
 IMAGERY_BASE = 8              # I = min(25, 8 + 4*K)
 IMAGERY_PER_HIT = 4
 IMAGERY_MAX = 25

@@ -5,13 +5,30 @@
       <view class="progress-fill" style="width: {{progress}}%;"></view>
     </view>
     <view class="step-indicator">
-      <text class="step-current">{{step}}/4</text>
+      <text class="step-current">{{step}}/{{totalSteps}}</text>
       <text class="step-title">{{stepTitle}}</text>
     </view>
   </view>
 
-  <!-- Step1 风格 -->
-  <block wx:if="{{step === 1}}">
+  <!-- Step·mode 起名方式 -->
+  <block wx:if="{{stepKey === 'mode'}}">
+    <view class="step-hint">先选择起名方式，后续推荐会相应调整</view>
+    <view class="mode-grid">
+      <view
+        class="mode-card {{item.selected ? 'active' : ''}}"
+        wx:for="{{modes}}"
+        wx:key="code"
+        bindtap="onModeTap"
+        data-code="{{item.code}}"
+      >
+        <view class="mode-name">{{item.name}}</view>
+        <view class="mode-desc">{{item.desc}}</view>
+      </view>
+    </view>
+  </block>
+
+  <!-- Step·style 风格 -->
+  <block wx:if="{{stepKey === 'style'}}">
     <view class="step-hint">选一种偏好的名字风格（可跳过）</view>
     <view class="style-grid">
       <view
@@ -28,8 +45,8 @@
     </view>
   </block>
 
-  <!-- Step2 寓意 -->
-  <block wx:if="{{step === 2}}">
+  <!-- Step·meaning 寓意 -->
+  <block wx:if="{{stepKey === 'meaning'}}">
     <view class="step-hint">选期望寓意（最多 3 个，可跳过）</view>
     <view class="meaning-grid">
       <view
@@ -46,8 +63,8 @@
     </view>
   </block>
 
-  <!-- Step3 避讳字 -->
-  <block wx:if="{{step === 3}}">
+  <!-- Step·avoid 避讳字 -->
+  <block wx:if="{{stepKey === 'avoid'}}">
     <view class="card avoid-card">
       <view class="step-hint">填写需要避开的名字用字（可跳过）</view>
       <input
@@ -60,8 +77,8 @@
     </view>
   </block>
 
-  <!-- Step4 确认 -->
-  <block wx:if="{{step === 4}}">
+  <!-- Step·confirm 确认 -->
+  <block wx:if="{{stepKey === 'confirm'}}">
     <view class="card summary-card">
       <view class="summary-title">确认起名信息</view>
 
@@ -70,22 +87,115 @@
         <text class="summary-value">{{item.value}}</text>
       </view>
 
-      <view class="summary-row tap-row" bindtap="onJumpStep" data-step="1">
+      <view class="summary-row tap-row" bindtap="onJumpStep" data-key="style">
         <text class="summary-label">风格</text>
         <text class="summary-value">{{selectedStyleName || '不限'}}</text>
         <text class="summary-edit">修改</text>
       </view>
 
-      <view class="summary-row tap-row" bindtap="onJumpStep" data-step="2">
+      <view class="summary-row tap-row" bindtap="onJumpStep" data-key="meaning">
         <text class="summary-label">寓意</text>
         <text class="summary-value">{{selectedMeaningText || '不限'}}</text>
         <text class="summary-edit">修改</text>
       </view>
 
-      <view class="summary-row tap-row" bindtap="onJumpStep" data-step="3">
+      <view class="summary-row tap-row" bindtap="onJumpStep" data-key="avoid">
         <text class="summary-label">避讳字</text>
         <text class="summary-value">{{avoidChars || '无'}}</text>
         <text class="summary-edit">修改</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- Step·sources 选意境来源 -->
+  <block wx:if="{{stepKey === 'sources'}}">
+    <!-- 命格优先：八字简析 -->
+    <view class="bazi-card" wx:if="{{mode === 'bazi_first' && baziExplanation}}">
+      <view class="bazi-head">
+        <text class="bazi-title">命格简析</text>
+        <text class="bazi-strength" wx:if="{{baziExplanation.strength_label}}">{{baziExplanation.strength_label}}</text>
+      </view>
+      <view class="bazi-row" wx:if="{{baziExplanation.day_master}}">
+        <text class="bazi-label">日主</text>
+        <text class="bazi-value">{{baziExplanation.day_master}}（{{baziExplanation.day_master_wuxing}}）</text>
+      </view>
+      <view class="bazi-row">
+        <text class="bazi-label">喜用神</text>
+        <text class="bazi-value">{{baziExplanation.xi_wuxing_text}}</text>
+      </view>
+      <view class="bazi-row" wx:if="{{baziExplanation.ji_wuxing_text}}">
+        <text class="bazi-label">忌神</text>
+        <text class="bazi-value">{{baziExplanation.ji_wuxing_text}}</text>
+      </view>
+      <view class="bazi-suggestion">{{baziExplanation.suggestion}}</view>
+    </view>
+
+    <view class="step-hint">挑选你喜欢的意境来源（可多选）</view>
+    <view class="source-count" wx:if="{{!sourceLoading}}">
+      已选 <text class="source-count-num">{{selectedSourceCount}}</text> 个来源
+    </view>
+
+    <view class="char-loading" wx:if="{{sourceLoading}}">正在为你挑选意境来源…</view>
+
+    <view wx:elif="{{sources.length === 0}}" class="empty-hint">暂无可选来源，请返回调整寓意或避讳字</view>
+
+    <view wx:else>
+      <view
+        class="source-card {{item.selected ? 'active' : ''}}"
+        wx:for="{{sources}}"
+        wx:key="id"
+        bindtap="onSourceTap"
+        data-index="{{index}}"
+      >
+        <view class="source-head">
+          <text class="source-title">{{item.title}}</text>
+          <text class="source-author">{{item.dynasty}} · {{item.author}}</text>
+        </view>
+        <view class="source-text">{{item.text}}</view>
+        <view class="source-meta">
+          <text class="source-flag flag-{{item.bazi_flag}}">{{item.bazi_flag === 'xiyong' ? '契合喜用' : (item.bazi_flag === 'ji' ? '建议避开' : '中正')}}</text>
+          <text class="source-reason">{{item.match_reason}}</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- Step·chars 精选用字 -->
+  <block wx:if="{{stepKey === 'chars'}}">
+    <view class="step-hint">在所选来源中勾选喜欢的字（可跳过）</view>
+
+    <view class="char-count" wx:if="{{!charLoading}}">
+      已选 <text class="char-count-num">{{selectedCharCount}}</text> 个字
+    </view>
+
+    <view class="char-loading" wx:if="{{charLoading}}">正在根据八字推荐好字…</view>
+
+    <view wx:elif="{{sourceCharGroups.length === 0}}" class="empty-hint">所选来源暂无可推荐字，可直接生成</view>
+
+    <view wx:else>
+      <view class="char-group" wx:for="{{sourceCharGroups}}" wx:key="id" wx:for-item="group" wx:for-index="gi">
+        <view class="char-group-head">
+          <text class="char-group-wx">{{group.title}}</text>
+          <text class="char-group-flag" wx:if="{{group.wuxing_tendency}}">{{group.wuxing_tendency}}</text>
+        </view>
+        <view class="source-line" wx:if="{{group.text}}">{{group.text}}</view>
+        <view class="char-grid">
+          <view
+            class="char-chip {{item.selected ? 'active' : ''}}"
+            wx:for="{{group.chars}}"
+            wx:for-item="item"
+            wx:for-index="ci"
+            wx:key="char"
+            bindtap="onCharTap"
+            data-gi="{{gi}}"
+            data-ci="{{ci}}"
+          >
+            <text class="char-chip-text">{{item.char}}</text>
+            <text class="char-chip-pinyin">{{item.pinyin}}</text>
+            <text class="char-chip-tag" wx:if="{{item.bazi_flag === 'xiyong'}}">喜</text>
+            <text class="char-chip-tag char-chip-tag-ji" wx:if="{{item.bazi_flag === 'ji'}}">忌</text>
+          </view>
+        </view>
       </view>
     </view>
   </block>
@@ -100,21 +210,41 @@
 
     <button
       class="btn-primary nav-btn"
-      wx:if="{{step !== 4}}"
+      wx:if="{{stepKey === 'mode' || stepKey === 'style' || stepKey === 'meaning' || stepKey === 'avoid'}}"
       bindtap="onNext"
     >下一步</button>
 
     <button
+      class="btn-primary nav-btn"
+      wx:if="{{stepKey === 'confirm'}}"
+      bindtap="onNext"
+      loading="{{loading}}"
+    >{{needCharStep ? '下一步 · 选意境来源' : (tab === 'prenatal' ? '查看孕期建议' : '开始起名')}}</button>
+
+    <button
+      class="btn-primary nav-btn"
+      wx:if="{{stepKey === 'sources'}}"
+      bindtap="onNext"
+      loading="{{sourceLoading}}"
+    >下一步 · 选字</button>
+
+    <button
+      class="btn-primary nav-btn"
+      wx:if="{{stepKey === 'chars'}}"
+      bindtap="onSubmit"
+      loading="{{loading}}"
+    >生成名字</button>
+
+    <button
       class="btn-secondary nav-btn"
-      wx:if="{{step !== 4}}"
+      wx:if="{{stepKey === 'style' || stepKey === 'meaning' || stepKey === 'avoid'}}"
       bindtap="onSkip"
     >跳过</button>
 
     <button
-      class="btn-primary nav-btn"
-      wx:if="{{step === 4}}"
-      bindtap="onSubmit"
-      loading="{{loading}}"
-    >{{tab === 'prenatal' ? '查看孕期建议' : '开始起名'}}</button>
+      class="btn-secondary nav-btn"
+      wx:if="{{stepKey === 'sources' || stepKey === 'chars'}}"
+      bindtap="onSkip"
+    >跳过，直接生成</button>
   </view>
 </view>

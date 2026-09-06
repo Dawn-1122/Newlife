@@ -108,6 +108,31 @@
   <view class="card">
     <view class="section-title">寓意解读</view>
     <view class="meaning-text">{{name.meaning}}</view>
+
+    <!-- 深度寓意（多层余味，分享解锁后可见） -->
+    <view class="deep-block" wx:if="{{unlocked}}">
+      <view class="deep-title">深度寓意 · 余味</view>
+
+      <view class="deep-loading" wx:if="{{deepLoading}}">深度解读生成中…</view>
+
+      <view wx:else>
+        <view class="layer-item" wx:for="{{layers}}" wx:key="level">
+          <view class="layer-level">{{item.level}}</view>
+          <view class="layer-text">{{item.text}}</view>
+        </view>
+        <view class="meaning-source">
+          <text wx:if="{{meaningSource === 'llm'}}">AI 深度解读</text>
+          <text wx:else>文化解读</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 分享解锁遮罩 -->
+    <view class="unlock-mask" wx:if="{{!unlocked}}">
+      <view class="unlock-title">解锁深度寓意</view>
+      <view class="unlock-desc">分享给好友，解锁这个名字的多层余味解读（字面 · 出处 · 余味）</view>
+      <button class="btn-primary unlock-btn" open-type="share">分享解锁</button>
+    </view>
   </view>
 
   <!-- 操作按钮 -->

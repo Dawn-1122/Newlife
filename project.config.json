@@ -1,5 +1,5 @@
 {
-  "description": "美名集 - 有据可循的起名工具",
+  "description": "名堂 - 有据可循的起名工具",
   "miniprogramRoot": "miniprogram/",
   "packOptions": {
     "ignore": [],

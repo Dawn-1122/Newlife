@@ -261,3 +261,84 @@
 .actions {
   padding: 20rpx 0 60rpx;
 }
+
+/* 深度寓意（多层余味） */
+.deep-block {
+  margin-top: 28rpx;
+  padding-top: 28rpx;
+  border-top: 1rpx solid #E2DED5;
+}
+
+.deep-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1F1F1F;
+  margin-bottom: 16rpx;
+}
+
+.deep-loading {
+  font-size: 26rpx;
+  color: #9C9A92;
+  padding: 20rpx 0;
+}
+
+.layer-item {
+  padding: 16rpx 0;
+}
+
+.layer-item + .layer-item {
+  border-top: 1rpx dashed #E2DED5;
+}
+
+.layer-level {
+  display: inline-block;
+  font-size: 22rpx;
+  color: #5E7A73;
+  font-weight: 600;
+  padding: 2rpx 14rpx;
+  border-radius: 6rpx;
+  background: #ECE8DE;
+  margin-bottom: 8rpx;
+}
+
+.layer-text {
+  font-size: 27rpx;
+  color: #5C5C5C;
+  line-height: 1.8;
+}
+
+.meaning-source {
+  margin-top: 16rpx;
+  font-size: 22rpx;
+  color: #B2B0A8;
+  text-align: right;
+}
+
+/* 分享解锁遮罩 */
+.unlock-mask {
+  margin-top: 28rpx;
+  padding: 40rpx 30rpx;
+  border: 2rpx dashed #D8D2C6;
+  border-radius: 16rpx;
+  background: #F8F5EE;
+  text-align: center;
+}
+
+.unlock-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1F1F1F;
+}
+
+.unlock-desc {
+  font-size: 24rpx;
+  color: #9C9A92;
+  line-height: 1.6;
+  margin: 16rpx 0 28rpx;
+}
+
+.unlock-btn {
+  display: inline-block;
+  width: 60%;
+  margin: 0 auto;
+}

@@ -13,10 +13,11 @@
 
 import re
 from typing import Optional
-from app.core.constants import RADICAL_IMAGERY_FAMILIES
+from app.core.constants import RADICAL_IMAGERY_FAMILIES, FAMOUS_PHRASES, VERB_CHARS
 from app.core.naming_options import (
     PROVENANCE_SAME_SOURCE,
     PROVENANCE_SINGLE_CHAR,
+    PROVENANCE_FAMOUS_PENALTY,
     IMAGERY_BASE,
     IMAGERY_PER_HIT,
     IMAGERY_MAX,
@@ -30,6 +31,7 @@ from app.core.naming_options import (
 from app.services.poetry_database import PoetryDatabase
 from app.services.source_database import SourceDatabase
 from app.services.surname_database import SurnameDatabase
+from app.services.surname_fit import SurnameFit
 
 
 class YunWeiScorer:
@@ -62,6 +64,7 @@ class YunWeiScorer:
         self.surname_db = surname_db or SurnameDatabase()
         self.source_db = source_db or SourceDatabase()
         self.poetry_db = poetry_db or PoetryDatabase()
+        self.surname_fit = SurnameFit()
 
     # ── 主入口 ──
 
@@ -111,12 +114,27 @@ class YunWeiScorer:
         if entry:
             rec = entry.get("recommend_chars", [])
             if all(ch in rec for ch in name_chars):
+                # 冷门句 > 名句直取（避烂大街：名句直取显俗，扣稀缺度）
+                if self._is_famous_entry(entry):
+                    return PROVENANCE_SAME_SOURCE - PROVENANCE_FAMOUS_PENALTY
                 return PROVENANCE_SAME_SOURCE
         # 单字有出处：名至少一个字命中任意出处条目 recommend_chars
         for ch in name_chars:
             if self.poetry_db.get_by_char(ch) or self.source_db.get_by_char(ch):
                 return PROVENANCE_SINGLE_CHAR
         return 0
+
+    @staticmethod
+    def _is_famous_entry(entry: Optional[dict]) -> bool:
+        """判断出处是否命中烂大街名句（名句直取显俗，稀缺度低）。"""
+        if not entry:
+            return False
+        text = " ".join([
+            entry.get("text", "") or "",
+            entry.get("citation", "") or "",
+            entry.get("title", "") or "",
+        ])
+        return any(phrase in text for phrase in FAMOUS_PHRASES)
 
     # ── I 意象分（0~25，只评「名」） ──
 
@@ -180,18 +198,21 @@ class YunWeiScorer:
         if len(chars_info) < 2:
             return 0  # 单名无「名内」两字呼应
         radicals = [c.get("radical", "") for c in chars_info]
-        if any(not r for r in radicals):
-            return 0
-        families = [self._radical_families(r) for r in radicals]
-        # 所有名字所属意象族有交集 → 同族
-        common = set.intersection(*families) if families else set()
-        if common:
-            return 10
-        # 可选：名各字 imagery 标签有交集（char.imagery，可选字段）
+        # 部首同族（需所有字都有部首）
+        if all(radicals):
+            families = [self._radical_families(r) for r in radicals]
+            common = set.intersection(*families) if families else set()
+            if common:
+                return 10
+        # imagery 标签交集
         imagery_sets = [
             set(c.get("imagery", []) or []) for c in chars_info
         ]
         if all(imagery_sets) and set.intersection(*imagery_sets):
+            return 5
+        # 动名结构（动态画面感）：恰好一个字是动词、另一个不是（动+名 / 名+动）
+        verb_flags = [c["char"] in VERB_CHARS for c in chars_info]
+        if sum(verb_flags) == 1:
             return 5
         return 0
 
@@ -239,6 +260,17 @@ class YunWeiScorer:
             name_chars = [c["char"] for c in chars_info]
             if name_chars and surname in rec and all(ch in rec for ch in name_chars):
                 return 6
+
+        # 优先级4：姓氏谐音借力成词（吴+与伦→无与伦比、韩+秋→寒秋）
+        boost, _ = self.surname_fit.surname_homophone_boost(surname, given_name)
+        if boost:
+            return 8
+
+        # 优先级5：名字本身是经典好词/典故（晨曦、浩然、望舒）
+        nb, _ = self.surname_fit.name_phrase_boost(given_name)
+        if nb:
+            return 6
+
         return 0
 
     def _s2_imagery_score(

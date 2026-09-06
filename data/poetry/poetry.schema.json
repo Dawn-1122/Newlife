@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "data/poetry/poetry.schema.json",
-  "title": "美名集诗词典故库 v2",
+  "title": "名堂诗词典故库 v2",
   "description": "诗词库数据结构定义（v2）。顶层保留 version/total/source_distribution/poems；poems 内每条为 PoetryEntry。",
   "type": "object",
   "required": ["version", "total", "source_distribution", "poems"],

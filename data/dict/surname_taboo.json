@@ -1,0 +1,37 @@
+{
+  "_comment": "姓氏谐音歧义词表（安全底线，硬排除）。key 为「全名拼音（无调，含姓）」，value 为谐音出的负面词。全名拼音与词表前缀/完整匹配即硬排除。可人工扩充：新增一行即可。",
+  "homophone_taboo": {
+    "wude": "无德",
+    "wuneng": "无能",
+    "wuyong": "无用",
+    "wuqing": "无情",
+    "wuchi": "无耻",
+    "wulai": "无赖",
+    "wuren": "无人",
+    "duziteng": "肚子疼",
+    "shizhenxiang": "屎真香",
+    "zhuyiqun": "猪一群",
+    "goushi": "狗屎",
+    "fanjian": "犯贱",
+    "qinshou": "禽兽",
+    "xiajian": "下贱",
+    "biyuntao": "避孕套",
+    "yangwei": "阳痿",
+    "baichi": "白痴",
+    "shazi": "傻子",
+    "wangba": "王八",
+    "hundan": "混蛋",
+    "laji": "垃圾",
+    "zhutou": "猪头",
+    "yaojing": "妖精",
+    "songzhong": "送终",
+    "jiahuo": "假货"
+  },
+  "_comment2": "姓氏本义冲突规则（高危硬排除项）。surname 配 conflict_chars：名字用字命中则硬排除（如 朱+红/丹/彤 语义重复、白+云/霜 易生贬义）。",
+  "meaning_conflict": {
+    "朱": ["红", "丹", "彤", "赤"],
+    "白": ["云", "霜", "雪"],
+    "黄": ["金", "澄"],
+    "青": ["蓝", "碧"]
+  }
+}

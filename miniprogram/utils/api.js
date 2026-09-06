@@ -132,6 +132,34 @@ function analyzeName(params) {
 }
 
 /**
+ * 两阶段第一步：推荐选字范围（按五行分组，喜用神优先）
+ */
+function recommendChars(params) {
+  return request('/recommend-chars', 'POST', params)
+}
+
+/**
+ * 两模式流程第一步：推荐意境来源（寓意优先 / 命格优先）
+ */
+function recommendSources(params) {
+  return request('/recommend-sources', 'POST', params)
+}
+
+/**
+ * 两模式流程第二步：在选定来源内按八字喜用神推荐字
+ */
+function sourceChars(params) {
+  return request('/source-chars', 'POST', params)
+}
+
+/**
+ * 名字深度寓意（详情页懒加载，多层余味）
+ */
+function nameMeaning(params) {
+  return request('/name/meaning', 'POST', params)
+}
+
+/**
  * 查询八字
  */
 function queryBazi(params) {
@@ -147,6 +175,10 @@ module.exports = {
   generateNames,
   prenatal,
   analyzeName,
+  recommendChars,
+  recommendSources,
+  sourceChars,
+  nameMeaning,
   queryBazi,
   STYLE_OPTIONS,
   MEANING_OPTIONS,

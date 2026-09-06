@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "美名集 · 字源条目 Schema",
+  "title": "名堂 · 字源条目 Schema",
   "type": "object",
   "required": ["version", "total", "entries"],
   "properties": {
