@@ -998,6 +998,43 @@ class NamingEngine:
             return sources[0]
         return None
 
+    @staticmethod
+    def _order_phonetic_better(c1: dict, c2: dict) -> bool:
+        """比较 c1+c2 与 c2+c1 的音韵，返回 True 表示 c1 在前更顺口。
+
+        只做「顺序敏感」的声调评价（姓的衔接不因名内两字交换而变，故不纳入）：
+        - 末字平声（1/2 声）收尾更响亮悠长；
+        - 两字声调起伏（不同优于相同）；
+        - 上声/去声连续拗口，额外扣分。
+        """
+        def _score(chars):
+            tones = [PhoneticsScorer.get_pinyin(ch)[1] for ch in chars]
+            s = 0.0
+            if len(tones) == 2:
+                if tones[1] in (1, 2):
+                    s += 3.0  # 末字平声收尾
+                if len(set(tones)) >= 2:
+                    s += 2.0  # 声调起伏
+                if tones[0] == tones[1] and tones[0] in (3, 4):
+                    s -= 2.0  # 上上/去去连续拗口
+            return s
+        return _score([c1["char"], c2["char"]]) >= _score([c2["char"], c1["char"]])
+
+    def _order_two_chars(self, entry: dict, c1: dict, c2: dict) -> tuple:
+        """决定两字的最终前后顺序：原文语序优先，其次音韵。
+
+        原文语序：两字在出处 text 中均有位置且先后不同 → 按出现先后；
+        否则（字不在原文 / 位置无法区分）退回音韵优选。
+        """
+        text = (entry or {}).get("text") or ""
+        p1 = text.find(c1["char"])
+        p2 = text.find(c2["char"])
+        if p1 >= 0 and p2 >= 0 and p1 != p2:
+            return (c1, c2) if p1 < p2 else (c2, c1)
+        if self._order_phonetic_better(c1, c2):
+            return (c1, c2)
+        return (c2, c1)
+
     def _compose_names(
         self,
         surname: str,
@@ -1062,17 +1099,19 @@ class NamingEngine:
                 for i in range(len(valid_chars)):
                     for j in range(i + 1, len(valid_chars)):
                         c1, c2 = valid_chars[i], valid_chars[j]
+                        # 字序决定：原文语序优先，其次音韵（治「颠倒一下更好」）
+                        first, second = self._order_two_chars(entry, c1, c2)
                         # 姓氏结合：三连同调（全平/全仄）提前跳过
                         if self.surname_fit.tri_tone_conflict(
-                            surname, [c1["char"], c2["char"]]
+                            surname, [first["char"], second["char"]]
                         ):
                             continue
-                        given_name = c1["char"] + c2["char"]
+                        given_name = first["char"] + second["char"]
                         if given_name in seen_names:
                             continue
                         seen_names.add(given_name)
                         name_data = self._evaluate_name(
-                            surname, given_name, [c1, c2], entry, bazi_result
+                            surname, given_name, [first, second], entry, bazi_result
                         )
                         if name_data:
                             name_data["_tier"] = tier
@@ -1117,6 +1156,9 @@ class NamingEngine:
                     c2 = self._weighted_char_choice(candidate_chars)
                     while c2["char"] == c1["char"]:
                         c2 = self._weighted_char_choice(candidate_chars)
+                    # 字序决定（随机组合无固定出处）：音韵优选
+                    if not self._order_phonetic_better(c1, c2):
+                        c1, c2 = c2, c1
                     # 姓氏结合：三连同调（全平/全仄）跳过
                     if self.surname_fit.tri_tone_conflict(
                         surname, [c1["char"], c2["char"]]
