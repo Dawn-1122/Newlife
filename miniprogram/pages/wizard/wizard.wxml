@@ -40,7 +40,7 @@
       >
         <view class="style-name">{{item.name}}</view>
         <view class="style-feeling">{{item.feeling}}</view>
-        <view class="style-examples">{{item.examplesText}}</view>
+        <view class="style-examples">{{item.imageryText}}</view>
       </view>
     </view>
   </block>
@@ -58,7 +58,7 @@
       >
         <view class="meaning-name">{{item.name}}</view>
         <view class="meaning-feeling">{{item.feeling}}</view>
-        <view class="meaning-examples">{{item.examplesText}}</view>
+        <view class="meaning-examples">{{item.imageryText}}</view>
       </view>
     </view>
   </block>

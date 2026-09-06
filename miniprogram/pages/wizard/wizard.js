@@ -1,22 +1,19 @@
 const api = require('../../utils/api')
 
-// 把风格示例卡转为带展示文本的卡片（单选项回填 selected）
+// 把风格卡转为带展示文本的卡片（单选项回填 selected）
 function buildStyles(selectedCode) {
   return (api.STYLE_EXAMPLES || []).map(function (s) {
-    const examplesText = (s.examples || []).map(function (e) {
-      return e.name + (e.source ? '(' + e.source + ')' : '')
-    }).join(' · ')
     return {
       code: s.code,
       name: s.name,
       feeling: s.feeling,
-      examplesText: examplesText,
+      imageryText: s.imagery || '',
       selected: s.code === selectedCode
     }
   })
 }
 
-// 把寓意示例卡转为带展示文本的卡片（多选项回填 selected）
+// 把寓意卡转为带展示文本的卡片（多选项回填 selected）
 function buildMeanings(selectedCodes) {
   const set = {}
   ;(selectedCodes || []).forEach(function (c) { set[c] = true })
@@ -25,7 +22,7 @@ function buildMeanings(selectedCodes) {
       code: m.code,
       name: m.name,
       feeling: m.feeling,
-      examplesText: (m.examples || []).join(' / '),
+      imageryText: m.imagery || '',
       selected: !!set[m.code]
     }
   })

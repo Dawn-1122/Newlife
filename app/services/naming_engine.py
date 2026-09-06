@@ -648,6 +648,30 @@ class NamingEngine:
 
         decorated.sort(key=sort_key)
 
+        # 分层洗牌：偏好命中的来源保持排前，但同层内随机打乱 → 换一批有变化、偏好确实生效
+        def bucket(item):
+            _e, _t, m_score, flag = item
+            if mode == "bazi_first":
+                if flag == "xiyong":
+                    return 0 if m_score > 0 else 1
+                if flag == "neutral":
+                    return 2 if m_score > 0 else 3
+                return 4
+            # 寓意优先：命中 / 未命中(非忌神) / 忌神
+            if flag == "ji":
+                return 2
+            return 0 if m_score > 0 else 1
+
+        buckets: dict[int, list] = {}
+        for item in decorated:
+            buckets.setdefault(bucket(item), []).append(item)
+        ordered = []
+        for b in sorted(buckets):
+            group = buckets[b]
+            random.shuffle(group)
+            ordered.extend(group)
+        decorated = ordered
+
         sources = []
         for entry, tendency, m_score, flag in decorated:
             sources.append(
@@ -867,13 +891,11 @@ class NamingEngine:
                 blob = blob_of(entry)
                 if any(kw in blob for kw in opt.get("imagery_keywords", [])):
                     return "B"
-            # 寓意命中：诗词 imagery/scene/text 命中寓意关键词 → 提升为 tier A（软加权优先引入）
+            # 寓意命中：诗词 imagery/scene/text 命中寓意词族 → 提升为 tier A（软加权优先引入）
             if meanings:
                 blob = blob_of(entry)
-                for m in meanings:
-                    opt = MEANING_OPTIONS.get(m)
-                    if opt and any(kw in blob for kw in opt.get("keywords", [])):
-                        return "A"
+                if NamingEngine._meanings_match_score(blob, meanings) > 0:
+                    return "A"
             return "C"
 
         def score_of(entry: dict) -> int:
@@ -893,7 +915,7 @@ class NamingEngine:
                     opt = MEANING_OPTIONS.get(m)
                     if not opt:
                         continue
-                    for kw in opt.get("keywords", []):
+                    for kw in opt.get("keywords", []) + opt.get("imagery_words", []):
                         if kw in blob:
                             total += MEANING_KEYWORD_WEIGHT
             return total
@@ -914,7 +936,12 @@ class NamingEngine:
 
     @staticmethod
     def _meanings_match_score(text: str, meanings: Optional[list[str]]) -> int:
-        """计算文本命中寓意关键词的次数（用于候选字/出处软排序与 tie-break）。"""
+        """
+        计算文本命中寓意词族的次数（用于候选字/出处软排序与 tie-break）。
+
+        词族 = keywords（字面词）+ imagery_words（意象词族），
+        让偏好匹配能覆盖 data 里 900+ 个意象标签，命中率从个位数提到几十上百条。
+        """
         if not meanings or not text:
             return 0
         score = 0
@@ -922,7 +949,7 @@ class NamingEngine:
             opt = MEANING_OPTIONS.get(m)
             if not opt:
                 continue
-            for kw in opt.get("keywords", []):
+            for kw in opt.get("keywords", []) + opt.get("imagery_words", []):
                 if kw in text:
                     score += 1
         return score
