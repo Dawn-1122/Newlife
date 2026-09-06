@@ -41,6 +41,10 @@ Page({
       wx.showToast({ title: '请输入至少2个字的姓名', icon: 'none' })
       return
     }
+    if (fullName.length > 10) {
+      wx.showToast({ title: '姓名最多 10 个字', icon: 'none' })
+      return
+    }
     if (this.data.useBazi && !this.data.birthDate) {
       wx.showToast({ title: '请选择出生日期', icon: 'none' })
       return

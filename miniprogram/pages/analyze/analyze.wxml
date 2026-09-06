@@ -7,7 +7,7 @@
   <view class="card form-card">
     <view class="form-item">
       <text class="form-label">姓名</text>
-      <input class="form-input" placeholder="请输入完整姓名" value="{{fullName}}" bindinput="onNameInput" maxlength="10" />
+      <input class="form-input" placeholder="请输入完整姓名" value="{{fullName}}" bindinput="onNameInput" />
     </view>
 
     <view class="form-item">

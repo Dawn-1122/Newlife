@@ -113,6 +113,10 @@ Page({
         wx.showToast({ title: '请输入姓氏', icon: 'none' })
         return
       }
+      if (surname.length > 4) {
+        wx.showToast({ title: '姓氏最多 4 个字', icon: 'none' })
+        return
+      }
       if (this.data.useBazi && !this.data.birthDate) {
         wx.showToast({ title: '请选择出生日期', icon: 'none' })
         return

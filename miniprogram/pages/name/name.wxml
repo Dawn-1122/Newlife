@@ -25,7 +25,7 @@
     <block wx:if="{{tab === 'postnatal'}}">
       <view class="form-item">
         <text class="form-label">姓氏</text>
-        <input class="form-input" placeholder="请输入姓氏" value="{{surname}}" bindinput="onSurnameInput" maxlength="4" />
+        <input class="form-input" placeholder="请输入姓氏（支持复姓，如 欧阳、司马）" value="{{surname}}" bindinput="onSurnameInput" />
       </view>
 
       <view class="form-item">
