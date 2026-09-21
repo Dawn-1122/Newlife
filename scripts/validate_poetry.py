@@ -10,7 +10,7 @@ R3  负面字黑名单（字库 luck=凶 ∪ blacklist.json）
 R4  emotion ∈ {喜庆, 中性, 哀伤}
 R5  emotion==哀伤 时 recommend_chars 必须为空
 R6  gender ∈ {男, 女, 中}
-R7  source ∈ 6 大类
+R7  source ∈ 8 大类
 R8  citation 非空且含《…》（格式异常仅警告）
 R9  text 非空且 2~30 字
 R10 id 全局唯一
@@ -34,7 +34,10 @@ DEFAULT_INPUT = PROJECT_ROOT / "data" / "poetry" / "poetry.json"
 
 EMOTION_ENUM = {"喜庆", "中性", "哀伤"}
 GENDER_ENUM = {"男", "女", "中"}
-SOURCE_ENUM = {"诗经", "楚辞", "唐诗", "宋词", "汉魏古诗", "经史子集"}
+SOURCE_ENUM = {
+    "诗经", "楚辞", "唐诗", "宋词", "汉魏古诗", "经史子集",
+    "五代词", "清词",  # 女性向扩容新增（见 scripts/normalize_female_corpus.py）
+}
 
 
 def is_cjk(ch: str) -> bool:

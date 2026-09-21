@@ -1,0 +1,380 @@
+{"id": "fem_0001", "recommend_chars": ["铄", "金", "光", "蕙", "翠"], "emotion": "中性", "gender": "中", "imagery": ["光辉", "金石", "蕙兰", "翠幕"], "scene": "寄托光明磊落、品性如兰、前程璀璨之愿"}
+{"id": "fem_0002", "recommend_chars": ["红", "萸", "黄", "橘"], "emotion": "喜庆", "gender": "中", "imagery": ["红萸", "黄花", "绿橘", "佳节"], "scene": "寄托珍惜美好时光、生活丰盈祥瑞之意"}
+{"id": "fem_0003", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["强颜欢笑", "借酒消愁", "愁绪难遣"], "scene": "抒发强乐无味、愁苦难解的怅惘之情"}
+{"id": "fem_0004", "recommend_chars": ["玉", "婵", "娟"], "emotion": "中性", "gender": "女", "imagery": ["明月", "婵娟", "思念"], "scene": "寄托对远方之人的美好祝愿与思念"}
+{"id": "fem_0005", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["相思", "憔悴", "执着"], "scene": "寄托刻骨相思与无悔深情"}
+{"id": "fem_0006", "recommend_chars": ["思", "歌"], "emotion": "中性", "gender": "中", "imagery": ["对酒当歌", "才思敏捷", "豪情逸兴"], "scene": "寄托洒脱豪迈、才思与歌咏之志"}
+{"id": "fem_0171", "recommend_chars": ["瑞", "香", "梅", "翠"], "emotion": "喜庆", "gender": "女", "imagery": ["祥瑞", "芳香", "梅妆", "翠钿"], "scene": "寄托女子容姿端丽、祥瑞芬芳的美好祝愿"}
+{"id": "fem_0321", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["星影", "归梦", "河声"], "scene": "寄托羁旅思归、梦断难成之愁"}
+{"id": "fem_0172", "recommend_chars": ["玉", "清", "月", "明", "香"], "emotion": "中性", "gender": "女", "imagery": ["美玉", "清辉", "明月", "芳香"], "scene": "寄托清雅高洁、温婉明净的闺秀气质"}
+{"id": "fem_0322", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["离愁", "相思", "孤寂", "梦断"], "scene": "寄托相思难寄、愁绪萦怀的怅惘之情"}
+{"id": "fem_0173", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["梦境", "桃花", "柳叶", "相思"], "scene": "寄托梦中重逢、相思难忘之情"}
+{"id": "fem_0323", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["夜雨", "花落", "繁华易逝"], "scene": "感叹繁华如梦、好景难凭的怅惘之情"}
+{"id": "fem_0174", "recommend_chars": ["碧", "玉", "香", "燕"], "emotion": "中性", "gender": "女", "imagery": ["碧玉", "燕钗", "香阶", "绣鞋"], "scene": "寄托女子温婉娴雅、仪态轻盈之美"}
+{"id": "fem_0324", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["梦幻", "虚无", "神女", "迷离"], "scene": "寄托人生如梦、往事难寻的怅惘之情"}
+{"id": "fem_0175", "recommend_chars": ["玉", "霞", "月", "秋"], "emotion": "喜庆", "gender": "女", "imagery": ["美玉", "云霞", "明月", "秋水"], "scene": "寄托女子容貌秀美、气质清雅如仙的祝愿"}
+{"id": "fem_0325", "recommend_chars": ["梅", "影", "红", "桥"], "emotion": "中性", "gender": "女", "imagery": ["梅影", "红桥", "裙带", "北风"], "scene": "寄托清雅幽独、暗香浮动的情怀"}
+{"id": "fem_0176", "recommend_chars": ["清", "兰", "蕙", "琴"], "emotion": "中性", "gender": "女", "imagery": ["蕙兰", "清琴", "百花", "河桥柳色"], "scene": "寄托清雅高洁、才思敏慧的闺秀情怀"}
+{"id": "fem_0326", "recommend_chars": ["龙", "扬", "青", "海"], "emotion": "中性", "gender": "男", "imagery": ["蛟龙腾跃", "飞扬豪迈", "海东青疾飞"], "scene": "寄托志存高远、奋发昂扬的豪情"}
+{"id": "fem_0177", "recommend_chars": ["晶", "霞", "晴", "露"], "emotion": "中性", "gender": "女", "imagery": ["露珠晶莹", "晚霞绮丽", "晴空澄澈"], "scene": "寄托女子清丽明净、温婉灵秀之姿"}
+{"id": "fem_0007", "recommend_chars": ["韶", "明", "和", "暖", "映"], "emotion": "喜庆", "gender": "中", "imagery": ["春光", "和暖", "明媚", "花村"], "scene": "寄托春光和暖、前程明媚、心境舒畅之愿"}
+{"id": "fem_0327", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["落叶", "钟声", "薄福"], "scene": "秋夜禅院闻钟，感怀身世薄福，寄托哀婉伤悼之情"}
+{"id": "fem_0178", "recommend_chars": ["明", "华", "平", "波"], "emotion": "中性", "gender": "中", "imagery": ["光明", "繁华", "平静", "波澜"], "scene": "寄托对光明与才华的追求，或对平静生活的向往"}
+{"id": "fem_0008", "recommend_chars": ["湘", "琴", "玉", "燕", "梁"], "emotion": "中性", "gender": "女", "imagery": ["湘水", "琴韵", "美玉", "燕钗"], "scene": "寄托闺阁雅致、才情温婉的美好寓意"}
+{"id": "fem_0328", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["和暖", "芳香", "离别"], "scene": "寄托温暖和煦却难留美好的惜别之情"}
+{"id": "fem_0179", "recommend_chars": ["玉", "梅", "香", "霞"], "emotion": "中性", "gender": "女", "imagery": ["春雪", "梅花", "香雾", "朝霞"], "scene": "寄托清雅高洁、芳华绝代之美"}
+{"id": "fem_0009", "recommend_chars": ["明", "良", "庆", "熙", "雅"], "emotion": "喜庆", "gender": "中", "imagery": ["光明", "良善", "吉庆", "和熙"], "scene": "寄托盛世祥和、贤良雅致之愿"}
+{"id": "fem_0329", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["春睡", "茶香", "赌书", "追忆"], "scene": "追忆往昔夫妻间诗书茶香的温馨日常，寄托深切的悼亡之情"}
+{"id": "fem_0180", "recommend_chars": ["锦", "香", "晓", "翠"], "emotion": "中性", "gender": "女", "imagery": ["锦绣", "芳香", "拂晓", "翠色"], "scene": "寄托闺阁雅致、芳华美好之愿"}
+{"id": "fem_0010", "recommend_chars": ["清", "润", "玉", "晓"], "emotion": "中性", "gender": "女", "imagery": ["清澈", "温润", "美玉", "拂晓"], "scene": "寄托清雅温润、明慧如玉的品格"}
+{"id": "fem_0330", "recommend_chars": ["安", "风"], "emotion": "中性", "gender": "中", "imagery": ["乘风", "归隐", "安定"], "scene": "寄托超脱尘世、归隐安居之志"}
+{"id": "fem_0181", "recommend_chars": ["清", "香", "春", "鸣"], "emotion": "喜庆", "gender": "女", "imagery": ["春水淘金", "步摇鸣珰", "江草清香"], "scene": "寄托春日欢愉、清雅芬芳、灵动美好之愿"}
+{"id": "fem_0011", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["登临", "愁绪", "无言"], "scene": "抒发登临触景、平生心事难言的黯然愁情"}
+{"id": "fem_0331", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["惆怅", "间阻", "东风无力"], "scene": "抒发离愁别恨与美好难留之叹"}
+{"id": "fem_0182", "recommend_chars": ["静", "珍", "绣", "红"], "emotion": "中性", "gender": "女", "imagery": ["静谧", "珍美", "锦绣", "红润"], "scene": "寄托女子娴静温婉、珍美如绣的闺秀气质"}
+{"id": "fem_0012", "recommend_chars": ["明", "月", "远", "霞"], "emotion": "中性", "gender": "中", "imagery": ["明月", "彩霞", "高远", "光明"], "scene": "寄托对光明圆满与高远理想的向往"}
+{"id": "fem_0332", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["孤雁", "只影", "早秋"], "scene": "寄托孤寂漂泊、秋日离愁的感伤之情"}
+{"id": "fem_0183", "recommend_chars": ["清", "光", "信", "飞"], "emotion": "中性", "gender": "中", "imagery": ["银河清浅", "蟾光鹊影", "守信不违", "飞鹊传情"], "scene": "寄托守信重诺、清朗高远、灵动进取之志"}
+{"id": "fem_0013", "recommend_chars": ["轩", "鸣", "修", "香"], "emotion": "喜庆", "gender": "男", "imagery": ["高轩驷马", "峨冠鸣佩", "修禊雅集", "御炉天香"], "scene": "寄托仕途显达、雅集风流之志"}
+{"id": "fem_0333", "recommend_chars": ["玉", "青", "翠", "箫"], "emotion": "中性", "gender": "女", "imagery": ["美玉", "青丝", "拾翠", "吹箫"], "scene": "寄托青春雅趣与美好邂逅的追忆"}
+{"id": "fem_0184", "recommend_chars": ["玉", "容", "新", "吟", "心"], "emotion": "中性", "gender": "女", "imagery": ["美玉", "妆容", "新起", "吟咏"], "scene": "寄托女子晨起梳妆、温婉从容、心境清雅之意"}
+{"id": "fem_0014", "recommend_chars": ["月", "婵", "娟", "珠", "好"], "emotion": "喜庆", "gender": "女", "imagery": ["明月", "婵娟", "珠楼", "团圆"], "scene": "寄托人月团圆、年年相守的美好祝愿"}
+{"id": "fem_0334", "recommend_chars": ["山", "水", "榆", "灯"], "emotion": "中性", "gender": "中", "imagery": ["山水兼程", "榆关远行", "夜深灯火"], "scene": "寄托人生旅途跋涉、心怀远方而灯火可亲之意"}
+{"id": "fem_0185", "recommend_chars": ["宜", "容", "光", "金", "翠"], "emotion": "喜庆", "gender": "女", "imagery": ["淡雅", "容光", "金翠"], "scene": "寄托女子淡雅宜人、容光焕发之美"}
+{"id": "fem_0015", "recommend_chars": ["秀", "琼", "莲", "月", "新"], "emotion": "中性", "gender": "女", "imagery": ["闺秀", "璧月", "琼树", "金莲"], "scene": "寄托女子秀美端庄、清雅出尘之愿"}
+{"id": "fem_0335", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["风雪交加", "乡愁难眠", "故园之思"], "scene": "抒发羁旅思乡、风雪夜归的孤寂愁绪"}
+{"id": "fem_0186", "recommend_chars": ["兰", "沐", "新", "初"], "emotion": "中性", "gender": "女", "imagery": ["兰花", "沐浴", "清新", "初晨"], "scene": "寄托清新雅致、如兰初沐的柔美气质"}
+{"id": "fem_0016", "recommend_chars": ["光", "成", "名", "高"], "emotion": "中性", "gender": "男", "imagery": ["光阴", "功名", "成就", "高远"], "scene": "寄托珍惜光阴、追求功名成就与高远志向的寓意"}
+{"id": "fem_0336", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["泪如丝", "弹指", "东风"], "scene": "寄托离愁别恨与相思之苦"}
+{"id": "fem_0187", "recommend_chars": ["信", "月", "中", "生"], "emotion": "中性", "gender": "中", "imagery": ["诚信", "明月", "中正", "生机"], "scene": "寄托守信如月、中正平和、生生不息之愿"}
+{"id": "fem_0017", "recommend_chars": ["明", "月", "琼", "容"], "emotion": "中性", "gender": "女", "imagery": ["明月", "琼箫", "霓裳", "花容"], "scene": "寄托月下清歌、芳华长驻的美好愿景"}
+{"id": "fem_0337", "recommend_chars": ["乘", "舟", "湖", "叶"], "emotion": "中性", "gender": "男", "imagery": ["扁舟", "五湖", "闲适", "归隐"], "scene": "寄托不依附他人、自在逍遥的隐逸之志"}
+{"id": "fem_0188", "recommend_chars": ["玉", "容", "闻"], "emotion": "中性", "gender": "女", "imagery": ["美玉", "雍容", "闻达"], "scene": "寄托女子温婉雍容、才名远闻之愿"}
+{"id": "fem_0018", "recommend_chars": ["贤", "勋", "登", "星", "欢"], "emotion": "喜庆", "gender": "男", "imagery": ["贤能", "功勋", "登庸", "欢宴"], "scene": "寄托建功立业、贤能受任、欢庆升平之志"}
+{"id": "fem_0338", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["清秋", "离愁", "绿杨"], "scene": "寄托离愁别绪与清秋怀人之情"}
+{"id": "fem_0189", "recommend_chars": ["碧", "宜", "宛", "香"], "emotion": "喜庆", "gender": "女", "imagery": ["罗衣拂地", "美人初着", "宛风如舞", "香肌透芳"], "scene": "寄托女子姿容秀美、气质温婉、风韵天成之愿"}
+{"id": "fem_0019", "recommend_chars": ["翠", "荷", "初", "梅", "玉"], "emotion": "中性", "gender": "女", "imagery": ["翠水荷初", "苍崖梅小", "玉壶春色"], "scene": "寄托清雅高洁、春意初萌的柔美意境"}
+{"id": "fem_0339", "recommend_chars": ["花", "枝", "画", "罗"], "emotion": "中性", "gender": "女", "imagery": ["折枝花样", "罗裙画意", "闺阁雅趣"], "scene": "寄托对美好容颜与精致生活的追忆"}
+{"id": "fem_0190", "recommend_chars": ["玉", "柔", "春", "心"], "emotion": "中性", "gender": "女", "imagery": ["美玉", "柔美", "春意", "芳心"], "scene": "寄托女子温婉柔美、春心萌动的闺阁情思"}
+{"id": "fem_0020", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["春梦", "相思", "素月", "花阴"], "scene": "寄托春梦易逝、相思难遣的怅惘之情"}
+{"id": "fem_0340", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["灯月花阴", "十年踪迹", "旧情难忘"], "scene": "追忆往昔、感怀岁月流逝与深情不渝"}
+{"id": "fem_0191", "recommend_chars": ["莲", "心", "意", "竹"], "emotion": "中性", "gender": "女", "imagery": ["莲心", "竹枝", "情意", "高洁"], "scene": "寄托纯真心意与高洁品格"}
+{"id": "fem_0021", "recommend_chars": ["玉", "婷", "素", "暖"], "emotion": "喜庆", "gender": "女", "imagery": ["美玉", "娉婷", "素雅", "温暖"], "scene": "寄托女子温婉娴雅、姿容秀美之愿"}
+{"id": "fem_0341", "recommend_chars": ["淑", "景", "明", "鸾", "春"], "emotion": "喜庆", "gender": "女", "imagery": ["鸾鸟", "春景", "贤淑", "光明"], "scene": "寄托春光明媚、贤淑明慧的美好祝愿"}
+{"id": "fem_0192", "recommend_chars": ["莺", "玉", "珠", "江"], "emotion": "中性", "gender": "女", "imagery": ["莺啼", "美玉", "明珠", "江水"], "scene": "寄托女子灵秀温婉、清雅如珠玉的美好气质"}
+{"id": "fem_0022", "recommend_chars": ["晓", "远", "乔", "初"], "emotion": "中性", "gender": "中", "imagery": ["拂晓", "乔木", "远空", "初心"], "scene": "寄托晨光初启、志存高远、迁善向上的期许"}
+{"id": "fem_0342", "recommend_chars": ["清", "醒"], "emotion": "中性", "gender": "中", "imagery": ["清澈", "清醒", "明辨"], "scene": "寄托于浊世中保持清醒自持、明辨是非之志"}
+{"id": "fem_0193", "recommend_chars": ["芳", "庭", "香", "景"], "emotion": "中性", "gender": "女", "imagery": ["芳草", "庭院", "芳香", "春景"], "scene": "寄托庭院春深、芳洁雅致的生活意趣"}
+{"id": "fem_0023", "recommend_chars": ["明", "景", "银", "水"], "emotion": "中性", "gender": "中", "imagery": ["光明", "银色世界", "水精宫", "清辉"], "scene": "寄托澄明心境与高洁志趣"}
+{"id": "fem_0343", "recommend_chars": ["林", "照", "疏"], "emotion": "中性", "gender": "中", "imagery": ["疏林", "斜照", "清幽"], "scene": "寄托清雅淡泊、静观自然之趣"}
+{"id": "fem_0194", "recommend_chars": ["凤", "金", "雷", "天"], "emotion": "喜庆", "gender": "男", "imagery": ["金榜题名", "一鸣惊人", "凤衔金榜", "平地惊雷"], "scene": "寄托科举高中、声名鹊起、功成名就之志"}
+{"id": "fem_0024", "recommend_chars": ["佳", "辰", "莲", "欢"], "emotion": "喜庆", "gender": "女", "imagery": ["良辰美景", "金莲倩影", "欢会佳期"], "scene": "寄托对美好良辰与欢聚佳期的期盼"}
+{"id": "fem_0344", "recommend_chars": ["松", "晓", "远", "香"], "emotion": "中性", "gender": "中", "imagery": ["苍松高洁", "拂晓云开", "馨香远播", "深远悠长"], "scene": "寄托高洁长寿、明晓通达、德馨致远之愿"}
+{"id": "fem_0195", "recommend_chars": ["春", "水", "竹", "花"], "emotion": "中性", "gender": "女", "imagery": ["春水", "白苹", "小艇", "竹枝"], "scene": "寄托春日水边清幽闲适、自然恬淡的意趣"}
+{"id": "fem_0025", "recommend_chars": ["春", "英", "微", "薰"], "emotion": "中性", "gender": "女", "imagery": ["春阴绿树", "红英微薰", "清雅芬芳"], "scene": "寄托春日庭院中清雅芬芳、温婉灵秀的气质"}
+{"id": "fem_0345", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["朔风", "夜雪", "桃花月", "倩魂"], "scene": "寄托对逝去美好与深情眷恋的追思"}
+{"id": "fem_0196", "recommend_chars": ["蕊", "香", "仙", "雪"], "emotion": "中性", "gender": "女", "imagery": ["花蕊", "芳香", "仙子", "冰雪"], "scene": "寄托女子清雅如仙、芬芳高洁之愿"}
+{"id": "fem_0026", "recommend_chars": ["江", "山", "景", "南", "津"], "emotion": "中性", "gender": "中", "imagery": ["江山", "江南", "水景", "辽阔"], "scene": "寄托胸怀江山、向往江南秀美风光之意"}
+{"id": "fem_0346", "recommend_chars": ["清", "礼", "乐", "玉"], "emotion": "喜庆", "gender": "男", "imagery": ["清正", "礼乐", "美玉", "盛世"], "scene": "寄托盛世礼乐、清正高洁的君子之志"}
+{"id": "fem_0197", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["山月", "落花", "碧云"], "scene": "寄托幽独相思、心事无人知的怅惘之情"}
+{"id": "fem_0027", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["春去", "飘零", "无人管"], "scene": "抒发春光消逝、落花无主的怅惘之情"}
+{"id": "fem_0347", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["环佩", "月下", "钗钿", "幽思"], "scene": "寄托对逝去之人的深切追怀与幽怨哀思"}
+{"id": "fem_0198", "recommend_chars": ["意", "春", "湘", "月"], "emotion": "中性", "gender": "女", "imagery": ["春水", "深情", "湘月", "烟月朦胧"], "scene": "寄托情意深长、心境澄明如水的美好祝愿"}
+{"id": "fem_0028", "recommend_chars": ["兰", "春", "城", "画"], "emotion": "喜庆", "gender": "中", "imagery": ["兰堂夜烛", "画阁春风", "豪情欢宴"], "scene": "寄托富贵欢聚、春风得意之志"}
+{"id": "fem_0348", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["清夜", "画图", "梦中人"], "scene": "寄托对逝去之人的深切追思与痴情守望"}
+{"id": "fem_0199", "recommend_chars": ["雪", "香", "娇", "语", "花"], "emotion": "中性", "gender": "女", "imagery": ["雪香", "花语", "娇柔", "春闺"], "scene": "寄托女子娇美温婉、如花解语的气质"}
+{"id": "fem_0029", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["独守空床", "离愁别恨", "音书难托"], "scene": "抒发深闺独守、思念远人的离愁别绪"}
+{"id": "fem_0349", "recommend_chars": ["照", "宁", "芙", "蓉"], "emotion": "中性", "gender": "女", "imagery": ["夕照", "秋风", "芙蓉", "宁静"], "scene": "寄托秋江晚景中恬淡自守、清雅高洁之志"}
+{"id": "fem_0200", "recommend_chars": ["凤", "香", "盈", "绣", "城"], "emotion": "喜庆", "gender": "女", "imagery": ["香车", "凤城", "笑靥", "绣帘"], "scene": "寄托邂逅欢愉、娇美灵动与美好相逢之意"}
+{"id": "fem_0030", "recommend_chars": ["芳", "素", "幽", "纤"], "emotion": "中性", "gender": "女", "imagery": ["幽芳", "素手", "纤枝", "乌云鬓"], "scene": "描绘晚来酌酒赏花、摘枝插鬓的闲雅情趣，寄托温婉清雅、惜芳自赏之意"}
+{"id": "fem_0350", "recommend_chars": ["绣", "红", "雨", "阳"], "emotion": "中性", "gender": "女", "imagery": ["绣榻", "红雨", "斜阳", "同倚"], "scene": "追忆往昔温馨相伴、寄托柔情与美好回忆"}
+{"id": "fem_0201", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["相思", "明月", "杏花"], "scene": "寄托深切思念与相知相守之情"}
+{"id": "fem_0031", "recommend_chars": ["檀", "芳", "韵", "心"], "emotion": "中性", "gender": "女", "imagery": ["檀心", "芳丛", "风韵"], "scene": "寄托女子含蓄清雅、风韵天成之美"}
+{"id": "fem_0351", "recommend_chars": ["银", "杏", "玉", "兰"], "emotion": "中性", "gender": "女", "imagery": ["银杏细雨", "玉兰清风", "高阁雅致", "庭院幽静"], "scene": "寄托清雅高洁、温婉从容的品格与生活意趣"}
+{"id": "fem_0202", "recommend_chars": ["凤", "翠", "红", "金"], "emotion": "中性", "gender": "女", "imagery": ["华美", "相思", "含情", "明艳"], "scene": "寄托女子温婉多情、华美明艳之姿"}
+{"id": "fem_0032", "recommend_chars": ["韶", "光", "明", "晴", "暖"], "emotion": "喜庆", "gender": "中", "imagery": ["春光", "明媚", "晴暖", "清明"], "scene": "寄托春光和煦、前程明朗的美好祝愿"}
+{"id": "fem_0352", "recommend_chars": ["银", "玉", "兰", "雨"], "emotion": "中性", "gender": "女", "imagery": ["银杏细雨", "玉兰清风", "高阁雅致", "银玉富贵"], "scene": "寄托清雅高洁、温润富贵的品格与气质"}
+{"id": "fem_0203", "recommend_chars": ["竹", "花", "枝", "风"], "emotion": "中性", "gender": "女", "imagery": ["风竹", "花枝", "缓步", "含情"], "scene": "寄托女子娴静温婉、含情脉脉之态"}
+{"id": "fem_0033", "recommend_chars": ["星", "珠", "光", "景"], "emotion": "喜庆", "gender": "中", "imagery": ["星辰", "连珠", "光明", "祥瑞"], "scene": "寄托盛世祥瑞、前程璀璨之愿"}
+{"id": "fem_0353", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["夕阳", "黄昏", "招魂"], "scene": "抒发对逝者的追怀与哀悼之情"}
+{"id": "fem_0204", "recommend_chars": ["翠", "香", "宝", "长"], "emotion": "中性", "gender": "女", "imagery": ["翠袖", "芳香", "宝钗", "长久"], "scene": "寄托女子娇美温婉、芳华长驻之愿"}
+{"id": "fem_0034", "recommend_chars": ["韵", "柔", "清", "冰"], "emotion": "中性", "gender": "女", "imagery": ["风韵", "柔美", "清瘦", "冰清"], "scene": "寄托女子清雅柔美、风韵天然之姿"}
+{"id": "fem_0354", "recommend_chars": ["翠", "黛", "海", "涛", "银"], "emotion": "中性", "gender": "中", "imagery": ["青山", "碧海", "银涛", "翠黛"], "scene": "寄托胸怀山海、气度开阔之志"}
+{"id": "fem_0205", "recommend_chars": ["露", "桃", "玉", "知"], "emotion": "中性", "gender": "女", "imagery": ["露桃", "眉眼", "鬓云", "多情"], "scene": "寄托女子娇美多情、聪慧灵秀之姿"}
+{"id": "fem_0035", "recommend_chars": ["江", "月", "风", "亭", "水"], "emotion": "中性", "gender": "中", "imagery": ["江乡", "月观", "风亭", "水边"], "scene": "寄托归隐江乡、临水观风、洒脱自在之志"}
+{"id": "fem_0355", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["红豆相思", "离愁别绪", "泪暗流"], "scene": "寄托离别相思之苦，基调悲苦，不宜取用为名"}
+{"id": "fem_0206", "recommend_chars": ["溪", "竹", "玉", "花"], "emotion": "中性", "gender": "女", "imagery": ["溪流", "翠竹", "美玉", "繁花"], "scene": "寄托清雅高洁、温婉秀美之愿"}
+{"id": "fem_0036", "recommend_chars": ["新", "天", "真", "香", "玉"], "emotion": "中性", "gender": "女", "imagery": ["新妆", "天真", "香娇玉软"], "scene": "寄托女子清新自然、娇美温婉的气质"}
+{"id": "fem_0356", "recommend_chars": ["安", "信", "如", "潮"], "emotion": "中性", "gender": "中", "imagery": ["春色如酒", "归期似潮", "诚信守约"], "scene": "寄托对归期如潮、信守承诺的期盼"}
+{"id": "fem_0207", "recommend_chars": ["锦", "翠", "月", "金"], "emotion": "中性", "gender": "女", "imagery": ["锦绣", "翠玉", "明月", "金辉"], "scene": "寄托女子容饰华美、气质清雅之愿"}
+{"id": "fem_0037", "recommend_chars": ["芝", "书", "竹", "春", "文"], "emotion": "喜庆", "gender": "男", "imagery": ["芝草", "书卷", "翠竹", "春意"], "scene": "寄托才学出众、仕途顺遂、文采风流之志"}
+{"id": "fem_0357", "recommend_chars": ["盈", "黛", "风", "流"], "emotion": "中性", "gender": "女", "imagery": ["盈盈", "青黛", "风流"], "scene": "寄托女子轻盈秀美、风姿绰约的意韵"}
+{"id": "fem_0208", "recommend_chars": ["棠", "芳", "钗", "庭"], "emotion": "中性", "gender": "女", "imagery": ["海棠", "芳香", "内家妆", "闲庭"], "scene": "寄托女子娴雅风流、如花芬芳之美"}
+{"id": "fem_0038", "recommend_chars": ["和", "暖", "杨", "桃", "花"], "emotion": "喜庆", "gender": "女", "imagery": ["和风", "暖阳", "垂杨", "桃花"], "scene": "寄托春日和暖、生活恬美、性情温婉之愿"}
+{"id": "fem_0358", "recommend_chars": ["檀", "秋", "水", "山", "流"], "emotion": "中性", "gender": "中", "imagery": ["秋日山水", "清流源远", "檀木芬芳", "山高水长"], "scene": "寄托清雅高远、源远流长之志"}
+{"id": "fem_0209", "recommend_chars": ["燕", "初", "香", "梁"], "emotion": "中性", "gender": "女", "imagery": ["春燕归巢", "花香闲庭", "画梁幽语"], "scene": "寄托春日闲适、家园温馨与初心归来的美好寓意"}
+{"id": "fem_0039", "recommend_chars": ["翠", "岚", "香", "林"], "emotion": "中性", "gender": "女", "imagery": ["山岚", "翠林", "暗香", "霜雪"], "scene": "寄托清雅高洁、幽谷含香之志"}
+{"id": "fem_0359", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["红笺模糊", "灯前呵手", "追忆旧情"], "scene": "寄托对往昔深情与离愁的追忆"}
+{"id": "fem_0210", "recommend_chars": ["秋", "雨", "香", "成"], "emotion": "中性", "gender": "女", "imagery": ["秋雨", "沙鸥", "野风", "芳香"], "scene": "寄托秋日渡头清丽野趣与自然芬芳之韵"}
+{"id": "fem_0040", "recommend_chars": ["赏", "心", "歌", "瑶", "君"], "emotion": "喜庆", "gender": "中", "imagery": ["赏心", "欢歌", "美酒", "知音"], "scene": "寄托与知音共赏良辰、欢歌醉饮的喜悦之情"}
+{"id": "fem_0360", "recommend_chars": ["泊", "光", "平", "台"], "emotion": "中性", "gender": "中", "imagery": ["水光", "淡泊", "平静", "高台"], "scene": "寄托淡泊明志、心境平和、光明磊落之愿"}
+{"id": "fem_0211", "recommend_chars": ["锦", "春", "越"], "emotion": "中性", "gender": "女", "imagery": ["锦绣", "春色", "越罗"], "scene": "寄托对美好年华与锦绣前程的期许"}
+{"id": "fem_0041", "recommend_chars": ["晓", "燕", "月", "山"], "emotion": "中性", "gender": "中", "imagery": ["燕山雪", "冰河月", "晓陇云飞"], "scene": "寄托清朗高远、志在四方的情怀"}
+{"id": "fem_0361", "recommend_chars": ["柳", "花", "心", "赏"], "emotion": "中性", "gender": "女", "imagery": ["柳枝", "花朵", "心境", "欣赏"], "scene": "寄托闲适雅致、赏心乐事的生活情趣"}
+{"id": "fem_0212", "recommend_chars": ["翠", "杨", "长"], "emotion": "中性", "gender": "女", "imagery": ["垂杨绿阴", "嫩红轻翠", "浓妆春色"], "scene": "寄托春光明媚、容颜秀美、生机绵长之意"}
+{"id": "fem_0042", "recommend_chars": ["皓", "月", "清", "风"], "emotion": "中性", "gender": "中", "imagery": ["皓月", "清风", "画堂", "光阴"], "scene": "寄托珍惜美好时光、追求清雅高洁之志"}
+{"id": "fem_0362", "recommend_chars": ["玉", "兰", "香", "月"], "emotion": "中性", "gender": "女", "imagery": ["玉兰", "月色", "幽香", "低语"], "scene": "寄托温婉娴静、清雅芳洁的闺秀气质"}
+{"id": "fem_0213", "recommend_chars": ["雪", "映", "红", "平"], "emotion": "中性", "gender": "女", "imagery": ["雪萼红跗", "交相辉映", "边塞情怀"], "scene": "寄托清雅高洁、明丽相映之美"}
+{"id": "fem_0043", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["离愁", "销魂", "萧瑟"], "scene": "寄托离愁别绪与人生感伤"}
+{"id": "fem_0363", "recommend_chars": ["松", "杉", "清", "晓", "雪"], "emotion": "中性", "gender": "中", "imagery": ["松杉挺拔", "清绝高洁", "晓雪澄明"], "scene": "寄托清正高洁、澄明脱俗的品格追求"}
+{"id": "fem_0214", "recommend_chars": ["兰", "绣", "声", "归"], "emotion": "中性", "gender": "女", "imagery": ["兰麝芬芳", "绣鞍华美", "醉归暮色"], "scene": "寄托富贵闲适、芳名远播之愿"}
+{"id": "fem_0044", "recommend_chars": ["清", "春", "光", "圆"], "emotion": "喜庆", "gender": "中", "imagery": ["春光", "鸟鸣", "清圆", "明媚"], "scene": "寄托春日生机、清朗圆融的美好祝愿"}
+{"id": "fem_0364", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["尘缘易断", "燕子依旧", "帘钩软语"], "scene": "寄托物是人非、尘缘难久的伤悼之情"}
+{"id": "fem_0215", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["梦醒空寂", "杜鹃悲啼", "离人无踪"], "scene": "抒写闺中女子梦醒后独对空屏、闻鹃啼而伤离怨别的凄苦之情"}
+{"id": "fem_0045", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["玉关遥望", "凝泪下楼", "平林暮色"], "scene": "寄托离愁别恨与遥念故人之思"}
+{"id": "fem_0365", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["明月", "归燕", "轻罗小扇"], "scene": "寄托对故人归来的深切思念与孤寂之情"}
+{"id": "fem_0216", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["梨雪", "玲珑", "玉容"], "scene": "描绘女子容颜憔悴、春夜孤寂的哀婉情境"}
+{"id": "fem_0046", "recommend_chars": ["芹", "香", "柳", "萍"], "emotion": "中性", "gender": "女", "imagery": ["芹香", "柳阴", "萍絮", "鲤花"], "scene": "寄托清雅闲适、自然灵动的生活意趣"}
+{"id": "fem_0366", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["绸缪", "摇落", "香减"], "scene": "伤悼往昔情缘，寄托哀思与追怀"}
+{"id": "fem_0217", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["征鸿", "流水", "兰红波碧", "潇湘"], "scene": "寄托离愁别绪与对远方潇湘的追忆之情"}
+{"id": "fem_0047", "recommend_chars": ["兰", "才", "贵", "真"], "emotion": "喜庆", "gender": "男", "imagery": ["兰心蕙质", "怜才惜玉", "贵气天成", "真率画眉"], "scene": "寄托对才俊之士的赏识与美好姻缘的祝愿"}
+{"id": "fem_0367", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["孤卧", "北斗", "玉笛", "泣血"], "scene": "寄托孤寂悲苦、思乡怀人之情"}
+{"id": "fem_0218", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["孤寂", "梦散", "空闺"], "scene": "描绘独处空闺、梦魂消散的孤寂愁绪"}
+{"id": "fem_0048", "recommend_chars": ["晴", "皓", "月", "春", "光"], "emotion": "喜庆", "gender": "中", "imagery": ["晴空皓月", "春光烂漫", "明朗清辉"], "scene": "寄托人生明朗、前程似锦的美好祝愿"}
+{"id": "fem_0368", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["裘敝", "太息", "才命相负"], "scene": "抒发怀才不遇、命运多舛的悲慨"}
+{"id": "fem_0219", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["绣罗", "博山香", "暗魂消"], "scene": "描写闺中香消魂断的哀愁，基调悲苦，不宜取名"}
+{"id": "fem_0049", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["梨花", "粉泪", "香润"], "scene": "寄托离愁别恨与追忆之情"}
+{"id": "fem_0369", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["海棠", "芳香", "追忆"], "scene": "寄托对往昔美好时光的追忆与感怀"}
+{"id": "fem_0220", "recommend_chars": ["静", "锦", "菱", "花"], "emotion": "中性", "gender": "女", "imagery": ["宁静", "锦绣", "菱花", "归期"], "scene": "寄托闺中静好、期盼归期的温婉情思"}
+{"id": "fem_0050", "recommend_chars": ["南", "仙", "神", "今"], "emotion": "喜庆", "gender": "中", "imagery": ["南斗", "神仙", "良夜", "欢聚"], "scene": "寄托良辰欢聚、超然如仙之愿"}
+{"id": "fem_0370", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["风雨萧瑟", "孤灯残夜", "凄清愁绪"], "scene": "抒发孤寂凄凉的愁思，不宜用于人名"}
+{"id": "fem_0221", "recommend_chars": ["香", "柳", "成"], "emotion": "中性", "gender": "女", "imagery": ["香车柳堤", "沉醉春色", "芳华流连"], "scene": "寄托春日游赏、沉醉美好时光的柔美情致"}
+{"id": "fem_0051", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["檐花飘落", "空阶滴碎", "秋容老尽"], "scene": "描绘秋日庭院花落阶空的萧瑟景象，寄托时光流逝、繁华衰尽的感伤"}
+{"id": "fem_0371", "recommend_chars": ["风", "纳", "葱", "茏"], "emotion": "中性", "gender": "中", "imagery": ["风云", "吐纳", "葱茏", "殿阁"], "scene": "寄托胸怀广阔、气度不凡、生机盎然的志向"}
+{"id": "fem_0222", "recommend_chars": ["玉", "香", "棠"], "emotion": "中性", "gender": "女", "imagery": ["海棠", "玉纤", "余香"], "scene": "寄托闺中闲雅、惜春怀人之情"}
+{"id": "fem_0052", "recommend_chars": ["澄", "笙", "绮", "芳"], "emotion": "喜庆", "gender": "女", "imagery": ["澄波", "笙歌", "罗绮", "芳尘"], "scene": "寄托富贵闲雅、歌舞升平的美好生活愿景"}
+{"id": "fem_0372", "recommend_chars": ["暖", "薰", "舜", "弦"], "emotion": "喜庆", "gender": "中", "imagery": ["温暖", "和风", "雅乐", "盛世"], "scene": "寄托温暖和煦、盛世雅乐之愿"}
+{"id": "fem_0223", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["秋夜", "幽会", "梦牵"], "scene": "寄托秋夜怀人、佳期难再的幽思之情"}
+{"id": "fem_0053", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["清梦", "耿耿忠心", "南国"], "scene": "寄托羁旅思乡、心志不渝之情"}
+{"id": "fem_0373", "recommend_chars": ["明", "月", "长", "镇"], "emotion": "中性", "gender": "中", "imagery": ["明月", "长久", "安定", "闲适"], "scene": "寄托明月长照、心境安闲、岁月悠长之愿"}
+{"id": "fem_0224", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["青鸟", "锦字", "兰房", "魂梦"], "scene": "寄托离愁别恨与相思难寄之情"}
+{"id": "fem_0054", "recommend_chars": ["燕", "歌", "珠", "仙"], "emotion": "喜庆", "gender": "女", "imagery": ["舞燕翩跹", "歌珠圆润", "神仙流品"], "scene": "寄托宴乐欢愉、才艺出众、气质如仙的美好祝愿"}
+{"id": "fem_0374", "recommend_chars": ["春", "新", "融", "红"], "emotion": "中性", "gender": "女", "imagery": ["春意", "新生", "融和", "红润"], "scene": "寄托惜春迎新、温婉明媚之意"}
+{"id": "fem_0225", "recommend_chars": ["越", "长"], "emotion": "中性", "gender": "中", "imagery": ["超越", "长久", "生长"], "scene": "寄托超越进取、长久绵延之愿"}
+{"id": "fem_0055", "recommend_chars": ["明", "月", "清", "玉"], "emotion": "中性", "gender": "中", "imagery": ["明月", "芦花", "清玉", "钓蓑"], "scene": "寄托清雅高洁、宁静致远之志"}
+{"id": "fem_0375", "recommend_chars": ["春", "湘", "雨", "飞"], "emotion": "中性", "gender": "女", "imagery": ["春云", "湘雨", "飞絮", "蝴蝶"], "scene": "寄托春日闺中清丽柔美、轻盈灵动的情致"}
+{"id": "fem_0226", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["落日", "荒芜", "兴亡"], "scene": "抒发王朝兴废、繁华消逝的沧桑之感"}
+{"id": "fem_0056", "recommend_chars": ["成", "琼", "蓝", "枝"], "emotion": "中性", "gender": "中", "imagery": ["东风结子", "蓝桥琼浆", "成阴成实"], "scene": "寄托静待时机、终得圆满与美好归宿之愿"}
+{"id": "fem_0376", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["蘼芜", "音书远", "离愁"], "scene": "寄托相思离别、音信渺茫的怅惘之情"}
+{"id": "fem_0227", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["离愁", "劝酒", "珍重"], "scene": "寄托异乡离别时的珍重与不舍之情"}
+{"id": "fem_0057", "recommend_chars": ["瑶", "玉", "香", "金"], "emotion": "中性", "gender": "女", "imagery": ["美玉", "芳香", "金镜", "闺阁"], "scene": "寄托温婉雅致、明净芬芳的闺秀气质"}
+{"id": "fem_0377", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["桃蕊", "胭脂", "东风泪"], "scene": "寄托红颜薄命、春愁伤逝之叹"}
+{"id": "fem_0228", "recommend_chars": ["清", "兰", "花"], "emotion": "中性", "gender": "女", "imagery": ["清秋", "兰花", "花钿"], "scene": "寄托清雅高洁、芳华美好的祝愿"}
+{"id": "fem_0058", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["孤栖", "多感", "夜坐"], "scene": "抒写孤身漂泊、愁绪难眠的凄清心境"}
+{"id": "fem_0378", "recommend_chars": ["柳", "平", "岸", "年"], "emotion": "中性", "gender": "中", "imagery": ["柳岸", "平分", "年年", "群聚"], "scene": "寄托平和自然、岁岁安宁之愿"}
+{"id": "fem_0229", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["新竹", "落桃", "深闺"], "scene": "抒写春光流逝、独处深闺的孤寂愁绪"}
+{"id": "fem_0059", "recommend_chars": ["俊", "婵", "娟", "香", "露"], "emotion": "中性", "gender": "女", "imagery": ["婵娟", "俊秀", "芳香", "露水"], "scene": "寄托对美好姿容与高洁品格的期许"}
+{"id": "fem_0379", "recommend_chars": ["暖", "新", "柳", "迎"], "emotion": "喜庆", "gender": "中", "imagery": ["暖阳", "新柳", "迎宾", "春意"], "scene": "寄托春日迎宾、万象更新的美好祝愿"}
+{"id": "fem_0230", "recommend_chars": ["香", "玉", "翠", "凤", "春"], "emotion": "中性", "gender": "女", "imagery": ["香玉", "翠凤", "春水", "金粟"], "scene": "寄托女子芳华明丽、春意盎然的柔美气质"}
+{"id": "fem_0060", "recommend_chars": ["清", "晓", "玉", "霞"], "emotion": "中性", "gender": "女", "imagery": ["清晓", "玉霞", "汀洲", "云飞"], "scene": "寄托清雅明丽、晓霞映玉的柔美气质"}
+{"id": "fem_0380", "recommend_chars": ["皎", "洁", "冰", "雪"], "emotion": "中性", "gender": "女", "imagery": ["明月", "冰雪", "纯洁", "深情"], "scene": "寄托冰清玉洁、坚贞不渝的深情与高洁品格"}
+{"id": "fem_0231", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["画堂", "旧书", "长安"], "scene": "寄托离愁别绪与对重逢的期盼"}
+{"id": "fem_0061", "recommend_chars": ["春", "芳", "莺", "飞"], "emotion": "喜庆", "gender": "女", "imagery": ["春意盎然", "繁花似锦", "莺歌蝶舞", "生机勃勃"], "scene": "寄托春光明媚、万物欣荣的美好愿景"}
+{"id": "fem_0232", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["旧梦", "微雨", "黄昏"], "scene": "寄托对往昔欢情的追忆与惆怅"}
+{"id": "fem_0062", "recommend_chars": ["笑", "香", "娇", "深"], "emotion": "喜庆", "gender": "女", "imagery": ["笑靥", "娇媚", "芳香", "深情"], "scene": "寄托女子娇美灵动、笑靥如花、情意深长之寓意"}
+{"id": "fem_0233", "recommend_chars": ["初", "婷"], "emotion": "中性", "gender": "女", "imagery": ["初醒", "娉婷", "翠翘"], "scene": "寄托女子初醒慵懒、娉婷婉约之美"}
+{"id": "fem_0063", "recommend_chars": ["玉", "梅", "暖", "胜"], "emotion": "喜庆", "gender": "女", "imagery": ["美玉", "梅花", "暖意", "胜景"], "scene": "寄托温婉美好、明媚欢愉的闺秀气质"}
+{"id": "fem_0234", "recommend_chars": ["玉", "婷", "娉", "轻"], "emotion": "中性", "gender": "女", "imagery": ["美玉", "娉婷", "轻盈", "石榴裙"], "scene": "寄托女子姿容秀美、体态轻盈之愿"}
+{"id": "fem_0064", "recommend_chars": ["月", "华", "如", "水", "天"], "emotion": "中性", "gender": "中", "imagery": ["月华如水", "心境澄明", "楚天辽阔"], "scene": "寄托澄澈心境与旷远胸怀"}
+{"id": "fem_0235", "recommend_chars": ["欢", "好", "期", "时", "怀"], "emotion": "中性", "gender": "女", "imagery": ["欢愉", "期约", "怀想"], "scene": "寄托对美好欢聚时光的期盼与珍惜"}
+{"id": "fem_0065", "recommend_chars": ["和", "雅", "丽", "繁"], "emotion": "喜庆", "gender": "女", "imagery": ["和风丽日", "繁红嫩绿", "雅致嬉游"], "scene": "寄托春日和暖、生活雅致欢愉的美好愿景"}
+{"id": "fem_0236", "recommend_chars": ["玉", "映", "光", "明"], "emotion": "中性", "gender": "女", "imagery": ["美玉", "烛光", "映照", "光明"], "scene": "寄托温婉明丽、光彩照人之美"}
+{"id": "fem_0066", "recommend_chars": ["明", "月", "如", "水"], "emotion": "中性", "gender": "女", "imagery": ["月明", "如水", "清幽", "露浓"], "scene": "寄托清雅纯净、明净如水的心性"}
+{"id": "fem_0237", "recommend_chars": ["碧", "清", "香", "凝"], "emotion": "中性", "gender": "女", "imagery": ["碧空澄澈", "池镜清辉", "荷香凝袖"], "scene": "寄托清雅闲适、澄澈高洁的闺秀情怀"}
+{"id": "fem_0067", "recommend_chars": ["乐", "静", "青", "闲"], "emotion": "喜庆", "gender": "中", "imagery": ["太平", "安宁", "清雅", "闲适"], "scene": "寄托盛世同乐、安宁闲适之愿"}
+{"id": "fem_0238", "recommend_chars": ["清", "明", "晴", "初"], "emotion": "喜庆", "gender": "中", "imagery": ["清明时节", "雨过天晴", "清新明朗", "初晴之美"], "scene": "寄托清明时节雨过天晴、万物清新明朗的美好愿景"}
+{"id": "fem_0068", "recommend_chars": ["明", "春", "梅", "书"], "emotion": "喜庆", "gender": "中", "imagery": ["光明", "春意", "梅花", "书香"], "scene": "寄托书香门第、春意盎然、光明磊落的美好祝愿"}
+{"id": "fem_0239", "recommend_chars": ["君", "玉", "金", "珍", "意"], "emotion": "中性", "gender": "中", "imagery": ["送别劝酒", "金玉珍重", "深情厚谊"], "scene": "寄托临别珍重、情谊深厚之愿"}
+{"id": "fem_0069", "recommend_chars": ["清", "华", "天", "阔"], "emotion": "中性", "gender": "中", "imagery": ["秋高气爽", "天阔云清", "风华标致", "超尘脱俗"], "scene": "寄托胸怀开阔、品格清正、才华出众之愿"}
+{"id": "fem_0240", "recommend_chars": ["柳", "翠", "香", "光", "融"], "emotion": "喜庆", "gender": "女", "imagery": ["柳色葱笼", "翠旗香风", "水光融融"], "scene": "寄托春光明媚、生活芬芳和融之愿"}
+{"id": "fem_0070", "recommend_chars": ["笙", "箫", "春", "桃", "绣"], "emotion": "喜庆", "gender": "女", "imagery": ["笙箫", "红云", "缃桃", "春起"], "scene": "寄托春意盎然、喜庆祥和、才艺双全的美好祝愿"}
+{"id": "fem_0241", "recommend_chars": ["珠", "欢", "凤", "金"], "emotion": "喜庆", "gender": "女", "imagery": ["珠玉", "欢娱", "凤凰", "金铺"], "scene": "寄托重逢欢聚、富贵吉祥的美好祝愿"}
+{"id": "fem_0071", "recommend_chars": ["清", "晓", "月", "素"], "emotion": "中性", "gender": "女", "imagery": ["清晓", "素月", "澄澈", "清辉"], "scene": "寄托清雅纯净、明净如水的美好品格"}
+{"id": "fem_0242", "recommend_chars": ["荷", "香", "潇", "湘"], "emotion": "中性", "gender": "女", "imagery": ["荷风轻拂", "帘幕飘香", "潇湘雅韵"], "scene": "寄托清雅闲适、温婉灵秀的闺阁情致"}
+{"id": "fem_0072", "recommend_chars": ["梅", "英", "新", "春"], "emotion": "中性", "gender": "女", "imagery": ["梅花", "新绿", "春色", "生机"], "scene": "寄托春回大地、万象更新的美好期盼"}
+{"id": "fem_0243", "recommend_chars": ["绣", "荔", "枝", "椒", "梨"], "emotion": "中性", "gender": "女", "imagery": ["刺绣", "荔枝", "椒房", "梨涡"], "scene": "描绘闺中女子闲适嬉戏的娇美情态"}
+{"id": "fem_0073", "recommend_chars": ["香", "玉", "月", "归"], "emotion": "中性", "gender": "女", "imagery": ["芳香", "美玉", "明月", "归家"], "scene": "寄托温婉雅致、盼归团圆之情"}
+{"id": "fem_0244", "recommend_chars": ["欢", "和", "月", "心"], "emotion": "喜庆", "gender": "女", "imagery": ["秋月", "同欢", "和醉", "携手"], "scene": "寄托与知己良人共度良宵、和乐相携的美好情意"}
+{"id": "fem_0074", "recommend_chars": ["清", "锦", "瑶", "歌"], "emotion": "中性", "gender": "女", "imagery": ["清歌", "锦绣", "瑶琴", "宴乐"], "scene": "寄托对往昔欢聚雅致生活的追忆与美好才情的期许"}
+{"id": "fem_0245", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["凤阁龙楼", "玉树琼枝", "繁华如梦", "干戈之痛"], "scene": "追忆昔日宫廷繁华，感叹亡国之痛"}
+{"id": "fem_0075", "recommend_chars": ["素", "月", "海", "信"], "emotion": "中性", "gender": "女", "imagery": ["素雅", "明月", "沧海", "诚信"], "scene": "寄托清雅高洁、心怀广阔之志"}
+{"id": "fem_0246", "recommend_chars": ["微", "怜", "书"], "emotion": "中性", "gender": "女", "imagery": ["娇羞", "怜爱", "书香"], "scene": "寄托少女含羞温婉、知书达理之态"}
+{"id": "fem_0076", "recommend_chars": ["霞", "梅", "柳", "飞"], "emotion": "喜庆", "gender": "女", "imagery": ["云霞", "梅花", "柳舞", "飞燕"], "scene": "寄托宴乐欢愉、姿容秀美、灵动飘逸之意"}
+{"id": "fem_0247", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["梦境", "笙歌", "柳絮", "桃花"], "scene": "寄托对往昔繁华与故人的追忆之情"}
+{"id": "fem_0077", "recommend_chars": ["清", "月", "远", "天"], "emotion": "中性", "gender": "中", "imagery": ["明月", "江湖", "高远", "清尘"], "scene": "寄托对远方故人的思念与清朗高远之志"}
+{"id": "fem_0248", "recommend_chars": ["香", "语", "翠", "眉"], "emotion": "中性", "gender": "女", "imagery": ["芳香", "低语", "翠眉", "闺阁"], "scene": "寄托温婉娴静、清雅灵秀的闺秀气质"}
+{"id": "fem_0078", "recommend_chars": ["星", "晓", "香", "笙"], "emotion": "喜庆", "gender": "中", "imagery": ["星河", "拂晓", "芳香", "笙箫"], "scene": "寄托寿宴欢庆、吉星高照、前程光明之愿"}
+{"id": "fem_0249", "recommend_chars": ["通", "闻", "道", "依"], "emotion": "中性", "gender": "中", "imagery": ["通达", "见闻", "道义", "依随"], "scene": "寄托通达事理、博闻有道、随和依人之愿"}
+{"id": "fem_0079", "recommend_chars": ["秋", "意", "迎", "池"], "emotion": "中性", "gender": "女", "imagery": ["秋千嬉戏", "缠绵情意", "池边祓禊"], "scene": "寄托对美好往昔与温柔情意的追忆"}
+{"id": "fem_0250", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["相思", "追忆", "仙乡"], "scene": "寄托对往昔情事的追忆与怅惘"}
+{"id": "fem_0080", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["落花", "春愁", "离情"], "scene": "寄托伤春惜别、情思难遣的怅惘"}
+{"id": "fem_0251", "recommend_chars": ["远", "舟", "思", "春", "平"], "emotion": "中性", "gender": "中", "imagery": ["远行", "扁舟", "思乡", "春水"], "scene": "寄托羁旅远行、思乡怀远与春水澄明之志"}
+{"id": "fem_0081", "recommend_chars": ["兰", "润", "香", "燕", "喜"], "emotion": "喜庆", "gender": "女", "imagery": ["兰花", "润泽", "芳香", "春燕"], "scene": "寄托春日生机、温润芬芳与喜乐安宁之愿"}
+{"id": "fem_0252", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["黄昏", "醉立", "马嘶", "尘烟"], "scene": "描绘宴散人离、黄昏独立的怅惘离愁"}
+{"id": "fem_0082", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["玉阑", "孤吟", "月下追忆"], "scene": "寄托对往昔心事无人可诉、月下空自追忆的怅惘之情"}
+{"id": "fem_0253", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["离散", "仙凡永隔", "魂梦相寻"], "scene": "寄托离愁别恨与仙凡阻隔的怅惘之情"}
+{"id": "fem_0083", "recommend_chars": ["灵", "犀", "通", "绵"], "emotion": "中性", "gender": "中", "imagery": ["灵犀相通", "情意缠绵", "春蚕吐丝"], "scene": "寄托心意相通、情意绵长之愿"}
+{"id": "fem_0254", "recommend_chars": ["燕", "梦", "天", "涯"], "emotion": "中性", "gender": "女", "imagery": ["双燕", "春梦", "天涯"], "scene": "寄托对远方与美好梦境的向往"}
+{"id": "fem_0084", "recommend_chars": ["玉", "露", "冉", "琉", "璃"], "emotion": "中性", "gender": "女", "imagery": ["玉阑", "清露", "云冉", "琉璃"], "scene": "寄托清雅高洁、温润柔美之气质"}
+{"id": "fem_0255", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["红藕花香", "似花人", "旧欢如梦", "音尘断绝"], "scene": "追忆旧欢、感伤离别的怀人之情"}
+{"id": "fem_0085", "recommend_chars": ["暖", "花", "月", "风"], "emotion": "中性", "gender": "女", "imagery": ["暖风", "繁花", "明月", "落英"], "scene": "寄托春光易逝、惜时怜花之情"}
+{"id": "fem_0256", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["离亭送别", "远道分襟", "燕宋秦吴"], "scene": "寄托离别相思与远行怀人之情"}
+{"id": "fem_0086", "recommend_chars": ["清", "月"], "emotion": "中性", "gender": "中", "imagery": ["清波", "明月", "风苹"], "scene": "寄托清雅脱俗、心境澄明之志"}
+{"id": "fem_0257", "recommend_chars": ["兰", "和", "笑", "长", "生"], "emotion": "中性", "gender": "中", "imagery": ["兰香", "和乐", "笑颜", "长生"], "scene": "寄托笑对人生、豁达长寿之愿"}
+{"id": "fem_0087", "recommend_chars": ["净", "永", "绣"], "emotion": "中性", "gender": "女", "imagery": ["洁净", "永恒", "华美"], "scene": "寄托清净自守、芳华长存之愿"}
+{"id": "fem_0258", "recommend_chars": ["南", "胜"], "emotion": "中性", "gender": "中", "imagery": ["南塘", "交颈", "胜意"], "scene": "寄托对忠贞不渝、情意相守的期许"}
+{"id": "fem_0088", "recommend_chars": ["知", "祥", "瑞", "贵", "呈"], "emotion": "喜庆", "gender": "男", "imagery": ["富贵", "祥瑞", "显露", "吉兆"], "scene": "寄托富贵吉祥、出人头地之愿"}
+{"id": "fem_0259", "recommend_chars": ["凌", "波", "珠", "翠", "明"], "emotion": "中性", "gender": "女", "imagery": ["凌波微步", "珠翠光华", "烟日朦胧"], "scene": "寄托女子轻盈灵动、明丽清雅之姿"}
+{"id": "fem_0089", "recommend_chars": ["明", "月", "清", "风", "佳"], "emotion": "中性", "gender": "中", "imagery": ["明月", "清风", "佳丽"], "scene": "寄托清雅高洁、光明磊落之志"}
+{"id": "fem_0260", "recommend_chars": ["安", "缘", "杏", "梁"], "emotion": "喜庆", "gender": "女", "imagery": ["杏梁安稳", "主人怜惜", "好因缘"], "scene": "寄托安居得所、良缘天成的美好祝愿"}
+{"id": "fem_0090", "recommend_chars": ["清", "文", "勋", "业", "高"], "emotion": "喜庆", "gender": "男", "imagery": ["澄清天下", "文治武功", "功勋卓著", "高远志向"], "scene": "寄托建功立业、文治武功兼备的远大抱负"}
+{"id": "fem_0261", "recommend_chars": ["玉", "珠", "月", "仙", "映"], "emotion": "喜庆", "gender": "女", "imagery": ["玉楼珠殿", "月轮相映", "神仙境界", "光华璀璨"], "scene": "寄托如仙如幻、光华照人的美好人生愿景"}
+{"id": "fem_0091", "recommend_chars": ["坚", "天", "桃", "花"], "emotion": "中性", "gender": "中", "imagery": ["坚定", "天意", "桃花", "重逢"], "scene": "寄托坚守本心、终得美好重逢的祝愿"}
+{"id": "fem_0262", "recommend_chars": ["芳", "兰", "妍", "仙"], "emotion": "喜庆", "gender": "女", "imagery": ["娇艳芳华", "兰室椒房", "云雨仙姿"], "scene": "寄托女子娇美芬芳、如兰似仙的美好祝愿"}
+{"id": "fem_0092", "recommend_chars": ["春", "芳", "融", "意"], "emotion": "喜庆", "gender": "女", "imagery": ["春风和煦", "芳草萋萋", "融融暖意"], "scene": "寄托温柔和煦、生机盎然的美好祝愿"}
+{"id": "fem_0263", "recommend_chars": ["绮", "雪", "金", "香"], "emotion": "中性", "gender": "女", "imagery": ["绮窗", "飘雪", "郁金香"], "scene": "寄托闺中雅致、静美芬芳之意"}
+{"id": "fem_0093", "recommend_chars": ["清", "辉", "光", "生"], "emotion": "喜庆", "gender": "中", "imagery": ["清辉万丈", "肺腑生光", "词人妙句", "光明磊落"], "scene": "寄托才思焕发、心怀光明、清朗高洁之志"}
+{"id": "fem_0264", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["远行", "离愁", "天仙"], "scene": "寄托离人久别归来、错倚生怨的怅惘之情"}
+{"id": "fem_0094", "recommend_chars": ["月", "香", "凤", "雁", "秋"], "emotion": "中性", "gender": "女", "imagery": ["圆月", "凤弦", "雁鸣", "秋夜"], "scene": "寄托中秋团圆、雅乐清音与高洁情思"}
+{"id": "fem_0265", "recommend_chars": ["梦", "笛", "雨", "桥"], "emotion": "中性", "gender": "中", "imagery": ["江南烟雨", "笛声悠远", "梅熟时节"], "scene": "寄托对江南水乡闲适生活的追忆与诗意情怀"}
+{"id": "fem_0095", "recommend_chars": ["清", "荷", "初", "阳"], "emotion": "中性", "gender": "中", "imagery": ["清荷", "初阳", "风荷", "清圆"], "scene": "寄托清雅高洁、朝气初升的品格"}
+{"id": "fem_0266", "recommend_chars": ["清", "香", "露"], "emotion": "中性", "gender": "女", "imagery": ["清露", "荷香", "晨妆"], "scene": "寄托清雅芬芳、晨起梳妆的柔美意趣"}
+{"id": "fem_0096", "recommend_chars": ["潇", "洒", "金", "翠"], "emotion": "中性", "gender": "中", "imagery": ["潇洒", "金翠", "超脱", "繁盛"], "scene": "寄托洒脱不羁、富贵自适的品格"}
+{"id": "fem_0267", "recommend_chars": ["娇", "影", "声", "名"], "emotion": "中性", "gender": "女", "imagery": ["行云鬓影", "裙裾屐声", "娇羞问曲"], "scene": "寄托少女娇柔灵动、才情初显的闺阁意趣"}
+{"id": "fem_0097", "recommend_chars": ["春", "初", "书", "峰"], "emotion": "中性", "gender": "中", "imagery": ["春夜", "初心", "书信", "登峰"], "scene": "寄托初心不改、志存高远的情怀"}
+{"id": "fem_0268", "recommend_chars": ["鸾", "绣", "罗", "轻"], "emotion": "中性", "gender": "女", "imagery": ["鸾鸟", "刺绣", "罗衣", "轻盈"], "scene": "寄托女子温婉灵秀、轻盈雅致之美"}
+{"id": "fem_0098", "recommend_chars": ["苑", "依", "如", "绪"], "emotion": "中性", "gender": "女", "imagery": ["柳烟", "依恋", "柳絮", "柔美"], "scene": "寄托温婉依人、情思绵长之寓意"}
+{"id": "fem_0269", "recommend_chars": ["春", "华", "月", "明"], "emotion": "中性", "gender": "女", "imagery": ["春草", "玉阶", "月华", "光明"], "scene": "寄托春意盎然、光华明净的美好愿景"}
+{"id": "fem_0099", "recommend_chars": ["春", "新", "霁"], "emotion": "喜庆", "gender": "中", "imagery": ["春夜", "新霁", "东风"], "scene": "寄托春意盎然、万象更新之美好愿景"}
+{"id": "fem_0270", "recommend_chars": ["晓", "露", "和", "香"], "emotion": "喜庆", "gender": "女", "imagery": ["晨露", "花香", "和风", "红日"], "scene": "寄托晨光美好、生活芬芳和顺的祝愿"}
+{"id": "fem_0100", "recommend_chars": ["尚", "诗", "雨", "陶"], "emotion": "中性", "gender": "中", "imagery": ["夜雨", "陶诗", "生平", "共语"], "scene": "寄托追忆旧友、共话生平、寄情诗书的淡泊情怀"}
+{"id": "fem_0271", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["鸳鸯", "泪痕", "空闺"], "scene": "寄托独处伤怀、思念远人的哀婉之情"}
+{"id": "fem_0101", "recommend_chars": ["清", "风", "天", "高"], "emotion": "中性", "gender": "男", "imagery": ["天高气爽", "清风万里", "澄澈无云"], "scene": "寄托胸怀高远、清正坦荡之志"}
+{"id": "fem_0272", "recommend_chars": ["青", "娥", "春", "花"], "emotion": "中性", "gender": "女", "imagery": ["春妆", "轻云", "司花"], "scene": "寄托女子娇美灵动、如花似春的气质"}
+{"id": "fem_0102", "recommend_chars": ["竹", "梅", "成", "飞", "山"], "emotion": "中性", "gender": "中", "imagery": ["竹屋梅窗", "东山再起", "飞诏催起"], "scene": "寄托隐逸高洁与应召出仕的期许"}
+{"id": "fem_0273", "recommend_chars": ["凝", "芳", "映", "香"], "emotion": "中性", "gender": "女", "imagery": ["凝情", "芬芳", "映照", "幽香"], "scene": "寄托女子娴静芬芳、清雅自持的闺秀气质"}
+{"id": "fem_0103", "recommend_chars": ["乐", "陶", "景", "平"], "emotion": "喜庆", "gender": "中", "imagery": ["太平盛世", "陶然自乐", "景明祥和"], "scene": "寄托安享太平、怡然自乐的美好愿景"}
+{"id": "fem_0274", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["凭栏", "竹声", "新月", "故国"], "scene": "抒发故国不堪回首的亡国之痛与物是人非之悲"}
+{"id": "fem_0104", "recommend_chars": ["溪", "山", "胜"], "emotion": "中性", "gender": "中", "imagery": ["溪水", "山峰", "胜景"], "scene": "寄托寄情山水、向往清幽胜趣之志"}
+{"id": "fem_0275", "recommend_chars": ["露", "珠", "荷", "圆"], "emotion": "中性", "gender": "女", "imagery": ["露珠", "圆荷", "清波", "垂杨"], "scene": "寄托清雅灵秀、圆润自持的品格"}
+{"id": "fem_0105", "recommend_chars": ["鹤", "月", "吟", "归"], "emotion": "中性", "gender": "中", "imagery": ["月下清辉", "仙鹤高洁", "猿吟幽远", "归隐之思"], "scene": "寄托超然物外、归隐林泉的高洁情怀"}
+{"id": "fem_0276", "recommend_chars": ["翠", "意", "水", "深"], "emotion": "中性", "gender": "女", "imagery": ["翠羽", "情深", "秋水", "回眸"], "scene": "寄托含蓄深情、灵秀温婉之意"}
+{"id": "fem_0106", "recommend_chars": ["紫", "碧"], "emotion": "中性", "gender": "女", "imagery": ["紫气", "碧霞", "暮云", "斜阳"], "scene": "寄托高远清雅、静观天地之志"}
+{"id": "fem_0277", "recommend_chars": ["月", "花", "蔻", "桥"], "emotion": "中性", "gender": "女", "imagery": ["山月", "豆蔻", "小桥", "烟深"], "scene": "寄托清幽婉约、豆蔻年华的柔美情致"}
+{"id": "fem_0107", "recommend_chars": ["春", "星", "月", "香"], "emotion": "中性", "gender": "女", "imagery": ["春夜", "星辰", "眉月", "芳香"], "scene": "寄托春夜清辉、闺阁芳洁的柔美意境"}
+{"id": "fem_0278", "recommend_chars": ["月", "华", "香", "菊"], "emotion": "中性", "gender": "女", "imagery": ["月色皎洁", "露华晶莹", "菊香盈袖"], "scene": "寄托清雅高洁、芳华自持的品格"}
+{"id": "fem_0108", "recommend_chars": ["晴", "霞", "青", "海"], "emotion": "喜庆", "gender": "中", "imagery": ["海霞映日", "晴风拂草", "青山绿水"], "scene": "寄托胸怀开阔、前程明朗、生机盎然之愿"}
+{"id": "fem_0279", "recommend_chars": ["香", "荷", "窈", "窕", "笑"], "emotion": "喜庆", "gender": "女", "imagery": ["芳香", "荷花", "窈窕", "欢笑"], "scene": "描绘少女游春嬉戏、折荷遮阳的欢快画面，寄托青春美好、活泼灵动之意"}
+{"id": "fem_0109", "recommend_chars": ["归", "时"], "emotion": "中性", "gender": "中", "imagery": ["功成身退", "归隐田园", "顺应天时"], "scene": "寄托功成之后归隐还乡、不忘初心的淡泊之志"}
+{"id": "fem_0280", "recommend_chars": ["珠", "艳", "阳", "秋"], "emotion": "中性", "gender": "女", "imagery": ["珠帘", "艳阳", "秋千", "庭院"], "scene": "寄托闺中雅趣与明媚春光的美好意境"}
+{"id": "fem_0110", "recommend_chars": ["清", "润", "亭", "槐"], "emotion": "中性", "gender": "中", "imagery": ["清幽", "温润", "亭台", "槐荫"], "scene": "寄托清雅温润、恬淡自适的品格"}
+{"id": "fem_0281", "recommend_chars": ["瑶", "珠", "香", "仙"], "emotion": "中性", "gender": "女", "imagery": ["仙姿", "珠玉", "芳香", "瑶台"], "scene": "寄托女子如仙似玉、芳华绝代的柔美气质"}
+{"id": "fem_0111", "recommend_chars": ["香", "燕", "语", "碧", "桃"], "emotion": "中性", "gender": "女", "imagery": ["燕语呢喃", "碧桃春雨", "帘影移香"], "scene": "寄托春日闺中温婉灵秀、芳华静好之意"}
+{"id": "fem_0282", "recommend_chars": ["南", "春", "笑", "语"], "emotion": "喜庆", "gender": "女", "imagery": ["南浦", "春风", "笑语", "红袖"], "scene": "寄托春日相逢、笑语盈盈的欢愉之情"}
+{"id": "fem_0112", "recommend_chars": ["春", "梅", "香", "功"], "emotion": "喜庆", "gender": "中", "imagery": ["春回大地", "梅香馥郁", "功业有成"], "scene": "寄托春意盎然、功业圆满、德馨远播的美好祝愿"}
+{"id": "fem_0283", "recommend_chars": ["霞", "笑", "金", "环"], "emotion": "喜庆", "gender": "女", "imagery": ["霞衣", "笑靥", "金环", "江头"], "scene": "寄托明艳欢悦、迎客纳福的美好寓意"}
+{"id": "fem_0113", "recommend_chars": ["映", "雪"], "emotion": "中性", "gender": "女", "imagery": ["归鸦映水", "东风融雪", "清冷澄澈"], "scene": "寄托清雅高洁、静美出尘之志"}
+{"id": "fem_0284", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["檀香", "秋夜", "思念"], "scene": "寄托秋夜相思、深情难忘之意"}
+{"id": "fem_0114", "recommend_chars": ["梅", "香", "疏", "影"], "emotion": "中性", "gender": "女", "imagery": ["梅花", "暗香", "疏影", "清雅"], "scene": "寄托清雅高洁、淡泊闲适的品格"}
+{"id": "fem_0285", "recommend_chars": ["春", "娇", "初", "伊"], "emotion": "中性", "gender": "女", "imagery": ["晚春", "娇美", "初心", "柔美"], "scene": "寄托少女初长成、娇柔灵动的美好意蕴"}
+{"id": "fem_0115", "recommend_chars": ["山", "月", "风", "城"], "emotion": "中性", "gender": "中", "imagery": ["千山爽气", "一城风月", "登临逍遥"], "scene": "寄托胸怀开阔、从容自适的山水雅趣"}
+{"id": "fem_0286", "recommend_chars": ["春", "暖", "盈", "岸"], "emotion": "喜庆", "gender": "女", "imagery": ["春风和暖", "药草盈岸", "邻女同游"], "scene": "寄托春日和暖、生活丰盈、友伴同游的欢愉之情"}
+{"id": "fem_0116", "recommend_chars": ["曼", "衍", "春", "绮"], "emotion": "喜庆", "gender": "女", "imagery": ["繁盛", "春意", "华美", "生生不息"], "scene": "寄托盛世欢腾、春意盎然、生生不息的美好愿景"}
+{"id": "fem_0287", "recommend_chars": ["芳", "妍", "杏", "画"], "emotion": "喜庆", "gender": "女", "imagery": ["芳香", "妍丽", "杏花", "如画"], "scene": "寄托春日芳菲、容颜妍丽、生活如画的美好祝愿"}
+{"id": "fem_0117", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["怀旧", "伤逝", "离愁"], "scene": "追忆往昔繁华，寄托故人旧事之思"}
+{"id": "fem_0288", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["故国", "明月", "东风", "回首"], "scene": "抒发亡国之痛与故园之思，基调悲苦哀婉，不宜取字入名"}
+{"id": "fem_0118", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["相思", "杨花", "东风雪"], "scene": "寄托相思难言、春光易逝的惆怅之情"}
+{"id": "fem_0289", "recommend_chars": ["莲", "知", "遥", "水"], "emotion": "中性", "gender": "女", "imagery": ["莲舟", "清波", "慧心", "远思"], "scene": "寄托少女采莲时纯真含羞、灵秀远思的情怀"}
+{"id": "fem_0119", "recommend_chars": ["琼", "窈", "纤", "冰"], "emotion": "中性", "gender": "女", "imagery": ["琼玉", "窈窕", "纤柔", "冰清"], "scene": "寄托女子清丽窈窕、冰清玉洁之姿"}
+{"id": "fem_0290", "recommend_chars": ["水", "红"], "emotion": "中性", "gender": "女", "imagery": ["清水", "红裙", "采莲"], "scene": "描绘少女采莲戏水的灵动画面，寄托纯真活泼、亲近自然之意"}
+{"id": "fem_0120", "recommend_chars": ["新", "月"], "emotion": "中性", "gender": "中", "imagery": ["明月", "新意", "思念"], "scene": "寄托对远方之人的思念与对新生美好的期许"}
+{"id": "fem_0291", "recommend_chars": ["玉", "春", "美", "宝"], "emotion": "喜庆", "gender": "女", "imagery": ["美玉", "春睡", "鸳鸯", "宝帐"], "scene": "寄托闺中春睡、美好安适的柔美情致"}
+{"id": "fem_0121", "recommend_chars": ["春", "君", "容", "花"], "emotion": "中性", "gender": "女", "imagery": ["春心", "东君", "飞花", "雍容"], "scene": "寄托惜春感怀与温婉从容之思"}
+{"id": "fem_0292", "recommend_chars": ["玉", "凤", "愉", "金"], "emotion": "中性", "gender": "女", "imagery": ["玉指纤纤", "双凤金线", "轻裙罗带"], "scene": "寄托女子灵巧温婉、生活雅致欢愉之美"}
+{"id": "fem_0122", "recommend_chars": ["琼", "香"], "emotion": "中性", "gender": "女", "imagery": ["琼瑰美玉", "花香十里"], "scene": "寄托如花初绽、芬芳远播的美好寓意"}
+{"id": "fem_0293", "recommend_chars": ["红", "素", "微", "雨"], "emotion": "中性", "gender": "女", "imagery": ["红豆", "微雨", "素手", "纤纤"], "scene": "寄托温婉清雅、相思柔情之意"}
+{"id": "fem_0123", "recommend_chars": ["芳", "容", "语", "情", "远"], "emotion": "中性", "gender": "女", "imagery": ["芳容", "娇语", "情深意远"], "scene": "寄托女子容颜美好、情意深长之愿"}
+{"id": "fem_0294", "recommend_chars": ["瑞", "春", "冠"], "emotion": "喜庆", "gender": "男", "imagery": ["祥瑞", "春色", "冠盖"], "scene": "寄托祥瑞盈门、春意盎然、功名显达之愿"}
+{"id": "fem_0124", "recommend_chars": ["雪", "绛", "绿", "罗"], "emotion": "中性", "gender": "女", "imagery": ["绛雪", "绿罗裙", "东风", "飞花"], "scene": "寄托女子如雪般清丽、罗裙翩跹的柔美风姿"}
+{"id": "fem_0295", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["幽会", "失约", "怅惘"], "scene": "抒写女子夜会情郎却失期未归的怅惘与哀愁"}
+{"id": "fem_0125", "recommend_chars": ["乐", "瑶", "月", "香"], "emotion": "喜庆", "gender": "女", "imagery": ["杨柳", "瑶台", "明月", "生香"], "scene": "寄托欢愉美好、清雅芬芳的生活愿景"}
+{"id": "fem_0296", "recommend_chars": ["兰", "锦", "龙", "香"], "emotion": "喜庆", "gender": "中", "imagery": ["龙舟竞渡", "兰香锦帆", "绿阴千里"], "scene": "寄托盛世欢游、前程锦绣之愿"}
+{"id": "fem_0126", "recommend_chars": ["燕", "莺", "香", "凝", "清"], "emotion": "中性", "gender": "女", "imagery": ["燕舞莺歌", "香凝翠暖", "清歌钟鼓"], "scene": "寄托生活雅致、岁月静好、才情温婉之意"}
+{"id": "fem_0297", "recommend_chars": ["秋", "雨", "花", "渔"], "emotion": "中性", "gender": "中", "imagery": ["秋雨", "芦花", "渔舟", "宿处"], "scene": "寄托秋江渔隐、恬淡自适的闲逸情怀"}
+{"id": "fem_0127", "recommend_chars": ["玉", "月", "桂", "笙"], "emotion": "中性", "gender": "女", "imagery": ["美玉", "明月", "桂香", "笙歌"], "scene": "寄托清雅高洁、月下笙歌的柔美意境"}
+{"id": "fem_0298", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["相思无寄", "落花芳草", "无人知晓"], "scene": "寄托相思难寄、韶华已逝的怅惘之情"}
+{"id": "fem_0128", "recommend_chars": ["芳", "香", "远", "胜"], "emotion": "喜庆", "gender": "女", "imagery": ["寻芳选胜", "香尘细细", "向晚归途", "远大前程"], "scene": "寄托游赏芳华、人生得意、前程似锦的美好愿景"}
+{"id": "fem_0299", "recommend_chars": ["明", "雪", "春", "初"], "emotion": "喜庆", "gender": "女", "imagery": ["明艳", "冰雪", "春意", "初心"], "scene": "寄托女子明艳清丽、纯真美好之愿"}
+{"id": "fem_0129", "recommend_chars": ["德", "香", "家", "时"], "emotion": "中性", "gender": "中", "imagery": ["厚德", "芳香", "家族传承", "时光积淀"], "scene": "寄托积德行善、家族绵延、德泽流芳之愿"}
+{"id": "fem_0300", "recommend_chars": ["月", "华", "香", "初"], "emotion": "中性", "gender": "女", "imagery": ["月色", "光华", "芳香", "初心"], "scene": "寄托清雅芳洁、初心如月之愿"}
+{"id": "fem_0130", "recommend_chars": ["良", "妍", "红", "玉"], "emotion": "喜庆", "gender": "女", "imagery": ["良宵", "红玉", "争妍"], "scene": "寄托良辰美景、容颜娇美、生活红火之愿"}
+{"id": "fem_0301", "recommend_chars": ["月", "玉", "春", "竹"], "emotion": "中性", "gender": "女", "imagery": ["明月", "玉楼", "春夜", "庭竹"], "scene": "寄托春夜清幽、玉洁竹清的高雅情致"}
+{"id": "fem_0131", "recommend_chars": ["清", "月", "春", "绮"], "emotion": "中性", "gender": "女", "imagery": ["月色", "春意", "清露", "绮丽"], "scene": "寄托清雅明净、春意盎然的美好气质"}
+{"id": "fem_0302", "recommend_chars": ["桔", "林", "红", "连"], "emotion": "中性", "gender": "中", "imagery": ["桔林", "霜红", "罗浮", "相连"], "scene": "寄托霜重色愈浓、暗路亦相通的美好愿景"}
+{"id": "fem_0132", "recommend_chars": ["玉", "春", "香", "天"], "emotion": "喜庆", "gender": "女", "imagery": ["玉阑", "春住", "天香", "罗盖"], "scene": "寄托留住美好春光、芬芳常伴的祝愿"}
+{"id": "fem_0303", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["浅眉", "旧梦", "悔情"], "scene": "追忆旧欢、梦魂惊断的相思愁怨"}
+{"id": "fem_0133", "recommend_chars": ["雪", "玉", "春", "光", "花"], "emotion": "喜庆", "gender": "女", "imagery": ["冰雪", "美玉", "春光", "花容"], "scene": "寄托女子冰清玉洁、容光焕发之美"}
+{"id": "fem_0304", "recommend_chars": ["玉", "锦", "香", "融"], "emotion": "中性", "gender": "女", "imagery": ["美玉", "锦绣", "芳香", "融和"], "scene": "寄托温婉芳洁、锦绣融和的美好气质"}
+{"id": "fem_0134", "recommend_chars": ["峰", "霁", "健", "青", "天"], "emotion": "喜庆", "gender": "男", "imagery": ["云开雨霁", "健笔凌云", "青天壮志"], "scene": "寄托胸怀开阔、才思健拔、志在青云的昂扬气度"}
+{"id": "fem_0305", "recommend_chars": ["明", "月", "春"], "emotion": "中性", "gender": "女", "imagery": ["明月", "柳丝", "春意"], "scene": "寄托对美好时光与柔美春意的追忆与眷恋"}
+{"id": "fem_0135", "recommend_chars": ["秀", "才", "钦", "崇", "同"], "emotion": "中性", "gender": "男", "imagery": ["才俊", "敬重", "兄弟同心"], "scene": "寄托对才德兼备、兄弟和睦的期许"}
+{"id": "fem_0306", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["离愁", "魂梦", "杨花", "天涯"], "scene": "寄托思妇盼归不得、魂梦相随的离愁别恨"}
+{"id": "fem_0136", "recommend_chars": ["清", "明", "乐", "美"], "emotion": "喜庆", "gender": "中", "imagery": ["清明时节", "美景良辰", "行乐赏心"], "scene": "寄托珍惜春光、及时行乐、生活明朗欢愉之愿"}
+{"id": "fem_0307", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["啼痕", "无语", "黄昏"], "scene": "寄托离愁别恨、孤寂伤怀之情"}
+{"id": "fem_0137", "recommend_chars": ["柏", "梅", "月", "新"], "emotion": "中性", "gender": "中", "imagery": ["坚贞", "傲雪", "新月", "高洁"], "scene": "寄托坚贞不屈、高洁清雅之志"}
+{"id": "fem_0308", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["锦书", "梦中相见", "泪脸珠融"], "scene": "寄托相思离别、梦醒惆怅之情"}
+{"id": "fem_0138", "recommend_chars": ["玉", "梅", "清"], "emotion": "中性", "gender": "女", "imagery": ["美玉", "梅花", "清浅"], "scene": "寄托冰清玉洁、高洁脱俗的品格追求"}
+{"id": "fem_0309", "recommend_chars": ["燕", "莺", "柳", "纤"], "emotion": "中性", "gender": "女", "imagery": ["春景", "灵动", "柔美", "婉约"], "scene": "寄托春日闺中柔美灵动、温婉可人之意"}
+{"id": "fem_0139", "recommend_chars": ["碧", "红", "紫", "艳"], "emotion": "中性", "gender": "女", "imagery": ["碧小红微", "黄轻紫艳", "妆点池台"], "scene": "寄托春日园林中色彩缤纷、妆点生活的柔美意趣"}
+{"id": "fem_0310", "recommend_chars": ["晴", "远", "南", "苑"], "emotion": "中性", "gender": "中", "imagery": ["晴空", "远大", "南苑", "春暮"], "scene": "寄托晴明高远、心怀南国春苑之雅意"}
+{"id": "fem_0140", "recommend_chars": ["鹗", "抟", "花", "朵"], "emotion": "中性", "gender": "中", "imagery": ["雕鹗抟空", "凌云壮志", "黄花傲霜", "篱下清芳"], "scene": "寄托志存高远、亦能安于淡泊的品格"}
+{"id": "fem_0311", "recommend_chars": ["芙", "蓉", "清", "玉"], "emotion": "中性", "gender": "女", "imagery": ["芙蓉", "碧玉", "清水", "芬芳"], "scene": "寄托清雅高洁、温婉芬芳之愿"}
+{"id": "fem_0141", "recommend_chars": ["鲲", "鹏", "南", "溟"], "emotion": "中性", "gender": "男", "imagery": ["鲲鹏变化", "九万里风", "南溟远志"], "scene": "寄托胸怀大志、扶摇直上、前程远大之愿"}
+{"id": "fem_0312", "recommend_chars": ["春", "芳", "林", "莺", "语"], "emotion": "喜庆", "gender": "女", "imagery": ["春意盎然", "鸟语花香", "生机勃勃"], "scene": "寄托春日芳华、聪慧灵秀的美好祝愿"}
+{"id": "fem_0142", "recommend_chars": ["晞", "秋", "露", "东", "山"], "emotion": "中性", "gender": "中", "imagery": ["秋露", "东山", "归隐", "高洁"], "scene": "寄托超脱尘俗、归隐东山之志"}
+{"id": "fem_0313", "recommend_chars": ["溪", "芳", "春", "光"], "emotion": "喜庆", "gender": "女", "imagery": ["清溪", "芳香", "春光", "繁花"], "scene": "寄托春日游赏、芳华正茂的美好愿景"}
+{"id": "fem_0143", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["月夜", "无眠", "旧情"], "scene": "抒发月夜无眠、追忆旧情的孤寂愁思"}
+{"id": "fem_0314", "recommend_chars": ["翠", "娥", "纤", "柳"], "emotion": "中性", "gender": "女", "imagery": ["翠色", "柔美", "纤手", "垂柳"], "scene": "寄托女子柔美温婉、清丽动人的气质"}
+{"id": "fem_0144", "recommend_chars": ["竹", "棋", "永", "花", "水"], "emotion": "中性", "gender": "中", "imagery": ["竹影清幽", "棋弈雅趣", "昼永花水"], "scene": "寄托清雅闲适、静好悠长的生活意趣"}
+{"id": "fem_0315", "recommend_chars": ["翠", "莺", "语", "薇"], "emotion": "喜庆", "gender": "女", "imagery": ["苍翠", "莺语", "蔷薇", "蝶舞"], "scene": "寄托春日庭院中生机盎然、欢愉清雅的美好意境"}
+{"id": "fem_0145", "recommend_chars": ["润", "璇", "秋", "纬"], "emotion": "中性", "gender": "中", "imagery": ["润泽", "璇玉", "秋夜", "经纬"], "scene": "寄托温润如玉、经纬天地之志"}
+{"id": "fem_0316", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["西风", "窗竹", "泪玉"], "scene": "寄托秋夜孤寂、离人垂泪的相思之苦"}
+{"id": "fem_0146", "recommend_chars": ["玲", "珑", "月", "珠"], "emotion": "中性", "gender": "女", "imagery": ["明月", "珠帘", "玲珑", "闲适"], "scene": "寄托闺中闲雅、月下清赏的柔美情致"}
+{"id": "fem_0317", "recommend_chars": ["信", "荔", "红", "水"], "emotion": "喜庆", "gender": "女", "imagery": ["荔枝红艳", "水波轻漾", "闲适游乐"], "scene": "寄托悠然自得、生活甜美红火之愿"}
+{"id": "fem_0147", "recommend_chars": ["苍", "松", "玉"], "emotion": "中性", "gender": "男", "imagery": ["苍松", "高洁", "美玉"], "scene": "寄托高洁坚贞、温润如玉的品格追求"}
+{"id": "fem_0318", "recommend_chars": ["清", "遥", "彩", "画"], "emotion": "中性", "gender": "女", "imagery": ["清雅", "高远", "绚烂", "如画"], "scene": "寄托清雅高远、人生如画的美好愿景"}
+{"id": "fem_0148", "recommend_chars": ["香", "尚", "桃", "花"], "emotion": "中性", "gender": "女", "imagery": ["桃花", "芳香", "高尚", "旧游"], "scene": "寄托对美好往昔与高洁品格的追怀"}
+{"id": "fem_0319", "recommend_chars": ["娜", "轻", "罗", "波"], "emotion": "中性", "gender": "女", "imagery": ["婀娜", "轻罗", "水波"], "scene": "寄托女子柔美轻盈、温婉灵动之姿"}
+{"id": "fem_0149", "recommend_chars": ["皓", "月", "光", "庭", "柯"], "emotion": "中性", "gender": "中", "imagery": ["皓月", "流光", "庭柯", "夜色"], "scene": "寄托清朗高洁、光明磊落之志"}
+{"id": "fem_0320", "recommend_chars": ["绿", "红", "深", "遥", "同"], "emotion": "喜庆", "gender": "女", "imagery": ["绿酒", "红颜", "相逢", "宴饮"], "scene": "寄托欢聚相逢、宴饮同乐的美好情谊"}
+{"id": "fem_0150", "recommend_chars": ["韵", "清"], "emotion": "中性", "gender": "女", "imagery": ["幽韵", "清标", "江东"], "scene": "寄托清雅高洁、风韵长存之志"}
+{"id": "fem_0151", "recommend_chars": ["水", "栖", "鸥", "鹭", "归"], "emotion": "中性", "gender": "中", "imagery": ["行云流水", "鸥鹭忘机", "归隐之约"], "scene": "寄托超脱尘世、与自然为伴的隐逸情怀"}
+{"id": "fem_0152", "recommend_chars": [], "emotion": "哀伤", "gender": "中", "imagery": ["离愁", "空梦", "前约"], "scene": "寄托离愁别绪与旧约难践的怅惘之情"}
+{"id": "fem_0153", "recommend_chars": ["悠", "扬", "锦", "春"], "emotion": "中性", "gender": "中", "imagery": ["悠然", "飞扬", "锦绣", "春意"], "scene": "寄托潇洒自在、前程锦绣的美好祝愿"}
+{"id": "fem_0154", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["玉佩", "妆台", "尘满", "宝筝"], "scene": "寄托对往昔美好时光的追忆与物是人非的怅惘"}
+{"id": "fem_0155", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["凝望", "烟幕", "思念"], "scene": "寄托离愁别绪与深切思念"}
+{"id": "fem_0156", "recommend_chars": ["清", "碧", "高", "长"], "emotion": "中性", "gender": "中", "imagery": ["碧云清空", "高情远致", "绿野长存"], "scene": "寄托高洁情怀与悠远志趣"}
+{"id": "fem_0157", "recommend_chars": ["玉", "绣", "红", "阶"], "emotion": "中性", "gender": "女", "imagery": ["绣窗", "红牙", "白玉盂", "玉阶"], "scene": "寄托闺中雅趣与精致生活情致"}
+{"id": "fem_0158", "recommend_chars": ["初", "静", "秋", "笛"], "emotion": "中性", "gender": "女", "imagery": ["灯影", "歌尘", "秋笛", "画楼"], "scene": "寄托清雅娴静、秋夜怀思的温婉情致"}
+{"id": "fem_0159", "recommend_chars": ["晓", "莺", "语", "新"], "emotion": "喜庆", "gender": "女", "imagery": ["拂晓", "莺语", "新年", "笑语"], "scene": "寄托新年欢聚、笑语迎春的美好祝愿"}
+{"id": "fem_0160", "recommend_chars": ["知", "中", "白"], "emotion": "中性", "gender": "中", "imagery": ["智慧", "中正", "高洁"], "scene": "寄托明理通达、守正清白之志"}
+{"id": "fem_0161", "recommend_chars": ["修", "香", "翠", "汀"], "emotion": "中性", "gender": "女", "imagery": ["汀洲暮色", "撷香拾翠", "修巾薄袂"], "scene": "寄托女子娴雅芳洁、从容自得之趣"}
+{"id": "fem_0162", "recommend_chars": ["玉", "亭", "凌", "秋", "绮"], "emotion": "中性", "gender": "女", "imagery": ["美玉", "亭亭玉立", "凌波仙子", "秋日绮丽"], "scene": "寄托女子姿容秀美、气质清雅、步态轻盈如仙的寓意"}
+{"id": "fem_0163", "recommend_chars": [], "emotion": "哀伤", "gender": "女", "imagery": ["相思", "仙侣", "鸾翼", "琼台"], "scene": "寄托对远方佳人的深切思念与仙侣同飞之愿"}
+{"id": "fem_0164", "recommend_chars": ["素", "景", "婵", "娟", "正"], "emotion": "中性", "gender": "女", "imagery": ["月光", "冰盘", "婵娟", "千里"], "scene": "寄托清雅高洁、美好团圆之愿"}
+{"id": "fem_0165", "recommend_chars": ["绮", "谐"], "emotion": "中性", "gender": "女", "imagery": ["绮丽", "和谐", "鸳侣"], "scene": "寄托美好姻缘与和谐相伴之意"}
+{"id": "fem_0166", "recommend_chars": ["碧", "平", "柳", "波"], "emotion": "中性", "gender": "女", "imagery": ["碧波", "柳岸", "明镜", "湖光"], "scene": "寄托心境澄明、温婉从容的江南水乡情怀"}
+{"id": "fem_0167", "recommend_chars": ["妍", "华", "初", "月"], "emotion": "喜庆", "gender": "女", "imagery": ["梅花绽放", "妍丽光华", "初心如月"], "scene": "寄托如梅初绽、芳华赠世的美好祝愿"}
+{"id": "fem_0168", "recommend_chars": ["春", "望", "中", "树"], "emotion": "中性", "gender": "中", "imagery": ["春草", "远望", "烟树", "沙鸥"], "scene": "寄托登高望远、心怀春意与自然清趣的寓意"}
+{"id": "fem_0169", "recommend_chars": ["知", "乐", "玉", "娟"], "emotion": "喜庆", "gender": "女", "imagery": ["雅致", "欢愉", "美玉", "婵娟"], "scene": "寄托闺中雅趣、自得其乐的美好生活"}
+{"id": "fem_0170", "recommend_chars": ["梅", "蕊", "香", "远", "初"], "emotion": "中性", "gender": "女", "imagery": ["梅花", "暗香", "花蕊", "初发"], "scene": "寄托如梅般清雅坚韧、初心不改的品格"}

@@ -15,7 +15,7 @@
 STYLE_OPTIONS = {
     "classic": {
         "name": "古风雅致",
-        "source_preference": ["诗经", "楚辞", "汉魏古诗"],
+        "source_preference": ["诗经", "楚辞", "汉魏古诗", "五代词"],
         "imagery_keywords": ["清雅", "高洁", "君子", "修身", "仁德", "文雅", "庄重", "雅正", "温润", "美玉"],
         "char_hint": "偏好玉/丝/木/水等雅致部首，笔画适中",
     },
@@ -39,13 +39,13 @@ STYLE_OPTIONS = {
     },
     "warm": {
         "name": "温润内敛",
-        "source_preference": ["诗经", "经史子集"],
+        "source_preference": ["诗经", "经史子集", "五代词", "清词"],
         "imagery_keywords": ["温润", "温良", "敦厚", "谦和", "含蓄", "内敛", "温婉", "仁和", "沉静", "温厚"],
         "char_hint": "偏好温和含蓄、不张扬的字",
     },
     "elegant": {
         "name": "清朗俊逸",
-        "source_preference": ["唐诗", "宋词"],
+        "source_preference": ["唐诗", "宋词", "五代词", "清词"],
         "imagery_keywords": ["清朗", "俊逸", "飘逸", "洒脱", "旷达", "爽朗", "明快", "俊朗", "飞扬", "清俊"],
         "char_hint": "偏好清俊飘逸、气象开阔的字",
     },
@@ -57,7 +57,7 @@ STYLE_OPTIONS = {
     },
     "zen": {
         "name": "空灵禅意",
-        "source_preference": ["唐诗", "宋词"],
+        "source_preference": ["唐诗", "宋词", "清词"],
         "imagery_keywords": ["空灵", "禅意", "超然", "隐逸", "静谧", "淡泊", "悠然", "清冷", "超脱", "清幽"],
         "char_hint": "偏好空灵留白、意境幽远的字",
     },

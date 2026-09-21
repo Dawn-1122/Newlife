@@ -8,14 +8,14 @@
 // 风格枚举（与后端 STYLE_OPTIONS 镜像；sources 对应后端 source_preference）
 // short 用于结果页筛选条（2 字，避免 8 个筛选项挤出屏幕）
 const STYLE_OPTIONS = [
-  { code: 'classic', name: '古风雅致', short: '古风', sources: ['诗经', '楚辞', '汉魏古诗'] },
+  { code: 'classic', name: '古风雅致', short: '古风', sources: ['诗经', '楚辞', '汉魏古诗', '五代词'] },
   { code: 'modern', name: '现代简约', short: '现代', sources: ['唐诗', '宋词'] },
   { code: 'grand', name: '大气沉稳', short: '大气', sources: ['经史子集', '汉魏古诗'] },
   { code: 'fresh', name: '清新灵动', short: '清新', sources: ['诗经', '唐诗'] },
-  { code: 'warm', name: '温润内敛', short: '温润', sources: ['诗经', '经史子集'] },
-  { code: 'elegant', name: '清朗俊逸', short: '清朗', sources: ['唐诗', '宋词'] },
+  { code: 'warm', name: '温润内敛', short: '温润', sources: ['诗经', '经史子集', '五代词', '清词'] },
+  { code: 'elegant', name: '清朗俊逸', short: '清朗', sources: ['唐诗', '宋词', '五代词', '清词'] },
   { code: 'plain', name: '质朴厚重', short: '质朴', sources: ['经史子集', '汉魏古诗'] },
-  { code: 'zen', name: '空灵禅意', short: '空灵', sources: ['唐诗', '宋词'] }
+  { code: 'zen', name: '空灵禅意', short: '空灵', sources: ['唐诗', '宋词', '清词'] }
 ]
 
 // 出处 → 风格 codes 反向映射（由 STYLE_OPTIONS.sources 派生，勿手工维护）

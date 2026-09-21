@@ -92,7 +92,7 @@ class PoetryDatabase:
         )
 
     def get_by_source(self, source: str, include_sad: bool = False) -> list[dict]:
-        """按来源查找（诗经/楚辞/唐诗/宋词/汉魏古诗/经史子集；默认排除哀伤）"""
+        """按来源查找（诗经/楚辞/唐诗/宋词/汉魏古诗/经史子集/五代词/清词；默认排除哀伤）"""
         return self._exclude_sad(
             [p for p in self._poems if p["source"] == source],
             include_sad,

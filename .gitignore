@@ -40,12 +40,22 @@ data/poetry/failed.jsonl
 data/poetry/raw_corpus.jsonl
 data/poetry/full_corpus.jsonl
 data/poetry/pilot_corpus.jsonl
+# 女性向扩容管线（同上：raw 可重新生成，annotated 是 LLM 产物需提交）
+data/poetry/raw_female.jsonl
+data/poetry/done_ids_female.json
+data/poetry/failed_female.jsonl
 
 # LLM 寓意缓存（运行时生成，不提交）
 data/meaning_cache/
+# 语境义项失败日志（空文件无意义，运行时可重生）
+data/sense/sense_failed.jsonl
+data/sense/sense_review_sample.jsonl
 data/dict/rare_enriched.jsonl
 data/dict/rare_enriched_done.json
 
 # 微信小程序
 miniprogram/miniprogram_npm/
 miniprogram/project.private.config.json
+
+# 测试临时目录（沙箱下 TMPDIR 需指向工作区，运行时生成）
+.pytest_tmp/
