@@ -27,6 +27,7 @@ from app.services.yunwei_scorer import YunWeiScorer
 from app.services.llm_service import LLMService
 from app.services.meaning_cache import MeaningCache
 from app.services.surname_fit import SurnameFit
+from app.services.char_sense_database import CharSenseDatabase
 from app.core.constants import NEGATIVE_CHARS, EMOTIONAL_CHARS, SAD_POETRY_TITLES, COMPOUND_SURNAMES, WUXING_LIST
 from app.core.naming_options import (
     STYLE_OPTIONS,
@@ -40,6 +41,44 @@ from app.core.naming_options import (
 
 class NamingEngine:
     """起名核心引擎"""
+
+    # ── 分层抽样可调参数（P3 主排序改造） ──
+    # 层内抽样温度：越大越均匀（多样性↑、「高频常客」↓），越小越偏高分。
+    # 职责分离：质量底线交给 STRATIFY_QUALITY_BAND，温度只负责多样性，
+    # 故可放宽到 36（实测 T>36 多样性收益递减，且八字匹配度开始下滑）。
+    STRATIFY_TEMPERATURE = 36.0
+    # 全喜神层配额占比（其余给「含非喜用神字」层）。忌神为喜神补集，不存在中性层。
+    STRATIFY_FULL_RATIO = 0.8
+    # 层内权重里「含用神字」的加分（用神随生日变化 → 抽样结果随输入变化）。
+    # 实测 60 会让抽样在「带宽后仅剩百来个候选」的层内极度集中到双用神字子集上
+    # （换一批重合 33%→20% 靠它下调）；而降为 20 对八字匹配度无影响（该指标由
+    # 分层配额独立保证，恒 90%），故取小值保留「用神进入主排序权重」的设计意图。
+    STRATIFY_YONG_BONUS = 20.0
+    # 层内权重里「覆盖喜神五行个数」的加分（实测无稳定收益，保留开关）
+    STRATIFY_COVER_BONUS = 0.0
+    # 组合阶段候选池规模：池太小（原 120）会让「高频常客」不可避免——
+    # 实测池 ≈970 是质量/多样/耗时（≈0.23s）的最佳平衡点。
+    COMPOSE_CAP_FACTOR = 40      # cap = max_results × factor
+    COMPOSE_CAP_MIN = 600
+    RANDOM_BUDGET_FACTOR = 20    # 随机组合名额 = max_results × factor
+    # 分层抽样时每层可参与抽样的候选上限（越大越不易出现跨输入「常客」）
+    STRATIFY_POOL_FACTOR = 25
+    STRATIFY_POOL_MIN = 800
+    # 质量带宽：抽样窗口内只保留「韵味分 ≥ 窗口最高分 − 带宽」的名字。
+    # 候选池实测呈双峰：同源名（双字同出一源，P=35）均分 63~64，单字名（P=20）
+    # 均分仅 44~47 且占池一半——尾部弱名全部来自后者。带宽 18 正好卡在两峰之间，
+    # 效果（18 组 × Top30 = 540 名，T=36/YONG=20）：
+    #   韵味 min 28→58、中位 52→66、低于 50 分 235→0 条、双字同源 40%→96%。
+    # 代价：高频常客 3→4~5、换一批重合 3%→17~27%（仍远低于 <90% 目标）。
+    # 该代价无法靠调参消除——同源名池被源数据硬顶在 326~459 条/生日，
+    # 组合预算翻 8 倍也不增长（多出来的全是单字名）。要同时提质量与多样性，
+    # 必须扩源数据（更多诗词/条目 → 更大的同源池）。设 0 关闭带宽。
+    STRATIFY_QUALITY_BAND = 18.0
+    # 带宽生效的最小窗口规模（带宽后候选不足 n×该系数时不用带宽，
+    # 以免窗口过窄导致抽样退化为确定性排序、诱发「高频常客」）。
+    # 取 2 而非 3：小请求（max_results=10）下 3 会让带宽在偏好池上被跳过、
+    # 尾部仍漏出 40 分级弱名。
+    STRATIFY_BAND_MIN_FACTOR = 2
 
     def __init__(self):
         self.char_db = CharDatabase()
@@ -57,6 +96,13 @@ class NamingEngine:
         self.llm = LLMService()
         self.cache = MeaningCache()
         self.surname_fit = SurnameFit()
+        self.sense_db = CharSenseDatabase()
+        # 同源搭档缓存（字 → 与它出现在同一条出处的字，与用户输入无关，可全局复用）
+        self._partner_cache: dict[str, list[str]] = {}
+        # 出处推荐字白名单缓存（懒加载）
+        self._provenance_char_set: Optional[set[str]] = None
+        # 字 → 该字「有语境义项」的最佳出处（回退用，与输入无关）
+        self._sense_entry_cache: dict[str, Optional[dict]] = {}
 
     def generate_names(
         self,
@@ -151,11 +197,15 @@ class NamingEngine:
         # 1. 八字分析（如提供生辰）
         bazi_result = None
         xiyong_wuxing = None
+        yong_wuxing = None
+        ji_wuxing = None
         if use_bazi and year and month and day:
             bazi_result = self.bazi.generate_bazi(
                 year, month, day, hour, minute, gender
             )
             xiyong_wuxing = bazi_result["xiyong"]["xi_wuxing"]
+            yong_wuxing = bazi_result["xiyong"]["yong_wuxing"]
+            ji_wuxing = bazi_result["xiyong"]["ji_wuxing"]
 
         # 0. 会话黑名单 = 负面字 + 用户避讳字（硬过滤）
         blacklist = set(NEGATIVE_CHARS)
@@ -199,10 +249,14 @@ class NamingEngine:
         )
 
         # 5. 韵味排序（韵味降序 → 喜用神 → 寓意 → 风格 tie-break）
-        #    → 多样性重排 → 加权随机采样 → 剥离内部标记
+        #    → 多样性重排 → 分层抽样（八字分层配额 + 偏好硬分流）→ 剥离内部标记
         names = self._rank_by_yunwei(names, xiyong_wuxing, meanings, style)
         names = self._diversify(names, max_same_char=2)
-        names = self._weighted_sample(names, max_results)
+        names = self._stratified_sample(
+            names, max_results,
+            yong_wuxing=yong_wuxing, xi_wuxing=xiyong_wuxing,
+            meanings=meanings, style=style,
+        )
         for n in names:
             n.pop("_tier", None)
 
@@ -241,39 +295,35 @@ class NamingEngine:
         return kept + deferred
 
     @staticmethod
-    def _weighted_sample(
-        names: list[dict],
-        k: int,
+    def _weighted_pick(
+        pool: list[dict],
+        n: int,
         temperature: float = 10.0,
+        weight_of=None,
     ) -> list[dict]:
+        """从候选池按权重软加权不放回抽取 n 个（高分概率更高，结果随机）。
+
+        weight_of 可覆盖默认权重（默认取 scores.yunwei）；调用方可借此混入
+        与用户输入相关的加分（如「含用神字」），让抽样结果随输入变化。
+        调用方需保证 pool 已按展示优先级降序；返回结果未排序。
         """
-        加权随机采样（最终截取阶段，解决「换一批不变」）。
-
-        从韵味分降序的候选里，取前若干高分做软加权不放回抽样，抽出 k 个：
-        - 高分名字被抽中的概率更高（质量有保障）
-        - 每次抽样结果不同（随机性）
-        - 结果仍按韵味分降序返回（观感：高分在前）
-
-        temperature 越大越均匀，越小越偏向最高分。
-        """
-        if not names:
-            return names
-        if len(names) <= k:
-            sampled = list(names)
-            random.shuffle(sampled)
-            return sampled
-
         import math
 
-        # 候选池取前 4k（或至少 60）个高分，保证质量下限
-        pool_size = max(4 * k, 60)
-        pool = list(names[:pool_size])
-        weights = [math.exp(n["scores"]["yunwei"] / temperature) for n in pool]
+        if n <= 0 or not pool:
+            return []
+        if len(pool) <= n:
+            picked = list(pool)
+            random.shuffle(picked)
+            return picked
 
+        if weight_of is None:
+            weights = [math.exp(x["scores"]["yunwei"] / temperature) for x in pool]
+        else:
+            weights = [math.exp(weight_of(x) / temperature) for x in pool]
         indices = list(range(len(pool)))
         total = sum(weights)
         picked: list[dict] = []
-        for _ in range(k):
+        for _ in range(n):
             if not indices or total <= 0:
                 break
             r = random.random() * total
@@ -287,6 +337,200 @@ class NamingEngine:
             picked.append(pool[chosen])
             indices.remove(chosen)
             total -= weights[chosen]
+        return picked
+
+    @staticmethod
+    def _weighted_sample(
+        names: list[dict],
+        k: int,
+        temperature: float = 10.0,
+    ) -> list[dict]:
+        """
+        加权随机采样（整体池，保留旧语义：无分层时使用）。
+
+        从韵味分降序的候选里取前若干高分做软加权不放回抽样，抽出 k 个：
+        高分名字被抽中概率更高（质量下限）+ 每次结果不同（随机性），
+        结果按韵味分降序返回。
+        """
+        if not names:
+            return names
+        if len(names) <= k:
+            sampled = list(names)
+            random.shuffle(sampled)
+            return sampled
+
+        pool_size = max(4 * k, 60)
+        picked = NamingEngine._weighted_pick(list(names[:pool_size]), k, temperature)
+        picked.sort(key=lambda n: -n["scores"]["yunwei"])
+        return picked
+
+    @staticmethod
+    def _wuxing_layer(
+        name: dict,
+        yong_wuxing: Optional[str],
+        xi_wuxing: Optional[list[str]],
+    ) -> str:
+        """按八字喜忌给名字分层。
+
+        - full：名字用字全部命中喜神（八字最优）
+        - partial：含至少一个非喜用神（即忌神）字
+
+        注意：`BaziEngine` 里忌神恒为喜神的补集，所以不存在「既非喜神又非忌神」的中性字，
+        原先的 yong/xi/neutral 三层里 neutral 恒为空。此处按「命中比例」重构为两层，
+        用神命中改为同层内的权重加分（见 STRATIFY_YONG_BONUS）。
+        """
+        if not xi_wuxing:
+            return "full"
+        wuxings = [c.get("wuxing") for c in name.get("chars_info", [])]
+        if wuxings and all(w in xi_wuxing for w in wuxings):
+            return "full"
+        return "partial"
+
+    @staticmethod
+    def _pref_hits(
+        name: dict,
+        meanings: Optional[list[str]],
+        style: Optional[str],
+    ) -> int:
+        """名字的偏好命中数（寓意命中 + 风格命中），用于偏好硬分流。"""
+        entry = name.get("poetry") or {}
+        imagery = " ".join(entry.get("imagery", []) or [])
+        scene = entry.get("scene", "") or ""
+        text = entry.get("text", "") or ""
+
+        hits = 0
+        if meanings:
+            char_text = "".join(
+                (c.get("meaning") or "") for c in name.get("chars_info", [])
+            )
+            hits += NamingEngine._meanings_match_score(
+                f"{char_text} {imagery} {scene}", meanings
+            )
+        if style and style in STYLE_OPTIONS:
+            hits += NamingEngine._meanings_match_score(
+                f"{imagery} {scene} {text}",
+                STYLE_OPTIONS[style].get("imagery_keywords", []),
+            )
+        return hits
+
+    def _stratified_sample(
+        self,
+        names: list[dict],
+        k: int,
+        yong_wuxing: Optional[str] = None,
+        xi_wuxing: Optional[list[str]] = None,
+        meanings: Optional[list[str]] = None,
+        style: Optional[str] = None,
+        temperature: Optional[float] = None,
+    ) -> list[dict]:
+        """分层抽样（最终截取阶段；P3 主排序改造，替代整体加权采样）。
+
+        目的：让「八字 + 偏好」真正改变输出形态，而不是只在同分时做 tie-break。
+
+        规则：
+        1) 偏好硬分流：给了寓意/风格时，先按偏好命中取 pref_quota
+           （= min(k, TARGET_MIN)，若存在命中者）席位，保证偏好真正生效。
+        2) 八字分层配额：其余名额按 全喜神层 : 含非喜用神层 = 8 : 2 分配。
+        3) 层内权重 = 韵味分 + 用神命中加分（随八字变化）→ 兼顾质量、多样、抗常客。
+        4) 某层不足时名额顺延给其余层；无八字信息时退化为单一池加权采样。
+
+        结果按韵味分降序返回（观感：高分在前）。
+        """
+        if not names:
+            return names
+        if len(names) <= k:
+            sampled = list(names)
+            random.shuffle(sampled)
+            return sampled
+
+        k = min(k, len(names))
+        temp = self.STRATIFY_TEMPERATURE if temperature is None else temperature
+        picked: list[dict] = []
+        picked_ids: set[int] = set()
+
+        def yong_bonus(n: dict) -> float:
+            """含用神字的加权加分（用神随生日变化 → 抽样结果随输入变化）。"""
+            if not yong_wuxing or not self.STRATIFY_YONG_BONUS:
+                return 0.0
+            return self.STRATIFY_YONG_BONUS * sum(
+                1 for c in n.get("chars_info", []) if c.get("wuxing") == yong_wuxing
+            )
+
+        def weight_of(n: dict) -> float:
+            """层内抽样权重 = 韵味分 + 八字相关加分（随输入变化 → 抗常客）。"""
+            w = n["scores"]["yunwei"] + yong_bonus(n)
+            if self.STRATIFY_COVER_BONUS and xi_wuxing:
+                covered = {
+                    c.get("wuxing") for c in n.get("chars_info", [])
+                    if c.get("wuxing") in xi_wuxing
+                }
+                w += self.STRATIFY_COVER_BONUS * len(covered)
+            return w
+
+        def take(pool: list[dict], n: int) -> None:
+            if n <= 0:
+                return
+            avail = [x for x in pool if id(x) not in picked_ids]
+            if not avail:
+                return
+            avail.sort(key=lambda x: -weight_of(x))
+            cap = max(
+                int(k * self.STRATIFY_POOL_FACTOR), self.STRATIFY_POOL_MIN
+            )  # 扩大参与抽样的候选池，避免总是同样的高分区
+            window = avail[:cap]
+            # 质量带宽：挡掉窗口内明显偏低的「非全源」名，抬升 Top-N 尾部质量。
+            # 只有当带宽后仍剩足够多候选时才启用，保证随机性不被牺牲。
+            band = self.STRATIFY_QUALITY_BAND
+            if band and len(window) > k:
+                top = max(x["scores"]["yunwei"] for x in window)
+                kept = [x for x in window
+                        if x["scores"]["yunwei"] >= top - band]
+                if len(kept) >= n * self.STRATIFY_BAND_MIN_FACTOR:
+                    window = kept
+            for g in NamingEngine._weighted_pick(
+                window, n, temp, weight_of=weight_of
+            ):
+                picked_ids.add(id(g))
+                picked.append(g)
+
+        # 1) 偏好硬分流
+        has_pref = bool(meanings or (style and style in STYLE_OPTIONS))
+        if has_pref:
+            pref_pool = [n for n in names if self._pref_hits(n, meanings, style) > 0]
+            pref_pool.sort(
+                key=lambda n: (-self._pref_hits(n, meanings, style),
+                               -n["scores"]["yunwei"])
+            )
+            if pref_pool:
+                take(pref_pool, min(k, TARGET_MIN))
+
+        # 2) 八字分层配额
+        remaining = k - len(picked)
+        if remaining > 0 and (yong_wuxing or xi_wuxing):
+            layers: dict[str, list[dict]] = {"full": [], "partial": []}
+            for n in names:
+                if id(n) in picked_ids:
+                    continue
+                layers[self._wuxing_layer(n, yong_wuxing, xi_wuxing)].append(n)
+            q_full = round(k * self.STRATIFY_FULL_RATIO)
+            for layer, quota in (("full", q_full), ("partial", k - q_full)):
+                if remaining <= 0:
+                    break
+                take(layers[layer], min(quota, remaining))
+                remaining = k - len(picked)
+            if remaining > 0:  # 层不足 → 顺延
+                take(names, remaining)
+        elif remaining > 0:
+            take(names, remaining)
+
+        # 3) 兜底（理论不会触达）
+        if len(picked) < k:
+            for n in names:
+                if len(picked) >= k:
+                    break
+                if id(n) not in picked_ids:
+                    picked_ids.add(id(n))
+                    picked.append(n)
 
         picked.sort(key=lambda n: -n["scores"]["yunwei"])
         return picked
@@ -344,13 +588,38 @@ class NamingEngine:
         name_length: int = 2,
         blacklist: set = None,
         meanings: Optional[list[str]] = None,
+        ji_wuxing: Optional[list[str]] = None,
     ) -> list[dict]:
-        """筛选候选字（黑名单硬过滤 + 寓意关键词硬前置）。"""
+        """筛选候选字（黑名单硬过滤 + 出处白名单 + 寓意关键词硬前置）。
+
+        出处白名单（关键质量闸门）：候选字必须来自「诗词/古文出处推荐过的字」并集，
+        否则会出现「订/切/叫/口/轧」这类无出处、无字义的字被按笔画归入某五行后混进名字。
+        产品定位是「有据可循」——每个名字用字都应有出处与语境义项。
+        例外：情绪字（哀悲愁怨恨怒）按用户的「分级放开」决定仍进候选池，
+        由 `_evaluate_name` 的软门槛（须有出处 + 非全情绪字）把关。
+
+        3a：提供 ji_wuxing 时，混入「非喜用神字」按约 3:7 稀释（用户已确认接受）。
+        注意：`BaziEngine` 中忌神恒为喜神的补集，因此「非喜用神字」== 「忌神字」，
+        不存在既非喜神又非忌神的中性字。混入后由 `_pass_gate` 保证不会出现「全忌神」名字。
+        代价：八字匹配度由「全部满分」降为「大部分高分」。
+        """
         blacklist = blacklist or set()
+        provenance = self._provenance_chars()
         if xiyong_wuxing:
             chars = []
             for wx in xiyong_wuxing:
                 chars.extend(self.char_db.get_by_wuxing(wx, gender))
+            # 3a：混入非喜用神字（忌神行），稀释「候选池全是喜用神字」
+            if ji_wuxing:
+                xi_set = set(xiyong_wuxing)
+                extra = [
+                    c for c in self.char_db.filter(gender=gender)
+                    if c["wuxing"] in set(ji_wuxing) and c["wuxing"] not in xi_set
+                    and c["char"] in provenance
+                ]
+                n_extra = min(len(extra), max(12, len(chars) * 3 // 7))
+                if n_extra > 0:
+                    chars.extend(random.sample(extra, n_extra))
             if len(chars) < 20:
                 all_chars = self.char_db.get_all()
                 for c in all_chars:
@@ -366,7 +635,11 @@ class NamingEngine:
         else:
             chars = self.char_db.filter(gender=gender)
 
-        chars = [c for c in chars if c["char"] not in blacklist]
+        chars = [
+            c for c in chars
+            if c["char"] not in blacklist
+            and (c["char"] in provenance or c["char"] in EMOTIONAL_CHARS)
+        ]
 
         if meanings:
             chars.sort(
@@ -376,6 +649,20 @@ class NamingEngine:
             )
 
         return chars
+
+    def _provenance_chars(self) -> set[str]:
+        """全部出处（诗词 + 字源）推荐过的字并集——「有据可循」的用字白名单。
+
+        只有这些字自带出处与语境义项，才允许进入候选字池。
+        """
+        if self._provenance_char_set is None:
+            chars: set[str] = set()
+            for entry in self.poetry_db.get_all(include_sad=True):
+                chars.update(entry.get("recommend_chars") or [])
+            for entry in self.source_db.get_all(include_sad=True):
+                chars.update(entry.get("recommend_chars") or [])
+            self._provenance_char_set = chars
+        return self._provenance_char_set
 
     def _char_affinity(
         self,
@@ -413,6 +700,35 @@ class NamingEngine:
         """从候选字前 top_n（已按亲和分降序）里随机选一个，偏向姓氏/偏好匹配的字。"""
         pool = chars[:top_n]
         return random.choice(pool)
+
+    def _same_source_partner(
+        self, c1: dict, candidate_chars: list[dict]
+    ) -> Optional[dict]:
+        """从 c1 的同源字（出现在同一出处推荐字里的字）中挑一个搭档。
+
+        随机组合原本两字可能毫无共同出处，导致详情页取不到语境义项。改为优先取同源搭档，
+        让随机组合的名字也「有据可循」，两字都能在该出处语境下释义。
+        同源字集合与用户输入无关，故全局缓存；再用当前候选池（随喜用神变化）过滤。
+        """
+        char = c1["char"]
+        partners = self._partner_cache.get(char)
+        if partners is None:
+            seen: set[str] = set()
+            partners = []
+            for db in (self.poetry_db, self.source_db):
+                for entry in db.get_by_char(char):
+                    for ch in entry.get("recommend_chars") or []:
+                        if ch != char and ch not in seen:
+                            seen.add(ch)
+                            partners.append(ch)
+            self._partner_cache[char] = partners
+        if not partners:
+            return None
+        allowed = {c["char"]: c for c in candidate_chars}
+        usable = [allowed[ch] for ch in partners if ch in allowed]
+        if not usable:
+            return None
+        return random.choice(usable)
 
     def recommend_chars(
         self,
@@ -648,19 +964,24 @@ class NamingEngine:
 
         decorated.sort(key=sort_key)
 
-        # 分层洗牌：偏好命中的来源保持排前，但同层内随机打乱 → 换一批有变化、偏好确实生效
+        # 分层洗牌：按「命中强度」分档（而非只分命中/未命中），档内随机打乱
+        #   → 换一批有变化；强命中档优先占据名额 → 不同偏好给出不同来源
         def bucket(item):
             _e, _t, m_score, flag = item
             if mode == "bazi_first":
                 if flag == "xiyong":
-                    return 0 if m_score > 0 else 1
+                    return 0 if m_score >= 2 else (1 if m_score == 1 else 2)
                 if flag == "neutral":
-                    return 2 if m_score > 0 else 3
-                return 4
-            # 寓意优先：命中 / 未命中(非忌神) / 忌神
-            if flag == "ji":
-                return 2
-            return 0 if m_score > 0 else 1
+                    return 3 if m_score > 0 else 4
+                return 5
+            # 寓意优先：寓意是核心，八字只做「忌神避让」——
+            #   故偏好命中优先于忌神避让，忌神仅在同强度内退后（避让提示由 reason 承载）。
+            #   强命中 → 强命中(忌) → 弱命中 → 弱命中(忌) → 未命中(非忌) → 忌神兜底
+            if m_score >= 2:
+                return 0 if flag != "ji" else 1
+            if m_score == 1:
+                return 2 if flag != "ji" else 3
+            return 4 if flag != "ji" else 5
 
         buckets: dict[int, list] = {}
         for item in decorated:
@@ -988,14 +1309,41 @@ class NamingEngine:
         valid.sort(key=sort_key)
         return valid
 
+    def _entry_fit_score(self, entry: dict, char: str) -> float:
+        """评估出处条目对某字的「贴合度」，用于多出处时择优（替代盲目取第 0 条）。
+
+        维度（降序）：该字在本出处有语境义项 > 字出现在原文 > 字出现在意象标签。
+        同分时优先推荐字更少的条目（该字更核心、语境更聚焦）。
+        """
+        score = 0.0
+        entry_id = entry.get("id")
+        if entry_id and self.sense_db.get_senses(char, entry_id):
+            score += 3.0
+        text = entry.get("text", "") or ""
+        if char in text:
+            score += 2.0
+        imagery = " ".join(entry.get("imagery", []) or [])
+        if char in imagery:
+            score += 1.0
+        return score
+
+    def _pick_entry_for_char(self, char: str, entries: list[dict]) -> Optional[dict]:
+        """从某字的所有出处（已按库内顺序）里择优：贴合度高者优先，同分取库内靠前者。"""
+        if not entries:
+            return None
+        return max(
+            entries,
+            key=lambda e: (self._entry_fit_score(e, char), -len(e.get("recommend_chars") or [])),
+        )
+
     def _find_entry_for_char(self, char: str) -> Optional[dict]:
-        """按字查找一条出处条目（优先诗词，其次字源）。"""
+        """按字查找贴合的出处条目（优先诗词，其次字源；多条时按贴合度择优）。"""
         poems = self.poetry_db.get_by_char(char)
         if poems:
-            return poems[0]
+            return self._pick_entry_for_char(char, poems)
         sources = self.source_db.get_by_char(char)
         if sources:
-            return sources[0]
+            return self._pick_entry_for_char(char, sources)
         return None
 
     @staticmethod
@@ -1127,7 +1475,7 @@ class NamingEngine:
             random.shuffle(tier_groups.get(tier, []))
 
         has_preference_tiers = bool(tier_groups.get("A") or tier_groups.get("B"))
-        cap = max(pool_size * 4, 120)
+        cap = max(pool_size * self.COMPOSE_CAP_FACTOR, self.COMPOSE_CAP_MIN)
 
         for tier in ("A", "B", "C"):
             if len(names) >= cap:
@@ -1142,7 +1490,7 @@ class NamingEngine:
 
         # 策略2：随机组合（始终参与，补充多样性 + 姓氏/偏好引导）
         if candidate_chars:
-            budget = max(pool_size, 40)
+            budget = max(pool_size * self.RANDOM_BUDGET_FACTOR, 120)
             max_attempts = budget * 10
             attempts = 0
             random_count = 0
@@ -1153,7 +1501,10 @@ class NamingEngine:
                     given_name = char_info["char"]
                 else:
                     c1 = self._weighted_char_choice(candidate_chars)
-                    c2 = self._weighted_char_choice(candidate_chars)
+                    # 优先取同源搭档（让随机组合也有共同出处）；无同源字时退回随机
+                    c2 = self._same_source_partner(c1, candidate_chars)
+                    if c2 is None:
+                        c2 = self._weighted_char_choice(candidate_chars)
                     while c2["char"] == c1["char"]:
                         c2 = self._weighted_char_choice(candidate_chars)
                     # 字序决定（随机组合无固定出处）：音韵优选
@@ -1165,19 +1516,22 @@ class NamingEngine:
                     ):
                         continue
                     given_name = c1["char"] + c2["char"]
-                    char_info = c1
 
                 if given_name in seen_names:
                     continue
                 seen_names.add(given_name)
-
-                entry = self._find_entry_for_char(char_info["char"])
 
                 chars_info = []
                 for c in given_name:
                     ci = self.char_db.get_char(c)
                     if ci:
                         chars_info.append(ci)
+
+                # 出处择优：优先「推荐字含全部名字用字」的同源条目，
+                # 保证两字在该出处语境下都能取到义项（原来只按首字取第一条）。
+                entry = self._find_best_entry(given_name, chars_info)
+                if entry is None and chars_info:
+                    entry = self._find_entry_for_char(chars_info[0]["char"])
 
                 name_data = self._evaluate_name(
                     surname, given_name, chars_info, entry, bazi_result
@@ -1247,11 +1601,16 @@ class NamingEngine:
         if not self._pass_gate(surname, given_name, phonetics, wuge, bazi_result, chars_info):
             return None
 
-        # 情绪字软门槛（分级放开）：含负面情绪字的名字须「有出处 + 名内有正向/中性字」
+        # 情绪字软门槛（分级放开）：含负面情绪字的名字须「该字本身有出处 + 名内非全情绪字」。
+        # 「有出处」按本字是否出现在某条出处的推荐字里判定，而不是名字整体有出处——
+        # 否则情绪字会搭同名中另一个有出处字的便车混进结果（数据中情绪字均无出处，故实际不出现）。
         emotional_hit = [c["char"] for c in chars_info if c["char"] in EMOTIONAL_CHARS]
         has_emotional = bool(emotional_hit)
-        if has_emotional and (not entry or len(emotional_hit) == len(chars_info)):
-            return None
+        if has_emotional:
+            if not entry or len(emotional_hit) == len(chars_info):
+                return None
+            if not all(ch in self._provenance_chars() for ch in emotional_hit):
+                return None
 
         # 八字匹配展示值（不再参与主排序）
         bazi_score = 70
@@ -1261,7 +1620,7 @@ class NamingEngine:
             bazi_score = 60 + int(matched / len(chars_info) * 40)
 
         # 韵味评分（含 S 姓氏协调）
-        yunwei_detail = self.yunwei.score(surname, chars_info, entry)
+        yunwei_detail = self.yunwei.score(surname, chars_info, entry, self.sense_db)
         yunwei_total = yunwei_detail["total"]
 
         meaning = self._generate_meaning(chars_info, entry)
@@ -1296,6 +1655,8 @@ class NamingEngine:
                 "imagery": entry.get("imagery", []),
                 "scene": entry.get("scene", ""),
             } if entry else None,
+            # 语境义项（免费展示）：各字在本出处语境下的取义，供详情页「按语境释义」
+            "context_senses": self._context_senses(chars_info, entry),
             "phonetics": phonetics,
             "wuge": wuge,
             "scores": {
@@ -1354,27 +1715,74 @@ class NamingEngine:
         return chars_info
 
     def _find_best_entry(self, given_name: str, chars_info: list[dict]) -> Optional[dict]:
-        """为名字查找最佳出处条目（优先同源，其次单字出处）。"""
+        """为名字查找最佳出处条目（优先「含全部名字用字」的同源条目，其次单字出处）。
+
+        同源候选有多条时，按「原文含名字用字个数 + 各字语境义项贴合度」择优，
+        避免固定取第一条导致详情页出处与语境义不匹配。
+        """
         name_chars = [c["char"] for c in chars_info]
-        # 同源优先
+        if not name_chars:
+            return None
+
+        def text_hits(entry: dict) -> int:
+            text = entry.get("text", "") or ""
+            return sum(1 for c in name_chars if c in text)
+
+        # 同源优先：收集所有「推荐字含全部名字用字」的条目
+        same_source: list[dict] = []
+        seen_ids: set = set()
+        for db in (self.source_db, self.poetry_db):
+            for ch in name_chars:
+                for entry in db.get_by_char(ch):
+                    eid = entry.get("id")
+                    if eid in seen_ids:
+                        continue
+                    if all(x in (entry.get("recommend_chars") or []) for x in name_chars):
+                        seen_ids.add(eid)
+                        same_source.append(entry)
+        if same_source:
+            return max(
+                same_source,
+                key=lambda e: (
+                    text_hits(e),
+                    sum(self._entry_fit_score(e, c) for c in name_chars),
+                    -len(e.get("recommend_chars") or []),
+                ),
+            )
+
+        # 单字出处兜底：逐字择优
         for ch in name_chars:
-            for entry in self.source_db.get_by_char(ch):
-                rec = entry["recommend_chars"]
-                if name_chars and all(x in rec for x in name_chars):
-                    return entry
-            for entry in self.poetry_db.get_by_char(ch):
-                rec = entry["recommend_chars"]
-                if name_chars and all(x in rec for x in name_chars):
-                    return entry
-        # 单字出处兜底
-        for ch in name_chars:
-            src = self.source_db.get_by_char(ch)
-            if src:
-                return src[0]
-            poem = self.poetry_db.get_by_char(ch)
-            if poem:
-                return poem[0]
+            entry = self._pick_entry_for_char(ch, self.source_db.get_by_char(ch))
+            if entry:
+                return entry
+            entry = self._pick_entry_for_char(ch, self.poetry_db.get_by_char(ch))
+            if entry:
+                return entry
         return None
+
+    def _entry_with_senses(self, char: str) -> Optional[dict]:
+        """找该字「有语境义项」的最佳出处（主出处未收录该字时的回退）。
+
+        结果与用户输入无关，故按字缓存。
+        """
+        if char in self._sense_entry_cache:
+            return self._sense_entry_cache[char]
+        best = None
+        best_key = None
+        for db in (self.poetry_db, self.source_db):
+            for entry in db.get_by_char(char):
+                eid = entry.get("id")
+                if not eid or not self.sense_db.get_senses(char, eid):
+                    continue
+                key = (
+                    self._entry_fit_score(entry, char),
+                    -len(entry.get("recommend_chars") or []),
+                )
+                if best_key is None or key > best_key:
+                    best_key = key
+                    best = entry
+        self._sense_entry_cache[char] = best
+        return best
 
     @staticmethod
     def _wuxing_note(chars_info: list[dict]) -> str:
@@ -1404,6 +1812,13 @@ class NamingEngine:
         chars_info = self._lookup_chars(given_name)
         entry = self._find_best_entry(given_name, chars_info)
 
+        # 语境义项：逐字取「在本出处语境下的取义」，供详情页按语境释义 + 供 LLM 在正确语境下解读
+        context_senses = self._context_senses(chars_info, entry)
+        sense_map = {s["char"]: s["senses"] for s in context_senses if s.get("senses")}
+        for ci in chars_info:
+            if sense_map.get(ci["char"]):
+                ci["context_senses"] = sense_map[ci["char"]]
+
         bazi_data = None
         bazi_signature = None
         if year and month and day:
@@ -1416,6 +1831,8 @@ class NamingEngine:
         key = self.cache.build_key(full_name, gender, bazi_signature, citation)
         cached = self.cache.get(key)
         if cached:
+            if "context_senses" not in cached:
+                cached["context_senses"] = context_senses
             return cached
 
         result = await self.llm.generate_meaning(
@@ -1435,6 +1852,7 @@ class NamingEngine:
                 ),
                 "wuxing_note": self._wuxing_note(chars_info),
                 "overall_note": self._generate_meaning(chars_info, entry),
+                "context_senses": context_senses,
                 "meaning_source": "template",
             }
             self.cache.set(key, fallback)
@@ -1444,9 +1862,42 @@ class NamingEngine:
         result["given_name"] = given_name
         result["surname"] = surname
         result["citation"] = citation
+        result["context_senses"] = context_senses
         result["meaning_source"] = "llm"
         self.cache.set(key, result)
         return result
+
+    def _context_senses(
+        self,
+        chars_info: list[dict],
+        entry: Optional[dict],
+    ) -> list[dict]:
+        """逐字输出「在本出处语境下的义项」，供详情页按语境释义展示。
+
+        返回 [{"char": "清", "senses": ["清朗", "高远"], "general": "水清，清澈"}]。
+        无出处 / 无标注时 senses 为空列表（前端回退到通用字义 general）。
+        """
+        entry_id = (entry or {}).get("id")
+        recommend = set((entry or {}).get("recommend_chars") or [])
+        out: list[dict] = []
+        for c in chars_info:
+            ch = c.get("char", "")
+            senses = self.sense_db.get_senses(ch, entry_id) if entry_id else []
+            from_main = True
+            if not senses and ch not in recommend:
+                # 主出处未收录该字（随机组合的两字可能无共同出处）→
+                # 退回该字自身最有据的一句，保证仍能按语境释义。
+                own = self._entry_with_senses(ch)
+                if own is not None and own.get("id") != entry_id:
+                    senses = self.sense_db.get_senses(ch, own["id"])
+                    from_main = False
+            out.append({
+                "char": ch,
+                "senses": senses,
+                "general": c.get("meaning") or c.get("detail") or "",
+                "from_main": from_main,
+            })
+        return out
 
     @staticmethod
     def _fallback_layers(chars_info: list[dict], entry: Optional[dict]) -> list[dict]:

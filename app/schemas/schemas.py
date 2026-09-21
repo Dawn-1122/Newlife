@@ -112,6 +112,10 @@ class NameResult(BaseModel):
     given_name: str
     chars_info: list[dict]
     poetry: Optional[dict] = None
+    context_senses: list[dict] = Field(
+        default_factory=list,
+        description='各字在本出处语境下的取义 [{"char":"清","senses":["清朗"],"general":"水清"}]',
+    )
     phonetics: dict
     wuge: dict
     scores: dict
@@ -155,6 +159,10 @@ class MeaningResponse(BaseModel):
     poetry_note: Optional[str] = None
     wuxing_note: Optional[str] = None
     overall_note: Optional[str] = None
+    context_senses: list[dict] = Field(
+        default_factory=list,
+        description='逐字语境义项 [{"char":"清","senses":["清朗","高远"],"general":"水清"}]',
+    )
     meaning_source: str = "template"
     provider: Optional[str] = None
     model: Optional[str] = None

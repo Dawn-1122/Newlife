@@ -222,6 +222,12 @@ class LLMService:
                 f"康熙笔画{ci.get('kangxi_strokes', '?')}画, "
                 f"含义: {ci.get('meaning', '未知')}\n"
             )
+            senses = ci.get("context_senses") or []
+            if senses:
+                chars_desc += (
+                    f"    （注意：此字在当前出处语境下取义为「{'、'.join(senses)}」，"
+                    f"解读时须以此语境义为准，不要泛用其字典本义）\n"
+                )
 
         # 诗词出处
         poetry_desc = ""

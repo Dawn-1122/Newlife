@@ -27,6 +27,14 @@ class PoetryDatabase:
             data = json.load(f)
         self._poems = [self.normalize(p) for p in data["poems"]]
         self._build_fullname_index()
+        self._build_char_index()
+
+    def _build_char_index(self):
+        """按推荐用字倒排索引：get_by_char 由 O(N) 线性扫描降为 O(1) 查表。"""
+        self._char_index: dict[str, list[dict]] = {}
+        for poem in self._poems:
+            for ch in poem.get("recommend_chars") or []:
+                self._char_index.setdefault(ch, []).append(poem)
 
     def _build_fullname_index(self):
         """预构建「姓+名 连词索引」：对 text/original_text/title/citation 抽 2~3 字 CJK n-gram。"""
@@ -74,10 +82,7 @@ class PoetryDatabase:
 
     def get_by_char(self, char: str, include_sad: bool = False) -> list[dict]:
         """按推荐用字查找诗词（默认排除哀伤）"""
-        return self._exclude_sad(
-            [p for p in self._poems if char in p["recommend_chars"]],
-            include_sad,
-        )
+        return self._exclude_sad(self._char_index.get(char, []), include_sad)
 
     def get_by_imagery(self, imagery: str, include_sad: bool = False) -> list[dict]:
         """按意象查找（默认排除哀伤）"""

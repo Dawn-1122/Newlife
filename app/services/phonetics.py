@@ -4,6 +4,8 @@
 分析名字的声调搭配，避免全平或全仄，给出音律评分。
 """
 
+from functools import lru_cache
+
 from pypinyin import pinyin, Style
 
 
@@ -21,8 +23,9 @@ class PhoneticsScorer:
     }
 
     @classmethod
+    @lru_cache(maxsize=8192)
     def get_pinyin(cls, char: str) -> tuple[str, int]:
-        """获取汉字拼音和声调"""
+        """获取汉字拼音和声调（纯函数，带缓存：单字拼音恒定，避免重复计算）。"""
         py = pinyin(char, style=Style.TONE, heteronym=False)
         if not py or py[0][0] == char:
             return char, 0

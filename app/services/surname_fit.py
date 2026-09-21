@@ -14,6 +14,7 @@
 """
 
 import json
+from functools import lru_cache
 from pathlib import Path
 from typing import Optional
 from pypinyin import lazy_pinyin
@@ -66,8 +67,9 @@ class SurnameFit:
     # ── 谐音歧义 ──
 
     @staticmethod
+    @lru_cache(maxsize=65536)
     def _plain_pinyin(text: str) -> str:
-        """全名拼音（无调、无空格）。"""
+        """全名拼音（无调、无空格）。带缓存：同一字符串拼音恒定，避免重复计算。"""
         return "".join(lazy_pinyin(text))
 
     def is_homophone_taboo(self, surname: str, given_name: str) -> tuple[bool, str]:

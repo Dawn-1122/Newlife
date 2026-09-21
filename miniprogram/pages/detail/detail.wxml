@@ -31,6 +31,12 @@
           <text class="tag">康熙·{{item.kangxi_strokes}}画</text>
         </view>
         <view class="char-meaning">{{item.meaning}}</view>
+        <view class="char-senses" wx:if="{{item.senses.length}}">
+          <text class="senses-label">语境取义</text>
+          <view class="sense-chips">
+            <text class="sense-chip" wx:for="{{item.senses}}" wx:for-item="s" wx:key="*this">{{s}}</text>
+          </view>
+        </view>
         <view class="char-shuowen" wx:if="{{item.shuowen}}">
           <text class="shuowen-label">说文解字</text>
           <text class="shuowen-text">{{item.shuowen}}</text>
@@ -52,6 +58,18 @@
         <text class="poetry-author">{{name.poetry.author}}（{{name.poetry.dynasty}}）</text>
       </view>
       <view class="poetry-text">{{name.poetry.text}}</view>
+    </view>
+    <!-- 语境取义：同一个字在这句里的意思 -->
+    <view class="ctx-senses" wx:if="{{ctxSenses.length}}">
+      <view class="ctx-title">此句语境取义</view>
+      <view class="ctx-row" wx:for="{{ctxSenses}}" wx:key="char">
+        <text class="ctx-char">{{item.char}}</text>
+        <text class="ctx-arrow">取</text>
+        <text class="ctx-words" wx:if="{{item.words}}">{{item.words}}</text>
+        <text class="ctx-words ctx-general" wx:else>{{item.general || '未收录'}}</text>
+        <text class="ctx-mark" wx:if="{{item.words && !item.fromMain}}">另一句</text>
+      </view>
+      <view class="ctx-note">同一字在不同诗句中含义不同，此处为该字在本句中的取义</view>
     </view>
   </view>
 

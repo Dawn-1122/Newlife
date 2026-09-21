@@ -73,6 +73,7 @@ class YunWeiScorer:
         surname: str,
         chars_info: list[dict],
         entry: Optional[dict] = None,
+        sense_db=None,
     ) -> dict:
         """
         计算一个名字的韵味分。
@@ -81,6 +82,8 @@ class YunWeiScorer:
             surname: 姓氏（单姓或复姓）
             chars_info: 「名」各字信息列表（不含姓），元素含 char/meaning/detail/shuowen/radical 等
             entry: 匹配到的出处条目（诗词/字源统一 dict），可为 None
+            sense_db: 语境义项库（CharSenseDatabase）。提供时 I/L 优先用「字×出处」的语境义项，
+                      否则回退静态字义（与改造前行为一致）。
 
         Returns:
             {"total": int, "provenance": int, "imagery": int, "aftertaste": int,
@@ -89,8 +92,8 @@ class YunWeiScorer:
         given_name = "".join(c["char"] for c in chars_info)
 
         p = self._provenance_score(chars_info, entry)
-        i = self._imagery_score(chars_info, entry)
-        l = self._aftertaste_score(chars_info)
+        i = self._imagery_score(chars_info, entry, sense_db)
+        l = self._aftertaste_score(chars_info, entry, sense_db)
         c = self._coherence_score(chars_info)
         s1, s2 = self._surname_coherence_score(surname, given_name, chars_info, entry)
 
@@ -138,8 +141,13 @@ class YunWeiScorer:
 
     # ── I 意象分（0~25，只评「名」） ──
 
-    def _imagery_score(self, chars_info: list[dict], entry: Optional[dict]) -> int:
-        name_text = self._char_text(chars_info)
+    def _imagery_score(
+        self,
+        chars_info: list[dict],
+        entry: Optional[dict],
+        sense_db=None,
+    ) -> int:
+        name_text = self._char_text(chars_info, entry, sense_db)
         tags: list[str] = []
         if entry:
             for tag in (entry.get("imagery", []) or []):
@@ -160,10 +168,36 @@ class YunWeiScorer:
         return min(IMAGERY_MAX, IMAGERY_BASE + IMAGERY_PER_HIT * k)
 
     @staticmethod
-    def _char_text(chars_info: list[dict]) -> str:
-        """拼接名各字的 meaning/detail/shuowen 文本（供意象/余味匹配）。"""
+    def _senses_for(char: str, entry: Optional[dict], sense_db) -> list[str]:
+        """取「字×出处」的语境义项；无 sense_db / 无记录返回 []。"""
+        if not sense_db or not entry:
+            return []
+        entry_id = entry.get("id")
+        if not entry_id:
+            return []
+        try:
+            return sense_db.get_senses(char, entry_id)
+        except Exception:
+            return []
+
+    @classmethod
+    def _char_text(
+        cls,
+        chars_info: list[dict],
+        entry: Optional[dict] = None,
+        sense_db=None,
+    ) -> str:
+        """拼接名各字的匹配文本（供意象/余味匹配）。
+
+        **语境优先**：若该字在 entry 中有语境义项，则用语境义项（体现「同字不同语境含义不同」）；
+        否则回退静态 meaning/detail/shuowen（与改造前行为一致）。
+        """
         parts: list[str] = []
         for c in chars_info:
+            senses = cls._senses_for(c["char"], entry, sense_db)
+            if senses:
+                parts.append(" ".join(senses))
+                continue
             for field in ("meaning", "detail", "shuowen"):
                 v = c.get(field) or ""
                 if v:
@@ -184,12 +218,25 @@ class YunWeiScorer:
 
     # ── L 余味分（0~15，只评「名」） ──
 
-    def _aftertaste_score(self, chars_info: list[dict]) -> int:
+    def _aftertaste_score(
+        self,
+        chars_info: list[dict],
+        entry: Optional[dict] = None,
+        sense_db=None,
+    ) -> int:
+        """余味分：优先按「字×出处」的语境义项数计；无则回退静态义项数。
+
+        与改造前（完全不接收 entry）相比，余味现在与出处绑定：
+        同一个字在语境丰厚的出处里得更高余味分。
+        """
         total_senses = 0
         for c in chars_info:
+            senses = self._senses_for(c["char"], entry, sense_db)
+            if senses:
+                total_senses += len(senses)
+                continue
             meaning = c.get("meaning") or ""
-            senses = [s for s in self._SENSE_SEP.split(meaning) if s.strip()]
-            total_senses += len(senses)
+            total_senses += len([s for s in self._SENSE_SEP.split(meaning) if s.strip()])
         return min(AFTERTASTE_MAX, AFTERTASTE_PER_SENSE * total_senses)
 
     # ── C 名内呼应分（0~10，只评「名」，不含姓） ──

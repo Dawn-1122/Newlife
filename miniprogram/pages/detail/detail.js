@@ -5,6 +5,9 @@ Page({
     name: null,
     pinyinText: '',
 
+    // 语境义项（免费）：各字在本出处语境下的取义
+    ctxSenses: [],
+
     // 深度寓意（多层余味，分享解锁）
     unlocked: false,
     deepLoading: false,
@@ -13,14 +16,38 @@ Page({
     meaningSource: ''
   },
 
+  // 语境义项 → 展示结构 [{char, words, general}]，并把 senses 挂到逐字上
+  buildCtxSenses(list) {
+    return (list || [])
+      .filter(item => item && item.char)
+      .map(item => ({
+        char: item.char,
+        senses: item.senses || [],
+        words: (item.senses || []).join('、'),
+        general: item.general || '',
+        // 该字不在名字主出处里，义项取自它自己最贴合的句子
+        fromMain: item.from_main !== false
+      }))
+  },
+
   onLoad() {
     const app = getApp()
-    const name = app.globalData.selectedName
+    let name = app.globalData.selectedName
 
     if (!name) {
       wx.navigateBack()
       return
     }
+
+    // 把语境义项挂到逐字上（用字解析区按语境释义）
+    const ctxSenses = this.buildCtxSenses(name.context_senses)
+    const senseMap = {}
+    ctxSenses.forEach(item => { senseMap[item.char] = item.senses })
+    name = Object.assign({}, name, {
+      chars_info: (name.chars_info || []).map(c =>
+        Object.assign({}, c, { senses: senseMap[c.char] || [] })
+      )
+    })
 
     // 按起名批次单次解锁：分享一次，本批次所有名字的深度寓意均可看
     const batchId = app.globalData.lastBatchId || 'default'
@@ -30,6 +57,7 @@ Page({
     this.setData({
       name,
       pinyinText: name.phonetics.pinyins.join(' · '),
+      ctxSenses,
       unlocked
     })
 
@@ -54,10 +82,13 @@ Page({
         hour: params.hour,
         minute: params.minute
       })
+      // 深度解读可能定位到更贴合的出处，其语境义项更准，优先采用
+      const deepCtx = this.buildCtxSenses(result.context_senses)
       this.setData({
         deepMeaning: result,
         layers: result.layers || [],
         meaningSource: result.meaning_source || '',
+        ctxSenses: deepCtx.length ? deepCtx : this.data.ctxSenses,
         deepLoading: false
       })
     } catch (err) {

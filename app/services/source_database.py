@@ -64,11 +64,20 @@ class SourceDatabase:
         if not path.exists():
             self._entries = []
             self._fullname_index: dict[str, dict] = {}
+            self._char_index: dict[str, list[dict]] = {}
             return
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
         self._entries = [self.normalize(e) for e in data.get("entries", [])]
         self._build_fullname_index()
+        self._build_char_index()
+
+    def _build_char_index(self):
+        """按推荐用字倒排索引：get_by_char 由 O(N) 线性扫描降为 O(1) 查表。"""
+        self._char_index: dict[str, list[dict]] = {}
+        for entry in self._entries:
+            for ch in entry.get("recommend_chars") or []:
+                self._char_index.setdefault(ch, []).append(entry)
 
     def _build_fullname_index(self):
         """预构建「姓+名 连词索引」：对 text/original_text/title/citation 抽 2~3 字 CJK n-gram。"""
@@ -111,10 +120,7 @@ class SourceDatabase:
 
     def get_by_char(self, char: str, include_sad: bool = False) -> list[dict]:
         """按推荐用字查找（默认排除哀伤）。"""
-        return self._exclude_sad(
-            [e for e in self._entries if char in e["recommend_chars"]],
-            include_sad,
-        )
+        return self._exclude_sad(self._char_index.get(char, []), include_sad)
 
     def get_by_imagery(self, imagery: str, include_sad: bool = False) -> list[dict]:
         return self._exclude_sad(

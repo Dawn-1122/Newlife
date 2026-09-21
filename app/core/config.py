@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     POETRY_DIR: Path = DATA_DIR / "poetry"
     SOURCE_DIR: Path = DATA_DIR / "source"
     MEANING_CACHE_DIR: Path = DATA_DIR / "meaning_cache"
+    SENSE_DIR: Path = DATA_DIR / "sense"
 
     # 字库文件
     CHAR_DB_FILE: str = "chars.json"

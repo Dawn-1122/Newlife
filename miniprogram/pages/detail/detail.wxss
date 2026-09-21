@@ -342,3 +342,88 @@
   width: 60%;
   margin: 0 auto;
 }
+
+/* 语境取义（同一字在不同诗句中含义不同） */
+.char-senses {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 12rpx;
+}
+
+.senses-label {
+  font-size: 22rpx;
+  color: #8A8A82;
+}
+
+.sense-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.sense-chip {
+  font-size: 22rpx;
+  color: #5E7A73;
+  background: rgba(94, 122, 115, 0.1);
+  border-radius: 8rpx;
+  padding: 4rpx 14rpx;
+}
+
+.ctx-senses {
+  margin-top: 20rpx;
+  padding: 20rpx 24rpx;
+  background: #F4F0E7;
+  border-radius: 12rpx;
+  border-left: 4rpx solid #5E7A73;
+}
+
+.ctx-title {
+  font-size: 24rpx;
+  color: #5E7A73;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.ctx-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10rpx;
+  margin-bottom: 8rpx;
+}
+
+.ctx-char {
+  font-size: 30rpx;
+  color: #1F1F1F;
+  font-weight: 600;
+}
+
+.ctx-arrow {
+  font-size: 22rpx;
+  color: #9C9A92;
+}
+
+.ctx-words {
+  font-size: 26rpx;
+  color: #5C5C5C;
+}
+
+.ctx-general {
+  color: #9C9A92;
+}
+
+.ctx-mark {
+  font-size: 20rpx;
+  color: #9C9A92;
+  border: 1rpx solid #D8D2C6;
+  border-radius: 6rpx;
+  padding: 0 8rpx;
+}
+
+.ctx-note {
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  color: #9C9A92;
+  line-height: 1.5;
+}
