@@ -1344,6 +1344,23 @@ class NamingEngine:
             score += 1.0
         return score
 
+    @staticmethod
+    def _gender_tag(gender: Optional[str]) -> Optional[str]:
+        """把 male/female 归一为库内性别标签；返回 None 表示不限制。"""
+        tag = {"male": "男", "female": "女"}.get(gender or "", gender)
+        return tag if tag in ("男", "女") else None
+
+    def _filter_by_gender(self, entries: list[dict], gender: Optional[str]) -> list[dict]:
+        """按性别口径收窄候选出处：只保留「本性别 + 中性」条目。
+
+        注意：这是「择优时优先」而非硬堵——若收窄后为空，调用方应退回全集，
+        避免冷门字因性别标签缺失而挂不上出处。
+        """
+        tag = self._gender_tag(gender)
+        if tag is None:
+            return entries
+        return [e for e in entries if e.get("gender") in (tag, "中")]
+
     def _pick_entry_for_char(self, char: str, entries: list[dict]) -> Optional[dict]:
         """从某字的所有出处（已按库内顺序）里择优：贴合度高者优先，同分取库内靠前者。"""
         if not entries:
@@ -1353,14 +1370,19 @@ class NamingEngine:
             key=lambda e: (self._entry_fit_score(e, char), -len(e.get("recommend_chars") or [])),
         )
 
-    def _find_entry_for_char(self, char: str) -> Optional[dict]:
-        """按字查找贴合的出处条目（优先诗词，其次字源；多条时按贴合度择优）。"""
-        poems = self.poetry_db.get_by_char(char)
-        if poems:
-            return self._pick_entry_for_char(char, poems)
-        sources = self.source_db.get_by_char(char)
-        if sources:
-            return self._pick_entry_for_char(char, sources)
+    def _find_entry_for_char(self, char: str, gender: Optional[str] = None) -> Optional[dict]:
+        """按字查找贴合的出处条目（优先诗词，其次字源；多条时按贴合度择优）。
+
+        gender 给定时先在本性别口径内择优，取不到再退回全集。
+        """
+        for db in (self.poetry_db, self.source_db):
+            entries = db.get_by_char(char)
+            if not entries:
+                continue
+            scoped = self._filter_by_gender(entries, gender)
+            picked = self._pick_entry_for_char(char, scoped or entries)
+            if picked:
+                return picked
         return None
 
     @staticmethod
@@ -1546,9 +1568,9 @@ class NamingEngine:
 
                 # 出处择优：优先「推荐字含全部名字用字」的同源条目，
                 # 保证两字在该出处语境下都能取到义项（原来只按首字取第一条）。
-                entry = self._find_best_entry(given_name, chars_info)
+                entry = self._find_best_entry(given_name, chars_info, gender)
                 if entry is None and chars_info:
-                    entry = self._find_entry_for_char(chars_info[0]["char"])
+                    entry = self._find_entry_for_char(chars_info[0]["char"], gender)
 
                 name_data = self._evaluate_name(
                     surname, given_name, chars_info, entry, bazi_result
@@ -1731,11 +1753,20 @@ class NamingEngine:
                 })
         return chars_info
 
-    def _find_best_entry(self, given_name: str, chars_info: list[dict]) -> Optional[dict]:
+    def _find_best_entry(
+        self,
+        given_name: str,
+        chars_info: list[dict],
+        gender: Optional[str] = None,
+    ) -> Optional[dict]:
         """为名字查找最佳出处条目（优先「含全部名字用字」的同源条目，其次单字出处）。
 
         同源候选有多条时，按「原文含名字用字个数 + 各字语境义项贴合度」择优，
         避免固定取第一条导致详情页出处与语境义不匹配。
+
+        gender 给定时，只在「本性别 + 中性」的出处里择优——否则女性请求会被挂上
+        男性向出处（性别标签不一致，且出处的意象/场景会污染偏好匹配与韵味分）。
+        收窄后为空时退回全集。
         """
         name_chars = [c["char"] for c in chars_info]
         if not name_chars:
@@ -1758,8 +1789,9 @@ class NamingEngine:
                         seen_ids.add(eid)
                         same_source.append(entry)
         if same_source:
+            scoped = self._filter_by_gender(same_source, gender) or same_source
             return max(
-                same_source,
+                scoped,
                 key=lambda e: (
                     text_hits(e),
                     sum(self._entry_fit_score(e, c) for c in name_chars),
@@ -1767,14 +1799,16 @@ class NamingEngine:
                 ),
             )
 
-        # 单字出处兜底：逐字择优
+        # 单字出处兜底：逐字择优（保持原顺序：字源优先，其次诗词）
         for ch in name_chars:
-            entry = self._pick_entry_for_char(ch, self.source_db.get_by_char(ch))
-            if entry:
-                return entry
-            entry = self._pick_entry_for_char(ch, self.poetry_db.get_by_char(ch))
-            if entry:
-                return entry
+            for db in (self.source_db, self.poetry_db):
+                entries = db.get_by_char(ch)
+                if not entries:
+                    continue
+                scoped = self._filter_by_gender(entries, gender) or entries
+                picked = self._pick_entry_for_char(ch, scoped)
+                if picked:
+                    return picked
         return None
 
     def _entry_with_senses(self, char: str) -> Optional[dict]:
@@ -1827,7 +1861,7 @@ class NamingEngine:
         """
         surname, given_name = self._split_name(full_name)
         chars_info = self._lookup_chars(given_name)
-        entry = self._find_best_entry(given_name, chars_info)
+        entry = self._find_best_entry(given_name, chars_info, gender)
 
         # 语境义项：逐字取「在本出处语境下的取义」，供详情页按语境释义 + 供 LLM 在正确语境下解读
         context_senses = self._context_senses(chars_info, entry)
