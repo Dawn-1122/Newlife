@@ -1,13 +1,11 @@
 const api = require('../../utils/api')
 
-// 诗词出处 → 前端风格筛选归类（与后端 STYLE_OPTIONS 的 source_preference 对应）
-function getStyleCode(name) {
-  const source = (name.poetry && name.poetry.source) || ''
-  if (source === '诗经' || source === '楚辞' || source === '汉魏古诗') return 'classic'
-  if (source === '唐诗' || source === '宋词') return 'modern'
-  if (source === '经史子集') return 'grand'
-  return ''
-}
+// 结果页风格筛选条：全部 + 8 个风格（与后端 STYLE_OPTIONS 同源，见 utils/api.js）
+const styleFilters = [{ code: '', name: '全部' }].concat(
+  api.STYLE_OPTIONS.map(function (o) {
+    return { code: o.code, name: o.short || o.name }
+  })
+)
 
 Page({
   data: {
@@ -29,12 +27,7 @@ Page({
       { code: '火', name: '火' },
       { code: '土', name: '土' }
     ],
-    styleFilters: [
-      { code: '', name: '全部' },
-      { code: 'classic', name: '古风' },
-      { code: 'modern', name: '现代' },
-      { code: 'grand', name: '大气' }
-    ]
+    styleFilters: styleFilters
   },
 
   onLoad() {
@@ -97,7 +90,9 @@ Page({
       }
 
       if (styleFilter) {
-        if (getStyleCode(n) !== styleFilter) return false
+        // 一对多判定：一条出处可同时属于多个风格，命中任一即保留
+        const source = (n.poetry && n.poetry.source) || ''
+        if (api.getStyleCodes(source).indexOf(styleFilter) === -1) return false
       }
 
       return true

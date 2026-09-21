@@ -5,17 +5,38 @@
  * 小程序无共享包，需在此手工同步，改动时两处一起改。
  */
 
-// 风格枚举（与后端 STYLE_OPTIONS 镜像）
+// 风格枚举（与后端 STYLE_OPTIONS 镜像；sources 对应后端 source_preference）
+// short 用于结果页筛选条（2 字，避免 8 个筛选项挤出屏幕）
 const STYLE_OPTIONS = [
-  { code: 'classic', name: '古风雅致' },
-  { code: 'modern', name: '现代简约' },
-  { code: 'grand', name: '大气沉稳' },
-  { code: 'fresh', name: '清新灵动' },
-  { code: 'warm', name: '温润内敛' },
-  { code: 'elegant', name: '清朗俊逸' },
-  { code: 'plain', name: '质朴厚重' },
-  { code: 'zen', name: '空灵禅意' }
+  { code: 'classic', name: '古风雅致', short: '古风', sources: ['诗经', '楚辞', '汉魏古诗'] },
+  { code: 'modern', name: '现代简约', short: '现代', sources: ['唐诗', '宋词'] },
+  { code: 'grand', name: '大气沉稳', short: '大气', sources: ['经史子集', '汉魏古诗'] },
+  { code: 'fresh', name: '清新灵动', short: '清新', sources: ['诗经', '唐诗'] },
+  { code: 'warm', name: '温润内敛', short: '温润', sources: ['诗经', '经史子集'] },
+  { code: 'elegant', name: '清朗俊逸', short: '清朗', sources: ['唐诗', '宋词'] },
+  { code: 'plain', name: '质朴厚重', short: '质朴', sources: ['经史子集', '汉魏古诗'] },
+  { code: 'zen', name: '空灵禅意', short: '空灵', sources: ['唐诗', '宋词'] }
 ]
+
+// 出处 → 风格 codes 反向映射（由 STYLE_OPTIONS.sources 派生，勿手工维护）
+// 重要：这是一对多映射 —— 同一条出处可属于多个风格
+//（如「唐诗」同时属于 现代简约/清新灵动/清朗俊逸/空灵禅意）；
+// 因此结果页的风格筛选必须用「命中任一」判定，不能用单值归类。
+const SOURCE_STYLE_MAP = (function () {
+  const map = {}
+  STYLE_OPTIONS.forEach(function (opt) {
+    (opt.sources || []).forEach(function (source) {
+      if (!map[source]) map[source] = []
+      map[source].push(opt.code)
+    })
+  })
+  return map
+})()
+
+// 取一条出处命中的全部风格 codes（无出处或出处不在映射内时返回空数组）
+function getStyleCodes(source) {
+  return SOURCE_STYLE_MAP[source] || []
+}
 
 // 寓意枚举（与后端 MEANING_OPTIONS 镜像）
 const MEANING_OPTIONS = [
@@ -161,6 +182,8 @@ module.exports = {
   nameMeaning,
   queryBazi,
   STYLE_OPTIONS,
+  SOURCE_STYLE_MAP,
+  getStyleCodes,
   MEANING_OPTIONS,
   STYLE_EXAMPLES,
   MEANING_EXAMPLES,

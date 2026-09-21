@@ -105,6 +105,7 @@ def main() -> None:
         ("NW_YONG", "STRATIFY_YONG_BONUS"),
         ("NW_FULL", "STRATIFY_FULL_RATIO"),
         ("NW_POOLF", "STRATIFY_POOL_FACTOR"),
+        ("NW_BANDF", "STRATIFY_BAND_MIN_FACTOR"),
     ):
         raw = os.environ.get(env_key)
         if raw not in (None, ""):

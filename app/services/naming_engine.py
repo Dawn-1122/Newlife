@@ -74,11 +74,10 @@ class NamingEngine:
     # 组合预算翻 8 倍也不增长（多出来的全是单字名）。要同时提质量与多样性，
     # 必须扩源数据（更多诗词/条目 → 更大的同源池）。设 0 关闭带宽。
     STRATIFY_QUALITY_BAND = 18.0
-    # 带宽生效的最小窗口规模（带宽后候选不足 n×该系数时不用带宽，
-    # 以免窗口过窄导致抽样退化为确定性排序、诱发「高频常客」）。
-    # 取 2 而非 3：小请求（max_results=10）下 3 会让带宽在偏好池上被跳过、
-    # 尾部仍漏出 40 分级弱名。
-    STRATIFY_BAND_MIN_FACTOR = 2
+    # 带宽生效的最小窗口规模（带宽后候选不足 n×该系数时逐档放宽带宽，见
+    # _banded_window）。取 3：实测 2/3 质量完全相同（min 58 / 中位 66 / 0 条 <50），
+    # 但 3 的「高频常客」更稳（多轮 5/5/5 vs 5/5/6）。
+    STRATIFY_BAND_MIN_FACTOR = 3
 
     def __init__(self):
         self.char_db = CharDatabase()
@@ -413,6 +412,33 @@ class NamingEngine:
             )
         return hits
 
+    def _banded_window(self, window: list[dict], n: int) -> list[dict]:
+        """对抽样窗口做质量带宽过滤（只保留「韵味 ≥ 窗口最高分 − 带宽」的名字）。
+
+        ｜为什么要「逐步放宽」而不是「不够就放弃」：
+        女性路径的同源名池只有约 186 条（男性 242），每层带宽后候选常常不足
+        n × STRATIFY_BAND_MIN_FACTOR。原实现此时**整体放弃带宽**，于是又退回
+        无过滤状态、让 40 分级弱名漏进 TopN —— 正是「女性结果尾部偏差」的机制。
+        现在改为**按 1.5 倍逐档放宽带宽**，在候选天生偏少的输入上也能兜到
+        尽可能高的质量底线，而不是二元地「要么全过滤、要么不过滤」。
+        """
+        band = self.STRATIFY_QUALITY_BAND
+        if not band or len(window) <= n:
+            return window
+        scores = [x["scores"]["yunwei"] for x in window]
+        top, lowest = max(scores), min(scores)
+        span = top - lowest
+        if span <= band:
+            return window  # 整个窗口都在带宽内，无需过滤
+        need = n * self.STRATIFY_BAND_MIN_FACTOR
+        b = band
+        while b < span:
+            kept = [x for x in window if x["scores"]["yunwei"] >= top - b]
+            if len(kept) >= need:
+                return kept
+            b *= 1.5
+        return window  # 放宽到全窗口仍不足 need，只能不过滤
+
     def _stratified_sample(
         self,
         names: list[dict],
@@ -477,16 +503,7 @@ class NamingEngine:
             cap = max(
                 int(k * self.STRATIFY_POOL_FACTOR), self.STRATIFY_POOL_MIN
             )  # 扩大参与抽样的候选池，避免总是同样的高分区
-            window = avail[:cap]
-            # 质量带宽：挡掉窗口内明显偏低的「非全源」名，抬升 Top-N 尾部质量。
-            # 只有当带宽后仍剩足够多候选时才启用，保证随机性不被牺牲。
-            band = self.STRATIFY_QUALITY_BAND
-            if band and len(window) > k:
-                top = max(x["scores"]["yunwei"] for x in window)
-                kept = [x for x in window
-                        if x["scores"]["yunwei"] >= top - band]
-                if len(kept) >= n * self.STRATIFY_BAND_MIN_FACTOR:
-                    window = kept
+            window = self._banded_window(avail[:cap], n)
             for g in NamingEngine._weighted_pick(
                 window, n, temp, weight_of=weight_of
             ):
