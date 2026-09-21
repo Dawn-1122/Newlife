@@ -82,3 +82,25 @@ def test_every_style_has_short_name(frontend):
     """结果页筛选条依赖 short，缺失会退化成 4 字长名而挤坏布局。"""
     for item in frontend["styles"]:
         assert item.get("short"), f"风格 {item['code']} 缺少 short 字段"
+
+
+def test_schema_style_description_lists_all_codes():
+    """app/schemas/schemas.py 里 style 字段的文档串必须列全 code。
+
+    它是 OpenAPI 文档里唯一描述风格取值的地方。风格由 4 项扩到 8 项时这里曾被漏改，
+    导致接口文档与实际取值不符。
+    """
+    src = (PROJECT_ROOT / "app" / "schemas" / "schemas.py").read_text(encoding="utf-8")
+    expected = "|".join(STYLE_OPTIONS)
+    assert 'description="风格偏好: %s"' % expected in src, (
+        f"schemas.py 的 style 描述串未列全 code，应为 {expected}"
+    )
+
+
+def test_schema_meaning_description_lists_all_codes():
+    """同理，meanings 字段的文档串必须列全寓意 code。"""
+    src = (PROJECT_ROOT / "app" / "schemas" / "schemas.py").read_text(encoding="utf-8")
+    expected = "|".join(MEANING_OPTIONS)
+    assert expected in src, (
+        f"schemas.py 的 meanings 描述串未列全 code，应为 {expected}"
+    )
