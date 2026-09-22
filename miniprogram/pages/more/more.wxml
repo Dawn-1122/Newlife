@@ -1,0 +1,27 @@
+<view class="page">
+  <!-- 窄幅泼墨页头 -->
+  <view class="band">
+    <image class="band-img" src="/images/ink-band.jpg" mode="widthFix" />
+  </view>
+  <view class="band-title-wrap">
+    <view class="band-title">更多功能</view>
+  </view>
+
+  <!-- 分组列表 -->
+  <view class="group" wx:for="{{groups}}" wx:key="title" wx:for-item="group">
+    <view class="group-title">{{group.title}}</view>
+
+    <view
+      class="row {{item.available ? '' : 'disabled'}}"
+      wx:for="{{group.items}}"
+      wx:key="key"
+      bindtap="onRowTap"
+      data-url="{{item.url}}"
+      data-available="{{item.available}}"
+    >
+      <text class="row-name">{{item.name}}</text>
+      <text class="row-tail" wx:if="{{item.available}}">›</text>
+      <text class="row-tail row-badge" wx:else>即将上线</text>
+    </view>
+  </view>
+</view>

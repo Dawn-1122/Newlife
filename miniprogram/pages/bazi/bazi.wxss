@@ -2,30 +2,30 @@
 
 .section-title {
   font-size: 30rpx;
-  font-weight: 600;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
   margin-bottom: 24rpx;
   padding-left: 20rpx;
-  border-left: 8rpx solid #5E7A73;
+  border-left: 8rpx solid #4A4F55;
 }
 
 /* 五行标签 */
 .wuxing-tag {
   display: inline-block;
   font-size: 26rpx;
-  font-weight: 600;
-  color: #fff;
+  font-weight: 500;
+  color: #FFFFFF;
   width: 52rpx;
   height: 52rpx;
   line-height: 52rpx;
   text-align: center;
-  border-radius: 12rpx;
+  border-radius: 4rpx;
 }
-.wuxing-tag.wx-jin { background: #C4A21E; }
-.wuxing-tag.wx-mu { background: #4CAF50; }
-.wuxing-tag.wx-shui { background: #2196F3; }
-.wuxing-tag.wx-huo { background: #FF5722; }
-.wuxing-tag.wx-tu { background: #8D6E63; }
+.wuxing-tag.wx-jin { background: #8D7B4F; }
+.wuxing-tag.wx-mu { background: #4E6B54; }
+.wuxing-tag.wx-shui { background: #3E5A73; }
+.wuxing-tag.wx-huo { background: #A6321F; }
+.wuxing-tag.wx-tu { background: #7A6248; }
 
 /* 头部总览 */
 .bazi-header {
@@ -37,12 +37,12 @@
   justify-content: space-between;
   align-items: center;
   font-size: 24rpx;
-  color: #9C9A92;
+  color: #8A9099;
   margin-bottom: 20rpx;
 }
 
 .header-shengxiao {
-  color: #5E7A73;
+  color: #4A4F55;
 }
 
 .day-master {
@@ -54,25 +54,25 @@
 
 .dm-label {
   font-size: 26rpx;
-  color: #9C9A92;
+  color: #8A9099;
 }
 
 .dm-value {
   font-size: 60rpx;
-  font-weight: 700;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
 }
 
 .header-note {
   margin-top: 16rpx;
   font-size: 24rpx;
-  color: #B2B0A8;
+  color: #8A9099;
 }
 
 /* 四柱详解 */
 .pillar-detail {
   padding: 24rpx 0;
-  border-bottom: 1rpx solid #E2DED5;
+  border-bottom: 1rpx solid #E4E2DD;
 }
 .pillar-detail:last-child {
   border-bottom: none;
@@ -88,14 +88,14 @@
 
 .pillar-name {
   font-size: 28rpx;
-  font-weight: 600;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
 }
 
 .pillar-ganzhi {
   font-size: 40rpx;
-  font-weight: 700;
-  color: #333;
+  font-weight: 500;
+  color: #16181A;
   letter-spacing: 4rpx;
 }
 
@@ -110,35 +110,35 @@
   flex-direction: column;
   align-items: center;
   padding: 20rpx;
-  background: #F4F0E7;
-  border-radius: 12rpx;
+  background: #F7F6F3;
+  border-radius: 4rpx;
 }
 
 .gz-char {
   font-size: 48rpx;
-  font-weight: 700;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
 }
 
 .gz-tag {
   display: inline-block;
   margin-top: 8rpx;
   padding: 2rpx 14rpx;
-  border-radius: 16rpx;
+  border-radius: 6rpx;
   font-size: 22rpx;
-  font-weight: 600;
-  color: #fff;
+  font-weight: 500;
+  color: #FFFFFF;
 }
-.gz-tag.wx-jin { background: #C4A21E; }
-.gz-tag.wx-mu { background: #4CAF50; }
-.gz-tag.wx-shui { background: #2196F3; }
-.gz-tag.wx-huo { background: #FF5722; }
-.gz-tag.wx-tu { background: #8D6E63; }
+.gz-tag.wx-jin { background: #8D7B4F; }
+.gz-tag.wx-mu { background: #4E6B54; }
+.gz-tag.wx-shui { background: #3E5A73; }
+.gz-tag.wx-huo { background: #A6321F; }
+.gz-tag.wx-tu { background: #7A6248; }
 
 .gz-brief {
   margin-top: 8rpx;
   font-size: 24rpx;
-  color: #6E6E6B;
+  color: #8A9099;
   text-align: center;
 }
 
@@ -151,18 +151,18 @@
 }
 
 .canggan-label {
-  color: #9C9A92;
+  color: #8A9099;
   flex-shrink: 0;
 }
 
 .canggan-value {
-  color: #5C5C5C;
+  color: #4A4F55;
 }
 
 .pillar-meaning {
   margin-top: 16rpx;
   font-size: 26rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
   line-height: 1.5;
 }
 
@@ -175,14 +175,14 @@
 
 .gz-detail-line {
   font-size: 24rpx;
-  color: #9C9A92;
+  color: #8A9099;
   line-height: 1.5;
 }
 
 /* 五行详解 */
 .wuxing-detail {
   padding: 24rpx 0;
-  border-bottom: 1rpx solid #E2DED5;
+  border-bottom: 1rpx solid #E4E2DD;
 }
 .wuxing-detail:last-child {
   border-bottom: none;
@@ -202,13 +202,13 @@
 
 .wuxing-percent {
   font-size: 32rpx;
-  font-weight: 700;
-  color: #333;
+  font-weight: 500;
+  color: #16181A;
 }
 
 .wuxing-brief {
   font-size: 24rpx;
-  color: #5E7A73;
+  color: #4A4F55;
 }
 
 .wuxing-meta {
@@ -220,15 +220,15 @@
 
 .meta-item {
   font-size: 22rpx;
-  color: #6E6E6B;
+  color: #8A9099;
   padding: 4rpx 16rpx;
-  background: #F4F0E7;
-  border-radius: 16rpx;
+  background: #F7F6F3;
+  border-radius: 6rpx;
 }
 
 .wuxing-detail-text {
   font-size: 26rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
   line-height: 1.6;
 }
 
@@ -242,18 +242,18 @@
 
 .strength-label {
   font-size: 34rpx;
-  font-weight: 700;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
 }
 
 .strength-ratio {
   font-size: 24rpx;
-  color: #9C9A92;
+  color: #8A9099;
 }
 
 .xiyong-list {
-  background: #F4F0E7;
-  border-radius: 12rpx;
+  background: #F7F6F3;
+  border-radius: 4rpx;
   padding: 20rpx;
   margin-bottom: 20rpx;
 }
@@ -267,19 +267,19 @@
 
 .xiyong-label {
   font-size: 24rpx;
-  color: #9C9A92;
+  color: #8A9099;
   flex-shrink: 0;
   width: 80rpx;
 }
 
 .xiyong-value {
   font-size: 28rpx;
-  font-weight: 600;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
 }
 
 .xiyong-explanation {
   font-size: 26rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
   line-height: 1.7;
 }

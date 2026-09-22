@@ -1,33 +1,54 @@
+/* 结果页 · 山水泼墨 */
+
+.page {
+  min-height: 100vh;
+  padding-bottom: 60rpx;
+}
+
+.band {
+  width: 100%;
+  overflow: hidden;
+}
+
+.band-img {
+  width: 100%;
+  display: block;
+}
+
+.container {
+  padding: 32rpx 40rpx 0;
+  box-sizing: border-box;
+}
+
 .fallback-note {
   padding: 20rpx 24rpx;
-  background: #F6EFDF;
-  border-radius: 12rpx;
-  border-left: 6rpx solid #A93226;
+  background: #EFEDE8;
+  border-radius: 4rpx;
+  border-left: 6rpx solid #A6321F;
   margin-bottom: 20rpx;
   font-size: 24rpx;
-  color: #7A6A45;
+  color: #8D7B4F;
 }
 
 .adjust-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #FCFAF5;
-  border-radius: 16rpx;
+  background: #FFFFFF;
+  border-radius: 6rpx;
   padding: 22rpx 24rpx;
   margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
 }
 
 .adjust-text {
   font-size: 28rpx;
-  color: #1F1F1F;
+  color: #16181A;
   font-weight: 500;
 }
 
 .adjust-more {
   font-size: 30rpx;
-  color: #5E7A73;
+  color: #4A4F55;
 }
 
 .bazi-summary {
@@ -36,8 +57,8 @@
 
 .bazi-title {
   font-size: 30rpx;
-  font-weight: 600;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
   margin-bottom: 20rpx;
 }
 
@@ -46,7 +67,7 @@
   top: 30rpx;
   right: 30rpx;
   font-size: 24rpx;
-  color: #5E7A73;
+  color: #4A4F55;
 }
 
 .bazi-summary {
@@ -67,13 +88,13 @@
 
 .pillar-label {
   font-size: 24rpx;
-  color: #9C9A92;
+  color: #8A9099;
 }
 
 .pillar-value {
   font-size: 36rpx;
-  font-weight: 600;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
   margin-top: 8rpx;
 }
 
@@ -82,7 +103,7 @@
   flex-direction: column;
   gap: 8rpx;
   font-size: 26rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
   margin-bottom: 20rpx;
 }
 
@@ -90,7 +111,7 @@
   display: flex;
   justify-content: space-around;
   padding-top: 16rpx;
-  border-top: 1rpx solid #E2DED5;
+  border-top: 1rpx solid #E4E2DD;
 }
 
 .wuxing-item {
@@ -101,24 +122,24 @@
 
 .wuxing-label {
   font-size: 28rpx;
-  font-weight: 600;
+  font-weight: 500;
   width: 48rpx;
   height: 48rpx;
   line-height: 48rpx;
   text-align: center;
   border-radius: 50%;
-  color: #fff;
+  color: #FFFFFF;
 }
 
-.wuxing-label.wx-jin { background: #C4A21E; }
-.wuxing-label.wx-mu { background: #4CAF50; }
-.wuxing-label.wx-shui { background: #2196F3; }
-.wuxing-label.wx-huo { background: #FF5722; }
-.wuxing-label.wx-tu { background: #8D6E63; }
+.wuxing-label.wx-jin { background: #8D7B4F; }
+.wuxing-label.wx-mu { background: #4E6B54; }
+.wuxing-label.wx-shui { background: #3E5A73; }
+.wuxing-label.wx-huo { background: #A6321F; }
+.wuxing-label.wx-tu { background: #7A6248; }
 
 .wuxing-percent {
   font-size: 22rpx;
-  color: #9C9A92;
+  color: #8A9099;
   margin-top: 6rpx;
 }
 
@@ -135,28 +156,28 @@
 
 .name-text {
   font-size: 40rpx;
-  font-weight: 600;
-  color: #333;
+  font-weight: 500;
+  color: #16181A;
   letter-spacing: 4rpx;
 }
 
 .name-pinyin {
   font-size: 24rpx;
-  color: #5E7A73;
+  color: #4A4F55;
   margin-top: 8rpx;
 }
 
 .name-poetry {
   margin-top: 16rpx;
   padding: 16rpx;
-  background: #F4F0E7;
-  border-radius: 8rpx;
-  border-left: 6rpx solid #5E7A73;
+  background: #F7F6F3;
+  border-radius: 3rpx;
+  border-left: 6rpx solid #4A4F55;
 }
 
 .poetry-source {
   font-size: 24rpx;
-  color: #1F1F1F;
+  color: #16181A;
   font-weight: 500;
   display: block;
   margin-bottom: 4rpx;
@@ -164,7 +185,7 @@
 
 .poetry-text {
   font-size: 26rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
   display: block;
 }
 
@@ -182,35 +203,53 @@
 
 .score-label {
   font-size: 22rpx;
-  color: #9C9A92;
+  color: #8A9099;
 }
 
 .score-value {
   font-size: 28rpx;
-  font-weight: 600;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
 }
 
 .name-meaning {
   margin-top: 16rpx;
   font-size: 26rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
   line-height: 1.5;
 }
 
 .empty {
   text-align: center;
   padding: 100rpx 0;
-  color: #9C9A92;
+  color: #8A9099;
 }
 
 /* 筛选栏 */
 .filter-bar {
-  background: #FCFAF5;
-  border-radius: 16rpx;
+  background: #FFFFFF;
+  border-radius: 6rpx;
   padding: 20rpx 24rpx;
   margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.filter-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12rpx;
+}
+
+.filter-head-title {
+  font-family: var(--serif);
+  font-size: 26rpx;
+  letter-spacing: 4rpx;
+  color: #16181A;
+}
+
+.filter-reset {
+  font-size: 24rpx;
+  color: #A6321F;
 }
 
 .filter-row {
@@ -220,15 +259,15 @@
 }
 
 .filter-row + .filter-row {
-  border-top: 1rpx solid #E2DED5;
+  border-top: 1rpx solid #E4E2DD;
 }
 
 .filter-label {
   flex-shrink: 0;
   width: 80rpx;
   font-size: 26rpx;
-  color: #1F1F1F;
-  font-weight: 600;
+  color: #16181A;
+  font-weight: 500;
   padding-top: 8rpx;
 }
 
@@ -239,18 +278,36 @@
   flex: 1;
 }
 
+/* 出处/用字项数不定，走横向滚动而不是换行堆高 */
+.filter-scroll {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.chip-inline-wrap {
+  display: inline-block;
+  white-space: nowrap;
+  padding: 4rpx 0;
+}
+
 .chip {
   padding: 8rpx 24rpx;
-  border-radius: 30rpx;
+  border-radius: var(--r-sm);
   font-size: 26rpx;
-  color: #5C5C5C;
-  background: #ECE8DE;
+  color: #4A4F55;
+  background: #EFEDE8;
   line-height: 1.4;
 }
 
+.chip-inline {
+  display: inline-block;
+  margin-right: 12rpx;
+}
+
 .chip-active {
-  background: linear-gradient(135deg, #1F1F1F, #3A3A3A);
-  color: #fff;
+  background: #16181A;
+  color: #FFFFFF;
   font-weight: 500;
 }
 

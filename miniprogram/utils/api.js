@@ -54,38 +54,32 @@ const MEANING_OPTIONS = [
   { code: 'tranquil', name: '宁静' }
 ]
 
-// 风格卡（wizard Step1 展示，用意象描述代替示例名，避免示例名引导用户判断）
-const STYLE_EXAMPLES = [
-  { code: 'classic', name: '古风雅致', feeling: '温润如玉，字句皆有出处', imagery: '雅正 · 清贵 · 有古意' },
-  { code: 'modern', name: '现代简约', feeling: '朗朗上口，简约不简单', imagery: '明快 · 自然 · 易读易写' },
-  { code: 'grand', name: '大气沉稳', feeling: '格局开阔，气度不凡', imagery: '壮阔 · 恢弘 · 家国山河' },
-  { code: 'fresh', name: '清新灵动', feeling: '山水草木，轻盈自然', imagery: '清新 · 生机 · 春意盎然' },
-  { code: 'warm', name: '温润内敛', feeling: '温厚含蓄，不事张扬', imagery: '温润 · 敦厚 · 谦和内敛' },
-  { code: 'elegant', name: '清朗俊逸', feeling: '清俊飘逸，气象开阔', imagery: '清朗 · 俊逸 · 洒脱旷达' },
-  { code: 'plain', name: '质朴厚重', feeling: '朴实厚重，踏实可靠', imagery: '质朴 · 醇厚 · 深沉稳重' },
-  { code: 'zen', name: '空灵禅意', feeling: '空灵留白，意境幽远', imagery: '空灵 · 超然 · 静谧悠远' }
-]
+// （旧版 STYLE_EXAMPLES / MEANING_EXAMPLES 已删除：起名偏好由单一 FEELING_CARDS 承载，
+//   两套面向用户的意象文案并存会互相漂移。）
 
-// 寓意卡（wizard Step2 展示，12 个寓意，用意象描述代替示例名）
-const MEANING_EXAMPLES = [
-  { code: 'wisdom', name: '智慧', feeling: '聪慧明达，才思敏捷', imagery: '求索 · 通达 · 明理' },
-  { code: 'health', name: '健康', feeling: '身强体健，茁壮成长', imagery: '生机 · 长寿 · 康健' },
-  { code: 'bravery', name: '勇敢', feeling: '勇毅果敢，无畏前行', imagery: '坚韧 · 进取 · 担当' },
-  { code: 'gentle', name: '温婉', feeling: '温柔娴静，婉约有礼', imagery: '娴静 · 清雅 · 柔美' },
-  { code: 'wealth', name: '富贵', feeling: '丰裕富足，前程似锦', imagery: '祥瑞 · 华贵 · 锦绣' },
-  { code: 'peace', name: '平安', feeling: '安宁顺遂，岁月静好', imagery: '祥和 · 安定 · 顺遂' },
-  { code: 'talent', name: '才华', feeling: '才华横溢，文采斐然', imagery: '文采 · 卓越 · 出众' },
-  { code: 'virtue', name: '品德', feeling: '德才兼备，品行高洁', imagery: '君子 · 高洁 · 仁德' },
-  { code: 'beauty', name: '美丽', feeling: '清丽俊秀，如玉温润', imagery: '美玉 · 芬芳 · 清丽' },
-  { code: 'loyal', name: '忠义', feeling: '忠诚赤诚，坚贞不移', imagery: '忠贞 · 节操 · 信义' },
-  { code: 'patriotic', name: '家国', feeling: '胸怀天下，济世安邦', imagery: '壮志 · 济世 · 凌云' },
-  { code: 'tranquil', name: '宁静', feeling: '淡泊安然，宁静致远', imagery: '淡泊 · 超然 · 悠然' }
+// 起名「感觉」卡（起名第二步的唯一选择，展示层概念，不新增后端枚举）
+//
+// 设计意图：用户不想先回答「寓意优先还是八字优先」这类算法口径问题，
+// 只想挑一种「感觉」。故把后端两个既有偏好维度合成一张卡：
+//   1 个 style（单选）+ 2 个 meanings（多选，上限 3）
+// 两者都是 NamingRequest / PrenatalRequest 的既有入参，无需改后端。
+// 每张卡保持「一卡一风格」的一对一映射，确保偏好能真正硬分流选池，
+// 而不是只做 tie-break（那样选不选结果都一样）。
+// 新增/调整卡时务必核对 code 同时存在于 STYLE_OPTIONS 与 MEANING_OPTIONS。
+const FEELING_CARDS = [
+  { code: 'classic', title: '古意', imagery: '典正清贵，字有来历', style: 'classic', meanings: ['virtue', 'talent'] },
+  { code: 'elegant', title: '清朗', imagery: '明净开阔，如秋长空', style: 'elegant', meanings: ['talent', 'wisdom'] },
+  { code: 'warm', title: '温润', imagery: '温厚含蓄，如玉在怀', style: 'warm', meanings: ['virtue', 'gentle'] },
+  { code: 'zen', title: '空灵', imagery: '疏朗留白，意远境幽', style: 'zen', meanings: ['tranquil', 'peace'] },
+  { code: 'fresh', title: '明媚', imagery: '草木山川，轻盈明净', style: 'fresh', meanings: ['beauty', 'health'] },
+  { code: 'grand', title: '峻拔', imagery: '格局开阔，气象不凡', style: 'grand', meanings: ['bravery', 'patriotic'] },
+  { code: 'plain', title: '静笃', imagery: '质朴醇厚，沉静踏实', style: 'plain', meanings: ['peace', 'virtue'] },
+  { code: 'modern', title: '简约', imagery: '明快自然，清简不繁', style: 'modern', meanings: ['wisdom', 'peace'] }
 ]
 
 // 预产期浮动档位（与后端 RANGE_OPTIONS 镜像）
 const RANGE_OPTIONS = [0, 3, 7, 14]
 const DEFAULT_RANGE_DAYS = 7
-const MEANING_MAX_SELECT = 3
 
 function request(url, method = 'GET', data = {}) {
   const app = getApp()
@@ -185,9 +179,7 @@ module.exports = {
   SOURCE_STYLE_MAP,
   getStyleCodes,
   MEANING_OPTIONS,
-  STYLE_EXAMPLES,
-  MEANING_EXAMPLES,
+  FEELING_CARDS,
   RANGE_OPTIONS,
-  DEFAULT_RANGE_DAYS,
-  MEANING_MAX_SELECT
+  DEFAULT_RANGE_DAYS
 }

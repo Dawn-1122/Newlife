@@ -2,31 +2,30 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #FCFAF5;
-  border-radius: 16rpx;
+  background: #FFFFFF;
+  border-radius: 6rpx;
   padding: 22rpx 24rpx;
   margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
 }
 
 .adjust-text {
   font-size: 28rpx;
-  color: #1F1F1F;
+  color: #16181A;
   font-weight: 500;
 }
 
 .adjust-more {
   font-size: 30rpx;
-  color: #5E7A73;
+  color: #4A4F55;
 }
 
 .section-title {
   font-size: 30rpx;
-  font-weight: 600;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
   margin-bottom: 20rpx;
   padding-left: 16rpx;
-  border-left: 6rpx solid #5E7A73;
+  border-left: 6rpx solid #4A4F55;
 }
 
 .range-row {
@@ -37,12 +36,12 @@
 
 .range-label {
   font-size: 26rpx;
-  color: #9C9A92;
+  color: #8A9099;
 }
 
 .range-value {
   font-size: 28rpx;
-  color: #333;
+  color: #16181A;
   font-weight: 500;
 }
 
@@ -51,7 +50,7 @@
   justify-content: space-around;
   padding-top: 20rpx;
   margin-top: 12rpx;
-  border-top: 1rpx solid #E2DED5;
+  border-top: 1rpx solid #E4E2DD;
 }
 
 .certain-item {
@@ -62,22 +61,22 @@
 
 .certain-label {
   font-size: 24rpx;
-  color: #9C9A92;
+  color: #8A9099;
 }
 
 .certain-value {
   font-size: 32rpx;
-  font-weight: 600;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
   margin-top: 6rpx;
 }
 
 /* 五行颜色 */
-.wuxing-text.wx-jin { color: #C4A21E; }
-.wuxing-text.wx-mu { color: #4CAF50; }
-.wuxing-text.wx-shui { color: #2196F3; }
-.wuxing-text.wx-huo { color: #FF5722; }
-.wuxing-text.wx-tu { color: #8D6E63; }
+.wuxing-text.wx-jin { color: #8D7B4F; }
+.wuxing-text.wx-mu { color: #4E6B54; }
+.wuxing-text.wx-shui { color: #3E5A73; }
+.wuxing-text.wx-huo { color: #A6321F; }
+.wuxing-text.wx-tu { color: #7A6248; }
 
 /* 概率柱状条 */
 .bar-row {
@@ -89,35 +88,35 @@
 .bar-name {
   width: 48rpx;
   font-size: 28rpx;
-  font-weight: 600;
+  font-weight: 500;
   flex-shrink: 0;
 }
 
 .bar-track {
   flex: 1;
   height: 24rpx;
-  background: #E2DED5;
-  border-radius: 12rpx;
+  background: #E4E2DD;
+  border-radius: 4rpx;
   margin: 0 16rpx;
   overflow: hidden;
 }
 
 .bar-fill {
   height: 100%;
-  border-radius: 12rpx;
+  border-radius: 4rpx;
 }
 
-.bar-fill.wx-jin { background: #C4A21E; }
-.bar-fill.wx-mu { background: #4CAF50; }
-.bar-fill.wx-shui { background: #2196F3; }
-.bar-fill.wx-huo { background: #FF5722; }
-.bar-fill.wx-tu { background: #8D6E63; }
+.bar-fill.wx-jin { background: #8D7B4F; }
+.bar-fill.wx-mu { background: #4E6B54; }
+.bar-fill.wx-shui { background: #3E5A73; }
+.bar-fill.wx-huo { background: #A6321F; }
+.bar-fill.wx-tu { background: #7A6248; }
 
 .bar-percent {
   width: 80rpx;
   text-align: right;
   font-size: 24rpx;
-  color: #9C9A92;
+  color: #8A9099;
   flex-shrink: 0;
 }
 
@@ -131,19 +130,19 @@
 
 .stable-label {
   font-size: 26rpx;
-  color: #9C9A92;
+  color: #8A9099;
 }
 
 .stable-value {
   font-size: 30rpx;
-  font-weight: 600;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
 }
 
 .safe-label {
   display: block;
   font-size: 26rpx;
-  color: #9C9A92;
+  color: #8A9099;
   margin-bottom: 12rpx;
 }
 
@@ -155,8 +154,8 @@
 
 .safe-item {
   width: 30%;
-  background: #F4F0E7;
-  border-radius: 12rpx;
+  background: #F7F6F3;
+  border-radius: 4rpx;
   padding: 16rpx;
   box-sizing: border-box;
   display: flex;
@@ -167,28 +166,28 @@
 
 .safe-char {
   font-size: 40rpx;
-  font-weight: 600;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
 }
 
 .safe-meta {
   font-size: 20rpx;
-  color: #5E7A73;
+  color: #4A4F55;
 }
 
 .safe-meaning {
   font-size: 22rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
   text-align: center;
 }
 
 .note {
   margin-top: 20rpx;
   padding: 20rpx;
-  background: #F6EFDF;
-  border-radius: 12rpx;
+  background: #EFEDE8;
+  border-radius: 4rpx;
   font-size: 24rpx;
-  color: #7A6A45;
+  color: #8D7B4F;
   line-height: 1.7;
 }
 

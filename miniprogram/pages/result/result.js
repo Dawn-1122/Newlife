@@ -7,6 +7,48 @@ const styleFilters = [{ code: '', name: '全部' }].concat(
   })
 )
 
+// 取一个候选名的用字（优先 chars_info，兜底 given_name）
+function charsOf(n) {
+  const out = []
+  ;(n.chars_info || []).forEach(function (ci) {
+    if (ci && ci.char) out.push(ci.char)
+  })
+  if (!out.length && n.given_name) {
+    n.given_name.split('').forEach(function (c) { out.push(c) })
+  }
+  return out
+}
+
+// 出处筛选：只列出本批候选里真实出现的出处。
+// 不预设全集，否则会出现「选了却筛不出任何名字」的空选项。
+function buildSourceFilters(allNames) {
+  const seen = {}
+  const list = [{ code: '', name: '全部' }]
+  allNames.forEach(function (n) {
+    const s = (n.poetry && n.poetry.source) || ''
+    if (s && !seen[s]) {
+      seen[s] = true
+      list.push({ code: s, name: s })
+    }
+  })
+  return list
+}
+
+// 用字筛选：取候选里出现频次最高的字。
+// 这一步承接了原先放在起名向导里的「精选用字」，改成生成后再收敛。
+function buildCharFilters(allNames, limit) {
+  const freq = {}
+  allNames.forEach(function (n) {
+    charsOf(n).forEach(function (c) {
+      freq[c] = (freq[c] || 0) + 1
+    })
+  })
+  return Object.keys(freq)
+    .sort(function (a, b) { return freq[b] - freq[a] })
+    .slice(0, limit || 24)
+    .map(function (c) { return { code: c, name: c } })
+}
+
 Page({
   data: {
     bazi: null,
@@ -16,6 +58,8 @@ Page({
     wuxingList: [],
     wuxingFilter: '',
     styleFilter: '',
+    sourceFilter: '',
+    charFilter: '',
     loading: false,
     fallbackNote: '',
 
@@ -27,7 +71,9 @@ Page({
       { code: '火', name: '火' },
       { code: '土', name: '土' }
     ],
-    styleFilters: styleFilters
+    styleFilters: styleFilters,
+    sourceFilters: [{ code: '', name: '全部' }],
+    charFilters: []
   },
 
   onLoad() {
@@ -67,7 +113,10 @@ Page({
       allNames: allNames,
       xiyongText: xiyongText,
       wuxingList: wuxingList,
-      fallbackNote: result.fallback_note || ''
+      fallbackNote: result.fallback_note || '',
+      // 候选变了，筛选项随之重建
+      sourceFilters: buildSourceFilters(allNames),
+      charFilters: buildCharFilters(allNames)
     })
     this.applyFilter()
   },
@@ -75,6 +124,8 @@ Page({
   applyFilter() {
     const wuxingFilter = this.data.wuxingFilter
     const styleFilter = this.data.styleFilter
+    const sourceFilter = this.data.sourceFilter
+    const charFilter = this.data.charFilter
 
     const names = this.data.allNames.filter(function (n) {
       if (wuxingFilter) {
@@ -95,6 +146,14 @@ Page({
         if (api.getStyleCodes(source).indexOf(styleFilter) === -1) return false
       }
 
+      if (sourceFilter) {
+        if (((n.poetry && n.poetry.source) || '') !== sourceFilter) return false
+      }
+
+      if (charFilter) {
+        if (charsOf(n).indexOf(charFilter) === -1) return false
+      }
+
       return true
     })
 
@@ -108,6 +167,24 @@ Page({
 
   onStyleFilterTap(e) {
     this.setData({ styleFilter: e.currentTarget.dataset.code })
+    this.applyFilter()
+  },
+
+  // 再点一次已选中的项 = 取消该项筛选
+  onSourceFilterTap(e) {
+    const code = e.currentTarget.dataset.code
+    this.setData({ sourceFilter: this.data.sourceFilter === code ? '' : code })
+    this.applyFilter()
+  },
+
+  onCharFilterTap(e) {
+    const code = e.currentTarget.dataset.code
+    this.setData({ charFilter: this.data.charFilter === code ? '' : code })
+    this.applyFilter()
+  },
+
+  onResetFilter() {
+    this.setData({ wuxingFilter: '', styleFilter: '', sourceFilter: '', charFilter: '' })
     this.applyFilter()
   },
 
@@ -130,7 +207,7 @@ Page({
       // 换一批 = 新批次，深度寓意需重新解锁
       app.globalData.lastBatchId = Date.now()
       // 换一批后重置筛选，展示全新候选
-      this.setData({ wuxingFilter: '', styleFilter: '' })
+      this.setData({ wuxingFilter: '', styleFilter: '', sourceFilter: '', charFilter: '' })
       this.renderResult(result)
       wx.showToast({ title: '已换一批', icon: 'none' })
     } catch (err) {
@@ -155,6 +232,7 @@ Page({
     })
   },
 
+  // 回跳起名第二步（挑一种感觉）并回填上次所选
   onAdjustPref() {
     const app = getApp()
     const params = app.globalData.lastParams
@@ -164,7 +242,6 @@ Page({
       return
     }
 
-    // 携带上次完整参数回跳 wizard 并回填
     app.globalData.draftParams = params
     app.globalData.draftTab = params.due_date ? 'prenatal' : 'postnatal'
     wx.navigateTo({ url: '/pages/wizard/wizard' })

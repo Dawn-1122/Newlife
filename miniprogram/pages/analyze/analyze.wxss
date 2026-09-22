@@ -5,14 +5,14 @@
 
 .title {
   font-size: 44rpx;
-  font-weight: 700;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
   letter-spacing: 4rpx;
 }
 
 .subtitle {
   font-size: 24rpx;
-  color: #5E7A73;
+  color: #4A4F55;
   margin-top: 8rpx;
 }
 
@@ -25,7 +25,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 20rpx 0;
-  border-bottom: 1rpx solid #E2DED5;
+  border-bottom: 1rpx solid #E4E2DD;
 }
 
 .form-item:last-child {
@@ -34,7 +34,7 @@
 
 .form-label {
   font-size: 28rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
   width: 160rpx;
   flex-shrink: 0;
 }
@@ -43,14 +43,14 @@
   flex: 1;
   text-align: right;
   font-size: 28rpx;
-  color: #333;
+  color: #16181A;
 }
 
 .picker-value {
   flex: 1;
   text-align: right;
   font-size: 28rpx;
-  color: #333;
+  color: #16181A;
 }
 
 .chip-row {
@@ -62,15 +62,15 @@
 
 .chip {
   padding: 12rpx 28rpx;
-  border-radius: 8rpx;
-  background: #ECE8DE;
-  color: #5C5C5C;
+  border-radius: 3rpx;
+  background: #EFEDE8;
+  color: #4A4F55;
   font-size: 26rpx;
 }
 
 .chip.active {
-  background: #1F1F1F;
-  color: #fff;
+  background: #16181A;
+  color: #FFFFFF;
 }
 
 .footer-note {
@@ -80,5 +80,5 @@
 
 .footer-note text {
   font-size: 22rpx;
-  color: #B2B0A8;
+  color: #8A9099;
 }

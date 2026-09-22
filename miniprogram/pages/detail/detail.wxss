@@ -5,14 +5,14 @@
 
 .name-main {
   font-size: 64rpx;
-  font-weight: 700;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
   letter-spacing: 12rpx;
 }
 
 .name-pinyin {
   font-size: 28rpx;
-  color: #5E7A73;
+  color: #4A4F55;
   margin-top: 12rpx;
 }
 
@@ -26,22 +26,22 @@
 
 .score-label {
   font-size: 26rpx;
-  color: #9C9A92;
+  color: #8A9099;
 }
 
 .score-number {
   font-size: 48rpx;
-  font-weight: 700;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
 }
 
 .section-title {
   font-size: 30rpx;
-  font-weight: 600;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
   margin-bottom: 20rpx;
   padding-left: 16rpx;
-  border-left: 6rpx solid #5E7A73;
+  border-left: 6rpx solid #4A4F55;
 }
 
 /* 用字解析 */
@@ -49,7 +49,7 @@
   display: flex;
   gap: 24rpx;
   padding: 20rpx 0;
-  border-bottom: 1rpx solid #E2DED5;
+  border-bottom: 1rpx solid #E4E2DD;
 }
 
 .char-item:last-child {
@@ -66,13 +66,13 @@
 
 .char-text {
   font-size: 48rpx;
-  font-weight: 600;
-  color: #333;
+  font-weight: 500;
+  color: #16181A;
 }
 
 .char-pinyin {
   font-size: 22rpx;
-  color: #5E7A73;
+  color: #4A4F55;
   margin-top: 4rpx;
 }
 
@@ -90,19 +90,19 @@
   font-size: 20rpx;
   padding: 4rpx 12rpx;
   border-radius: 6rpx;
-  background: #ECE8DE;
-  color: #5C5C5C;
+  background: #EFEDE8;
+  color: #4A4F55;
 }
 
-.wuxing-tag.wx-jin { background: #FFF8E1; color: #C4A21E; }
-.wuxing-tag.wx-mu { background: #E8F5E9; color: #4CAF50; }
-.wuxing-tag.wx-shui { background: #E3F2FD; color: #2196F3; }
-.wuxing-tag.wx-huo { background: #FBE9E7; color: #FF5722; }
-.wuxing-tag.wx-tu { background: #EFEBE9; color: #8D6E63; }
+.wuxing-tag.wx-jin { background: #EFEDE8; color: #8D7B4F; }
+.wuxing-tag.wx-mu { background: #EFEDE8; color: #4E6B54; }
+.wuxing-tag.wx-shui { background: #EFEDE8; color: #3E5A73; }
+.wuxing-tag.wx-huo { background: #FBF1EE; color: #A6321F; }
+.wuxing-tag.wx-tu { background: #EFEDE8; color: #7A6248; }
 
 .char-meaning {
   font-size: 26rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
   line-height: 1.5;
 }
 
@@ -110,22 +110,22 @@
 .char-shuowen {
   margin-top: 12rpx;
   padding: 16rpx 20rpx;
-  background: #F4F0E7;
-  border-radius: 10rpx;
-  border-left: 4rpx solid #5E7A73;
+  background: #F7F6F3;
+  border-radius: 4rpx;
+  border-left: 4rpx solid #4A4F55;
 }
 
 .shuowen-label {
   display: block;
   font-size: 22rpx;
-  color: #5E7A73;
+  color: #4A4F55;
   font-weight: 500;
   margin-bottom: 6rpx;
 }
 
 .shuowen-text {
   font-size: 26rpx;
-  color: #6B6658;
+  color: #4A4F55;
   line-height: 1.7;
 }
 
@@ -137,22 +137,22 @@
 .detail-label {
   display: block;
   font-size: 22rpx;
-  color: #9C9A92;
+  color: #8A9099;
   margin-bottom: 6rpx;
 }
 
 .detail-text {
   font-size: 26rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
   line-height: 1.7;
 }
 
 /* 诗词 */
 .poetry-block {
   padding: 20rpx;
-  background: #F4F0E7;
-  border-radius: 12rpx;
-  border-left: 6rpx solid #5E7A73;
+  background: #F7F6F3;
+  border-radius: 4rpx;
+  border-left: 6rpx solid #4A4F55;
 }
 
 .poetry-header {
@@ -161,21 +161,21 @@
 
 .poetry-source {
   font-size: 28rpx;
-  color: #1F1F1F;
+  color: #16181A;
   font-weight: 500;
   display: block;
 }
 
 .poetry-author {
   font-size: 24rpx;
-  color: #9C9A92;
+  color: #8A9099;
   margin-top: 4rpx;
   display: block;
 }
 
 .poetry-text {
   font-size: 30rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
   line-height: 1.8;
   font-style: italic;
 }
@@ -194,18 +194,18 @@
 
 .phon-label {
   font-size: 28rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
 }
 
 .phon-value {
   font-size: 28rpx;
-  color: #1F1F1F;
+  color: #16181A;
   font-weight: 500;
 }
 
 .phon-desc {
   font-size: 26rpx;
-  color: #9C9A92;
+  color: #8A9099;
   margin-top: 8rpx;
 }
 
@@ -224,13 +224,13 @@
 
 .wuge-name {
   font-size: 24rpx;
-  color: #9C9A92;
+  color: #8A9099;
 }
 
 .wuge-num {
   font-size: 36rpx;
-  font-weight: 600;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
   margin-top: 4rpx;
 }
 
@@ -239,22 +239,22 @@
   margin-top: 4rpx;
 }
 
-.wuge-luck.luck-daji { color: #4CAF50; }
-.wuge-luck.luck-ji { color: #8BC34A; }
-.wuge-luck.luck-xiong { color: #e57373; }
+.wuge-luck.luck-daji { color: #4E6B54; }
+.wuge-luck.luck-ji { color: #4E6B54; }
+.wuge-luck.luck-xiong { color: #A6321F; }
 
 .wuge-desc {
   font-size: 26rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
   text-align: center;
   padding-top: 12rpx;
-  border-top: 1rpx solid #E2DED5;
+  border-top: 1rpx solid #E4E2DD;
 }
 
 /* 寓意 */
 .meaning-text {
   font-size: 28rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
   line-height: 1.8;
 }
 
@@ -266,19 +266,19 @@
 .deep-block {
   margin-top: 28rpx;
   padding-top: 28rpx;
-  border-top: 1rpx solid #E2DED5;
+  border-top: 1rpx solid #E4E2DD;
 }
 
 .deep-title {
   font-size: 28rpx;
-  font-weight: 600;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
   margin-bottom: 16rpx;
 }
 
 .deep-loading {
   font-size: 26rpx;
-  color: #9C9A92;
+  color: #8A9099;
   padding: 20rpx 0;
 }
 
@@ -287,30 +287,30 @@
 }
 
 .layer-item + .layer-item {
-  border-top: 1rpx dashed #E2DED5;
+  border-top: 1rpx dashed #E4E2DD;
 }
 
 .layer-level {
   display: inline-block;
   font-size: 22rpx;
-  color: #5E7A73;
-  font-weight: 600;
+  color: #4A4F55;
+  font-weight: 500;
   padding: 2rpx 14rpx;
   border-radius: 6rpx;
-  background: #ECE8DE;
+  background: #EFEDE8;
   margin-bottom: 8rpx;
 }
 
 .layer-text {
   font-size: 27rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
   line-height: 1.8;
 }
 
 .meaning-source {
   margin-top: 16rpx;
   font-size: 22rpx;
-  color: #B2B0A8;
+  color: #8A9099;
   text-align: right;
 }
 
@@ -318,21 +318,21 @@
 .unlock-mask {
   margin-top: 28rpx;
   padding: 40rpx 30rpx;
-  border: 2rpx dashed #D8D2C6;
-  border-radius: 16rpx;
-  background: #F8F5EE;
+  border: 2rpx dashed #C9CDD2;
+  border-radius: 6rpx;
+  background: #FFFFFF;
   text-align: center;
 }
 
 .unlock-title {
   font-size: 30rpx;
-  font-weight: 600;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
 }
 
 .unlock-desc {
   font-size: 24rpx;
-  color: #9C9A92;
+  color: #8A9099;
   line-height: 1.6;
   margin: 16rpx 0 28rpx;
 }
@@ -354,7 +354,7 @@
 
 .senses-label {
   font-size: 22rpx;
-  color: #8A8A82;
+  color: #8A9099;
 }
 
 .sense-chips {
@@ -365,24 +365,24 @@
 
 .sense-chip {
   font-size: 22rpx;
-  color: #5E7A73;
-  background: rgba(94, 122, 115, 0.1);
-  border-radius: 8rpx;
+  color: #4A4F55;
+  background: #EFEDE8;
+  border-radius: 3rpx;
   padding: 4rpx 14rpx;
 }
 
 .ctx-senses {
   margin-top: 20rpx;
   padding: 20rpx 24rpx;
-  background: #F4F0E7;
-  border-radius: 12rpx;
-  border-left: 4rpx solid #5E7A73;
+  background: #F7F6F3;
+  border-radius: 4rpx;
+  border-left: 4rpx solid #4A4F55;
 }
 
 .ctx-title {
   font-size: 24rpx;
-  color: #5E7A73;
-  font-weight: 600;
+  color: #4A4F55;
+  font-weight: 500;
   margin-bottom: 12rpx;
 }
 
@@ -395,28 +395,28 @@
 
 .ctx-char {
   font-size: 30rpx;
-  color: #1F1F1F;
-  font-weight: 600;
+  color: #16181A;
+  font-weight: 500;
 }
 
 .ctx-arrow {
   font-size: 22rpx;
-  color: #9C9A92;
+  color: #8A9099;
 }
 
 .ctx-words {
   font-size: 26rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
 }
 
 .ctx-general {
-  color: #9C9A92;
+  color: #8A9099;
 }
 
 .ctx-mark {
   font-size: 20rpx;
-  color: #9C9A92;
-  border: 1rpx solid #D8D2C6;
+  color: #8A9099;
+  border: 1rpx solid #C9CDD2;
   border-radius: 6rpx;
   padding: 0 8rpx;
 }
@@ -424,6 +424,6 @@
 .ctx-note {
   margin-top: 12rpx;
   font-size: 22rpx;
-  color: #9C9A92;
+  color: #8A9099;
   line-height: 1.5;
 }

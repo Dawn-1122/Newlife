@@ -48,6 +48,13 @@ Page({
     loading: false
   },
 
+  onLoad(options) {
+    // 支持从二级菜单「孕期参考起名」直达产前分支
+    if (options && options.tab === 'prenatal') {
+      this.setData({ tab: 'prenatal' })
+    }
+  },
+
   onTabTap(e) {
     this.setData({ tab: e.currentTarget.dataset.tab })
   },

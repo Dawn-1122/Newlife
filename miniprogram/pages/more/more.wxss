@@ -1,0 +1,75 @@
+/* 二级菜单 · 山水泼墨
+   窄幅泼墨页头 + 分组列表（细线分隔，无卡片、无阴影）。 */
+
+.page {
+  min-height: 100vh;
+  padding-bottom: 60rpx;
+}
+
+/* ── 窄幅泼墨页头 ── */
+.band {
+  width: 100%;
+  overflow: hidden;
+}
+
+.band-img {
+  width: 100%;
+  display: block;
+}
+
+.band-title-wrap {
+  padding: 36rpx 40rpx 8rpx;
+}
+
+.band-title {
+  font-family: var(--serif);
+  font-size: 44rpx;
+  font-weight: 500;
+  letter-spacing: 8rpx;
+  color: var(--ink);
+}
+
+/* ── 分组 ── */
+.group {
+  padding: 48rpx 40rpx 0;
+}
+
+.group-title {
+  font-size: 24rpx;
+  letter-spacing: 6rpx;
+  color: var(--ink-3);
+  padding-bottom: 12rpx;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 34rpx 0;
+  border-bottom: 1rpx solid var(--line);
+}
+
+.row:active {
+  background: var(--paper-deep);
+}
+
+.row-name {
+  font-size: 31rpx;
+  letter-spacing: 2rpx;
+  color: var(--ink);
+}
+
+.row.disabled .row-name {
+  color: var(--ink-3);
+}
+
+.row-tail {
+  font-size: 28rpx;
+  line-height: 1;
+  color: var(--ink-3);
+}
+
+.row-badge {
+  font-size: 22rpx;
+  letter-spacing: 1rpx;
+}

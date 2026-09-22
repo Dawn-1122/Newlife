@@ -1,28 +1,38 @@
-.header {
-  text-align: center;
-  padding: 30rpx 0 20rpx;
+/* 起名第一步 · 填资料（山水泼墨） */
+
+.page {
+  min-height: 100vh;
+  padding-bottom: 60rpx;
 }
 
-.title {
-  font-size: 44rpx;
-  font-weight: 700;
-  color: #1F1F1F;
-  letter-spacing: 4rpx;
+/* ── 窄幅泼墨页头 ── */
+.band {
+  width: 100%;
+  overflow: hidden;
 }
 
-.subtitle {
-  font-size: 24rpx;
-  color: #5E7A73;
-  margin-top: 8rpx;
+.band-img {
+  width: 100%;
+  display: block;
 }
 
+.head {
+  padding: 40rpx 40rpx 28rpx;
+}
+
+.head-title {
+  font-family: var(--serif);
+  font-size: 46rpx;
+  font-weight: 500;
+  letter-spacing: 8rpx;
+  color: var(--ink);
+}
+
+/* ── 已出生 / 未出生 ── */
 .tab-bar {
   display: flex;
-  background: #FCFAF5;
-  border-radius: 16rpx;
-  padding: 8rpx;
-  margin-bottom: 24rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+  margin: 0 40rpx 16rpx;
+  border-bottom: 1rpx solid var(--line);
 }
 
 .tab {
@@ -30,68 +40,64 @@
   text-align: center;
   padding: 20rpx 0;
   font-size: 28rpx;
-  color: #5C5C5C;
-  border-radius: 12rpx;
+  letter-spacing: 2rpx;
+  color: var(--ink-3);
+  border-bottom: 3rpx solid transparent;
+  margin-bottom: -1rpx;
 }
 
 .tab.active {
-  background: #1F1F1F;
-  color: #fff;
-  font-weight: 500;
+  color: var(--ink);
+  border-bottom-color: var(--cinnabar);
 }
 
+/* ── 表单 ── */
 .form-card {
-  margin-bottom: 30rpx;
+  padding: 8rpx 40rpx 0;
 }
 
 .form-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20rpx 0;
-  border-bottom: 1rpx solid #E2DED5;
+  padding: 26rpx 0;
+  border-bottom: 1rpx solid var(--line);
 }
 
 .form-item:last-child {
   border-bottom: none;
 }
 
-.form-item.column {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 16rpx;
-}
-
 .form-label {
   font-size: 28rpx;
-  color: #5C5C5C;
-  width: 160rpx;
+  letter-spacing: 2rpx;
+  color: var(--ink-3);
+  width: 170rpx;
   flex-shrink: 0;
-}
-
-.form-item.column .form-label {
-  width: auto;
 }
 
 .form-input {
   flex: 1;
   text-align: right;
-  font-size: 28rpx;
-  color: #333;
+  font-size: 30rpx;
+  color: var(--ink);
 }
 
 .picker-value {
   flex: 1;
   text-align: right;
-  font-size: 28rpx;
-  color: #333;
+  font-size: 30rpx;
+  color: var(--ink);
 }
 
 .chip-row {
   display: flex;
-  gap: 16rpx;
   flex: 1;
   justify-content: flex-end;
+}
+
+.chip-row .chip + .chip {
+  margin-left: 14rpx;
 }
 
 .chip-row.wrap {
@@ -99,25 +105,27 @@
   justify-content: flex-start;
 }
 
+/* wrap 布局下换行间距用 margin 而非 gap，兼容旧 WebView */
+.chip-row.wrap .chip {
+  margin: 0 14rpx 14rpx 0;
+}
+
 .chip {
-  padding: 12rpx 28rpx;
-  border-radius: 8rpx;
-  background: #ECE8DE;
-  color: #5C5C5C;
-  font-size: 26rpx;
+  padding: 14rpx 30rpx;
+  border: 1rpx solid var(--line-strong);
+  border-radius: var(--r-sm);
+  font-size: 27rpx;
+  color: var(--ink-2);
+  background: transparent;
 }
 
 .chip.active {
-  background: #1F1F1F;
-  color: #fff;
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
 }
 
-.footer-note {
-  text-align: center;
-  padding: 20rpx 0 40rpx;
-}
-
-.footer-note text {
-  font-size: 22rpx;
-  color: #B2B0A8;
+/* ── 主行动 ── */
+.foot {
+  padding: 56rpx 40rpx 0;
 }

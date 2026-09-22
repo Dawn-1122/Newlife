@@ -5,24 +5,24 @@
 
 .name-main {
   font-size: 64rpx;
-  font-weight: 700;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
   letter-spacing: 12rpx;
 }
 
 .name-pinyin {
   font-size: 28rpx;
-  color: #5E7A73;
+  color: #4A4F55;
   margin-top: 12rpx;
 }
 
 .section-title {
   font-size: 30rpx;
-  font-weight: 600;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
   margin-bottom: 20rpx;
   padding-left: 16rpx;
-  border-left: 6rpx solid #5E7A73;
+  border-left: 6rpx solid #4A4F55;
 }
 
 /* 用字解析 */
@@ -30,7 +30,7 @@
   display: flex;
   gap: 24rpx;
   padding: 20rpx 0;
-  border-bottom: 1rpx solid #E2DED5;
+  border-bottom: 1rpx solid #E4E2DD;
 }
 
 .char-item:last-child {
@@ -47,13 +47,13 @@
 
 .char-text {
   font-size: 48rpx;
-  font-weight: 600;
-  color: #333;
+  font-weight: 500;
+  color: #16181A;
 }
 
 .char-pinyin {
   font-size: 22rpx;
-  color: #5E7A73;
+  color: #4A4F55;
   margin-top: 4rpx;
 }
 
@@ -71,19 +71,19 @@
   font-size: 20rpx;
   padding: 4rpx 12rpx;
   border-radius: 6rpx;
-  background: #ECE8DE;
-  color: #5C5C5C;
+  background: #EFEDE8;
+  color: #4A4F55;
 }
 
-.wuxing-tag.wx-jin { background: #FFF8E1; color: #C4A21E; }
-.wuxing-tag.wx-mu { background: #E8F5E9; color: #4CAF50; }
-.wuxing-tag.wx-shui { background: #E3F2FD; color: #2196F3; }
-.wuxing-tag.wx-huo { background: #FBE9E7; color: #FF5722; }
-.wuxing-tag.wx-tu { background: #EFEBE9; color: #8D6E63; }
+.wuxing-tag.wx-jin { background: #EFEDE8; color: #8D7B4F; }
+.wuxing-tag.wx-mu { background: #EFEDE8; color: #4E6B54; }
+.wuxing-tag.wx-shui { background: #EFEDE8; color: #3E5A73; }
+.wuxing-tag.wx-huo { background: #FBF1EE; color: #A6321F; }
+.wuxing-tag.wx-tu { background: #EFEDE8; color: #7A6248; }
 
 .char-meaning {
   font-size: 26rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
   line-height: 1.5;
 }
 
@@ -96,18 +96,18 @@
 
 .phon-label {
   font-size: 28rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
 }
 
 .phon-value {
   font-size: 28rpx;
-  color: #1F1F1F;
+  color: #16181A;
   font-weight: 500;
 }
 
 .phon-desc {
   font-size: 26rpx;
-  color: #9C9A92;
+  color: #8A9099;
   margin-top: 8rpx;
 }
 
@@ -126,13 +126,13 @@
 
 .wuge-name {
   font-size: 24rpx;
-  color: #9C9A92;
+  color: #8A9099;
 }
 
 .wuge-num {
   font-size: 36rpx;
-  font-weight: 600;
-  color: #1F1F1F;
+  font-weight: 500;
+  color: #16181A;
   margin-top: 4rpx;
 }
 
@@ -141,24 +141,24 @@
   margin-top: 4rpx;
 }
 
-.wuge-luck.luck-daji { color: #4CAF50; }
-.wuge-luck.luck-ji { color: #8BC34A; }
-.wuge-luck.luck-xiong { color: #e57373; }
+.wuge-luck.luck-daji { color: #4E6B54; }
+.wuge-luck.luck-ji { color: #4E6B54; }
+.wuge-luck.luck-xiong { color: #A6321F; }
 
 .wuge-desc {
   font-size: 26rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
   text-align: center;
   padding-top: 12rpx;
-  border-top: 1rpx solid #E2DED5;
+  border-top: 1rpx solid #E4E2DD;
 }
 
 /* 诗词出处 */
 .poetry-block {
   padding: 20rpx;
-  background: #F4F0E7;
-  border-radius: 12rpx;
-  border-left: 6rpx solid #5E7A73;
+  background: #F7F6F3;
+  border-radius: 4rpx;
+  border-left: 6rpx solid #4A4F55;
   margin-bottom: 16rpx;
 }
 
@@ -172,21 +172,21 @@
 
 .poetry-source {
   font-size: 28rpx;
-  color: #1F1F1F;
+  color: #16181A;
   font-weight: 500;
   display: block;
 }
 
 .poetry-author {
   font-size: 24rpx;
-  color: #9C9A92;
+  color: #8A9099;
   margin-top: 4rpx;
   display: block;
 }
 
 .poetry-text {
   font-size: 30rpx;
-  color: #5C5C5C;
+  color: #4A4F55;
   line-height: 1.8;
   font-style: italic;
 }

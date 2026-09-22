@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/home/home",
+    "pages/more/more",
     "pages/name/name",
     "pages/wizard/wizard",
     "pages/prenatal-result/prenatal-result",
@@ -13,10 +14,10 @@
   ],
   "window": {
     "backgroundTextStyle": "dark",
-    "navigationBarBackgroundColor": "#F4F0E7",
+    "navigationBarBackgroundColor": "#F7F6F3",
     "navigationBarTitleText": "名堂",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#F4F0E7"
+    "backgroundColor": "#F7F6F3"
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json"

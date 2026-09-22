@@ -4,124 +4,169 @@
     wx: function(v) { return wuxingMap[v] || '' }
   }
 </wxs>
-<view class="container">
-  <!-- 强加权降级提示 -->
-  <view class="fallback-note" wx:if="{{fallbackNote}}">
-    <text>{{fallbackNote}}</text>
+
+<view class="page">
+  <!-- 窄幅泼墨页头 -->
+  <view class="band">
+    <image class="band-img" src="/images/ink-band.jpg" mode="widthFix" />
   </view>
 
-  <!-- 八字摘要 -->
-  <view class="card bazi-summary" wx:if="{{bazi}}" bindtap="onBaziTap">
-    <view class="bazi-title">八字排盘</view>
-    <view class="bazi-more">查看详解 ›</view>
-    <view class="bazi-pillars">
-      <view class="pillar">
-        <text class="pillar-label">年柱</text>
-        <text class="pillar-value">{{bazi.four_pillars.year}}</text>
-      </view>
-      <view class="pillar">
-        <text class="pillar-label">月柱</text>
-        <text class="pillar-value">{{bazi.four_pillars.month}}</text>
-      </view>
-      <view class="pillar">
-        <text class="pillar-label">日柱</text>
-        <text class="pillar-value">{{bazi.four_pillars.day}}</text>
-      </view>
-      <view class="pillar">
-        <text class="pillar-label">时柱</text>
-        <text class="pillar-value">{{bazi.four_pillars.hour}}</text>
-      </view>
+  <view class="container">
+    <!-- 强加权降级提示 -->
+    <view class="fallback-note" wx:if="{{fallbackNote}}">
+      <text>{{fallbackNote}}</text>
     </view>
-    <view class="bazi-info">
-      <text>日主: {{bazi.day_master}} ({{bazi.day_master_wuxing}})</text>
-      <text>{{bazi.xiyong.strength_label}} · 喜用神: {{xiyongText}}</text>
-    </view>
-    <view class="wuxing-bar">
-      <view class="wuxing-item" wx:for="{{wuxingList}}" wx:key="name">
-        <view class="wuxing-label {{m.wx(item.name)}}">{{item.name}}</view>
-        <view class="wuxing-percent">{{item.percent}}%</view>
-      </view>
-    </view>
-  </view>
 
-  <!-- 筛选栏 -->
-  <view class="filter-bar">
-    <view class="filter-row">
-      <text class="filter-label">五行</text>
-      <view class="filter-chips">
-        <view
-          class="chip {{wuxingFilter === item.code ? 'chip-active' : ''}}"
-          wx:for="{{wuxingFilters}}"
-          wx:key="code"
-          data-code="{{item.code}}"
-          bindtap="onWuxingFilterTap"
-        >{{item.name}}</view>
+    <!-- 八字摘要 -->
+    <view class="card bazi-summary" wx:if="{{bazi}}" bindtap="onBaziTap">
+      <view class="bazi-title">八字排盘</view>
+      <view class="bazi-more">查看详解 ›</view>
+      <view class="bazi-pillars">
+        <view class="pillar">
+          <text class="pillar-label">年柱</text>
+          <text class="pillar-value">{{bazi.four_pillars.year}}</text>
+        </view>
+        <view class="pillar">
+          <text class="pillar-label">月柱</text>
+          <text class="pillar-value">{{bazi.four_pillars.month}}</text>
+        </view>
+        <view class="pillar">
+          <text class="pillar-label">日柱</text>
+          <text class="pillar-value">{{bazi.four_pillars.day}}</text>
+        </view>
+        <view class="pillar">
+          <text class="pillar-label">时柱</text>
+          <text class="pillar-value">{{bazi.four_pillars.hour}}</text>
+        </view>
+      </view>
+      <view class="bazi-info">
+        <text>日主: {{bazi.day_master}} ({{bazi.day_master_wuxing}})</text>
+        <text>{{bazi.xiyong.strength_label}} · 喜用神: {{xiyongText}}</text>
+      </view>
+      <view class="wuxing-bar">
+        <view class="wuxing-item" wx:for="{{wuxingList}}" wx:key="name">
+          <view class="wuxing-label {{m.wx(item.name)}}">{{item.name}}</view>
+          <view class="wuxing-percent">{{item.percent}}%</view>
+        </view>
       </view>
     </view>
-    <view class="filter-row">
-      <text class="filter-label">风格</text>
-      <view class="filter-chips">
-        <view
-          class="chip {{styleFilter === item.code ? 'chip-active' : ''}}"
-          wx:for="{{styleFilters}}"
-          wx:key="code"
-          data-code="{{item.code}}"
-          bindtap="onStyleFilterTap"
-        >{{item.name}}</view>
+
+    <!-- 筛选栏：五行 / 风格 / 出处 / 用字 -->
+    <view class="filter-bar">
+      <view class="filter-head">
+        <text class="filter-head-title">筛选</text>
+        <text class="filter-reset" bindtap="onResetFilter">重置</text>
       </view>
-    </view>
-  </view>
 
-  <!-- 调整偏好 -->
-  <view class="adjust-bar" bindtap="onAdjustPref">
-    <text class="adjust-text">调整偏好</text>
-    <text class="adjust-more">›</text>
-  </view>
-
-  <!-- 名字列表 -->
-  <view class="name-list">
-    <view class="card name-card" wx:for="{{names}}" wx:key="full_name" bindtap="onNameTap" data-index="{{index}}">
-      <view class="name-header">
-        <text class="name-text">{{item.full_name}}</text>
-        <view class="score-badge {{item.scores.overall >= 85 ? 'score-high' : item.scores.overall >= 70 ? 'score-mid' : 'score-low'}}">
-          {{item.scores.overall}}分
+      <view class="filter-row">
+        <text class="filter-label">五行</text>
+        <view class="filter-chips">
+          <view
+            class="chip {{wuxingFilter === item.code ? 'chip-active' : ''}}"
+            wx:for="{{wuxingFilters}}"
+            wx:key="code"
+            data-code="{{item.code}}"
+            bindtap="onWuxingFilterTap"
+          >{{item.name}}</view>
         </view>
       </view>
 
-      <view class="name-pinyin">{{item.pinyinText}}</view>
-
-      <view class="name-poetry" wx:if="{{item.poetry}}">
-        <text class="poetry-source">「{{item.poetry.source}}·{{item.poetry.title}}」</text>
-        <text class="poetry-text">{{item.poetry.text}}</text>
-      </view>
-
-      <view class="name-scores">
-        <view class="score-item">
-          <text class="score-label">音律</text>
-          <text class="score-value">{{item.scores.phonetics}}</text>
-        </view>
-        <view class="score-item">
-          <text class="score-label">五格</text>
-          <text class="score-value">{{item.scores.wuge}}</text>
-        </view>
-        <view class="score-item">
-          <text class="score-label">八字</text>
-          <text class="score-value">{{item.scores.bazi}}</text>
+      <view class="filter-row">
+        <text class="filter-label">风格</text>
+        <view class="filter-chips">
+          <view
+            class="chip {{styleFilter === item.code ? 'chip-active' : ''}}"
+            wx:for="{{styleFilters}}"
+            wx:key="code"
+            data-code="{{item.code}}"
+            bindtap="onStyleFilterTap"
+          >{{item.name}}</view>
         </view>
       </view>
 
-      <view class="name-meaning">{{item.meaning}}</view>
+      <!-- 出处与用字原先在起名向导里选，现改为生成后收敛 -->
+      <view class="filter-row">
+        <text class="filter-label">出处</text>
+        <scroll-view class="filter-scroll" scroll-x>
+          <view class="chip-inline-wrap">
+            <view
+              class="chip chip-inline {{sourceFilter === item.code ? 'chip-active' : ''}}"
+              wx:for="{{sourceFilters}}"
+              wx:key="code"
+              data-code="{{item.code}}"
+              bindtap="onSourceFilterTap"
+            >{{item.name}}</view>
+          </view>
+        </scroll-view>
+      </view>
+
+      <view class="filter-row" wx:if="{{charFilters.length}}">
+        <text class="filter-label">用字</text>
+        <scroll-view class="filter-scroll" scroll-x>
+          <view class="chip-inline-wrap">
+            <view
+              class="chip chip-inline {{charFilter === item.code ? 'chip-active' : ''}}"
+              wx:for="{{charFilters}}"
+              wx:key="code"
+              data-code="{{item.code}}"
+              bindtap="onCharFilterTap"
+            >{{item.name}}</view>
+          </view>
+        </scroll-view>
+      </view>
     </view>
-  </view>
 
-  <!-- 空状态 -->
-  <view class="empty" wx:if="{{!names.length}}">
-    <text>{{loading ? '加载中…' : '暂无结果，请调整筛选条件后重试'}}</text>
-  </view>
+    <!-- 调整偏好 -->
+    <view class="adjust-bar" bindtap="onAdjustPref">
+      <text class="adjust-text">调整偏好</text>
+      <text class="adjust-more">›</text>
+    </view>
 
-  <!-- 底部操作 -->
-  <view class="footer-actions">
-    <button class="btn-primary refresh-btn" bindtap="onRefresh" loading="{{loading}}" disabled="{{loading}}">换一批</button>
-    <button class="btn-primary home-btn" bindtap="onBackHome">返回首页</button>
+    <!-- 名字列表 -->
+    <view class="name-list">
+      <view class="card name-card" wx:for="{{names}}" wx:key="full_name" bindtap="onNameTap" data-index="{{index}}">
+        <view class="name-header">
+          <text class="name-text">{{item.full_name}}</text>
+          <view class="score-badge {{item.scores.overall >= 85 ? 'score-high' : item.scores.overall >= 70 ? 'score-mid' : 'score-low'}}">
+            {{item.scores.overall}}分
+          </view>
+        </view>
+
+        <view class="name-pinyin">{{item.pinyinText}}</view>
+
+        <view class="name-poetry" wx:if="{{item.poetry}}">
+          <text class="poetry-source">「{{item.poetry.source}}·{{item.poetry.title}}」</text>
+          <text class="poetry-text">{{item.poetry.text}}</text>
+        </view>
+
+        <view class="name-scores">
+          <view class="score-item">
+            <text class="score-label">音律</text>
+            <text class="score-value">{{item.scores.phonetics}}</text>
+          </view>
+          <view class="score-item">
+            <text class="score-label">五格</text>
+            <text class="score-value">{{item.scores.wuge}}</text>
+          </view>
+          <view class="score-item">
+            <text class="score-label">八字</text>
+            <text class="score-value">{{item.scores.bazi}}</text>
+          </view>
+        </view>
+
+        <view class="name-meaning">{{item.meaning}}</view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty" wx:if="{{!names.length}}">
+      <text>{{loading ? '加载中…' : '暂无结果，请调整筛选条件后重试'}}</text>
+    </view>
+
+    <!-- 底部操作 -->
+    <view class="footer-actions">
+      <button class="btn-secondary refresh-btn" bindtap="onRefresh" loading="{{loading}}" disabled="{{loading}}">换一批</button>
+      <button class="btn-primary home-btn" bindtap="onBackHome">返回首页</button>
+    </view>
   </view>
 </view>
