@@ -23,7 +23,7 @@ from app.services.source_database import SourceDatabase
 from app.services.surname_database import SurnameDatabase
 from app.services.phonetics import PhoneticsScorer
 from app.services.wuge import WugeScorer
-from app.services.yunwei_scorer import YunWeiScorer
+from app.services.yunwei_scorer import YunWeiScorer, pair_cohesion
 from app.services.llm_service import LLMService
 from app.services.meaning_cache import MeaningCache
 from app.services.surname_fit import SurnameFit
@@ -36,6 +36,7 @@ from app.core.naming_options import (
     MEANING_KEYWORD_WEIGHT,
     IMAGERY_WEIGHT,
     TARGET_MIN,
+    COHESION_RANK,
 )
 
 
@@ -78,6 +79,18 @@ class NamingEngine:
     # _banded_window）。取 3：实测 2/3 质量完全相同（min 58 / 中位 66 / 0 条 <50），
     # 但 3 的「高频常客」更稳（多轮 5/5/5 vs 5/5/6）。
     STRATIFY_BAND_MIN_FACTOR = 3
+
+    # 组合成立度门槛：抽样前先把窗口收窄到「两字在原文中成对」的同源名。
+    # 出处的推荐字是「一袋好字」，两字组合由全交叉产生，实测 65% 的配对在原诗中
+    # 分处不同分句——即「只是从同一句里抠了两个不相干的字」（萸橘/红黄式）。
+    # 这类名字看起来有出处、实则配对是假的，且评分器对它失明，是用户
+    # 「不像名字」体感的根源。故在质量带宽之前先按成立度收窄；
+    # 成对候选不足 k × 该系数时才放开到跨句拼接与单字出处。
+    # 取 2：实测成对候选 97~134 条（k=30 时门槛 60），有足够余量；
+    # 取 1 会因池太窄把常客推高。
+    COHESION_MIN_FACTOR = 2
+    # 「成对」的成立度档位（相邻 = 原句成词，同句 = 同分句内可解释）
+    COHESION_PAIRED_KINDS = ("adjacent", "same_clause")
 
     def __init__(self):
         self.char_db = CharDatabase()
@@ -439,6 +452,27 @@ class NamingEngine:
             b *= 1.5
         return window  # 放宽到全窗口仍不足 need，只能不过滤
 
+    def _cohesion_window(self, names: list[dict], k: int) -> list[dict]:
+        """组合成立度门槛：优先只用「两字在原文中成对」的同源名。
+
+        为什么单独做成一道门槛而不是并进韵味分：
+        韵味分是「相对带宽 + 加权采样」，只能表达「这个比那个高几分」，
+        无法表达「整类不要」。实测把跨句同源从 35 压到 22 分后，
+        它与单字出处（20 分）几乎持平，反而丢掉区分度、让单字弱名漏进 Top。
+        成对/不成对是**类别差异**，就该用类别门槛表达。
+
+        成对候选不足 k × COHESION_MIN_FACTOR 时退回全集——
+        宁可出几个跨句拼接，也不要让用户拿到不足数的结果。
+        """
+        paired = [
+            x for x in names
+            if (x.get("scores", {}).get("yunwei_detail") or {}).get("cohesion")
+            in self.COHESION_PAIRED_KINDS
+        ]
+        if len(paired) >= k * self.COHESION_MIN_FACTOR:
+            return paired
+        return names
+
     def _stratified_sample(
         self,
         names: list[dict],
@@ -464,6 +498,9 @@ class NamingEngine:
         """
         if not names:
             return names
+        # 组合成立度门槛（先于质量带宽）：只看「原文成对」的同源名，
+        # 不足时才放开到跨句拼接 / 单字出处。
+        names = self._cohesion_window(names, k)
         if len(names) <= k:
             sampled = list(names)
             random.shuffle(sampled)
@@ -1408,14 +1445,19 @@ class NamingEngine:
         return _score([c1["char"], c2["char"]]) >= _score([c2["char"], c1["char"]])
 
     def _order_two_chars(self, entry: dict, c1: dict, c2: dict) -> tuple:
-        """决定两字的最终前后顺序：原文语序优先，其次音韵。
+        """决定两字的最终前后顺序：原文成词语序 > 原文出现先后 > 音韵。
 
-        原文语序：两字在出处 text 中均有位置且先后不同 → 按出现先后；
-        否则（字不在原文 / 位置无法区分）退回音韵优选。
+        原文成词：两字在 text 中相邻 → 按词序（「婵娟」不得倒成「娟婵」）。
+        否则按首次出现先后；字不在原文则退回音韵优选。
         """
         text = (entry or {}).get("text") or ""
-        p1 = text.find(c1["char"])
-        p2 = text.find(c2["char"])
+        a, b = c1["char"], c2["char"]
+        if (a + b) in text and (b + a) not in text:
+            return (c1, c2)
+        if (b + a) in text and (a + b) not in text:
+            return (c2, c1)
+        p1 = text.find(a)
+        p2 = text.find(b)
         if p1 >= 0 and p2 >= 0 and p1 != p2:
             return (c1, c2) if p1 < p2 else (c2, c1)
         if self._order_phonetic_better(c1, c2):
@@ -1483,26 +1525,39 @@ class NamingEngine:
                         name_data["_tier"] = tier
                         names.append(name_data)
             else:
+                # 组合优先序：先出「原文中成对」的两字，再出同句，最后才是跨句拼接。
+                # 出处的推荐字是「一袋好字」，全交叉会产生大量原诗中并不相邻的配对
+                # （「萸橘」「红黄」式），这些是用户体感「只是抠了两个字」的来源。
+                # 注意：此处只决定「入库顺序」，最终排序仍由韵味分（含组合成立度）决定。
+                text = entry.get("text") or ""
+                pairs = []
                 for i in range(len(valid_chars)):
                     for j in range(i + 1, len(valid_chars)):
-                        c1, c2 = valid_chars[i], valid_chars[j]
-                        # 字序决定：原文语序优先，其次音韵（治「颠倒一下更好」）
-                        first, second = self._order_two_chars(entry, c1, c2)
-                        # 姓氏结合：三连同调（全平/全仄）提前跳过
-                        if self.surname_fit.tri_tone_conflict(
-                            surname, [first["char"], second["char"]]
-                        ):
-                            continue
-                        given_name = first["char"] + second["char"]
-                        if given_name in seen_names:
-                            continue
-                        seen_names.add(given_name)
-                        name_data = self._evaluate_name(
-                            surname, given_name, [first, second], entry, bazi_result
+                        kind = pair_cohesion(
+                            valid_chars[i]["char"], valid_chars[j]["char"], text
                         )
-                        if name_data:
-                            name_data["_tier"] = tier
-                            names.append(name_data)
+                        pairs.append((COHESION_RANK.get(kind, 9), i, j))
+                pairs.sort(key=lambda t: (t[0], t[1], t[2]))
+
+                for _, i, j in pairs:
+                    c1, c2 = valid_chars[i], valid_chars[j]
+                    # 字序决定：原文语序优先，其次音韵（治「颠倒一下更好」）
+                    first, second = self._order_two_chars(entry, c1, c2)
+                    # 姓氏结合：三连同调（全平/全仄）提前跳过
+                    if self.surname_fit.tri_tone_conflict(
+                        surname, [first["char"], second["char"]]
+                    ):
+                        continue
+                    given_name = first["char"] + second["char"]
+                    if given_name in seen_names:
+                        continue
+                    seen_names.add(given_name)
+                    name_data = self._evaluate_name(
+                        surname, given_name, [first, second], entry, bazi_result
+                    )
+                    if name_data:
+                        name_data["_tier"] = tier
+                        names.append(name_data)
 
         # 策略1：同源组名，按 tier 预算式（A → B → C），tier 内随机 shuffle + 总量封顶
         tier_groups: dict[str, list[dict]] = {"A": [], "B": [], "C": []}

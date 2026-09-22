@@ -43,7 +43,7 @@ for g in ("male", "female"):
         p50.append(sc[len(sc) // 2])
         sames.append(sum(1 for n in pool
                          if (n["scores"].get("yunwei_detail") or {})
-                         .get("provenance", 0) >= 35))
+                         .get("same_source")))
         rs = [n["scores"]["yunwei"] for n in r["names"]]
         rmin.append(min(rs))
         rmed.append(statistics.median(rs))

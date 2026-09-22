@@ -41,8 +41,10 @@ def main() -> None:
         pool = captured[-1]
         by: dict[str, list[float]] = collections.defaultdict(list)
         for n in pool:
-            p = (n["scores"].get("yunwei_detail") or {}).get("provenance", 0)
-            by["同源" if p >= 35 else "单字"].append(n["scores"]["yunwei"])
+            detail = n["scores"].get("yunwei_detail") or {}
+            by["同源" if detail.get("same_source") else "单字"].append(
+                n["scores"]["yunwei"]
+            )
         scores = sorted(n["scores"]["yunwei"] for n in pool)
         avg = lambda key: statistics.fmean(by[key]) if by[key] else 0  # noqa: E731
         print(f"{y}-{m:02d}-{d:02d}   {len(pool):>5}{len(by['同源']):>6}"
@@ -64,7 +66,7 @@ def main() -> None:
                                name_length=2, max_results=30)
             sames.append(sum(
                 1 for n in captured[-1]
-                if (n["scores"].get("yunwei_detail") or {}).get("provenance", 0) >= 35))
+                if (n["scores"].get("yunwei_detail") or {}).get("same_source")))
         print(f"{rbf:>9}{max(30 * ccf, 600):>9}  " +
               "  ".join(f"{s:>6}" for s in sames))
 

@@ -169,9 +169,35 @@ YUNWEI_WEIGHTS = {
 }
 
 # ── 韵味各维度计算参数 ──
-PROVENANCE_SAME_SOURCE = 35   # 同源：名所有字 ∈ 同一条出处 recommend_chars
+PROVENANCE_SAME_SOURCE = 35   # 同源满分：名的所有字同出一条出处「且两字在原文中成对」
 PROVENANCE_SINGLE_CHAR = 20   # 单字有出处：名至少一字命中任意出处 recommend_chars
 PROVENANCE_FAMOUS_PENALTY = 7  # 名句直取扣分（出处命中烂大街名句，稀缺度降档）
+
+# ── 组合成立度（同源名分档）──
+# 出处推荐字是「一袋好字」，两字组合由全交叉产生；实测 65% 的配对在原诗中分处不同分句，
+# 属机械拼接（「萸橘」「红黄」式）。同源分因此按两字在原文中的关系分档，
+# 而非一律给满分——否则「婵娟」（原句成词）与「萸橘」（跨句硬拼）同分，评分器对组合失明。
+COHESION_ADJACENT = PROVENANCE_SAME_SOURCE       # 35 原文中相邻成词（婵娟/望舒）——真正的取典
+COHESION_SAME_CLAUSE = 30                        # 同句内不相邻（灼华/清扬）——仍可解释
+COHESION_CROSS_CLAUSE = 22                       # 分处两个分句——机械拼接，略高于单字出处
+COHESION_CHAR_ABSENT = PROVENANCE_SINGLE_CHAR    # 20 有字不在原文（靠意象标签推的）
+
+# kind -> 分值；kind 由 yunwei_scorer._pair_cohesion 判定
+COHESION_SCORES = {
+    "adjacent": COHESION_ADJACENT,
+    "same_clause": COHESION_SAME_CLAUSE,
+    "cross_clause": COHESION_CROSS_CLAUSE,
+    "char_absent": COHESION_CHAR_ABSENT,
+}
+
+# 组合产出优先序（数字越小越先入库）：与 COHESION_SCORES 同序
+COHESION_RANK = {
+    "adjacent": 0,
+    "same_clause": 1,
+    "cross_clause": 2,
+    "char_absent": 3,
+}
+
 IMAGERY_BASE = 8              # I = min(25, 8 + 4*K)
 IMAGERY_PER_HIT = 4
 IMAGERY_MAX = 25

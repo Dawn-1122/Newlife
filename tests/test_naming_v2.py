@@ -144,28 +144,64 @@ def test_s1_homophone_boost_score(engine):
 # ── 出处稀缺度（优先级1） ──
 
 def test_provenance_famous_penalty(engine):
-    """名句直取降档，冷门句满分（避烂大街）。"""
+    """名句直取降档，冷门句满分（避烂大街）。
+
+    注意：出处分现在按「组合成立度」分档，故对比必须在**同等成立度**下进行——
+    用合成条目固定两字相邻，只让「是否名句」这一个变量变化。
+    """
     from app.core.constants import FAMOUS_PHRASES
     y = engine.yunwei
-    famous_poem = None
-    cold_poem = None
-    for p in engine.poetry_db.get_all():
-        text = " ".join([p.get("text", "") or "", p.get("citation", "") or "",
-                         p.get("title", "") or ""])
-        is_fam = any(ph in text for ph in FAMOUS_PHRASES)
-        if is_fam and not famous_poem:
-            famous_poem = p
-        if not is_fam and not cold_poem:
-            cold_poem = p
-        if famous_poem and cold_poem:
-            break
+    phrase = FAMOUS_PHRASES[0]
 
-    def p_score(poem):
-        rc = [c for c in poem["recommend_chars"] if engine.char_db.get_char(c)][:2]
-        chars_info = [engine.char_db.get_char(c) for c in rc]
-        return y._provenance_score(chars_info, poem)
+    base = {
+        "id": "synthetic",
+        "recommend_chars": ["清", "风"],
+        "text": "清风入我怀",
+        "imagery": [],
+        "scene": "",
+    }
+    famous = dict(base, citation=f"《{phrase}》", title="")
+    cold = dict(base, citation="《冷门篇》", title="")
 
-    assert p_score(famous_poem) < p_score(cold_poem)
+    chars_info = [engine.char_db.get_char(c) for c in ("清", "风")]
+    famous_score, _, famous_kind = y._provenance_score(chars_info, famous)
+    cold_score, _, cold_kind = y._provenance_score(chars_info, cold)
+
+    # 前置条件：两边的「组合成立度」必须相同，否则测的不是稀缺度
+    assert famous_kind == cold_kind == "adjacent"
+    assert famous_score < cold_score
+
+
+def test_provenance_cohesion_tiers(engine):
+    """同源分按组合成立度分档：原文成词 > 同句 > 跨句拼接。"""
+    y = engine.yunwei
+    db = engine.char_db
+
+    def p(text):
+        entry = {"id": "t", "recommend_chars": ["婵", "娟", "橘"], "text": text}
+        chars = [db.get_char("婵"), db.get_char("娟")]
+        return y._provenance_score(chars, entry)
+
+    adjacent_score, same_source, kind = p("玉人千里共婵娟")
+    assert same_source is True and kind == "adjacent"
+
+    cross_entry = {"id": "t", "recommend_chars": ["婵", "橘"], "text": "婵娟千里，橘柚飘香"}
+    cross_score, _, cross_kind = y._provenance_score(
+        [db.get_char("婵"), db.get_char("橘")], cross_entry
+    )
+    assert cross_kind == "cross_clause"
+    assert adjacent_score > cross_score, "原文成词必须高于跨句拼接"
+
+
+def test_pair_cohesion_kinds():
+    """成立度不分词函数：相邻/同句/跨句/字不在原文。"""
+    from app.services.yunwei_scorer import pair_cohesion
+
+    assert pair_cohesion("婵", "娟", "共婵娟") == "adjacent"
+    assert pair_cohesion("灼", "华", "桃之夭夭，灼灼其华") == "same_clause"
+    assert pair_cohesion("红", "黄", "白酒红萸，黄花绿橘") == "cross_clause"
+    assert pair_cohesion("清", "风", "山高水长") == "char_absent"
+    assert pair_cohesion("清", "风", "") == "cross_clause"
 
 
 # ── 词性标注 + 动名组合（优先级2） ──

@@ -144,7 +144,7 @@ def main() -> None:
     # 质量分布（低分名 = 用户可感知的「凑数名」）
     q = sorted(n["scores"]["yunwei"] for n in all_names)
     same = sum(1 for n in all_names
-               if (n["scores"].get("yunwei_detail") or {}).get("provenance", 0) >= 35)
+               if (n["scores"].get("yunwei_detail") or {}).get("same_source"))
     print(f"[质量分布] 韵味 min {q[0]:.0f} / p5 {q[max(0, int(len(q) * .05) - 1)]:.0f}"
           f" / p10 {q[max(0, int(len(q) * .1) - 1)]:.0f} / 中位 {q[len(q) // 2]:.0f}"
           f" / max {q[-1]:.0f}；低于 50 分 {sum(1 for v in q if v < 50)} 条")

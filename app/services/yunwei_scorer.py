@@ -18,6 +18,7 @@ from app.core.naming_options import (
     PROVENANCE_SAME_SOURCE,
     PROVENANCE_SINGLE_CHAR,
     PROVENANCE_FAMOUS_PENALTY,
+    COHESION_SCORES,
     IMAGERY_BASE,
     IMAGERY_PER_HIT,
     IMAGERY_MAX,
@@ -32,6 +33,36 @@ from app.services.poetry_database import PoetryDatabase
 from app.services.source_database import SourceDatabase
 from app.services.surname_database import SurnameDatabase
 from app.services.surname_fit import SurnameFit
+
+
+# 分句切分（组合成立度判定用）：中英文标点 + 空白 + 各类引号书名号
+_CLAUSE_SEP = re.compile(r"[，。；！？、,.;!?：:\s「」『』（）()《》〈〉【】\[\]]+")
+
+
+def pair_cohesion(a: str, b: str, text: str) -> str:
+    """判定两字在原文中的关系（同源组合的「成立度」）。
+
+    出处推荐字是「一袋好字」，两字组合由全交叉产生，多数配对在原诗中并不成对。
+    本函数把「这对字在原文里是什么关系」变成可计算信号：
+
+        adjacent     两字在原文中相邻（婵娟/望舒）——本就是词，最强
+        same_clause  同分句内不相邻（灼…其华）——仍可解释
+        cross_clause 分处两个分句——机械拼接
+        char_absent  有字不在原文（靠意象标签推的）——最弱
+
+    `naming_engine`（组合优先序）与 `YunWeiScorer`（出处分档）共用本函数，
+    保证「排序看到的成立度」与「打分的成立度」是同一个口径。
+    """
+    if not text:
+        return "cross_clause"
+    if a not in text or b not in text:
+        return "char_absent"
+    if (a + b) in text or (b + a) in text:
+        return "adjacent"
+    for clause in _CLAUSE_SEP.split(text):
+        if a in clause and b in clause:
+            return "same_clause"
+    return "cross_clause"
 
 
 class YunWeiScorer:
@@ -91,7 +122,7 @@ class YunWeiScorer:
         """
         given_name = "".join(c["char"] for c in chars_info)
 
-        p = self._provenance_score(chars_info, entry)
+        p, same_source, cohesion_kind = self._provenance_score(chars_info, entry)
         i = self._imagery_score(chars_info, entry, sense_db)
         l = self._aftertaste_score(chars_info, entry, sense_db)
         c = self._coherence_score(chars_info)
@@ -101,6 +132,8 @@ class YunWeiScorer:
         return {
             "total": total,
             "provenance": p,
+            "same_source": same_source,
+            "cohesion": cohesion_kind,
             "imagery": i,
             "aftertaste": l,
             "coherence": c,
@@ -109,23 +142,39 @@ class YunWeiScorer:
 
     # ── P 出处分（0~35，只评「名」） ──
 
-    def _provenance_score(self, chars_info: list[dict], entry: Optional[dict]) -> int:
+    _pair_cohesion = staticmethod(pair_cohesion)
+
+    def _provenance_score(
+        self, chars_info: list[dict], entry: Optional[dict]
+    ) -> tuple[int, bool, str]:
+        """出处分：同源时按「组合成立度」分档，不再一律满分。
+
+        Returns:
+            (score, same_source, cohesion_kind)
+        """
         name_chars = [c["char"] for c in chars_info]
         if not name_chars:
-            return 0
+            return 0, False, ""
         # 同源：名所有字 ∈ 同一条出处的 recommend_chars
         if entry:
             rec = entry.get("recommend_chars", [])
             if all(ch in rec for ch in name_chars):
+                if len(name_chars) >= 2:
+                    kind = self._pair_cohesion(
+                        name_chars[0], name_chars[1], entry.get("text") or ""
+                    )
+                else:
+                    kind = "adjacent"  # 单字名无「组合」问题，按满分（与改造前一致）
+                score = COHESION_SCORES.get(kind, PROVENANCE_SINGLE_CHAR)
                 # 冷门句 > 名句直取（避烂大街：名句直取显俗，扣稀缺度）
                 if self._is_famous_entry(entry):
-                    return PROVENANCE_SAME_SOURCE - PROVENANCE_FAMOUS_PENALTY
-                return PROVENANCE_SAME_SOURCE
+                    score -= PROVENANCE_FAMOUS_PENALTY
+                return max(0, score), True, kind
         # 单字有出处：名至少一个字命中任意出处条目 recommend_chars
         for ch in name_chars:
             if self.poetry_db.get_by_char(ch) or self.source_db.get_by_char(ch):
-                return PROVENANCE_SINGLE_CHAR
-        return 0
+                return PROVENANCE_SINGLE_CHAR, False, ""
+        return 0, False, ""
 
     @staticmethod
     def _is_famous_entry(entry: Optional[dict]) -> bool:
