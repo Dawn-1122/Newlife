@@ -66,6 +66,24 @@ PROTECTED = {
     "窈窕", "伊人", "锦瑟", "霓裳",
 }
 
+# 硬黑名单：确定不宜作名、且**实测 LLM 复核会漏判**的组合。
+# 为什么需要它：LLM 复核有召回缺口 —— 2026-09-22 实测「壮心」（《龟虽寿》
+# 「烈士暮年，壮心不已」）、「中立」（中天下而立）、「用明」「知己」「石上」
+# 「社方」「盈岸」「新燠」全部通过了复核，直接产出「苏壮心」这类名字。
+# 语义漏网无法只靠调提示词根治，故与项目既有的「事件负面字黑名单」同思路，
+# 再加一道**确定性下限**：不看 LLM 脸色，命中即剔除。
+BLOCKLIST = {
+    # 论断 / 志向 / 评价（最像名字，也最易漏判）
+    "壮心", "中立", "廉正", "固朝", "君子", "圣人", "大知", "淑女",
+    # 功能 / 虚字组合
+    "用明", "用恩", "用财", "教多", "在志", "里志", "有土", "社方",
+    # 关系 / 称谓
+    "知己", "妻子", "天子", "诸侯", "呦鹿",
+    # 物产 / 方位 / 俗语
+    "荔枝", "福禄", "延寿", "年寿", "红萸", "黄橘", "石上", "盈岸",
+    "新燠", "花语", "长征",
+}
+
 
 def build_user_prompt(words: list[str]) -> str:
     lines = ["下面这批两字组合，请挑出不适合做人名的："]
@@ -100,6 +118,11 @@ async def main() -> None:
     ap.add_argument("--in", dest="inp", default=str(DEFAULT_IN))
     ap.add_argument("--report", default=str(DEFAULT_REPORT))
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument(
+        "--blocklist-only",
+        action="store_true",
+        help="只应用人工硬黑名单（不调 LLM、结果确定），用于修补 LLM 复核的召回缺口",
+    )
     ap.add_argument("--concurrency", type=int, default=4)
     ap.add_argument("--provider", default=None)
     ap.add_argument("--api-key", default=None)
@@ -110,6 +133,30 @@ async def main() -> None:
     path = Path(args.inp)
     data: dict[str, list] = json.loads(path.read_text(encoding="utf-8"))
     words = sorted({p[0] + p[1] for v in data.values() for p in v if len(p) == 2})
+
+    if args.blocklist_only:
+        # 确定性路径：不调 LLM，只剔除人工硬黑名单里的组合（幂等、无随机性）
+        bad = sorted({w for w in words if w in BLOCKLIST and w not in PROTECTED})
+        print(f"[review] 硬黑名单模式：命中 {len(bad)} 个 —— {'、'.join(bad) if bad else '无'}")
+        print(f"[review] 条目 {len(data)} 条，去重后字对 {len(words)} 个")
+        bad_set = set(bad)
+        backup = path.with_suffix(path.suffix + ".bak")
+        try:
+            backup.write_text(path.read_text(encoding="utf-8"), encoding="utf-8")
+        except OSError as e:
+            print(f"[review] 警告：备份失败（{e}），仍继续写入")
+        removed = 0
+        kept: dict[str, list] = {}
+        for eid, pairs in data.items():
+            survive = [p for p in pairs if (p[0] + p[1]) not in bad_set]
+            removed += len(pairs) - len(survive)
+            kept[eid] = survive
+        path.write_text(json.dumps(kept, ensure_ascii=False, indent=1), encoding="utf-8")
+        with_pairs = sum(1 for v in kept.values() if v)
+        print(f"[review] 剔除 {removed} 个字对；剩余 {sum(len(v) for v in kept.values())} 个，"
+              f"{with_pairs}/{len(kept)} 条仍有可用字对")
+        return
+
     print(f"[review] 条目 {len(data)} 条，去重后字对 {len(words)} 个")
 
     batches = [words[i:i + BATCH] for i in range(0, len(words), BATCH)]
@@ -129,7 +176,9 @@ async def main() -> None:
             return []
 
     results = await asyncio.gather(*[safe(b) for b in batches])
-    bad = sorted({w for r in results for w in r if w not in PROTECTED})
+    bad = sorted(
+        {w for r in results for w in r if w not in PROTECTED} | BLOCKLIST
+    )
     print(f"[review] 判定不适合 {len(bad)} 个（{len(bad) / max(1, len(words)):.0%}）")
 
     Path(args.report).write_text(
