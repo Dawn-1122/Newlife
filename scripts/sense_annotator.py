@@ -61,10 +61,27 @@ def _load_list(path: Path, keys: tuple[str, ...]) -> list[dict]:
     return data if isinstance(data, list) else []
 
 
+def _load_name_pairs(poetry_path: Path) -> dict[str, list]:
+    """读「宜作名字对」标注（与 poetry.json 同目录，独立文件）。缺失时返回空表。"""
+    path = poetry_path.parent / "name_pairs.json"
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+
+
 def build_tasks(poetry_path: Path, source_path: Path) -> list[dict]:
-    """构造 (char, entry) 任务列表。"""
+    """构造 (char, entry) 任务列表。
+
+    字来源 = recommend_chars ∪ name_pairs 用字。后者是「宜作名字对」标注
+    （scripts/pair_annotator.py）引入的，可能用到推荐字之外的字（如「修远」的「远」），
+    若不算进来，这些名字在评分时会回退到字典义、语境义项覆盖率掉档。
+    """
     tasks: list[dict] = []
     seen: set[tuple[str, str]] = set()
+    pairs_map = _load_name_pairs(poetry_path)
 
     for path, source_type, keys in (
         (poetry_path, "poetry", ("poems", "poetry", "data")),
@@ -74,7 +91,11 @@ def build_tasks(poetry_path: Path, source_path: Path) -> list[dict]:
             entry_id = entry.get("id")
             if not entry_id:
                 continue
-            for char in entry.get("recommend_chars") or []:
+            chars = list(entry.get("recommend_chars") or [])
+            for pair in (entry.get("name_pairs") or pairs_map.get(entry_id) or []):
+                if isinstance(pair, (list, tuple)) and len(pair) == 2:
+                    chars.extend(pair)
+            for char in chars:
                 key = (char, entry_id)
                 if key in seen:
                     continue

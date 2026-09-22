@@ -177,13 +177,17 @@ PROVENANCE_FAMOUS_PENALTY = 7  # 名句直取扣分（出处命中烂大街名�
 # 出处推荐字是「一袋好字」，两字组合由全交叉产生；实测 65% 的配对在原诗中分处不同分句，
 # 属机械拼接（「萸橘」「红黄」式）。同源分因此按两字在原文中的关系分档，
 # 而非一律给满分——否则「婵娟」（原句成词）与「萸橘」（跨句硬拼）同分，评分器对组合失明。
+# 另外，「同句但不宜作名」（圣人/教多/用财）只能靠语义判断，故引入 LLM 标注的名字对
+# （data/poetry/name_pairs.json）作为最高档：它既成对、又经过「像不像名字」的筛选。
+COHESION_ANNOTATED = PROVENANCE_SAME_SOURCE      # 35 LLM 判定宜作名的字对（最可靠）
 COHESION_ADJACENT = PROVENANCE_SAME_SOURCE       # 35 原文中相邻成词（婵娟/望舒）——真正的取典
 COHESION_SAME_CLAUSE = 30                        # 同句内不相邻（灼华/清扬）——仍可解释
 COHESION_CROSS_CLAUSE = 22                       # 分处两个分句——机械拼接，略高于单字出处
 COHESION_CHAR_ABSENT = PROVENANCE_SINGLE_CHAR    # 20 有字不在原文（靠意象标签推的）
 
-# kind -> 分值；kind 由 yunwei_scorer._pair_cohesion 判定
+# kind -> 分值；kind 由 yunwei_scorer._cohesion_kind 判定
 COHESION_SCORES = {
+    "annotated": COHESION_ANNOTATED,
     "adjacent": COHESION_ADJACENT,
     "same_clause": COHESION_SAME_CLAUSE,
     "cross_clause": COHESION_CROSS_CLAUSE,
@@ -192,10 +196,11 @@ COHESION_SCORES = {
 
 # 组合产出优先序（数字越小越先入库）：与 COHESION_SCORES 同序
 COHESION_RANK = {
-    "adjacent": 0,
-    "same_clause": 1,
-    "cross_clause": 2,
-    "char_absent": 3,
+    "annotated": 0,
+    "adjacent": 1,
+    "same_clause": 2,
+    "cross_clause": 3,
+    "char_absent": 4,
 }
 
 IMAGERY_BASE = 8              # I = min(25, 8 + 4*K)

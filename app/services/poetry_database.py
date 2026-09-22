@@ -26,8 +26,38 @@ class PoetryDatabase:
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
         self._poems = [self.normalize(p) for p in data["poems"]]
+        self._attach_name_pairs()
         self._build_fullname_index()
         self._build_char_index()
+        self._build_pair_index()
+
+    def _attach_name_pairs(self):
+        """挂上「宜作名字对」标注（data/poetry/name_pairs.json，见 scripts/pair_annotator.py）。
+
+        这是独立于 recommend_chars 的**成对**标注：从原句中挑出可直接作双字名的组合。
+        组合层优先使用它，避免把推荐字全交叉硬拼出「萸橘」「圣人」这类配对。
+        文件缺失时静默跳过（引擎回退到 pair_cohesion 排序的全交叉，功能不降级）。
+
+        同时标注 `name_pairs_known`：该出处的 id **是否出现在标注文件里**。
+        用于区分两种「字对为空」——
+        - `known=True` 且空：标注跑过、但复核判定该出处没有适合作名的组合
+          → 引擎**不得**退回全交叉（否则机械拼接会重新漏出，如「荔枝」「长安」）；
+        - `known=False`：从未标注（如新增语料尚未补标）→ 保留全交叉兜底，功能不降级。
+        """
+        path = settings.POETRY_DIR / "name_pairs.json"
+        pairs: dict[str, list] = {}
+        if path.exists():
+            try:
+                pairs = json.loads(path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                pairs = {}
+        for poem in self._poems:
+            raw = pairs.get(poem["id"]) or []
+            poem["name_pairs"] = [
+                list(p) for p in raw
+                if isinstance(p, (list, tuple)) and len(p) == 2 and p[0] != p[1]
+            ]
+            poem["name_pairs_known"] = poem["id"] in pairs
 
     def _build_char_index(self):
         """按推荐用字倒排索引：get_by_char 由 O(N) 线性扫描降为 O(1) 查表。"""
@@ -35,6 +65,29 @@ class PoetryDatabase:
         for poem in self._poems:
             for ch in poem.get("recommend_chars") or []:
                 self._char_index.setdefault(ch, []).append(poem)
+
+    def _build_pair_index(self):
+        """按「已批准字对」倒排索引（name_pairs，语义层判定宜作名的组合）。
+
+        随机组合路径原本靠 `recommend_chars` 共现来找搭档 —— 那正是「一袋好字」
+        的旧机制，会拼出「圣人」「荔枝」这类「同源但不宜作名」的组合。
+        改为只认**已批准字对**，让随机组合也走语义层。
+        """
+        self._pair_index: dict[frozenset, list[dict]] = {}
+        self._partner_index: dict[str, list[str]] = {}
+        for poem in self._poems:
+            for pair in poem.get("name_pairs") or []:
+                self._pair_index.setdefault(frozenset(pair), []).append(poem)
+                self._partner_index.setdefault(pair[0], []).append(pair[1])
+                self._partner_index.setdefault(pair[1], []).append(pair[0])
+
+    def entries_for_pair(self, a: str, b: str) -> list[dict]:
+        """含「已批准字对 (a,b)」的出处列表（无序）。"""
+        return list(self._pair_index.get(frozenset((a, b)), ()))
+
+    def approved_partners(self, char: str) -> list[str]:
+        """与 char 组成「已批准字对」的全部搭档字。"""
+        return self._partner_index.get(char, [])
 
     def _build_fullname_index(self):
         """预构建「姓+名 连词索引」：对 text/original_text/title/citation 抽 2~3 字 CJK n-gram。"""

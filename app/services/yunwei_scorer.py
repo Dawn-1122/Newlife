@@ -144,6 +144,19 @@ class YunWeiScorer:
 
     _pair_cohesion = staticmethod(pair_cohesion)
 
+    @staticmethod
+    def _cohesion_kind(a: str, b: str, entry: Optional[dict]) -> str:
+        """组合成立度档位；入口处优先认「LLM 标注的宜作名字对」。
+
+        标注字对（name_pairs）既成对、又经过「像不像名字」的语义筛选，
+        因此列为最高档；其余按 pair_cohesion 的原文关系分档。
+        """
+        if entry:
+            for pair in (entry.get("name_pairs") or []):
+                if len(pair) == 2 and {pair[0], pair[1]} == {a, b}:
+                    return "annotated"
+        return pair_cohesion(a, b, (entry or {}).get("text") or "")
+
     def _provenance_score(
         self, chars_info: list[dict], entry: Optional[dict]
     ) -> tuple[int, bool, str]:
@@ -155,13 +168,15 @@ class YunWeiScorer:
         name_chars = [c["char"] for c in chars_info]
         if not name_chars:
             return 0, False, ""
-        # 同源：名所有字 ∈ 同一条出处的 recommend_chars
+        # 同源：名所有字 ∈ 同一条出处的 recommend_chars ∪ name_pairs 用字
         if entry:
-            rec = entry.get("recommend_chars", [])
+            rec = list(entry.get("recommend_chars", []))
+            for pair in (entry.get("name_pairs") or []):
+                rec.extend(pair)
             if all(ch in rec for ch in name_chars):
                 if len(name_chars) >= 2:
-                    kind = self._pair_cohesion(
-                        name_chars[0], name_chars[1], entry.get("text") or ""
+                    kind = self._cohesion_kind(
+                        name_chars[0], name_chars[1], entry
                     )
                 else:
                     kind = "adjacent"  # 单字名无「组合」问题，按满分（与改造前一致）

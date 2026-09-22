@@ -44,6 +44,10 @@ data/poetry/pilot_corpus.jsonl
 data/poetry/raw_female.jsonl
 data/poetry/done_ids_female.json
 data/poetry/failed_female.jsonl
+# 「宜作名字对」标注的断点/失败/备份（运行时可重生；字对本身 name_pairs.json 要提交）
+data/poetry/pairs_done.json
+data/poetry/pairs_failed.jsonl
+data/poetry/*.bak
 
 # LLM 寓意缓存（运行时生成，不提交）
 data/meaning_cache/

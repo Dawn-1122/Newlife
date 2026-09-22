@@ -204,6 +204,123 @@ def test_pair_cohesion_kinds():
     assert pair_cohesion("清", "风", "") == "cross_clause"
 
 
+# ── 组合成立度：语义层（LLM「宜作名字对」标注） ──
+
+def test_cohesion_kind_prefers_annotated(engine):
+    """有 name_pairs 标注的字对判为 annotated；未标注的仍按原文关系判档。
+
+    注意：「圣人」在原句中相邻（adjacent），标注不会把它抬成 annotated。
+    真正把它挡在候选池外的是**组合层**「有标注只出标注字对」（见下一个测试），
+    这里只验证档位判定本身。
+    """
+    y = engine.yunwei
+    db = engine.char_db
+    entry = {
+        "id": "t",
+        "recommend_chars": ["圣", "人", "清", "扬"],
+        "text": "圣人无常心，清扬婉兮",
+        "name_pairs": [["清", "扬"]],
+    }
+    assert y._cohesion_kind("清", "扬", entry) == "annotated"
+    assert y._cohesion_kind("圣", "人", entry) == "adjacent"
+
+    chars = [db.get_char("清"), db.get_char("扬")]
+    score, same_source, kind = y._provenance_score(chars, entry)
+    assert same_source is True and kind == "annotated"
+    # 标注档 = 最高分（与原文成词同分）
+    from app.core.naming_options import COHESION_ANNOTATED
+
+    assert score == COHESION_ANNOTATED
+
+
+def test_compose_annotated_entry_only_emits_pairs(engine):
+    """有标注的出处只产出标注字对，不再全交叉。
+
+    这是「不要单纯抠两个字」的落点：若退回全交叉，「原句成词但不宜作名」的
+    配对（圣人/壮心）会重新漏出，而语义判断只有标注能提供。
+    """
+    entry = next(
+        p for p in engine.poetry_db._poems
+        if p.get("name_pairs") and len(p.get("recommend_chars") or []) >= 3
+    )
+    allowed = {frozenset(p) for p in entry["name_pairs"]}
+
+    names = engine._compose_names(
+        "苏", [], [(entry, "A")], "female", 2,
+    )
+    assert names, "有标注的出处应至少产出一个名字"
+    for n in names:
+        if n["scores"]["yunwei_detail"].get("same_source"):
+            assert frozenset(n["given_name"]) in allowed, (
+                f"{n['given_name']} 不在标注字对内 —— 全交叉漏出了"
+            )
+
+
+def test_compose_with_selected_chars_does_not_crash(engine):
+    """两阶段流程：用户点选字后，标注字对含未选字必须被跳过而非 KeyError。"""
+    entry = next(
+        p for p in engine.poetry_db._poems
+        if len(p.get("name_pairs") or []) >= 2
+        and len(p.get("recommend_chars") or []) >= 3
+    )
+    # 只选一个与某标注字对同字的字，必然触发「字对含未选字」
+    picked = entry["recommend_chars"][:2]
+    names = engine._compose_names(
+        "苏", [], [(entry, "A")], "female", 2, selected_chars=picked,
+    )
+    for n in names:
+        for ch in n["given_name"]:
+            assert ch in set(picked)
+
+
+def test_annotated_empty_entry_yields_no_two_char_names(engine):
+    """标注跑过但字对为空 → 不产出双字名。
+
+    否则退回全交叉会把复核刚剔掉的组合（荔枝/长安/寿年）重新拼回来 ——
+    实测这是 40% 漏网名的来源。
+    """
+    found = False
+    for p in engine.poetry_db._poems[:400]:
+        if len(p.get("recommend_chars") or []) < 3:
+            continue
+        # 对照：从未标注（known=False）→ 规则层兜底应产出候选
+        fallback = dict(p, name_pairs=[], name_pairs_known=False)
+        if not engine._compose_names("苏", [], [(fallback, "A")], "female", 2):
+            continue
+        found = True
+        # 标注跑过但为空 → 语义层说「此出处无适合作名组合」，必须尊重
+        blocked = dict(p, name_pairs=[], name_pairs_known=True)
+        assert engine._compose_names("苏", [], [(blocked, "A")], "female", 2) == []
+        break
+    assert found, "应能找到一条「未标注时能产出候选」的出处作为对照"
+
+
+def test_random_partner_only_from_approved_pairs(engine):
+    """随机组合的搭档必须来自已批准字对，且能挂回「字对真正被批准」的那条出处。"""
+    pdb = engine.poetry_db
+    char = next(c for c in pdb._partner_index if c)
+    approved = set(pdb.approved_partners(char))
+    cand = [ci for ci in (engine.char_db.get_char(ch) for ch in approved) if ci]
+    assert cand, "该字应有可用的已批准搭档"
+
+    partner = engine._same_source_partner({"char": char}, cand)
+    assert partner is not None and partner["char"] in approved
+    # 出处必须真的批准了这对字（否则详情页里两字并不成对）
+    assert pdb.entries_for_pair(char, partner["char"])
+
+
+def test_dedupe_reverse_pairs(engine):
+    """同字对反序只保留韵味分更高的语序（杨柳/柳杨 不应同时在榜）。"""
+
+    def mk(given: str, score: int) -> dict:
+        return {"given_name": given, "scores": {"yunwei": score}}
+
+    out = engine._dedupe_reverse_pairs(
+        [mk("杨柳", 60), mk("柳杨", 70), mk("香红", 55), mk("流水", 50), mk("湘湘", 40)]
+    )
+    assert [n["given_name"] for n in out] == ["柳杨", "香红", "流水", "湘湘"]
+
+
 # ── 词性标注 + 动名组合（优先级2） ──
 
 def test_verb_noun_coherence(engine):
