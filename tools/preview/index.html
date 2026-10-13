@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>名堂 · 小程序 Web 预览</title>
+<style>
+  :root {
+    --bg: #F2F1EE;
+    --panel: #FFFFFF;
+    --ink: #16181A;
+    --ink-2: #4A4F55;
+    --ink-3: #8A9099;
+    --line: #E4E2DD;
+    --cinnabar: #A6321F;
+    --frame-w: 390px;
+    --rpx: 0.52px; /* 390 / 750 */
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 10px 14px; background: var(--panel);
+    border-bottom: 1px solid var(--line);
+  }
+  header .brand { font-weight: 600; letter-spacing: .5px; }
+  header .brand small { font-weight: 400; color: var(--ink-3); margin-left: 6px; }
+  header .grow { flex: 1; }
+
+  select, button.ctl {
+    font: inherit; color: var(--ink-2); background: #fff;
+    border: 1px solid var(--line); border-radius: 3px;
+    padding: 5px 10px; cursor: pointer;
+  }
+  button.ctl:hover { border-color: var(--ink-3); }
+  button.ctl.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  main { flex: 1; display: flex; min-height: 0; }
+
+  .stage {
+    flex: 1; display: flex; align-items: flex-start; justify-content: center;
+    padding: 18px; overflow: auto; gap: 18px;
+  }
+
+  /* 手机壳 */
+  .phone {
+    width: var(--frame-w); flex: 0 0 auto;
+    background: #fff; border: 1px solid #D7D4CE; border-radius: 14px;
+    overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.07);
+    display: flex; flex-direction: column;
+  }
+  .navbar {
+    height: 42px; flex: 0 0 auto; display: flex; align-items: center;
+    padding: 0 12px; gap: 8px;
+    background: #F7F6F3; border-bottom: 1px solid var(--line);
+    font-size: 14px; color: var(--ink);
+  }
+  .navbar .back {
+    cursor: pointer; color: var(--ink-3); font-size: 18px; line-height: 1;
+    padding: 2px 6px; border-radius: 3px;
+  }
+  .navbar .back:hover { background: #EDEBE6; color: var(--ink); }
+  .navbar .title { flex: 1; text-align: center; font-family: "Songti SC", serif; letter-spacing: 1px; }
+  .navbar .badge { font-size: 11px; color: var(--ink-3); }
+
+  .screen {
+    height: 760px; overflow-y: auto; overflow-x: hidden;
+    background: #F7F6F3; position: relative;
+  }
+
+  /* 名堂页面根：承接 app.wxss 里的 page 选择器 */
+  .wb-page-root {
+    min-height: 100%;
+    position: relative;
+  }
+
+  /* 小程序基础组件在浏览器里的默认显示形态（其余样式一律来自 wxss） */
+  view, scroll-view, swiper, picker, form, navigator, cover-view { display: block; }
+  text { display: inline; }
+  scroll-view { overflow: hidden; }
+  scroll-view[scroll-x] { overflow-x: auto; overflow-y: hidden; }
+  scroll-view[scroll-y] { overflow-y: auto; }
+  img { display: block; max-width: 100%; }
+  input { border: 0; outline: 0; background: transparent; font: inherit; color: inherit; width: 100%; padding: 0; }
+  button { font: inherit; }
+  picker { cursor: pointer; }
+  .wb-switch {
+    display: inline-block; width: 80rpx; height: 46rpx; border-radius: 23rpx;
+    background: #D8D5CF; position: relative; vertical-align: middle;
+    transition: background .15s; cursor: pointer;
+  }
+  .wb-switch-on { background: #4E6B54; }
+  .wb-switch i {
+    position: absolute; top: 4rpx; left: 4rpx; width: 38rpx; height: 38rpx;
+    border-radius: 50%; background: #fff; transition: left .15s;
+  }
+  .wb-switch-on i { left: 38rpx; }
+
+  /* 侧栏 */
+  aside {
+    width: 320px; flex: 0 0 auto; background: var(--panel);
+    border-left: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0;
+  }
+  aside h3 {
+    margin: 0; padding: 10px 14px; font-size: 12px; font-weight: 600;
+    color: var(--ink-3); letter-spacing: 1px; border-bottom: 1px solid var(--line);
+  }
+  #logs { flex: 1; overflow: auto; padding: 8px 10px; font-family: ui-monospace, Menlo, monospace; font-size: 11px; line-height: 1.6; }
+  #logs div { padding: 2px 0; border-bottom: 1px dashed #F0EEEA; word-break: break-all; }
+  #logs .warn { color: #9A6A16; }
+  #logs .error { color: var(--cinnabar); }
+  #logs .info { color: var(--ink-3); }
+
+  /* toast / 弹层 */
+  #toast {
+    position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%);
+    background: rgba(22,24,26,.9); color: #fff; padding: 9px 16px; border-radius: 4px;
+    font-size: 13px; opacity: 0; transition: opacity .2s; pointer-events: none; max-width: 70%;
+  }
+  #toast.on { opacity: 1; }
+
+  .modal-mask {
+    position: fixed; inset: 0; background: rgba(0,0,0,.28);
+    display: none; align-items: center; justify-content: center; z-index: 50;
+  }
+  .modal-mask.on { display: flex; }
+  .modal {
+    background: #fff; border-radius: 6px; padding: 16px; width: 300px;
+    border: 1px solid var(--line);
+  }
+  .modal .modal-title { font-size: 13px; color: var(--ink-3); margin-bottom: 10px; }
+  .modal select, .modal input[type=date] {
+    width: 100%; font: inherit; padding: 8px; border: 1px solid var(--line); border-radius: 3px;
+  }
+  .modal .modal-actions { display: flex; gap: 8px; margin-top: 14px; }
+  .modal .modal-actions button { flex: 1; }
+
+  .hint { color: var(--ink-3); font-size: 12px; padding: 0 14px 12px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">名堂 · 小程序 Web 预览<small>读的是 miniprogram/ 原始文件</small></div>
+  <label>页面
+    <select id="page-picker"></select>
+  </label>
+  <button class="ctl" id="btn-reload">重载当前页</button>
+  <button class="ctl" id="btn-restart">回到首页</button>
+  <button class="ctl" id="btn-flow">跑通起名流程</button>
+  <div class="grow"></div>
+  <button class="ctl primary" id="btn-logs">日志</button>
+</header>
+
+<main>
+  <div class="stage">
+    <div class="phone">
+      <div class="navbar">
+        <span class="back" id="nav-back">‹</span>
+        <span class="title" id="nav-title">名堂</span>
+        <span class="badge" id="nav-path"></span>
+      </div>
+      <div class="screen"><div class="wb-page-root" id="mount"></div></div>
+    </div>
+  </div>
+  <aside id="sidebar">
+    <h3>运行日志（含未实现的 wx.* 调用）</h3>
+    <div id="logs"></div>
+    <div class="hint">点页面里的东西就能交互：筛选、换一批、跳转、分享都会走真实逻辑与真实后端。</div>
+  </aside>
+</main>
+
+<div id="toast"></div>
+
+<div class="modal-mask" id="modal-mask">
+  <div class="modal">
+    <div class="modal-title" id="modal-title"></div>
+    <div id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="ctl" id="modal-cancel">取消</button>
+      <button class="ctl primary" id="modal-ok">确定</button>
+    </div>
+  </div>
+</div>
+
+<script src="/runner.js"></script>
+<script type="application/json" id="wb-report">{}</script>
+<script>
+(function () {
+  var mount = document.getElementById('mount')
+  var logsEl = document.getElementById('logs')
+  var toastEl = document.getElementById('toast')
+  var pagePicker = document.getElementById('page-picker')
+  var navTitle = document.getElementById('nav-title')
+  var navPath = document.getElementById('nav-path')
+  var navBack = document.getElementById('nav-back')
+
+  var APP_NAME = '名堂'
+  var currentInstance = null
+  var currentPath = ''
+  var pickerCtx = null
+
+  // ── 自检：把面板日志 + 未捕获错误汇总成机器可读报告 ──
+  // 目的：让「预览到底跑没跑起来」可以不用肉眼判断（node tools/preview/probe.js 读它）
+  var panel = []
+  var runtimeErrors = []
+  var panelMark = 0 // 报告只覆盖「本次进入页面之后」的日志，避免上一页的报错串台
+
+  function writeReport(extra) {
+    var el = document.getElementById('wb-report')
+    if (!el) return
+    var base = {
+      page: currentPath,
+      panelFrom: panelMark,
+      panel: panel.slice(panelMark),
+      errors: runtimeErrors
+    }
+    if (extra) for (var k in extra) base[k] = extra[k]
+    el.textContent = JSON.stringify(base, null, 0)
+  }
+
+  function log(msg, type) {
+    panel.push({ level: type || 'info', text: String(msg) })
+    var d = document.createElement('div')
+    d.className = type || 'info'
+    d.textContent = msg
+    logsEl.appendChild(d)
+    logsEl.scrollTop = logsEl.scrollHeight
+    writeReport()
+  }
+
+  window.addEventListener('error', function (e) {
+    runtimeErrors.push('onerror: ' + (e.message || '') + ' @' + (e.filename || '') + ':' + (e.lineno || 0))
+    log('未捕获异常：' + (e.message || e.type), 'error')
+  })
+  window.addEventListener('unhandledrejection', function (e) {
+    var r = e.reason
+    runtimeErrors.push('unhandledrejection: ' + ((r && (r.message || r)) || ''))
+    log('未处理的 Promise 拒绝：' + ((r && (r.message || r)) || ''), 'error')
+  })
+  ;['error', 'warn'].forEach(function (lvl) {
+    var orig = console[lvl].bind(console)
+    console[lvl] = function () {
+      var parts = Array.prototype.map.call(arguments, function (a) {
+        return a && a.message ? a.message : String(a)
+      })
+      if (lvl === 'error') runtimeErrors.push('console.error: ' + parts.join(' '))
+      log('console.' + lvl + ': ' + parts.join(' '), lvl === 'error' ? 'error' : 'warn')
+      orig.apply(null, arguments)
+    }
+  })
+
+  var toastTimer = null
+  function toast(msg) {
+    toastEl.textContent = msg
+    toastEl.classList.add('on')
+    clearTimeout(toastTimer)
+    toastTimer = setTimeout(function () { toastEl.classList.remove('on') }, 1800)
+  }
+
+  // ── 原生 picker 替身 ──
+  function openPicker(el, cb) {
+    var mode = el.getAttribute('data-mp-picker') || 'selector'
+    var rawRange = el.getAttribute('data-mp-range')
+    var rangeKey = el.getAttribute('data-mp-range-key')
+    var curValue = el.getAttribute('data-mp-value')
+    var range = []
+    try { range = rawRange ? JSON.parse(decodeURIComponent(rawRange)) : [] } catch (e) { range = [] }
+
+    var body = document.getElementById('modal-body')
+    document.getElementById('modal-title').textContent =
+      (mode === 'date' ? '选择日期' : '选择一项') + '（picker 的浏览器替身）'
+    body.innerHTML = ''
+
+    var input
+    if (mode === 'date' || mode === 'time') {
+      input = document.createElement('input')
+      input.type = mode
+      input.value = curValue || ''
+    } else {
+      input = document.createElement('select')
+      range.forEach(function (item, idx) {
+        var label = (rangeKey && item && typeof item === 'object') ? item[rangeKey] : item
+        var opt = document.createElement('option')
+        opt.value = idx
+        opt.textContent = label
+        input.appendChild(opt)
+      })
+      if (curValue !== null && curValue !== '') input.value = curValue
+    }
+    body.appendChild(input)
+
+    pickerCtx = { el: el, cb: cb, input: input, mode: mode }
+    document.getElementById('modal-mask').classList.add('on')
+  }
+
+  function closePicker() {
+    document.getElementById('modal-mask').classList.remove('on')
+    pickerCtx = null
+  }
+
+  document.getElementById('modal-cancel').onclick = closePicker
+  document.getElementById('modal-ok').onclick = function () {
+    var ctx = pickerCtx
+    if (!ctx) return
+    var value = ctx.mode === 'date' || ctx.mode === 'time'
+      ? ctx.input.value
+      : Number(ctx.input.value)
+    closePicker()
+    ctx.cb(value)
+  }
+
+  // ── 事件委托 ──
+  function fire(evIndex, domEvent, detail) {
+    if (currentInstance && currentInstance.__fire) {
+      currentInstance.__fire(evIndex, domEvent, detail)
+    }
+  }
+
+  mount.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-wb-ev]')
+    if (!el) return
+    var idx = Number(el.getAttribute('data-wb-ev'))
+    var tag = el.tagName.toLowerCase()
+
+    if (el.classList.contains('wb-switch')) {
+      fire(idx, { currentTarget: el }, { value: !el.classList.contains('wb-switch-on') })
+      return
+    }
+    if (tag === 'picker') {
+      openPicker(el, function (value) { fire(idx, { currentTarget: el }, { value: value }) })
+      return
+    }
+    fire(idx, { currentTarget: el }, {})
+  })
+
+  mount.addEventListener('input', function (e) {
+    var el = e.target.closest('[data-wb-ev]')
+    if (!el) return
+    fire(Number(el.getAttribute('data-wb-ev')), { currentTarget: el }, { value: e.target.value })
+  })
+
+  mount.addEventListener('change', function (e) {
+    var el = e.target.closest('[data-wb-ev]')
+    if (!el) return
+    fire(Number(el.getAttribute('data-wb-ev')), { currentTarget: el }, { value: e.target.value })
+  })
+
+  // ── 样式注入 ──
+  function styleTag(id, css) {
+    var s = document.getElementById(id)
+    if (!s) {
+      s = document.createElement('style')
+      s.id = id
+      document.head.appendChild(s)
+    }
+    s.textContent = css
+    return s
+  }
+
+  var BASE_CSS = [
+    'view, scroll-view, swiper, picker, form, navigator, cover-view { display: block; }',
+    'text { display: inline; }',
+    'scroll-view { overflow: hidden; }',
+    'scroll-view[scroll-x] { overflow-x: auto; overflow-y: hidden; }',
+    'scroll-view[scroll-y] { overflow-y: auto; }',
+    'img { display: block; max-width: 100%; }',
+    'input { border: 0; outline: 0; background: transparent; font: inherit; color: inherit; width: 100%; padding: 0; }',
+    'button { font: inherit; }',
+    'picker { cursor: pointer; }',
+    '.wb-switch { display:inline-block; width:80rpx; height:46rpx; border-radius:23rpx; background:#D8D5CF;',
+    '  position:relative; vertical-align:middle; transition:background .15s; cursor:pointer; }',
+    '.wb-switch-on { background:#4E6B54; }',
+    '.wb-switch i { position:absolute; top:4rpx; left:4rpx; width:38rpx; height:38rpx; border-radius:50%;',
+    '  background:#fff; transition:left .15s; }',
+    '.wb-switch-on i { left:38rpx; }'
+  ].join('\n')
+
+  // ── 启动 ──
+  var runtime
+  fetch('/__manifest')
+    .then(function (r) { return r.json() })
+    .then(function (manifest) {
+      var files = manifest.files
+      var root = manifest.root || 'miniprogram/'
+      var W = window.WBPreview
+
+      styleTag('wb-base-style', W.transformWxss(BASE_CSS))
+      if (files[root + 'app.wxss']) {
+        styleTag('wb-app-style', W.transformWxss(files[root + 'app.wxss']))
+      }
+
+      var uiHooks = {
+        mount: function (html, events, inst) {
+          mount.innerHTML = html
+          currentInstance = inst
+        },
+        setTitle: function (t) { if (t) navTitle.textContent = t },
+        setNav: function (info) {
+          currentPath = info.path
+          navPath.textContent = info.path.replace('pages/', '')
+          navBack.style.visibility = info.canBack ? 'visible' : 'hidden'
+          if (info.title) navTitle.textContent = info.title
+          var pageWxss = files[root + info.path + '.wxss']
+          styleTag('wb-page-style', pageWxss ? W.transformWxss(pageWxss) : '')
+          pagePicker.value = info.path
+          writeReport()
+        },
+        toast: toast
+      }
+
+      runtime = W.createRuntime({
+        files: files,
+        mpBase: '/mp/',
+        apiBase: 'http://127.0.0.1:8000/api/v1',
+        log: log,
+        ui: uiHooks
+      })
+
+      // 页面下拉
+      runtime.appJson.pages.forEach(function (p) {
+        var opt = document.createElement('option')
+        opt.value = p
+        opt.textContent = p.replace('pages/', '')
+        pagePicker.appendChild(opt)
+      })
+
+      pagePicker.onchange = function () { window.__wb.goto(pagePicker.value) }
+      document.getElementById('btn-reload').onclick = function () { window.__wb.goto(currentPath) }
+      document.getElementById('btn-restart').onclick = function () { window.__wb.goto('pages/home/home') }
+      document.getElementById('btn-flow').onclick = function () { window.__wb.flow() }
+      navBack.onclick = function () { runtime.back() }
+      document.getElementById('btn-logs').onclick = function () {
+        var s = document.getElementById('sidebar')
+        s.style.display = s.style.display === 'none' ? 'flex' : 'none'
+      }
+
+      log('清单载入：' + Object.keys(files).length + ' 个文本文件', 'info')
+
+      // ── 自动化接口 ──
+      // 供命令行探针（probe.js）与人工调试使用。所有动作都走页面真实的事件处理函数，
+      // 不绕过任何业务逻辑 —— 否则预览就失去意义了。
+      function q(sel) { return mount.querySelector(sel) }
+      function handlerEl(name) { return mount.querySelector('[data-wb-h="' + name + '"]') }
+
+      function clickEl(el) {
+        if (!el) return false
+        el.click()
+        return true
+      }
+
+      function clickHandler(name) {
+        var el = handlerEl(name)
+        if (!el) return false
+        if (el.tagName.toLowerCase() === 'picker') {
+          el.click() // 由 harness 弹层接管，再调用 __pickConfirm
+          return true
+        }
+        el.click()
+        return true
+      }
+
+      /** 给 input 赋值并触发真实 bindinput */
+      function typeHandler(name, value) {
+        var el = handlerEl(name)
+        if (!el) return false
+        el.value = value
+        el.dispatchEvent(new Event('input', { bubbles: true }))
+        return true
+      }
+
+      /** 走真实的 picker 弹层：点开 → 填值 → 确定 */
+      function pickHandler(name, value) {
+        var el = handlerEl(name)
+        if (!el) return false
+        el.click()
+        return new Promise(function (resolve) {
+          setTimeout(function () {
+            var input = document.getElementById('modal-body').querySelector('input,select')
+            if (!input) { resolve(false); return }
+            if (input.tagName === 'SELECT') {
+              // 选择型：按文本或下标匹配
+              var idx = Number(value)
+              if (isNaN(idx)) {
+                var opts = Array.prototype.slice.call(input.options)
+                var hit = opts.filter(function (o) { return o.textContent.indexOf(String(value)) !== -1 })[0]
+                input.value = hit ? hit.value : input.value
+              } else {
+                input.value = String(idx)
+              }
+            } else {
+              input.value = value
+            }
+            document.getElementById('modal-ok').click()
+            resolve(true)
+          }, 30)
+        })
+      }
+
+      function clickText(text) {
+        var nodes = Array.prototype.slice.call(mount.querySelectorAll('[data-wb-ev]'))
+        var hit = nodes.filter(function (el) { return (el.textContent || '').indexOf(text) !== -1 })[0]
+        return clickEl(hit)
+      }
+
+      /** 等某个条件成立（页面切换 / 出现某元素 / 数据就绪） */
+      function waitFor(predicate, timeoutMs) {
+        var t0 = Date.now()
+        return new Promise(function (resolve) {
+          ;(function loop() {
+            var ok = false
+            try { ok = predicate() } catch (e) { ok = false }
+            if (ok) return resolve(true)
+            if (Date.now() - t0 > (timeoutMs || 15000)) return resolve(false)
+            setTimeout(loop, 120)
+          })()
+        })
+      }
+
+      /**
+       * 通用步骤执行器。每个步骤都是「等某元素出现 → 对它做一个真实动作」，
+       * 动作全部走页面自己的事件处理函数，不绕过业务逻辑。
+       * steps 里可用的键：
+       *   wait:  处理器名（等它出现）
+       *   type:  { sel, value }  给 input 赋值并触发 bindinput
+       *   pick:  { sel, value }  走原生 picker 弹层
+       *   click: 处理器名
+       *   sleep: 毫秒
+       */
+      function runSteps(steps) {
+        return steps.reduce(function (chain, step) {
+          return chain.then(function () {
+            if (step.wait && !step.optional) {
+              return waitFor(function () { return handlerEl(step.wait) }, 15000)
+            }
+            return true
+          }).then(function () {
+            if (step.type) return typeHandler(step.type.sel, step.type.value)
+            if (step.pick) return pickHandler(step.pick.sel, step.pick.value)
+            if (step.click) return clickHandler(step.click)
+            if (step.txt) return clickText(step.txt)
+            return true
+          }).then(function () {
+            return step.sleep ? new Promise(function (r) { setTimeout(r, step.sleep) }) : true
+          })
+        }, Promise.resolve(true))
+      }
+
+      /**
+       * 跑通真实起名流程：资料页 → 挑一种感觉 → 生成 → 结果页。
+       * 之所以要做这个：结果页/详情页依赖 globalData.lastResult，
+       * 直接下拉跳过去只会被 navigateBack 弹回，看不到真实内容。
+       */
+      function runFlow(opts) {
+        opts = opts || {}
+        panelMark = panel.length
+        log('[流程] 起名：资料页 → 挑一种感觉 → 生成', 'info')
+        return startAt('pages/name/name').then(function () {
+          return runSteps([
+            { wait: 'onSurnameInput' },
+            { type: { sel: 'onSurnameInput', value: opts.surname || '林' } },
+            { pick: { sel: 'onDateChange', value: opts.birthDate || '1994-05-20' } },
+            { sleep: 200 },
+            { click: 'onNext' },
+            { wait: 'onFeelTap' },
+            { click: 'onFeelTap' },
+            { sleep: 200 },
+            { click: 'onSubmit' }
+          ])
+        }).then(function () {
+          return waitFor(function () { return currentPath === 'pages/result/result' }, 30000)
+        }).then(function (ok) {
+          if (opts.thenDetail) {
+            log(ok ? '[流程] 再进一个名字的详情页' : '[流程] 未到结果页，跳过详情', ok ? 'info' : 'warn')
+            if (ok) {
+              return runSteps([{ wait: 'onNameTap' }, { click: 'onNameTap' }])
+                .then(function () { return waitFor(function () { return currentPath === 'pages/detail/detail' }, 10000) })
+                .then(function () { return true })
+            }
+          }
+          return ok
+        }).then(function (ok) {
+          log(ok ? '[流程] 已到 ' + currentPath : '[流程] 未到结果页（后端没起？）', ok ? 'info' : 'error')
+          writeReport({ flowDone: !!ok, flowAt: currentPath })
+          return !!ok
+        }).catch(function (err) {
+          log('[流程] 失败：' + err.message, 'error')
+          writeReport({ flowDone: false, flowError: err.message })
+          return false
+        })
+      }
+
+      /** 孕期起名流程 → 停在 prenatal-result */
+      function runPrenatalFlow() {
+        panelMark = panel.length
+        log('[流程] 孕期起名：未出生 → 预产期 → 生成', 'info')
+        return startAt('pages/name/name?tab=prenatal').then(function () {
+          return runSteps([
+            { wait: 'onDueDateChange' },
+            { pick: { sel: 'onDueDateChange', value: '2026-04-15' } },
+            { sleep: 200 },
+            { click: 'onNext' },
+            { wait: 'onFeelTap' },
+            { click: 'onFeelTap' },
+            { sleep: 200 },
+            { click: 'onSubmit' }
+          ])
+        }).then(function () {
+          return waitFor(function () { return currentPath === 'pages/prenatal-result/prenatal-result' }, 30000)
+        }).then(function (ok) {
+          log(ok ? '[流程] 已到 ' + currentPath : '[流程] 未到孕期结果页', ok ? 'info' : 'error')
+          writeReport({ flowDone: !!ok, flowAt: currentPath })
+          return !!ok
+        })
+      }
+
+      /** 名字测评流程 → 停在 analyze-result */
+      function runAnalyzeFlow() {
+        panelMark = panel.length
+        log('[流程] 名字测评：填姓名 → 开始测评', 'info')
+        return startAt('pages/analyze/analyze').then(function () {
+          return runSteps([
+            { wait: 'onNameInput' },
+            { type: { sel: 'onNameInput', value: '林海深' } },
+            { pick: { sel: 'onDateChange', value: '1994-05-20' } },
+            { sleep: 200 },
+            { click: 'onSubmit' }
+          ])
+        }).then(function () {
+          return waitFor(function () { return currentPath === 'pages/analyze-result/analyze-result' }, 30000)
+        }).then(function (ok) {
+          log(ok ? '[流程] 已到 ' + currentPath : '[流程] 未到测评结果页', ok ? 'info' : 'error')
+          writeReport({ flowDone: !!ok, flowAt: currentPath })
+          return !!ok
+        })
+      }
+
+      function startAt(path) {
+        runtime.stack = []
+        runtime.navigate('/' + path.replace(/^\//, ''), 'reset')
+        return new Promise(function (r) { setTimeout(r, 250) })
+      }
+
+      // ── 上下文补齐 ──
+      // 结果页 / 详情页 / 八字页只从 globalData 取数据，直接跳过去会被
+      // 页面自己的 navigateBack 弹回。这里先**走真实流程**把上下文准备好，
+      // 而不是手塞一份假数据 —— 否则预览看到的就不是真实结果了。
+      var NEED_CONTEXT = {
+        'pages/result/result': 'lastResult',
+        'pages/bazi/bazi': 'lastResult',
+        'pages/detail/detail': 'selectedName',
+        'pages/prenatal-result/prenatal-result': 'prenatalResult',
+        'pages/analyze-result/analyze-result': 'analyzeResult'
+      }
+
+      function seedSelectedName() {
+        var g = runtime.getApp().globalData
+        if (g.lastResult && (g.lastResult.names || []).length) {
+          g.selectedName = g.lastResult.names[0]
+          if (!g.lastBatchId) g.lastBatchId = Date.now()
+          log('[预览] 已把第一个候选名设为 selectedName（等价于点开第一张名字卡）', 'info')
+        }
+      }
+
+      function ensureContext(path) {
+        var need = NEED_CONTEXT[path]
+        if (!need) return Promise.resolve(true)
+        var g = runtime.getApp().globalData || {}
+        if (g[need]) return Promise.resolve(true)
+
+        if (need === 'lastResult' || need === 'selectedName') {
+          if (!g.lastResult) {
+            log('[预览] ' + path + ' 需要起名结果，先自动跑一遍起名流程', 'info')
+            return runFlow().then(function (ok) {
+              if (ok && need === 'selectedName') seedSelectedName()
+              return ok
+            })
+          }
+          if (need === 'selectedName') seedSelectedName()
+          return Promise.resolve(true)
+        }
+        if (need === 'prenatalResult') return runPrenatalFlow()
+        if (need === 'analyzeResult') return runAnalyzeFlow()
+        return Promise.resolve(true)
+      }
+
+      window.__wb = {
+        runtime: runtime,
+        log: log,
+        /** 把当前日志位置设为报告基线：之后的日志才算「这一次」的 */
+        mark: function () { panelMark = panel.length },
+        goto: function (path) {
+          var clean = String(path).replace(/^\//, '').split('?')[0]
+          return ensureContext(clean).then(function () {
+            panelMark = panel.length
+            runtime.stack = []
+            runtime.navigate('/' + String(path).replace(/^\//, ''), 'reset')
+            return true
+          })
+        },
+        clickHandler: clickHandler,
+        clickText: clickText,
+        typeHandler: typeHandler,
+        pickHandler: pickHandler,
+        waitFor: waitFor,
+        flow: runFlow,
+        prenatalFlow: runPrenatalFlow,
+        analyzeFlow: runAnalyzeFlow,
+        runSteps: runSteps,
+        panel: function () { return panel.slice() },
+        report: function () { return JSON.parse(document.getElementById('wb-report').textContent || '{}') }
+      }
+
+      // 页面切换后报告里的 page 字段同步刷新
+      var _setNav = uiHooks.setNav
+      uiHooks.setNav = function (info) { _setNav(info); writeReport() }
+
+      // ── 启动：支持 ?page=<路径> 与 ?flow=1|prenatal|analyze|detail ──
+      var params = new URLSearchParams(location.search)
+      var startPage = params.get('page')
+      var flow = params.get('flow')
+      var flowOpts = {
+        surname: params.get('surname') || undefined,
+        birthDate: params.get('birth') || undefined,
+        thenDetail: flow === 'detail'
+      }
+      if (flow === 'prenatal') {
+        runPrenatalFlow()
+      } else if (flow === 'analyze') {
+        runAnalyzeFlow()
+      } else if (flow) {
+        runFlow(flowOpts)
+      } else if (startPage) {
+        window.__wb.goto(startPage)
+      } else {
+        runtime.open('pages/home/home', {})
+      }
+      if (params.get('logs') === '0') {
+        document.getElementById('sidebar').style.display = 'none'
+      }
+    })
+    .catch(function (err) {
+      log('启动失败：' + err.message, 'error')
+      writeReport({ bootFailed: String(err && err.message) })
+    })
+})()
+</script>
+</body>
+</html>
