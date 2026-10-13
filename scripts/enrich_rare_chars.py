@@ -8,14 +8,21 @@
 ⚠️ 费用控制：先做小规模试点（约 50 字）验证流程与数据质量，报告确认后再全量。
 
 用法：
-    # 试点 50 字（只输出 JSONL，不写回 chars.json）
-    venv/bin/python scripts/enrich_rare_chars.py --limit 50
+    # 先看缺口（不花钱）
+    venv/bin/python scripts/enrich_rare_chars.py --report
+
+    # 试点 50 字，优先补「用户看得到的」候选池空字（只输出 JSONL，不写回 chars.json）
+    venv/bin/python scripts/enrich_rare_chars.py --pool-only --limit 50
 
     # 试点 50 字并合并写回 chars.json
-    venv/bin/python scripts/enrich_rare_chars.py --limit 50 --merge
+    venv/bin/python scripts/enrich_rare_chars.py --pool-only --limit 50 --merge
 
-    # 全量（谨慎，预算确认后）
-    venv/bin/python scripts/enrich_rare_chars.py --merge
+    # 全量候选池空字（谨慎，预算确认后）
+    venv/bin/python scripts/enrich_rare_chars.py --pool-only --merge
+
+⚠️ 排序已改为「候选展示字池优先」（`--pool-only` 可只保留池内字）：
+   池 = 全部出处的 recommend_chars ∪ name_pairs 用字，即用户真正能看到的字。
+   原实现按 level（扩展→二→一）排序，会先把预算花在用户永远看不到的生僻字上。
 """
 
 from __future__ import annotations
@@ -101,14 +108,75 @@ def load_chars() -> dict:
         return json.load(f)
 
 
-def select_candidates(data: dict, limit: int) -> list[dict]:
-    """选取 meaning 为空的新扩充字（level=二/扩展 优先，其次一级空义项字）。"""
+# --------------------------------------------------------------------------- #
+# 候选展示字池：用户真正能看到的字
+# --------------------------------------------------------------------------- #
+#
+# 为什么需要它：原实现按 level（扩展 → 二 → 一）排序选字，
+# 于是预算先花在用户**永远看不到**的生僻字上 —— 而真正造成
+# 「用字解析一片空白」（鹿/云/雪/梅/川…）的是候选池里的常用字。
+# 候选池 = 全部出处的 recommend_chars ∪ name_pairs 用字，
+# 与 naming_engine 实际取字范围一致。
+
+def candidate_pool() -> set[str]:
+    from app.services.poetry_database import PoetryDatabase  # 延迟导入，避免无谓加载
+
+    db = PoetryDatabase()
+    pool: set[str] = set()
+    for entry in db.get_all():
+        pool.update(entry.get("recommend_chars") or [])
+        for pair in entry.get("name_pairs") or []:
+            if isinstance(pair, (list, tuple)):
+                pool.update(pair)
+            elif isinstance(pair, str):
+                pool.add(pair)
+    return pool
+
+
+def pool_gap(data: dict) -> tuple[set[str], list[str]]:
+    """返回（候选池, 池中 meaning 为空的字）。"""
+    pool = candidate_pool()
+    by_char = {c["char"]: c for c in data["chars"]}
+    empty = [
+        ch for ch in sorted(pool)
+        if ch in by_char and not (by_char[ch].get("meaning") or "").strip()
+    ]
+    return pool, empty
+
+
+def select_candidates(
+    data: dict,
+    limit: int,
+    pool_only: bool = False,
+    pool_first: bool = True,
+) -> list[dict]:
+    """选取 meaning 为空的字。
+
+    排序优先级：
+      1. `--pool-only` 时只保留候选展示字池内的字（用户可见）；
+         `--pool-first`（默认）时池内字排在最前，池外字靠后兜底。
+      2. 池内/池外各自按 level（扩展 → 二 → 一）排序。
+    """
     chars = data["chars"]
     order = {"扩展": 0, "二": 1, "一": 2}
-    candidates = [
-        c for c in chars if not (c.get("meaning") or "").strip()
-    ]
-    candidates.sort(key=lambda c: (order.get(c.get("level", "一"), 9), c["char"]))
+    candidates = [c for c in chars if not (c.get("meaning") or "").strip()]
+
+    try:
+        pool = candidate_pool()
+    except Exception as exc:  # 出处库不可用时退化为纯 level 排序
+        print(f"[enrich] ⚠️ 候选池加载失败（{exc}），退回按 level 排序")
+        pool = set()
+
+    if pool_only:
+        candidates = [c for c in candidates if c["char"] in pool]
+
+    candidates.sort(
+        key=lambda c: (
+            0 if (pool_first and c["char"] in pool) else 1,
+            order.get(c.get("level", "一"), 9),
+            c["char"],
+        )
+    )
     if limit and limit > 0:
         return candidates[:limit]
     return candidates
@@ -233,6 +301,17 @@ def main() -> None:
     parser.add_argument("--out", default=str(DEFAULT_OUT))
     parser.add_argument("--done", default=str(DEFAULT_DONE))
     parser.add_argument("--merge", action="store_true", help="标注后合并写回 chars.json")
+    parser.add_argument(
+        "--pool-only",
+        action="store_true",
+        help="只标注「候选展示字池」内的空字（用户真正能看到的字，推荐）",
+    )
+    parser.add_argument(
+        "--no-pool-first",
+        action="store_true",
+        help="关闭「候选池优先」，退回纯 level 排序",
+    )
+    parser.add_argument("--report", action="store_true", help="只打印候选池缺口统计，不调用 LLM")
     parser.add_argument("--concurrency", type=int, default=4)
     parser.add_argument("--delay", type=float, default=0.2)
     parser.add_argument("--provider", default=None)
@@ -242,7 +321,26 @@ def main() -> None:
     args = parser.parse_args()
 
     data = load_chars()
-    candidates = select_candidates(data, args.limit)
+
+    if args.report:
+        try:
+            pool, empty = pool_gap(data)
+        except Exception as exc:
+            print(f"[report] 候选池加载失败：{exc}")
+            return
+        total_empty = sum(1 for c in data["chars"] if not (c.get("meaning") or "").strip())
+        print(f"[report] 字库 {len(data['chars'])} 字，其中 meaning 为空 {total_empty} 字")
+        print(f"[report] 候选展示字池 {len(pool)} 字，其中空字 {len(empty)} 字"
+              f"（占池 {len(empty) / max(len(pool), 1) * 100:.1f}%）")
+        print(f"[report] 池内空字：{''.join(empty)}")
+        return
+
+    candidates = select_candidates(
+        data,
+        args.limit,
+        pool_only=args.pool_only,
+        pool_first=not args.no_pool_first,
+    )
     done = load_done(Path(args.done))
     pending = [c for c in candidates if c["char"] not in done]
     print(f"[enrich] 候选 {len(candidates)} 字，已完成 {len(candidates) - len(pending)}，待标注 {len(pending)}")
