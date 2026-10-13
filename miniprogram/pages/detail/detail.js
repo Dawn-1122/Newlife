@@ -122,14 +122,29 @@ Page({
   },
 
   onShareAppMessage() {
+    // ⚠️ 微信 onShareAppMessage 的返回值只支持 title / path / imageUrl / promise 四个字段
+    //    （官方文档：框架接口 / Page，onShareAppMessage 小节），平台**不提供**
+    //    「分享成功」回调。此前这里写了 success 字段，会被静默忽略 →
+    //    markUnlocked() 永不执行 → 深度寓意永远锁着，「分享解锁」整条链路是死的。
+    //    现改为「用户发起分享即解锁」：本函数被调用本身就代表用户点了分享入口
+    //    （页面内 open-type="share" 按钮，或右上角菜单「转发」），
+    //    这是官方允许的、最接近「已分享」的时机。
+    //    ⚠️ 代价：用户在分享面板里点取消也会解锁 —— 平台层面无法区分，属于已知取舍。
+    this.markUnlocked()
+
     const name = this.data.name
     return {
       title: `「${name.full_name}」综合评分${name.scores.overall}分`,
-      path: '/pages/home/home',
-      // 分享成功即解锁深度寓意
-      success: () => {
-        this.markUnlocked()
-      }
+      path: '/pages/home/home'
+    }
+  },
+
+  // 分享到朋友圈同样解锁（该场景不支持自定义 path，只能带 query）
+  onShareTimeline() {
+    this.markUnlocked()
+    const name = this.data.name
+    return {
+      title: `「${name.full_name}」综合评分${name.scores.overall}分`
     }
   }
 })

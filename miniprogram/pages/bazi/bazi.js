@@ -1,3 +1,5 @@
+const share = require('../../utils/share')
+
 Page({
   data: {
     bazi: null,
@@ -32,5 +34,9 @@ Page({
       xiyongText,
       jiyongText
     })
-  }
+  },
+
+  onShareAppMessage: share.defaultShare,
+
+  onShareTimeline: share.defaultTimeline
 })

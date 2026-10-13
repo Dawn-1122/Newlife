@@ -1,5 +1,7 @@
 // 二级菜单：主页只留「起名 / 名字测评」两个主入口，细分功能集中在这里。
 // available:false 的行点按只提示「即将上线」。
+const share = require('../../utils/share')
+
 Page({
   data: {
     groups: [
@@ -33,5 +35,9 @@ Page({
       return
     }
     if (url) wx.navigateTo({ url })
-  }
+  },
+
+  onShareAppMessage: share.defaultShare,
+
+  onShareTimeline: share.defaultTimeline
 })

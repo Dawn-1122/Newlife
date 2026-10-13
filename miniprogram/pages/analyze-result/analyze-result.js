@@ -1,3 +1,5 @@
+const share = require('../../utils/share')
+
 Page({
   data: {
     result: null,
@@ -35,5 +37,9 @@ Page({
 
   onBackHome() {
     wx.reLaunch({ url: '/pages/home/home' })
-  }
+  },
+
+  onShareAppMessage: share.defaultShare,
+
+  onShareTimeline: share.defaultTimeline
 })

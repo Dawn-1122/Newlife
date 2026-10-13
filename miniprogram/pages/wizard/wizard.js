@@ -1,4 +1,5 @@
 const api = require('../../utils/api')
+const share = require('../../utils/share')
 
 // 起名第二步（也是最后一步）：挑一种「感觉」→ 直接生成。
 //
@@ -145,10 +146,7 @@ Page({
     }
   },
 
-  onShareAppMessage() {
-    return {
-      title: '名堂 · 有据可循的起名工具',
-      path: '/pages/home/home'
-    }
-  }
+  onShareAppMessage: share.defaultShare,
+
+  onShareTimeline: share.defaultTimeline
 })

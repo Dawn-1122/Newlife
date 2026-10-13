@@ -1,3 +1,5 @@
+const share = require('../../utils/share')
+
 const WUXING_ORDER = ['金', '木', '水', '火', '土']
 
 function distToList(dist) {
@@ -57,5 +59,9 @@ Page({
 
   onBackHome() {
     wx.reLaunch({ url: '/pages/home/home' })
-  }
+  },
+
+  onShareAppMessage: share.defaultShare,
+
+  onShareTimeline: share.defaultTimeline
 })

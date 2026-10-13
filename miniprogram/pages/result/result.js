@@ -1,4 +1,5 @@
 const api = require('../../utils/api')
+const share = require('../../utils/share')
 
 // 结果页风格筛选条：全部 + 8 个风格（与后端 STYLE_OPTIONS 同源，见 utils/api.js）
 const styleFilters = [{ code: '', name: '全部' }].concat(
@@ -251,10 +252,7 @@ Page({
     wx.reLaunch({ url: '/pages/home/home' })
   },
 
-  onShareAppMessage() {
-    return {
-      title: '名堂 · 有据可循的起名工具',
-      path: '/pages/home/home'
-    }
-  }
+  onShareAppMessage: share.defaultShare,
+
+  onShareTimeline: share.defaultTimeline
 })

@@ -1,4 +1,5 @@
 const api = require('../../utils/api')
+const share = require('../../utils/share')
 
 Page({
   data: {
@@ -156,5 +157,9 @@ Page({
     }
 
     wx.navigateTo({ url: '/pages/wizard/wizard' })
-  }
+  },
+
+  onShareAppMessage: share.defaultShare,
+
+  onShareTimeline: share.defaultTimeline
 })
