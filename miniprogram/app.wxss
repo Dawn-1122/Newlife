@@ -16,6 +16,15 @@ page {
   --line-strong: #C9CDD2;
   --cinnabar: #A6321F;
   --cinnabar-bg: #FBF1EE;
+  /* 赭黄：注解类文字（说明、降级提示）。与「五行·金」同色但语义不同 ——
+     拆成两个令牌是为了将来单独调整其中之一时不互相牵连。 */
+  --ochre: #8D7B4F;
+  /* 五行用传统矿物色（非 Material 色），供 .wuxing-* / .gz-tag / .bar-fill 等复用 */
+  --wx-jin: #8D7B4F;
+  --wx-mu: #4E6B54;
+  --wx-shui: #3E5A73;
+  --wx-huo: #A6321F;
+  --wx-tu: #7A6248;
   --r-sm: 3rpx;
   --r-md: 6rpx;
   --serif: "Songti SC", "STSong", "Noto Serif SC", "Source Han Serif SC", serif;

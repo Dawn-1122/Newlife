@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #FFFFFF;
+  background: var(--card);
   border-radius: 6rpx;
   padding: 22rpx 24rpx;
   margin-bottom: 20rpx;
@@ -10,22 +10,22 @@
 
 .adjust-text {
   font-size: 28rpx;
-  color: #16181A;
+  color: var(--ink);
   font-weight: 500;
 }
 
 .adjust-more {
   font-size: 30rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
 }
 
 .section-title {
   font-size: 30rpx;
   font-weight: 500;
-  color: #16181A;
+  color: var(--ink);
   margin-bottom: 20rpx;
   padding-left: 16rpx;
-  border-left: 6rpx solid #4A4F55;
+  border-left: 6rpx solid var(--ink-2);
 }
 
 .range-row {
@@ -36,12 +36,12 @@
 
 .range-label {
   font-size: 26rpx;
-  color: #8A9099;
+  color: var(--ink-3);
 }
 
 .range-value {
   font-size: 28rpx;
-  color: #16181A;
+  color: var(--ink);
   font-weight: 500;
 }
 
@@ -50,7 +50,7 @@
   justify-content: space-around;
   padding-top: 20rpx;
   margin-top: 12rpx;
-  border-top: 1rpx solid #E4E2DD;
+  border-top: 1rpx solid var(--line);
 }
 
 .certain-item {
@@ -61,22 +61,22 @@
 
 .certain-label {
   font-size: 24rpx;
-  color: #8A9099;
+  color: var(--ink-3);
 }
 
 .certain-value {
   font-size: 32rpx;
   font-weight: 500;
-  color: #16181A;
+  color: var(--ink);
   margin-top: 6rpx;
 }
 
 /* 五行颜色 */
-.wuxing-text.wx-jin { color: #8D7B4F; }
-.wuxing-text.wx-mu { color: #4E6B54; }
-.wuxing-text.wx-shui { color: #3E5A73; }
-.wuxing-text.wx-huo { color: #A6321F; }
-.wuxing-text.wx-tu { color: #7A6248; }
+.wuxing-text.wx-jin { color: var(--wx-jin); }
+.wuxing-text.wx-mu { color: var(--wx-mu); }
+.wuxing-text.wx-shui { color: var(--wx-shui); }
+.wuxing-text.wx-huo { color: var(--wx-huo); }
+.wuxing-text.wx-tu { color: var(--wx-tu); }
 
 /* 概率柱状条 */
 .bar-row {
@@ -95,7 +95,7 @@
 .bar-track {
   flex: 1;
   height: 24rpx;
-  background: #E4E2DD;
+  background: var(--line);
   border-radius: 4rpx;
   margin: 0 16rpx;
   overflow: hidden;
@@ -106,17 +106,17 @@
   border-radius: 4rpx;
 }
 
-.bar-fill.wx-jin { background: #8D7B4F; }
-.bar-fill.wx-mu { background: #4E6B54; }
-.bar-fill.wx-shui { background: #3E5A73; }
-.bar-fill.wx-huo { background: #A6321F; }
-.bar-fill.wx-tu { background: #7A6248; }
+.bar-fill.wx-jin { background: var(--wx-jin); }
+.bar-fill.wx-mu { background: var(--wx-mu); }
+.bar-fill.wx-shui { background: var(--wx-shui); }
+.bar-fill.wx-huo { background: var(--wx-huo); }
+.bar-fill.wx-tu { background: var(--wx-tu); }
 
 .bar-percent {
   width: 80rpx;
   text-align: right;
   font-size: 24rpx;
-  color: #8A9099;
+  color: var(--ink-3);
   flex-shrink: 0;
 }
 
@@ -130,19 +130,19 @@
 
 .stable-label {
   font-size: 26rpx;
-  color: #8A9099;
+  color: var(--ink-3);
 }
 
 .stable-value {
   font-size: 30rpx;
   font-weight: 500;
-  color: #16181A;
+  color: var(--ink);
 }
 
 .safe-label {
   display: block;
   font-size: 26rpx;
-  color: #8A9099;
+  color: var(--ink-3);
   margin-bottom: 12rpx;
 }
 
@@ -154,7 +154,7 @@
 
 .safe-item {
   width: 30%;
-  background: #F7F6F3;
+  background: var(--paper);
   border-radius: 4rpx;
   padding: 16rpx;
   box-sizing: border-box;
@@ -167,27 +167,27 @@
 .safe-char {
   font-size: 40rpx;
   font-weight: 500;
-  color: #16181A;
+  color: var(--ink);
 }
 
 .safe-meta {
   font-size: 20rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
 }
 
 .safe-meaning {
   font-size: 22rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
   text-align: center;
 }
 
 .note {
   margin-top: 20rpx;
   padding: 20rpx;
-  background: #EFEDE8;
+  background: var(--paper-deep);
   border-radius: 4rpx;
   font-size: 24rpx;
-  color: #8D7B4F;
+  color: var(--ochre);
   line-height: 1.7;
 }
 

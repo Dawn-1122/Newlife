@@ -6,13 +6,13 @@
 .name-main {
   font-size: 64rpx;
   font-weight: 500;
-  color: #16181A;
+  color: var(--ink);
   letter-spacing: 12rpx;
 }
 
 .name-pinyin {
   font-size: 28rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
   margin-top: 12rpx;
 }
 
@@ -26,22 +26,22 @@
 
 .score-label {
   font-size: 26rpx;
-  color: #8A9099;
+  color: var(--ink-3);
 }
 
 .score-number {
   font-size: 48rpx;
   font-weight: 500;
-  color: #16181A;
+  color: var(--ink);
 }
 
 .section-title {
   font-size: 30rpx;
   font-weight: 500;
-  color: #16181A;
+  color: var(--ink);
   margin-bottom: 20rpx;
   padding-left: 16rpx;
-  border-left: 6rpx solid #4A4F55;
+  border-left: 6rpx solid var(--ink-2);
 }
 
 /* 用字解析 */
@@ -49,7 +49,7 @@
   display: flex;
   gap: 24rpx;
   padding: 20rpx 0;
-  border-bottom: 1rpx solid #E4E2DD;
+  border-bottom: 1rpx solid var(--line);
 }
 
 .char-item:last-child {
@@ -67,12 +67,12 @@
 .char-text {
   font-size: 48rpx;
   font-weight: 500;
-  color: #16181A;
+  color: var(--ink);
 }
 
 .char-pinyin {
   font-size: 22rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
   margin-top: 4rpx;
 }
 
@@ -90,19 +90,19 @@
   font-size: 20rpx;
   padding: 4rpx 12rpx;
   border-radius: 6rpx;
-  background: #EFEDE8;
-  color: #4A4F55;
+  background: var(--paper-deep);
+  color: var(--ink-2);
 }
 
-.wuxing-tag.wx-jin { background: #EFEDE8; color: #8D7B4F; }
-.wuxing-tag.wx-mu { background: #EFEDE8; color: #4E6B54; }
-.wuxing-tag.wx-shui { background: #EFEDE8; color: #3E5A73; }
-.wuxing-tag.wx-huo { background: #FBF1EE; color: #A6321F; }
-.wuxing-tag.wx-tu { background: #EFEDE8; color: #7A6248; }
+.wuxing-tag.wx-jin { background: var(--paper-deep); color: var(--wx-jin); }
+.wuxing-tag.wx-mu { background: var(--paper-deep); color: var(--wx-mu); }
+.wuxing-tag.wx-shui { background: var(--paper-deep); color: var(--wx-shui); }
+.wuxing-tag.wx-huo { background: var(--cinnabar-bg); color: var(--wx-huo); }
+.wuxing-tag.wx-tu { background: var(--paper-deep); color: var(--wx-tu); }
 
 .char-meaning {
   font-size: 26rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
   line-height: 1.5;
 }
 
@@ -110,22 +110,22 @@
 .char-shuowen {
   margin-top: 12rpx;
   padding: 16rpx 20rpx;
-  background: #F7F6F3;
+  background: var(--paper);
   border-radius: 4rpx;
-  border-left: 4rpx solid #4A4F55;
+  border-left: 4rpx solid var(--ink-2);
 }
 
 .shuowen-label {
   display: block;
   font-size: 22rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
   font-weight: 500;
   margin-bottom: 6rpx;
 }
 
 .shuowen-text {
   font-size: 26rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
   line-height: 1.7;
 }
 
@@ -137,22 +137,22 @@
 .detail-label {
   display: block;
   font-size: 22rpx;
-  color: #8A9099;
+  color: var(--ink-3);
   margin-bottom: 6rpx;
 }
 
 .detail-text {
   font-size: 26rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
   line-height: 1.7;
 }
 
 /* 诗词 */
 .poetry-block {
   padding: 20rpx;
-  background: #F7F6F3;
+  background: var(--paper);
   border-radius: 4rpx;
-  border-left: 6rpx solid #4A4F55;
+  border-left: 6rpx solid var(--ink-2);
 }
 
 .poetry-header {
@@ -161,21 +161,21 @@
 
 .poetry-source {
   font-size: 28rpx;
-  color: #16181A;
+  color: var(--ink);
   font-weight: 500;
   display: block;
 }
 
 .poetry-author {
   font-size: 24rpx;
-  color: #8A9099;
+  color: var(--ink-3);
   margin-top: 4rpx;
   display: block;
 }
 
 .poetry-text {
   font-size: 30rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
   line-height: 1.8;
   font-style: italic;
 }
@@ -194,18 +194,18 @@
 
 .phon-label {
   font-size: 28rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
 }
 
 .phon-value {
   font-size: 28rpx;
-  color: #16181A;
+  color: var(--ink);
   font-weight: 500;
 }
 
 .phon-desc {
   font-size: 26rpx;
-  color: #8A9099;
+  color: var(--ink-3);
   margin-top: 8rpx;
 }
 
@@ -224,13 +224,13 @@
 
 .wuge-name {
   font-size: 24rpx;
-  color: #8A9099;
+  color: var(--ink-3);
 }
 
 .wuge-num {
   font-size: 36rpx;
   font-weight: 500;
-  color: #16181A;
+  color: var(--ink);
   margin-top: 4rpx;
 }
 
@@ -239,22 +239,22 @@
   margin-top: 4rpx;
 }
 
-.wuge-luck.luck-daji { color: #4E6B54; }
-.wuge-luck.luck-ji { color: #4E6B54; }
-.wuge-luck.luck-xiong { color: #A6321F; }
+.wuge-luck.luck-daji { color: var(--wx-mu); }
+.wuge-luck.luck-ji { color: var(--wx-mu); }
+.wuge-luck.luck-xiong { color: var(--cinnabar); }
 
 .wuge-desc {
   font-size: 26rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
   text-align: center;
   padding-top: 12rpx;
-  border-top: 1rpx solid #E4E2DD;
+  border-top: 1rpx solid var(--line);
 }
 
 /* 寓意 */
 .meaning-text {
   font-size: 28rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
   line-height: 1.8;
 }
 
@@ -266,19 +266,19 @@
 .deep-block {
   margin-top: 28rpx;
   padding-top: 28rpx;
-  border-top: 1rpx solid #E4E2DD;
+  border-top: 1rpx solid var(--line);
 }
 
 .deep-title {
   font-size: 28rpx;
   font-weight: 500;
-  color: #16181A;
+  color: var(--ink);
   margin-bottom: 16rpx;
 }
 
 .deep-loading {
   font-size: 26rpx;
-  color: #8A9099;
+  color: var(--ink-3);
   padding: 20rpx 0;
 }
 
@@ -287,30 +287,30 @@
 }
 
 .layer-item + .layer-item {
-  border-top: 1rpx dashed #E4E2DD;
+  border-top: 1rpx dashed var(--line);
 }
 
 .layer-level {
   display: inline-block;
   font-size: 22rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
   font-weight: 500;
   padding: 2rpx 14rpx;
   border-radius: 6rpx;
-  background: #EFEDE8;
+  background: var(--paper-deep);
   margin-bottom: 8rpx;
 }
 
 .layer-text {
   font-size: 27rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
   line-height: 1.8;
 }
 
 .meaning-source {
   margin-top: 16rpx;
   font-size: 22rpx;
-  color: #8A9099;
+  color: var(--ink-3);
   text-align: right;
 }
 
@@ -318,21 +318,21 @@
 .unlock-mask {
   margin-top: 28rpx;
   padding: 40rpx 30rpx;
-  border: 2rpx dashed #C9CDD2;
+  border: 2rpx dashed var(--line-strong);
   border-radius: 6rpx;
-  background: #FFFFFF;
+  background: var(--card);
   text-align: center;
 }
 
 .unlock-title {
   font-size: 30rpx;
   font-weight: 500;
-  color: #16181A;
+  color: var(--ink);
 }
 
 .unlock-desc {
   font-size: 24rpx;
-  color: #8A9099;
+  color: var(--ink-3);
   line-height: 1.6;
   margin: 16rpx 0 28rpx;
 }
@@ -354,7 +354,7 @@
 
 .senses-label {
   font-size: 22rpx;
-  color: #8A9099;
+  color: var(--ink-3);
 }
 
 .sense-chips {
@@ -365,8 +365,8 @@
 
 .sense-chip {
   font-size: 22rpx;
-  color: #4A4F55;
-  background: #EFEDE8;
+  color: var(--ink-2);
+  background: var(--paper-deep);
   border-radius: 3rpx;
   padding: 4rpx 14rpx;
 }
@@ -374,14 +374,14 @@
 .ctx-senses {
   margin-top: 20rpx;
   padding: 20rpx 24rpx;
-  background: #F7F6F3;
+  background: var(--paper);
   border-radius: 4rpx;
-  border-left: 4rpx solid #4A4F55;
+  border-left: 4rpx solid var(--ink-2);
 }
 
 .ctx-title {
   font-size: 24rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
   font-weight: 500;
   margin-bottom: 12rpx;
 }
@@ -395,28 +395,28 @@
 
 .ctx-char {
   font-size: 30rpx;
-  color: #16181A;
+  color: var(--ink);
   font-weight: 500;
 }
 
 .ctx-arrow {
   font-size: 22rpx;
-  color: #8A9099;
+  color: var(--ink-3);
 }
 
 .ctx-words {
   font-size: 26rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
 }
 
 .ctx-general {
-  color: #8A9099;
+  color: var(--ink-3);
 }
 
 .ctx-mark {
   font-size: 20rpx;
-  color: #8A9099;
-  border: 1rpx solid #C9CDD2;
+  color: var(--ink-3);
+  border: 1rpx solid var(--line-strong);
   border-radius: 6rpx;
   padding: 0 8rpx;
 }
@@ -424,6 +424,6 @@
 .ctx-note {
   margin-top: 12rpx;
   font-size: 22rpx;
-  color: #8A9099;
+  color: var(--ink-3);
   line-height: 1.5;
 }

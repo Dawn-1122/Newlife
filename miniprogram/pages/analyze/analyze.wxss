@@ -6,13 +6,13 @@
 .title {
   font-size: 44rpx;
   font-weight: 500;
-  color: #16181A;
+  color: var(--ink);
   letter-spacing: 4rpx;
 }
 
 .subtitle {
   font-size: 24rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
   margin-top: 8rpx;
 }
 
@@ -25,7 +25,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 20rpx 0;
-  border-bottom: 1rpx solid #E4E2DD;
+  border-bottom: 1rpx solid var(--line);
 }
 
 .form-item:last-child {
@@ -34,7 +34,7 @@
 
 .form-label {
   font-size: 28rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
   width: 160rpx;
   flex-shrink: 0;
 }
@@ -43,14 +43,14 @@
   flex: 1;
   text-align: right;
   font-size: 28rpx;
-  color: #16181A;
+  color: var(--ink);
 }
 
 .picker-value {
   flex: 1;
   text-align: right;
   font-size: 28rpx;
-  color: #16181A;
+  color: var(--ink);
 }
 
 .chip-row {
@@ -63,14 +63,14 @@
 .chip {
   padding: 12rpx 28rpx;
   border-radius: 3rpx;
-  background: #EFEDE8;
-  color: #4A4F55;
+  background: var(--paper-deep);
+  color: var(--ink-2);
   font-size: 26rpx;
 }
 
 .chip.active {
-  background: #16181A;
-  color: #FFFFFF;
+  background: var(--ink);
+  color: var(--card);
 }
 
 .footer-note {
@@ -80,5 +80,5 @@
 
 .footer-note text {
   font-size: 22rpx;
-  color: #8A9099;
+  color: var(--ink-3);
 }

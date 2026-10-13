@@ -32,6 +32,8 @@
 | `--line-strong` | `#C9CDD2` | 描边 chip 边框 |
 | `--cinnabar` | `#A6321F` | 朱砂：**仅**选中 / 主行动文字 / 印章 |
 | `--cinnabar-bg` | `#FBF1EE` | 朱砂选中态的极淡底 |
+| `--ochre` | `#8D7B4F` | 赭黄：注解类文字（说明、降级提示）。与 `--wx-jin` 同色但语义不同，拆开以免互相牵连 |
+| `--wx-jin` `--wx-mu` `--wx-shui` `--wx-huo` `--wx-tu` | 见第六节 | 五行矿物色（供 `.wuxing-*` / `.gz-tag` / `.bar-fill` 复用） |
 | `--r-sm` | `3rpx` | 小圆角（chip、按钮） |
 | `--r-md` | `6rpx` | 中圆角（卡片、感觉卡） |
 | `--serif` | `Songti SC / STSong / Noto Serif SC` | 标题宋体（替代楷体） |
@@ -46,6 +48,10 @@
 2. **不用阴影，用线**。分层靠 `--line` 细线 + 留白。全局已清空 `box-shadow`。
 3. **圆角一律收敛**：卡片 `6rpx`、chip/按钮 `3rpx`。禁止 `16rpx` 以上与胶囊 `999rpx`。
 4. **标题用宋体**（`.h1/.h2/.h3` 或 `var(--serif)`），正文保持无衬线。
+
+> **以上四条已由 `tests/test_visual_tokens.py`（7 项）自动门禁**：
+> 页面样式不得出现裸色值、引用的变量必须已定义、已定义的变量必须有人用、
+> 全站禁 `box-shadow`、圆角不得超过 `16rpx` 或做成胶囊、五行不得回落 Material 色。
 
 ## 四、主视觉素材
 
@@ -98,7 +104,7 @@ button::after { border: none; }
 ## 八、旧色值迁移对照
 
 2026-09-23 已用一次性脚本把 7 个旧页面（analyze / analyze-result / bazi / detail / index /
-prenatal-result / result）共 303 处硬编码色值迁移到新令牌，迁移后零残留。对照关系留存备查：
+prenatal-result / result）的旧色值**取值**迁移到新色板（迁移后已无旧色值残留）。对照关系留存备查：
 
 ```
 #F4F0E7 → #F7F6F3      #FCFAF5 → #FFFFFF      #F0EDE4/#ECE8DE → #EFEDE8
@@ -109,3 +115,18 @@ prenatal-result / result）共 303 处硬编码色值迁移到新令牌，迁移
 圆角 16rpx→6rpx  12/10rpx→4rpx  8rpx→3rpx  胶囊→3rpx
 box-shadow → 删除；font-weight 700/600 → 500；楷体 → var(--serif)
 ```
+
+### ⚠️ 补做：取值对了，但「间接层」没补（2026-10-13）
+
+上面那次只把**颜色取值**换新了，7 个页面里 **241 处仍然是字面色值**（写 `#16181A` 而不是
+`var(--ink)`）。后果很隐蔽：**改 `app.wxss` 的令牌对这些页面完全不生效**，
+而肉眼与色值比对都看不出问题（取值本来就等于令牌值）。
+
+现已全部改为 `var(--token)`：
+- 6 个页面共 **225 处**色值 → 变量（analyze / analyze-result / bazi / detail / prenatal-result / result）；
+- 五行色**新增 5 个令牌**（`--wx-*`），原先在 5 个文件里各写一遍、共 3 套规则（`.wuxing-tag` /
+  `.wuxing-label` / `.bar-fill` / `.gz-tag` / `.wuxing-text`），现在单点定义；
+- `pages/index/index.wxss` 里 111 行是**旧版主页的死代码**（该页只是跳转兜底，模板只用了
+  `.redirect-tip`），连同 16 处色值一并删除，只留跳转提示样式。
+
+新增门禁 `tests/test_visual_tokens.py` 防止回退：**颜色只允许出现在 `app.wxss`**。

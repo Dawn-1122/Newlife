@@ -22,19 +22,19 @@
 
 .fallback-note {
   padding: 20rpx 24rpx;
-  background: #EFEDE8;
+  background: var(--paper-deep);
   border-radius: 4rpx;
-  border-left: 6rpx solid #A6321F;
+  border-left: 6rpx solid var(--cinnabar);
   margin-bottom: 20rpx;
   font-size: 24rpx;
-  color: #8D7B4F;
+  color: var(--ochre);
 }
 
 .adjust-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #FFFFFF;
+  background: var(--card);
   border-radius: 6rpx;
   padding: 22rpx 24rpx;
   margin-bottom: 20rpx;
@@ -42,13 +42,13 @@
 
 .adjust-text {
   font-size: 28rpx;
-  color: #16181A;
+  color: var(--ink);
   font-weight: 500;
 }
 
 .adjust-more {
   font-size: 30rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
 }
 
 .bazi-summary {
@@ -58,7 +58,7 @@
 .bazi-title {
   font-size: 30rpx;
   font-weight: 500;
-  color: #16181A;
+  color: var(--ink);
   margin-bottom: 20rpx;
 }
 
@@ -67,7 +67,7 @@
   top: 30rpx;
   right: 30rpx;
   font-size: 24rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
 }
 
 .bazi-summary {
@@ -88,13 +88,13 @@
 
 .pillar-label {
   font-size: 24rpx;
-  color: #8A9099;
+  color: var(--ink-3);
 }
 
 .pillar-value {
   font-size: 36rpx;
   font-weight: 500;
-  color: #16181A;
+  color: var(--ink);
   margin-top: 8rpx;
 }
 
@@ -103,7 +103,7 @@
   flex-direction: column;
   gap: 8rpx;
   font-size: 26rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
   margin-bottom: 20rpx;
 }
 
@@ -111,7 +111,7 @@
   display: flex;
   justify-content: space-around;
   padding-top: 16rpx;
-  border-top: 1rpx solid #E4E2DD;
+  border-top: 1rpx solid var(--line);
 }
 
 .wuxing-item {
@@ -128,18 +128,18 @@
   line-height: 48rpx;
   text-align: center;
   border-radius: 50%;
-  color: #FFFFFF;
+  color: var(--card);
 }
 
-.wuxing-label.wx-jin { background: #8D7B4F; }
-.wuxing-label.wx-mu { background: #4E6B54; }
-.wuxing-label.wx-shui { background: #3E5A73; }
-.wuxing-label.wx-huo { background: #A6321F; }
-.wuxing-label.wx-tu { background: #7A6248; }
+.wuxing-label.wx-jin { background: var(--wx-jin); }
+.wuxing-label.wx-mu { background: var(--wx-mu); }
+.wuxing-label.wx-shui { background: var(--wx-shui); }
+.wuxing-label.wx-huo { background: var(--wx-huo); }
+.wuxing-label.wx-tu { background: var(--wx-tu); }
 
 .wuxing-percent {
   font-size: 22rpx;
-  color: #8A9099;
+  color: var(--ink-3);
   margin-top: 6rpx;
 }
 
@@ -157,27 +157,27 @@
 .name-text {
   font-size: 40rpx;
   font-weight: 500;
-  color: #16181A;
+  color: var(--ink);
   letter-spacing: 4rpx;
 }
 
 .name-pinyin {
   font-size: 24rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
   margin-top: 8rpx;
 }
 
 .name-poetry {
   margin-top: 16rpx;
   padding: 16rpx;
-  background: #F7F6F3;
+  background: var(--paper);
   border-radius: 3rpx;
-  border-left: 6rpx solid #4A4F55;
+  border-left: 6rpx solid var(--ink-2);
 }
 
 .poetry-source {
   font-size: 24rpx;
-  color: #16181A;
+  color: var(--ink);
   font-weight: 500;
   display: block;
   margin-bottom: 4rpx;
@@ -185,7 +185,7 @@
 
 .poetry-text {
   font-size: 26rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
   display: block;
 }
 
@@ -203,31 +203,31 @@
 
 .score-label {
   font-size: 22rpx;
-  color: #8A9099;
+  color: var(--ink-3);
 }
 
 .score-value {
   font-size: 28rpx;
   font-weight: 500;
-  color: #16181A;
+  color: var(--ink);
 }
 
 .name-meaning {
   margin-top: 16rpx;
   font-size: 26rpx;
-  color: #4A4F55;
+  color: var(--ink-2);
   line-height: 1.5;
 }
 
 .empty {
   text-align: center;
   padding: 100rpx 0;
-  color: #8A9099;
+  color: var(--ink-3);
 }
 
 /* 筛选栏 */
 .filter-bar {
-  background: #FFFFFF;
+  background: var(--card);
   border-radius: 6rpx;
   padding: 20rpx 24rpx;
   margin-bottom: 20rpx;
@@ -244,12 +244,12 @@
   font-family: var(--serif);
   font-size: 26rpx;
   letter-spacing: 4rpx;
-  color: #16181A;
+  color: var(--ink);
 }
 
 .filter-reset {
   font-size: 24rpx;
-  color: #A6321F;
+  color: var(--cinnabar);
 }
 
 .filter-row {
@@ -259,14 +259,14 @@
 }
 
 .filter-row + .filter-row {
-  border-top: 1rpx solid #E4E2DD;
+  border-top: 1rpx solid var(--line);
 }
 
 .filter-label {
   flex-shrink: 0;
   width: 80rpx;
   font-size: 26rpx;
-  color: #16181A;
+  color: var(--ink);
   font-weight: 500;
   padding-top: 8rpx;
 }
@@ -295,8 +295,8 @@
   padding: 8rpx 24rpx;
   border-radius: var(--r-sm);
   font-size: 26rpx;
-  color: #4A4F55;
-  background: #EFEDE8;
+  color: var(--ink-2);
+  background: var(--paper-deep);
   line-height: 1.4;
 }
 
@@ -306,8 +306,8 @@
 }
 
 .chip-active {
-  background: #16181A;
-  color: #FFFFFF;
+  background: var(--ink);
+  color: var(--card);
   font-weight: 500;
 }
 

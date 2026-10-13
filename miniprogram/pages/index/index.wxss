@@ -1,111 +1,11 @@
-.header {
+/* pages/index 是历史入口的兜底重定向页（onLoad 即 redirectTo 首页），
+   页面上只会短暂出现一句「正在跳转首页…」。
+   原来这里残留着旧版主页的 111 行样式（header/title/form-card…），
+   既无人引用、又写死了 16 处颜色 —— 已删除，只留跳转提示的样式。 */
+
+.redirect-tip {
+  padding: 120rpx 0;
   text-align: center;
-  padding: 40rpx 0 30rpx;
-}
-
-.title {
-  font-size: 56rpx;
-  font-weight: 500;
-  color: #16181A;
-  letter-spacing: 8rpx;
-}
-
-.subtitle {
   font-size: 28rpx;
-  color: #4A4F55;
-  margin-top: 8rpx;
-}
-
-.tagline {
-  font-size: 24rpx;
-  color: #8A9099;
-  margin-top: 12rpx;
-}
-
-.form-card {
-  margin-bottom: 30rpx;
-}
-
-.form-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20rpx 0;
-  border-bottom: 1rpx solid #E4E2DD;
-}
-
-.form-item:last-child {
-  border-bottom: none;
-}
-
-.form-label {
-  font-size: 28rpx;
-  color: #4A4F55;
-  width: 160rpx;
-  flex-shrink: 0;
-}
-
-.form-input {
-  flex: 1;
-  text-align: right;
-  font-size: 28rpx;
-  color: #16181A;
-}
-
-.picker-value {
-  flex: 1;
-  text-align: right;
-  font-size: 28rpx;
-  color: #16181A;
-}
-
-/* 性别选择 */
-.gender-tabs {
-  display: flex;
-  gap: 16rpx;
-}
-
-.gender-tab {
-  padding: 12rpx 32rpx;
-  border-radius: 3rpx;
-  background: #EFEDE8;
-  color: #4A4F55;
-  font-size: 26rpx;
-}
-
-.gender-tab.active {
-  background: #16181A;
-  color: #FFFFFF;
-}
-
-/* 字数选择 */
-.length-tabs {
-  display: flex;
-  gap: 16rpx;
-}
-
-.length-tab {
-  padding: 12rpx 32rpx;
-  border-radius: 3rpx;
-  background: #EFEDE8;
-  color: #4A4F55;
-  font-size: 26rpx;
-}
-
-.length-tab.active {
-  background: #16181A;
-  color: #FFFFFF;
-}
-
-.footer-note {
-  text-align: center;
-  padding: 30rpx 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8rpx;
-}
-
-.footer-note text {
-  font-size: 22rpx;
-  color: #8A9099;
+  color: var(--ink-3);
 }
