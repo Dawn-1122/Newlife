@@ -63,6 +63,9 @@ node tools/preview/probe.js --attach 9222 --flow
 # 名字本专项：起名落盘 → 收藏 → 名字本 → 恢复 → 删除 → 清空
 node tools/preview/probe.js --attach 9222 --book
 
+# 原生组件替身专项：picker / switch 命中区与回填
+node tools/preview/probe.js --attach 9222 --picker
+
 # 只看一页 / 全部页
 node tools/preview/probe.js --attach 9222 pages/detail/detail
 node tools/preview/probe.js --attach 9222 --all
@@ -87,6 +90,9 @@ node tools/preview/probe.js --attach 9222 --all
 
 - **picker / switch 是浏览器替身**：`<picker>` 映射到原生 `select`/`date` 弹层，
   `<switch>` 自绘。语义一致（`bindchange` 收到的 `detail.value` 类型相同），观感不同。
+  但 `<picker>` 在浏览器里是未知名元素，会被 flex 压成文字宽度，出现「点空白处没反应」。
+  预览器给 `.form-item > picker/input` 加了 `flex: 1; text-align: right` 把它撑成通栏，
+  视觉上与真机一致，**点击区域比真机更宽**（方便预览调试）。
 - **后台页面的 setData 只更新数据、不重绘**（与真机一致）。这是刻意做的：
   感觉页 `onSubmit` 的 `finally { setData({loading:false}) }` 在 `navigateTo` 之后执行，
   若允许它重绘，会把已打开的结果页画面覆盖回感觉页。

@@ -21,6 +21,7 @@
  *   node tools/preview/probe.js pages/bazi/bazi        # 只看一页
  *   node tools/preview/probe.js --flow                 # 跑通真实起名流程，再看结果页/详情页
  *   node tools/preview/probe.js --book                 # 验证名字本：起名落盘→收藏→记录恢复→删除→清空
+ *   node tools/preview/probe.js --picker               # 验证 picker / switch 替身的命中区与回填
  *   node tools/preview/probe.js --out /tmp/shots
  *
  * 前置：后端 :8000 与预览服务 :8899 都要在跑（起名、测评要真后端）。
@@ -38,6 +39,7 @@ const outIdx = argv.indexOf('--out')
 const OUT_DIR = outIdx === -1 ? '/tmp/mingtang-shots' : argv[outIdx + 1]
 const WITH_FLOW = argv.includes('--flow')
 const WITH_BOOK = argv.includes('--book')
+const WITH_PICKER = argv.includes('--picker')
 const ALL = argv.includes('--all')
 const PAGES = argv.filter((a) => a.startsWith('pages/'))
 
@@ -518,6 +520,95 @@ async function runBook() {
   return res
 }
 
+/**
+ * 验证原生 picker / switch 替身在浏览器里真的能点、能选、能回填。
+ *
+ * 真机上它们是微信原生组件，所占区域就是整行右侧；但浏览器里 <picker>
+ * 是未知名元素，默认会被 flex 布局压成文字宽度，出现「点空白处没反应」。
+ * 此场景专门守卫命中区 + 弹层选择 + bindchange 回填这一整条链。
+ */
+async function runPicker() {
+  label = 'picker'
+  const before = consoleLines.length
+  console.log('[probe] 验证 picker / switch 替身：真鼠标点击 → 弹层 → 选择 → 回填 …')
+
+  const script = `(async () => {
+    var wb = window.__wb
+    var out = {}
+    var wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms) }) }
+    function clickAt(x, y) {
+      var t = document.elementFromPoint(x, y)
+      if (!t) return false
+      ;['mousedown', 'mouseup', 'click'].forEach(function (type) {
+        t.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, clientX: x, clientY: y }))
+      })
+      return true
+    }
+    function pickerValue(idx) {
+      var p = document.querySelectorAll('.form-item picker')[idx]
+      return p ? p.textContent.trim() : ''
+    }
+
+    await wb.goto('pages/name/name')
+    await wait(700)
+
+    // 1) 出生日期：点最右侧空白处，必须命中 picker 并打开弹层
+    var dateEl = document.querySelectorAll('.form-item picker')[0]
+    var r = dateEl.getBoundingClientRect()
+    var hit = document.elementFromPoint(r.right - 6, r.top + r.height / 2)
+    out.dateHitOnRight = !!(hit && hit.closest('picker') === dateEl)
+    clickAt(r.right - 6, r.top + r.height / 2)
+    await wait(400)
+    out.dateModalOpen = document.getElementById('modal-mask').classList.contains('on')
+    var input = document.getElementById('modal-body').querySelector('input')
+    if (input) input.value = '1994-05-20'
+    document.getElementById('modal-ok').click()
+    await wait(400)
+    out.dateAfterPick = pickerValue(0)
+
+    // 2) 出生时辰（selector）
+    var hourEl = document.querySelectorAll('.form-item picker')[1]
+    var hr = hourEl.getBoundingClientRect()
+    clickAt(hr.right - 6, hr.top + hr.height / 2)
+    await wait(400)
+    out.hourModalOpen = document.getElementById('modal-mask').classList.contains('on')
+    var sel = document.getElementById('modal-body').querySelector('select')
+    out.hourOptions = sel ? sel.options.length : 0
+    if (sel) sel.value = '3'
+    document.getElementById('modal-ok').click()
+    await wait(400)
+    out.hourAfterPick = pickerValue(1)
+
+    // 3) switch：点一次应触发 bindchange，收起八字行
+    var sw = document.querySelector('.wb-switch')
+    out.switchBefore = sw && sw.classList.contains('wb-switch-on')
+    var sr = sw.getBoundingClientRect()
+    clickAt(sr.left + sr.width / 2, sr.top + sr.height / 2)
+    await wait(400)
+    out.switchAfter = document.querySelector('.wb-switch').classList.contains('wb-switch-on')
+    out.dateRowHidden = document.body.innerText.indexOf('出生日期') === -1
+
+    return out
+  })()`
+
+  const res = await evaluate(script)
+  await sleep(500)
+  const shot = await screenshot('picker')
+  const issues = consoleLines.slice(before)
+  results.push({
+    page: 'picker / switch 替身',
+    note: '日期/时辰选择器命中区与回填',
+    reached: !!(res && res.dateModalOpen && res.hourModalOpen && res.dateAfterPick === '1994-05-20' && res.hourAfterPick.indexOf('卯时') !== -1),
+    rep: {},
+    issues,
+    shot,
+    text: '',
+    handlers: -1,
+    picker: res
+  })
+  return res
+}
+
 const pagesToRun = PAGES.length
   ? PAGES
   : ALL
@@ -526,8 +617,12 @@ const pagesToRun = PAGES.length
 
 if (WITH_FLOW) {
   await runFlow()
-} else if (!WITH_BOOK) {
+} else if (!WITH_BOOK && !WITH_PICKER) {
   console.log('[probe] 提示：结果页/详情页依赖起名结果，加 --flow 才能看到真实内容')
+}
+
+if (WITH_PICKER) {
+  await runPicker()
 }
 
 if (WITH_BOOK) {
@@ -596,6 +691,23 @@ for (const r of results) {
       )
       console.log(`  取消收藏后收藏数=${b.favsAfterDelete}`)
       console.log(`  清空：前=${b.recordsBeforeClear} 后=${b.recordsAfterClear}`)
+    }
+  }
+
+  if (r.picker) {
+    const p = r.picker
+    if (p.__err) {
+      console.log('  [ERR] picker 场景脚本异常: ' + String(p.__err).slice(0, 300))
+    } else {
+      console.log(
+        `  日期：最右侧命中 picker=${p.dateHitOnRight} modal=${p.dateModalOpen} 回填=${p.dateAfterPick}`
+      )
+      console.log(
+        `  时辰：modal=${p.hourModalOpen} 选项数=${p.hourOptions} 回填=${p.hourAfterPick}`
+      )
+      console.log(
+        `  switch：点前=${p.switchBefore} 点后=${p.switchAfter} 日期行已收起=${p.dateRowHidden}`
+      )
     }
   }
 }

@@ -295,8 +295,12 @@
     try { range = rawRange ? JSON.parse(decodeURIComponent(rawRange)) : [] } catch (e) { range = [] }
 
     var body = document.getElementById('modal-body')
-    document.getElementById('modal-title').textContent =
-      (mode === 'date' ? '选择日期' : '选择一项') + '（picker 的浏览器替身）'
+    var titleText = mode === 'date'
+      ? '选择日期（点击输入框，选好后按确定）'
+      : mode === 'time'
+        ? '选择时间'
+        : '选择一项'
+    document.getElementById('modal-title').textContent = titleText
     body.innerHTML = ''
 
     var input
@@ -304,6 +308,10 @@
       input = document.createElement('input')
       input.type = mode
       input.value = curValue || ''
+      // 浏览器日期输入框形态不一，加一行提示避免用户看不到入口
+      var hint = document.createElement('p')
+      hint.className = 'hint'
+      hint.textContent = '点击上方日期框，在弹出的日历里选择后按「确定」。'
     } else {
       input = document.createElement('select')
       range.forEach(function (item, idx) {
@@ -316,6 +324,7 @@
       if (curValue !== null && curValue !== '') input.value = curValue
     }
     body.appendChild(input)
+    if (hint) body.appendChild(hint)
 
     pickerCtx = { el: el, cb: cb, input: input, mode: mode }
     document.getElementById('modal-mask').classList.add('on')
@@ -441,6 +450,10 @@
     'input { border: 0; outline: 0; background: transparent; font: inherit; color: inherit; width: 100%; padding: 0; }',
     'button { font: inherit; }',
     'picker { cursor: pointer; }',
+    'picker:active { background: rgba(0,0,0,.05); }',
+    // 预览里 flex 行右侧的 picker/input 会缩成文字宽，点空白处没反应；
+    // 真机 <picker> 本身会占满整行，这里给 preview 补上同等点击区域。
+    '.form-item > picker, .form-item > input { flex: 1; text-align: right; }',
     '.wb-switch { display:inline-block; width:80rpx; height:46rpx; border-radius:23rpx; background:#D8D5CF;',
     '  position:relative; vertical-align:middle; transition:background .15s; cursor:pointer; }',
     '.wb-switch-on { background:#4E6B54; }',
