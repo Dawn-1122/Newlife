@@ -1,9 +1,13 @@
 const api = require('../../utils/api')
+const namebook = require('../../utils/namebook')
 
 Page({
   data: {
     name: null,
     pinyinText: '',
+
+    // 是否已收进「名字本」（本机存储，见 utils/namebook.js）
+    fav: false,
 
     // 语境义项（免费）：各字在本出处语境下的取义
     ctxSenses: [],
@@ -58,7 +62,8 @@ Page({
       name,
       pinyinText: name.phonetics.pinyins.join(' · '),
       ctxSenses,
-      unlocked
+      unlocked,
+      fav: namebook.isFav(name.full_name)
     })
 
     if (unlocked) {
@@ -103,6 +108,19 @@ Page({
     if (!this.data.deepMeaning) {
       this.loadDeepMeaning()
     }
+  },
+
+  // 收藏 / 取消收藏：和结果页共用同一套落盘（utils/namebook.js）
+  onFavTap() {
+    const name = this.data.name
+    const app = getApp()
+    const ret = namebook.toggleFav(name, app.globalData.lastParams, app.globalData.lastBatchId)
+    if (!ret.ok) {
+      wx.showToast({ title: ret.error, icon: 'none' })
+      return
+    }
+    this.setData({ fav: !!ret.added })
+    wx.showToast({ title: ret.added ? '已收藏' : '已取消收藏', icon: 'none' })
   },
 
   onCopyTap() {

@@ -9,6 +9,7 @@
     "pages/analyze-result/analyze-result",
     "pages/result/result",
     "pages/detail/detail",
+    "pages/history/history",
     "pages/bazi/bazi",
     "pages/index/index"
   ],
@@ -20,5 +21,6 @@
     "backgroundColor": "#F7F6F3"
   },
   "style": "v2",
-  "sitemapLocation": "sitemap.json"
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
 }

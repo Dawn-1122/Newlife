@@ -19,9 +19,17 @@
     </view>
   </view>
 
-  <!-- 更多功能 -->
-  <view class="more-link" bindtap="onMoreTap" hover-class="more-link-hover">
-    <text>更多功能</text>
-    <text class="more-arrow">›</text>
+  <!-- 文字入口：依然只有两行，不新增功能卡 -->
+  <view class="links">
+    <view class="more-link" bindtap="onBookTap" hover-class="more-link-hover">
+      <text>我的名字本</text>
+      <text class="link-count" wx:if="{{bookCount}}">{{bookCount}}</text>
+      <text class="more-arrow">›</text>
+    </view>
+
+    <view class="more-link" bindtap="onMoreTap" hover-class="more-link-hover">
+      <text>更多功能</text>
+      <text class="more-arrow">›</text>
+    </view>
   </view>
 </view>

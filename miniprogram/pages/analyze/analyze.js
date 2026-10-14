@@ -1,5 +1,6 @@
 const api = require('../../utils/api')
 const share = require('../../utils/share')
+const namebook = require('../../utils/namebook')
 
 Page({
   data: {
@@ -70,6 +71,12 @@ Page({
       const result = await api.analyzeName(params)
       const app = getApp()
       app.globalData.analyzeResult = result
+      app.globalData.lastParams = params
+      // 收进「名字本」（本机存储）；存失败只提示，不阻断查看结果
+      const saved = namebook.addRecord(namebook.buildRecord('analyze', params, result, 0))
+      if (!saved.ok) {
+        wx.showToast({ title: saved.error, icon: 'none' })
+      }
       wx.navigateTo({ url: '/pages/analyze-result/analyze-result' })
     } catch (err) {
       wx.showToast({ title: (err && err.message) || '测评失败，请重试', icon: 'none' })

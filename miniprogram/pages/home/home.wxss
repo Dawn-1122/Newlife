@@ -74,20 +74,31 @@
   color: var(--ink);
 }
 
-/* ── 更多功能 ── */
+/* ── 文字入口（我的名字本 / 更多功能）── */
+.links {
+  margin-top: 64rpx;
+}
+
 .more-link {
-  margin-top: 72rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 26rpx;
   letter-spacing: 4rpx;
   color: var(--cinnabar);
-  padding: 20rpx 0;
+  padding: 18rpx 0;
 }
 
 .more-link-hover {
   opacity: 0.6;
+}
+
+/* 名字本里的条数：是数据不是说明，压在墨阶里不抢视线 */
+.link-count {
+  margin-left: 10rpx;
+  font-size: 22rpx;
+  letter-spacing: 0;
+  color: var(--ink-3);
 }
 
 .more-arrow {

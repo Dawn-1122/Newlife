@@ -262,6 +262,11 @@
   padding: 20rpx 0 60rpx;
 }
 
+/* 收藏在复制下方：两个 button 默认块级堆叠，给上面那个留出间距 */
+.actions .btn-secondary {
+  margin-bottom: 20rpx;
+}
+
 /* 深度寓意（多层余味） */
 .deep-block {
   margin-top: 28rpx;

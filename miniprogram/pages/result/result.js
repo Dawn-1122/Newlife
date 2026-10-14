@@ -1,5 +1,6 @@
 const api = require('../../utils/api')
 const share = require('../../utils/share')
+const namebook = require('../../utils/namebook')
 
 // 结果页风格筛选条：全部 + 8 个风格（与后端 STYLE_OPTIONS 同源，见 utils/api.js）
 const styleFilters = [{ code: '', name: '全部' }].concat(
@@ -64,6 +65,9 @@ Page({
     loading: false,
     fallbackNote: '',
 
+    // 已收藏的全名映射 { 全名: true }，供每张卡片显示收藏态
+    favIds: {},
+
     wuxingFilters: [
       { code: '', name: '全部' },
       { code: '金', name: '金' },
@@ -117,7 +121,9 @@ Page({
       fallbackNote: result.fallback_note || '',
       // 候选变了，筛选项随之重建
       sourceFilters: buildSourceFilters(allNames),
-      charFilters: buildCharFilters(allNames)
+      charFilters: buildCharFilters(allNames),
+      // 已收藏的全名映射，applyFilter 渲染时按它打标
+      favIds: namebook.favMap()
     })
     this.applyFilter()
   },
@@ -127,6 +133,7 @@ Page({
     const styleFilter = this.data.styleFilter
     const sourceFilter = this.data.sourceFilter
     const charFilter = this.data.charFilter
+    const favIds = this.data.favIds || {}
 
     const names = this.data.allNames.filter(function (n) {
       if (wuxingFilter) {
@@ -158,7 +165,13 @@ Page({
       return true
     })
 
-    this.setData({ names: names })
+    // 渲染项按收藏态复制一份：不直接改 allNames 里的对象，
+    // 避免 wx:for 复用旧对象时收藏标记不刷新（setData 的差量只到数组这一层）
+    const decorated = names.map(function (n) {
+      return Object.assign({}, n, { fav: !!favIds[n.full_name] })
+    })
+
+    this.setData({ names: decorated })
   },
 
   onWuxingFilterTap(e) {
@@ -204,13 +217,23 @@ Page({
     try {
       // 复用原始请求参数重新调用；后端无固定 seed，天然得到不同候选
       const result = await api.generateNames(params)
-      app.globalData.lastResult = result
       // 换一批 = 新批次，深度寓意需重新解锁
-      app.globalData.lastBatchId = Date.now()
+      const batchId = Date.now()
+      app.globalData.lastResult = result
+      app.globalData.lastBatchId = batchId
       // 换一批后重置筛选，展示全新候选
       this.setData({ wuxingFilter: '', styleFilter: '', sourceFilter: '', charFilter: '' })
       this.renderResult(result)
-      wx.showToast({ title: '已换一批', icon: 'none' })
+
+      // 每一批都收进「名字本」，否则「换一批」出来的好名字看完就没了
+      const saved = namebook.addRecord(
+        namebook.buildRecord('postnatal', params, result, batchId)
+      )
+      if (!saved.ok) {
+        wx.showToast({ title: saved.error, icon: 'none' })
+      } else {
+        wx.showToast({ title: '已换一批', icon: 'none' })
+      }
     } catch (err) {
       wx.showToast({ title: (err && err.message) || '换一批失败，请重试', icon: 'none' })
     } finally {
@@ -250,6 +273,24 @@ Page({
 
   onBackHome() {
     wx.reLaunch({ url: '/pages/home/home' })
+  },
+
+  // ── 收藏（本机存储，落盘逻辑见 utils/namebook.js）──
+  // 卡片本身是「查看详情」，故收藏用 catchtap 绑定，避免冒泡把详情页也打开了
+  onFavTap(e) {
+    const name = this.data.names[e.currentTarget.dataset.index]
+    if (!name) return
+
+    const app = getApp()
+    // 连 params / batchId 一起存：从名字本点进详情时，深度寓意的解锁状态要对得上
+    const ret = namebook.toggleFav(name, app.globalData.lastParams, app.globalData.lastBatchId)
+    if (!ret.ok) {
+      wx.showToast({ title: ret.error, icon: 'none' })
+      return
+    }
+    this.setData({ favIds: namebook.favMap() })
+    this.applyFilter()
+    wx.showToast({ title: ret.added ? '已收藏' : '已取消收藏', icon: 'none' })
   },
 
   onShareAppMessage: share.defaultShare,

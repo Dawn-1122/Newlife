@@ -1,0 +1,186 @@
+/* 名字本 · 山水泼墨
+   窄幅泼墨页头 + 分段切换 + 细线列表（无卡片堆叠、无阴影）。 */
+
+.page {
+  min-height: 100vh;
+  padding-bottom: 60rpx;
+}
+
+/* ── 窄幅泼墨页头 ── */
+.band {
+  width: 100%;
+  overflow: hidden;
+}
+
+.band-img {
+  width: 100%;
+  display: block;
+}
+
+.band-title-wrap {
+  padding: 36rpx 40rpx 8rpx;
+}
+
+.band-title {
+  font-family: var(--serif);
+  font-size: 44rpx;
+  font-weight: 500;
+  letter-spacing: 8rpx;
+  color: var(--ink);
+}
+
+/* ── 分段切换：选中态用朱砂，与「选中」语义一致 ── */
+.seg-wrap {
+  padding: 28rpx 40rpx 0;
+}
+
+.seg {
+  display: flex;
+  border: 1rpx solid var(--line-strong);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+}
+
+.seg-item {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 0;
+  font-size: 28rpx;
+  letter-spacing: 2rpx;
+  color: var(--ink-2);
+}
+
+.seg-item.on {
+  background: var(--cinnabar);
+  color: var(--paper);
+  font-weight: 500;
+}
+
+/* ── 列表 ── */
+.list {
+  padding: 8rpx 40rpx 0;
+}
+
+.rec,
+.fav {
+  padding: 30rpx 0;
+  border-bottom: 1rpx solid var(--line);
+}
+
+.rec:active,
+.fav:active {
+  background: var(--paper-deep);
+}
+
+.rec-head,
+.fav-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rec-title {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: 2rpx;
+}
+
+.rec-kind {
+  font-size: 22rpx;
+  color: var(--ink-3);
+  letter-spacing: 2rpx;
+  border: 1rpx solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 2rpx 12rpx;
+}
+
+.rec-sub {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: var(--ink-3);
+}
+
+/* 候选名字并排：只作提示，点整行才进详情 */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 18rpx;
+}
+
+.chip {
+  font-family: var(--serif);
+  font-size: 28rpx;
+  letter-spacing: 2rpx;
+  color: var(--ink);
+  background: var(--card);
+  border: 1rpx solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 2rpx 16rpx;
+}
+
+.rec-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18rpx;
+}
+
+.rec-time {
+  font-size: 22rpx;
+  color: var(--ink-3);
+}
+
+.rec-del {
+  font-size: 24rpx;
+  color: var(--cinnabar);
+  padding: 6rpx 0 6rpx 24rpx;
+}
+
+/* ── 收藏条目 ── */
+.fav-name {
+  font-size: 38rpx;
+  font-weight: 500;
+  letter-spacing: 4rpx;
+  color: var(--ink);
+}
+
+.fav-pinyin {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: var(--ink-2);
+}
+
+.fav-poetry {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: var(--ink-2);
+}
+
+/* ── 空状态 ── */
+.empty {
+  padding: 120rpx 0;
+  text-align: center;
+}
+
+.empty-title {
+  display: block;
+  font-family: var(--serif);
+  font-size: 32rpx;
+  letter-spacing: 4rpx;
+  color: var(--ink-2);
+}
+
+.empty-note {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: var(--ink-3);
+  line-height: 1.7;
+}
+
+/* ── 底部 ── */
+.foot {
+  padding: 40rpx 40rpx 0;
+}

@@ -436,6 +436,19 @@
         })
       },
       showToast: function (o) { ui.toast && ui.toast((o && o.title) || '') },
+      showModal: function (o) {
+        var opts = o || {}
+        var handled = function (res) {
+          opts.success && opts.success(res)
+          opts.complete && opts.complete(res)
+        }
+        if (ui.modal) {
+          ui.modal(opts, handled)
+        } else {
+          // 宿主没给弹窗替身时，默认「确定」——真机上这里必然有原生弹窗
+          handled({ confirm: true, cancel: false })
+        }
+      },
       showLoading: function () {},
       hideLoading: function () {},
       setNavigationBarTitle: function (o) { ui.setTitle && ui.setTitle((o && o.title) || '') },
@@ -705,6 +718,8 @@
 
     // 暴露给 harness / 调试台：读 globalData 用（getApp() 才是页面里的正路）
     runtime.getApp = getApp
+    // 本地存储替身的内容（自检用，真机上是 wx.getStorage 系列）
+    runtime.debugStorage = function (key) { return storage[key] }
 
     return runtime
   }

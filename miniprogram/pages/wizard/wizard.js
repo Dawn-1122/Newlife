@@ -1,5 +1,6 @@
 const api = require('../../utils/api')
 const share = require('../../utils/share')
+const namebook = require('../../utils/namebook')
 
 // 起名第二步（也是最后一步）：挑一种「感觉」→ 直接生成。
 //
@@ -130,19 +131,31 @@ Page({
         const result = await api.prenatal(params)
         app.globalData.prenatalResult = result
         app.globalData.lastParams = params
+        this.saveRecord('prenatal', params, result, 0)
         wx.navigateTo({ url: '/pages/prenatal-result/prenatal-result' })
       } else {
         const result = await api.generateNames(params)
+        // 每次起名 = 一个批次，深度寓意按批次单次解锁
+        const batchId = Date.now()
         app.globalData.lastResult = result
         app.globalData.lastParams = params
-        // 每次起名 = 一个批次，深度寓意按批次单次解锁
-        app.globalData.lastBatchId = Date.now()
+        app.globalData.lastBatchId = batchId
+        this.saveRecord('postnatal', params, result, batchId)
         wx.navigateTo({ url: '/pages/result/result' })
       }
     } catch (err) {
       wx.showToast({ title: (err && err.message) || '起名失败，请重试', icon: 'none' })
     } finally {
       this.setData({ loading: false })
+    }
+  },
+
+  // 收进「名字本」（本机存储，见 utils/namebook.js）。
+  // 存失败只提示、不阻断 —— 结果已经拿到了，不该因为存不下就看不成。
+  saveRecord(kind, params, result, batchId) {
+    const ret = namebook.addRecord(namebook.buildRecord(kind, params, result, batchId))
+    if (!ret.ok) {
+      wx.showToast({ title: ret.error, icon: 'none' })
     }
   },
 

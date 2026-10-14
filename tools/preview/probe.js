@@ -20,6 +20,7 @@
  *   node tools/preview/probe.js --all                  # 连冷门页一起巡检
  *   node tools/preview/probe.js pages/bazi/bazi        # 只看一页
  *   node tools/preview/probe.js --flow                 # 跑通真实起名流程，再看结果页/详情页
+ *   node tools/preview/probe.js --book                 # 验证名字本：起名落盘→收藏→记录恢复→删除→清空
  *   node tools/preview/probe.js --out /tmp/shots
  *
  * 前置：后端 :8000 与预览服务 :8899 都要在跑（起名、测评要真后端）。
@@ -36,6 +37,7 @@ const argv = process.argv.slice(2)
 const outIdx = argv.indexOf('--out')
 const OUT_DIR = outIdx === -1 ? '/tmp/mingtang-shots' : argv[outIdx + 1]
 const WITH_FLOW = argv.includes('--flow')
+const WITH_BOOK = argv.includes('--book')
 const ALL = argv.includes('--all')
 const PAGES = argv.filter((a) => a.startsWith('pages/'))
 
@@ -386,6 +388,136 @@ async function runFlow() {
   })
 }
 
+/**
+ * 验证「名字本」这条链路（本机存储）：
+ * 起名落盘 → 收藏 → 名字本两个分段 → 从收藏进详情 → 从记录恢复结果 → 删除 → 清空。
+ *
+ * 为什么值得单独跑：这条链路全靠 wx.setStorageSync 落盘，
+ * 「存上了没有」「恢复得回来没有」都只能在跑起来之后才看得见。
+ */
+async function runBook() {
+  label = 'book'
+  const before = consoleLines.length
+  console.log('[probe] 验证名字本：起名落盘 → 收藏 → 记录恢复 → 删除 → 清空 …')
+
+  const script = `(async () => {
+    var wb = window.__wb
+    var out = {}
+    var wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms) }) }
+    var text = function () {
+      var m = document.getElementById('mount')
+      return m ? m.innerText.replace(/\\s+/g, ' ').slice(0, 400) : ''
+    }
+    var at = function () { return wb.runtime.current ? wb.runtime.current.path : '' }
+    var countOf = function (sel) {
+      var m = document.getElementById('mount')
+      return m ? m.querySelectorAll(sel).length : -1
+    }
+    // 删除/清空都要过 wx.showModal，预设成「确定」，否则脚本会停在弹窗上
+    wb.setModalAnswer(true)
+
+    // 1) 跑通一次起名：结果应自动落盘成一条记录
+    out.flow = await wb.flow({ surname: '林', birthDate: '1994-05-20' })
+    await wait(800)
+    var recs = wb.storage('mt_records_v1') || []
+    out.records = recs.length
+    out.recKind = recs[0] && recs[0].kind
+    out.recTitle = recs[0] && recs[0].title
+    out.recSubtitle = recs[0] && recs[0].subtitle
+    out.recChips = recs[0] ? recs[0].chips.length : -1
+    out.recHasPayload = !!(recs[0] && recs[0].payload && recs[0].payload.names)
+
+    // 2) 结果页收藏第一个名字
+    out.favClicked = await wb.clickHandler('onFavTap')
+    await wait(500)
+    var favs = wb.storage('mt_favs_v1') || []
+    out.favs = favs.length
+    out.favName = favs[0] && favs[0].full_name
+    // 收藏要存下整份候选名对象，详情页才渲染得出来
+    out.favHasChars = !!(favs[0] && favs[0].data && favs[0].data.chars_info)
+    out.favHasPoetry = !!(favs[0] && favs[0].data && favs[0].data.poetry)
+    out.cardSaysFaved = text().indexOf('已收藏') !== -1
+
+    // 3) 名字本 · 起名记录
+    await wb.goto('pages/history/history')
+    await wait(800)
+    out.historyPath = at()
+    out.recRows = countOf('.rec')
+    out.recChipEls = countOf('.rec .chip')
+    out.historyText = text()
+
+    // 4) 切到收藏分段
+    await wb.clickText('收藏')
+    await wait(400)
+    out.favRows = countOf('.fav')
+    out.favText = text()
+
+    // 5) 从收藏点进详情：与从结果页点名字是同一条路径
+    await wb.clickHandler('onFavTap')
+    await wait(1200)
+    out.detailPath = at()
+    out.detailText = text()
+    out.detailFavBtn = countOf('.actions .btn-secondary')
+
+    // 6) 回名字本，点那条记录 → 应恢复该批结果并回到结果页
+    await wb.goto('pages/history/history')
+    await wait(700)
+    out.backToBook = at()
+    await wb.clickText('起名记录')
+    await wait(300)
+    await wb.clickHandler('onRecordTap')
+    await wait(1200)
+    out.restoredPath = at()
+    out.restoredText = text()
+    out.restoredCards = countOf('.name-card')
+
+    // 7) 删除单条记录
+    await wb.goto('pages/history/history')
+    await wait(700)
+    await wb.clickHandler('onRecordDelete')
+    await wait(500)
+    out.recordsAfterDelete = (wb.storage('mt_records_v1') || []).length
+    out.emptyAfterDelete = text()
+
+    // 8) 取消单个收藏
+    await wb.clickText('收藏')
+    await wait(300)
+    await wb.clickHandler('onFavDelete')
+    await wait(500)
+    out.favsAfterDelete = (wb.storage('mt_favs_v1') || []).length
+
+    // 9) 再起一批，然后整批清空
+    out.flow2 = await wb.flow({ surname: '沈', birthDate: '1992-03-08' })
+    await wait(800)
+    out.recordsBeforeClear = (wb.storage('mt_records_v1') || []).length
+    await wb.goto('pages/history/history')
+    await wait(700)
+    await wb.clickHandler('onClearTap')
+    await wait(500)
+    out.recordsAfterClear = (wb.storage('mt_records_v1') || []).length
+
+    wb.setModalAnswer(null)
+    return out
+  })()`
+
+  const res = await evaluate(script)
+  await sleep(600)
+  const shot = await screenshot('book')
+  const issues = consoleLines.slice(before)
+  results.push({
+    page: '名字本（记录 + 收藏）',
+    note: '起名→收藏→名字本→恢复→删除→清空',
+    reached: !!(res && res.flow === true && res.restoredPath === 'pages/result/result'),
+    rep: {},
+    issues,
+    shot,
+    text: '',
+    handlers: -1,
+    book: res
+  })
+  return res
+}
+
 const pagesToRun = PAGES.length
   ? PAGES
   : ALL
@@ -394,8 +526,12 @@ const pagesToRun = PAGES.length
 
 if (WITH_FLOW) {
   await runFlow()
-} else {
+} else if (!WITH_BOOK) {
   console.log('[probe] 提示：结果页/详情页依赖起名结果，加 --flow 才能看到真实内容')
+}
+
+if (WITH_BOOK) {
+  await runBook()
 }
 
 for (const p of pagesToRun) {
@@ -428,6 +564,40 @@ for (const r of results) {
   const soft = (r.rep.panel || []).filter((l) => l.level !== 'info' && l.level !== 'error')
   soft.slice(0, 6).forEach((l) => console.log(`  [${l.level}] ` + String(l.text).slice(0, 200)))
   console.log('  可见文本: ' + (r.text || '（空）').slice(0, 240))
+
+  if (r.book) {
+    const b = r.book
+    if (b.__err) {
+      console.log('  [ERR] 场景脚本异常: ' + String(b.__err).slice(0, 300))
+    } else {
+      console.log(
+        `  起名流程=${b.flow} 记录=${b.records}（${b.recKind} / ${b.recTitle} / ${b.recSubtitle} / ` +
+          `${b.recChips} chips / 带完整结果=${b.recHasPayload}）`
+      )
+      console.log(
+        `  收藏：点击成功=${b.favClicked} 条数=${b.favs} 名字=${b.favName} ` +
+          `存了用字=${b.favHasChars} 存了出处=${b.favHasPoetry} 卡片显示已收藏=${b.cardSaysFaved}`
+      )
+      console.log(
+        `  名字本：${b.historyPath} 记录行=${b.recRows} 候选字=${b.recChipEls} 收藏行=${b.favRows}`
+      )
+      console.log('  记录文案: ' + String(b.historyText || '').slice(0, 200))
+      console.log('  收藏文案: ' + String(b.favText || '').slice(0, 200))
+      console.log(
+        `  收藏→详情：${b.detailPath} 收藏按钮=${b.detailFavBtn} | ` +
+          String(b.detailText || '').slice(0, 140)
+      )
+      console.log(
+        `  记录→恢复：${b.restoredPath} 候选卡=${b.restoredCards} | ` +
+          String(b.restoredText || '').slice(0, 140)
+      )
+      console.log(
+        `  删除单条后记录=${b.recordsAfterDelete} 空态可见=${String(b.emptyAfterDelete || '').indexOf('还没有起名记录') !== -1}`
+      )
+      console.log(`  取消收藏后收藏数=${b.favsAfterDelete}`)
+      console.log(`  清空：前=${b.recordsBeforeClear} 后=${b.recordsAfterClear}`)
+    }
+  }
 }
 
 console.log(`\n合计硬报错：${hard}`)

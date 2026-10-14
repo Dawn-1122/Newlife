@@ -60,6 +60,9 @@ URL 参数（便于分享/自动化）：
 # 巡检常用页 + 跑通起名流程
 node tools/preview/probe.js --attach 9222 --flow
 
+# 名字本专项：起名落盘 → 收藏 → 名字本 → 恢复 → 删除 → 清空
+node tools/preview/probe.js --attach 9222 --book
+
 # 只看一页 / 全部页
 node tools/preview/probe.js --attach 9222 pages/detail/detail
 node tools/preview/probe.js --attach 9222 --all
@@ -90,3 +93,8 @@ node tools/preview/probe.js --attach 9222 --all
 - **页面实例保活**：`navigateTo` 建新实例，`navigateBack` 复用栈里的实例，
   所以「结果页筛完 → 返回 → 再进来」的状态保持与真机一致。
 - `reLaunch` / `switchTab`（`reset`）会销毁全部实例，`redirectTo`（`replace`）销毁当前实例。
+- **`wx.showModal` 是浏览器替身**：自绘确认弹层。自动化跑流程时用
+  `window.__wb.setModalAnswer(true|false)` 预设答案，否则脚本会停在弹窗上等真人点。
+- **本地存储用内存对象替身**（`wx.setStorageSync` 系列），刷新即清空，与真机一致的地方是
+  「退出小程序就丢」这一层语义；真机还有 10MB 配额，预览里不模拟。
+  用 `window.__wb.storage('<key>')` 可以直接读到落盘内容做断言。

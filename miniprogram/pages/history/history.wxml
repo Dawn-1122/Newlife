@@ -1,0 +1,91 @@
+<view class="page">
+  <!-- 窄幅泼墨页头 -->
+  <view class="band">
+    <image class="band-img" src="/images/ink-band.jpg" mode="widthFix" />
+  </view>
+
+  <view class="band-title-wrap">
+    <view class="band-title">名字本</view>
+  </view>
+
+  <!-- 分段：起名记录 / 收藏 -->
+  <view class="seg-wrap">
+    <view class="seg">
+      <view
+        class="seg-item {{tab === 'records' ? 'on' : ''}}"
+        data-tab="records"
+        bindtap="onTabTap"
+      >起名记录</view>
+      <view
+        class="seg-item {{tab === 'favs' ? 'on' : ''}}"
+        data-tab="favs"
+        bindtap="onTabTap"
+      >收藏</view>
+    </view>
+  </view>
+
+  <!-- ── 起名记录 ── -->
+  <view class="list" wx:if="{{tab === 'records'}}">
+    <view
+      class="rec"
+      wx:for="{{records}}"
+      wx:key="id"
+      bindtap="onRecordTap"
+      data-id="{{item.id}}"
+    >
+      <view class="rec-head">
+        <text class="rec-title">{{item.title}}</text>
+        <text class="rec-kind">{{item.kindLabel}}</text>
+      </view>
+      <view class="rec-sub">{{item.subtitle}}</view>
+
+      <view class="chips" wx:if="{{item.chips.length}}">
+        <text class="chip" wx:for="{{item.chips}}" wx:for-item="c" wx:key="text">{{c.text}}</text>
+      </view>
+
+      <view class="rec-foot">
+        <text class="rec-time">{{item.createdText}}</text>
+        <text class="rec-del" catchtap="onRecordDelete" data-id="{{item.id}}">删除</text>
+      </view>
+    </view>
+
+    <view class="empty" wx:if="{{!records.length}}">
+      <text class="empty-title">还没有起名记录</text>
+      <text class="empty-note">起的每一批名字都会自动收进这里，方便回头再看</text>
+    </view>
+  </view>
+
+  <!-- ── 收藏 ── -->
+  <view class="list" wx:else>
+    <view
+      class="fav"
+      wx:for="{{favs}}"
+      wx:key="id"
+      bindtap="onFavTap"
+      data-id="{{item.id}}"
+    >
+      <view class="fav-head">
+        <text class="fav-name">{{item.full_name}}</text>
+        <view class="score-badge {{item.overall >= 85 ? 'score-high' : item.overall >= 70 ? 'score-mid' : 'score-low'}}">{{item.overall}}分</view>
+      </view>
+
+      <view class="fav-pinyin">{{item.pinyinText}}</view>
+      <view class="fav-poetry" wx:if="{{item.source}}">「{{item.source}}·{{item.title}}」</view>
+
+      <view class="rec-foot">
+        <text class="rec-time">收藏于 {{item.savedText}}</text>
+        <text class="rec-del" catchtap="onFavDelete" data-id="{{item.id}}">取消收藏</text>
+      </view>
+    </view>
+
+    <view class="empty" wx:if="{{!favs.length}}">
+      <text class="empty-title">还没有收藏名字</text>
+      <text class="empty-note">在结果页或名字详情页点「收藏」，中意的名字就留在这里</text>
+    </view>
+  </view>
+
+  <!-- 底部：清空（有内容才出现） -->
+  <view class="foot" wx:if="{{tab === 'records' ? records.length : favs.length}}">
+    <button class="btn-secondary" bindtap="onClearTap">{{tab === 'records' ? '清空起名记录' : '清空收藏'}}</button>
+  </view>
+</view>

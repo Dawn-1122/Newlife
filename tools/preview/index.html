@@ -144,6 +144,14 @@
   .modal .modal-actions { display: flex; gap: 8px; margin-top: 14px; }
   .modal .modal-actions button { flex: 1; }
 
+  /* wx.showModal 的浏览器替身（与 picker 替身共用遮罩样式，各自一套 DOM） */
+  .confirm-mask {
+    position: fixed; inset: 0; background: rgba(0,0,0,.28);
+    display: none; align-items: center; justify-content: center; z-index: 60;
+  }
+  .confirm-mask.on { display: flex; }
+  .confirm-body { font-size: 13px; color: var(--ink); line-height: 1.6; margin-top: 8px; }
+
   .hint { color: var(--ink-3); font-size: 12px; padding: 0 14px 12px; }
 </style>
 </head>
@@ -187,6 +195,17 @@
     <div class="modal-actions">
       <button class="ctl" id="modal-cancel">取消</button>
       <button class="ctl primary" id="modal-ok">确定</button>
+    </div>
+  </div>
+</div>
+
+<div class="confirm-mask" id="confirm-mask">
+  <div class="modal">
+    <div class="modal-title" id="confirm-title"></div>
+    <div class="confirm-body" id="confirm-content"></div>
+    <div class="modal-actions">
+      <button class="ctl" id="confirm-cancel">取消</button>
+      <button class="ctl primary" id="confirm-ok">确定</button>
     </div>
   </div>
 </div>
@@ -318,6 +337,52 @@
     ctx.cb(value)
   }
 
+  // ── wx.showModal 替身 ──
+  // 自动化跑流程时不能让弹窗把脚本卡住，故留一个「预设答案」开关：
+  //   window.__wb.setModalAnswer(true)  → 之后所有 showModal 立刻按「确定」返回
+  //   window.__wb.setModalAnswer(false) → 立刻按「取消」返回
+  //   window.__wb.setModalAnswer(null)  → 恢复真人点击（默认）
+  var modalAnswer = null
+  var confirmCtx = null
+
+  function openConfirm(opts, cb) {
+    confirmCtx = cb
+    document.getElementById('confirm-title').textContent = opts.title || '提示'
+    document.getElementById('confirm-content').textContent = opts.content || ''
+    document.getElementById('confirm-ok').textContent = opts.confirmText || '确定'
+    document.getElementById('confirm-cancel').textContent = opts.cancelText || '取消'
+    document.getElementById('confirm-mask').classList.add('on')
+  }
+
+  function closeConfirm() {
+    document.getElementById('confirm-mask').classList.remove('on')
+  }
+
+  function showModal(opts, cb) {
+    var o = opts || {}
+    if (o.showCancel === false) o.cancelText = ''
+    if (modalAnswer !== null) {
+      setTimeout(function () {
+        cb({ confirm: !!modalAnswer, cancel: !modalAnswer })
+      }, 0)
+      return
+    }
+    openConfirm(o, cb)
+  }
+
+  document.getElementById('confirm-cancel').onclick = function () {
+    var cb = confirmCtx
+    confirmCtx = null
+    closeConfirm()
+    cb && cb({ confirm: false, cancel: true })
+  }
+  document.getElementById('confirm-ok').onclick = function () {
+    var cb = confirmCtx
+    confirmCtx = null
+    closeConfirm()
+    cb && cb({ confirm: true, cancel: false })
+  }
+
   // ── 事件委托 ──
   function fire(evIndex, domEvent, detail) {
     if (currentInstance && currentInstance.__fire) {
@@ -414,7 +479,8 @@
           pagePicker.value = info.path
           writeReport()
         },
-        toast: toast
+        toast: toast,
+        modal: showModal
       }
 
       runtime = W.createRuntime({
@@ -715,6 +781,10 @@
         prenatalFlow: runPrenatalFlow,
         analyzeFlow: runAnalyzeFlow,
         runSteps: runSteps,
+        /** 预设 wx.showModal 的答案：true=确定 / false=取消 / null=恢复真人点击 */
+        setModalAnswer: function (v) { modalAnswer = v === undefined ? true : v },
+        /** 名字本的落盘内容（本机存储替身里的真实数据，用于自检） */
+        storage: function (key) { return runtime.debugStorage ? runtime.debugStorage(key) : null },
         panel: function () { return panel.slice() },
         report: function () { return JSON.parse(document.getElementById('wb-report').textContent || '{}') }
       }

@@ -127,8 +127,15 @@
       <view class="card name-card" wx:for="{{names}}" wx:key="full_name" bindtap="onNameTap" data-index="{{index}}">
         <view class="name-header">
           <text class="name-text">{{item.full_name}}</text>
-          <view class="score-badge {{item.scores.overall >= 85 ? 'score-high' : item.scores.overall >= 70 ? 'score-mid' : 'score-low'}}">
-            {{item.scores.overall}}分
+          <view class="name-header-right">
+            <view class="score-badge {{item.scores.overall >= 85 ? 'score-high' : item.scores.overall >= 70 ? 'score-mid' : 'score-low'}}">
+              {{item.scores.overall}}分
+            </view>
+            <text
+              class="fav-btn {{item.fav ? 'fav-on' : ''}}"
+              catchtap="onFavTap"
+              data-index="{{index}}"
+            >{{item.fav ? '已收藏' : '收藏'}}</text>
           </view>
         </view>
 

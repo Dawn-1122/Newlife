@@ -24,6 +24,13 @@ Page({
           { key: 'compare', name: '双名对比', url: '', available: false },
           { key: 'special', name: '专项测评', url: '', available: false }
         ]
+      },
+      {
+        // 起名记录与收藏名字都落在本机（utils/namebook.js），换设备不会同步
+        title: '我的',
+        items: [
+          { key: 'book', name: '我的名字本', url: '/pages/history/history', available: true }
+        ]
       }
     ]
   },
