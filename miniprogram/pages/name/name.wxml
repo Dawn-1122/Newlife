@@ -58,12 +58,6 @@
         </view>
       </view>
 
-      <view class="form-item">
-        <text class="form-label">行业</text>
-        <picker mode="selector" range="{{industryOptions}}" range-key="name" bindchange="onIndustryChange">
-          <view class="picker-value">{{industryName}}</view>
-        </picker>
-      </view>
     </block>
 
     <!-- 未出生 -->
@@ -90,8 +84,8 @@
     </block>
   </view>
 
-  <!-- 下一步：挑感觉 -->
+  <!-- 下一步：定偏好 -->
   <view class="foot">
-    <button class="btn-primary" bindtap="onNext" loading="{{loading}}">下一步 · 挑一种感觉</button>
+    <button class="btn-primary" bindtap="onNext" loading="{{loading}}">下一步 · 定偏好</button>
   </view>
 </view>

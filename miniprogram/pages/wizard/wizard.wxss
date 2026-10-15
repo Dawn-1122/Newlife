@@ -1,4 +1,4 @@
-/* 起名第二步 · 挑一种感觉（山水泼墨） */
+/* 起名第二步 · 定偏好（山水泼墨） */
 
 .page {
   min-height: 100vh;
@@ -17,7 +17,7 @@
 }
 
 .head {
-  padding: 40rpx 40rpx 36rpx;
+  padding: 40rpx 40rpx 20rpx;
 }
 
 .head-title {
@@ -35,56 +35,224 @@
   color: var(--ink-3);
 }
 
-/* ── 感觉卡 ── */
-.feel-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  padding: 0 40rpx;
+/* ── 分区 ── */
+.block {
+  margin: 32rpx 40rpx 0;
+  padding-top: 32rpx;
+  border-top: 1rpx solid var(--line);
 }
 
-.feel-card {
-  width: 48.5%;
+.block-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.block-title {
+  font-family: var(--serif);
+  font-size: 34rpx;
+  font-weight: 500;
+  letter-spacing: 6rpx;
+  color: var(--ink);
+}
+
+.block-tail {
+  font-size: 23rpx;
+  letter-spacing: 2rpx;
+  color: var(--ink-3);
+}
+
+.block-note {
+  margin-top: 20rpx;
+  font-size: 22rpx;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+
+/* ── 偏好标签（气质 / 期待 / 意象 / 典籍）──
+   选中用墨色实底（与基础资料页的 chip 同语言），不用朱砂 ——
+   朱砂留给「真正被选进名字」的字，避免一屏红点看不出轻重。 */
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tag {
+  margin: 0 14rpx 14rpx 0;
+  padding: 14rpx 28rpx;
+  border: 1rpx solid var(--line-strong);
+  border-radius: var(--r-sm);
+  font-size: 27rpx;
+  line-height: 1.3;
+  color: var(--ink-2);
+  background: transparent;
+}
+
+.tag.active {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* ── 路径卡 ── */
+.path-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.path-card {
+  width: 32%;
   box-sizing: border-box;
-  margin-bottom: 20rpx;
-  padding: 34rpx 26rpx;
+  padding: 26rpx 20rpx;
   background: var(--card);
   border: 1rpx solid var(--line);
   border-radius: var(--r-md);
 }
 
-/* 朱砂只用于「选中」这一处语义 */
-.feel-card.active {
+.path-card.active {
+  border-color: var(--ink);
+}
+
+.path-name {
+  font-family: var(--serif);
+  font-size: 30rpx;
+  font-weight: 500;
+  letter-spacing: 3rpx;
+  color: var(--ink);
+}
+
+.path-desc {
+  margin-top: 10rpx;
+  font-size: 20rpx;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+/* ── 可选字表 ── */
+.pick-hint {
+  padding: 24rpx 0;
+  font-size: 24rpx;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+
+.pick-stat {
+  font-size: 23rpx;
+  letter-spacing: 2rpx;
+  color: var(--ink-2);
+  margin-bottom: 24rpx;
+}
+
+.pick-warn {
+  margin-bottom: 24rpx;
+  padding: 18rpx 22rpx;
+  border: 1rpx solid var(--ochre);
+  border-radius: var(--r-sm);
+  font-size: 22rpx;
+  line-height: 1.5;
+  color: var(--ochre);
+}
+
+.pick-warn-act {
+  margin-left: 12rpx;
+  color: var(--cinnabar);
+  text-decoration: underline;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 24rpx;
+}
+
+.chip {
+  margin: 0 14rpx 14rpx 0;
+  padding: 10rpx 22rpx;
+  border: 1rpx solid var(--line-strong);
+  border-radius: var(--r-sm);
+  font-size: 23rpx;
+  line-height: 1.3;
+  color: var(--ink-2);
+}
+
+.chip.active {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* 每行 5 格：5 × w + 5 × 10rpx = 100% → w = (100% − 50rpx) / 5 */
+.char-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.char-cell {
+  width: calc((100% - 50rpx) / 5);
+  box-sizing: border-box;
+  margin: 0 10rpx 10rpx 0;
+  padding: 16rpx 0 14rpx;
+  text-align: center;
+  background: var(--card);
+  border: 1rpx solid var(--line);
+  border-radius: var(--r-sm);
+}
+
+.char-cell.active {
   border-color: var(--cinnabar);
   background: var(--cinnabar-bg);
 }
 
-.feel-card:active {
-  background: var(--paper-deep);
-}
-
-.feel-card.active:active {
-  background: var(--cinnabar-bg);
-}
-
-.feel-title {
+.char-glyph {
   font-family: var(--serif);
-  font-size: 36rpx;
-  font-weight: 500;
-  letter-spacing: 6rpx;
+  font-size: 34rpx;
+  line-height: 1.2;
   color: var(--ink);
-  line-height: 1.3;
 }
 
-.feel-card.active .feel-title {
+.char-cell.active .char-glyph {
   color: var(--cinnabar);
 }
 
-.feel-imagery {
-  margin-top: 14rpx;
-  font-size: 22rpx;
-  line-height: 1.5;
+.char-sub {
+  margin-top: 6rpx;
+  font-size: 18rpx;
+  line-height: 1.2;
   color: var(--ink-3);
+}
+
+.more {
+  margin-top: 12rpx;
+  padding: 20rpx 0;
+  text-align: center;
+  font-size: 24rpx;
+  letter-spacing: 2rpx;
+  color: var(--ink-2);
+  border-top: 1rpx solid var(--line);
+}
+
+.picked-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid var(--line);
+}
+
+.picked-text {
+  font-family: var(--serif);
+  font-size: 30rpx;
+  letter-spacing: 6rpx;
+  color: var(--cinnabar);
+}
+
+.picked-clear {
+  font-size: 23rpx;
+  letter-spacing: 2rpx;
+  color: var(--ink-3);
+  text-decoration: underline;
 }
 
 /* ── 避讳字 ── */

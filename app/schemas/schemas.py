@@ -22,9 +22,9 @@ class NamingRequest(BaseModel):
     style: Optional[str] = Field(None, description="风格偏好: classic|modern|grand|fresh|warm|elegant|plain|zen")
     meanings: Optional[list[str]] = Field(None, max_length=3, description="期望寓意（code 见 /chars 的 meanings 字段），最多3个，取值: wisdom|health|bravery|gentle|wealth|peace|talent|virtue|beauty|loyal|patriotic|tranquil")
     avoid_chars: Optional[list[str]] = Field(None, description="避讳字（单个汉字列表）")
-    industry: Optional[str] = Field(None, description="行业 code，映射五行（P1 启用）")
+    industry: Optional[str] = Field(None, description="行业 code，映射五行（**商业起名**纵向使用；宝宝起名主流程不再暴露该字段，此处仅作透传位）")
     selected_chars: Optional[list[str]] = Field(None, description="用户点选的候选字（先字后出处）：语义为「名字必须含所选字」（任一位置）")
-    source_classes: Optional[list[str]] = Field(None, description="出处类目限定（先出处后字），可多选: 诗经|楚辞|唐诗|宋词|五代词|清词|汉魏古诗|经史子集（字源 4 部典籍归入经史子集）")
+    source_classes: Optional[list[str]] = Field(None, description="出处类目限定（先出处后字），可多选: 诗经|楚辞|汉魏古诗|唐诗|五代词|宋词|清词|经史子集（字源 4 部典籍归入经史子集）")
 
 
 class RecommendCharsRequest(BaseModel):
@@ -174,6 +174,47 @@ class RecommendCharsResponse(BaseModel):
     bazi: Optional[dict] = None
     groups: list[dict] = Field(default_factory=list, description="按五行分组的推荐字")
     total: int = 0
+
+
+class PickableCharsRequest(BaseModel):
+    """可选字表请求（「先字后出处」路径：用户在字表里点选候选字）"""
+    surname: str = Field(..., min_length=1, max_length=4, description="姓氏")
+    gender: str = Field("female", pattern="^(male|female)$", description="性别")
+    year: Optional[int] = Field(None, ge=1900, le=2100, description="出生年")
+    month: Optional[int] = Field(None, ge=1, le=12, description="出生月")
+    day: Optional[int] = Field(None, ge=1, le=31, description="出生日")
+    hour: Optional[int] = Field(12, ge=0, le=23, description="出生时")
+    minute: Optional[int] = Field(0, ge=0, le=59, description="出生分")
+    use_bazi: bool = Field(False, description="是否使用八字分析")
+    name_length: int = Field(2, ge=1, le=2, description="名字字数（1或2，决定门槛口径）")
+    style: Optional[str] = Field(None, description="风格偏好: classic|modern|grand|fresh|warm|elegant|plain|zen")
+    meanings: Optional[list[str]] = Field(None, max_length=3, description="期望寓意（code 见 /chars 的 meanings 字段），最多3个")
+    imagery_families: Optional[list[str]] = Field(
+        None,
+        description="字形意象族（排序用，不作硬过滤）: 日月星辰|草木|水|玉|金|火|土",
+    )
+    avoid_chars: Optional[list[str]] = Field(None, description="避讳字（单个汉字列表）")
+    source_classes: Optional[list[str]] = Field(None, description="出处类目限定（可选），可多选: 诗经|楚辞|汉魏古诗|唐诗|五代词|宋词|清词|经史子集（字源 4 部典籍归入经史子集）")
+    limit: int = Field(400, ge=1, le=400, description="返回字数上限")
+
+
+class PickableCharsResponse(BaseModel):
+    """可选字表响应（每个字都能真的组出名字；字表外的字一个都出不来）"""
+    bazi: Optional[dict] = None
+    total: int = Field(0, description="池内字数（有出处、性别相符、非黑名单）")
+    feasible: int = Field(0, description="真出得来名字的字数（字表实际可选范围）")
+    returned: int = 0
+    truncated: bool = False
+    no_family: int = Field(0, description="无意象族归属的字数（7 族只覆盖约 35%）")
+    families: list[dict] = Field(
+        default_factory=list,
+        description='意象族概览 [{"family","count","total","selected","sample"}]',
+    )
+    chars: list[dict] = Field(
+        default_factory=list,
+        description='字表 [{"char","pinyin","wuxing","family","partner_count",'
+                    '"name_hits","match","xiyong","sample","meaning"}]',
+    )
 
 
 class RecommendSourcesRequest(BaseModel):

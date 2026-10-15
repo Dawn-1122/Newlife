@@ -608,3 +608,118 @@ merge_poetry.py --annotated annotated_female.jsonl --raw raw_female.jsonl
 
 
 
+
+---
+
+## 13. 偏好选择层（第 2 步：27 标签 + 三条路径）
+
+### 13.1 为什么拆掉「感觉卡」
+
+旧版把 1 个 style 与 2 个 meanings 打包成 8 张卡（古意/清朗/温润/…），
+一对一映射到 8 个风格 code。问题：**用户的偏好被卡片的组合绑死**——
+想「温润 + 勇敢」时无路可走（温润卡只带 品德+温婉）。
+现拆成三层独立标签，与后端入参一一对应：
+
+| 维度 | 数量 | 上限 | 后端入参 | 作用域 |
+|---|---|---|---|---|
+| 气质 | 8（STYLE_OPTIONS） | 单选 | `style` | 来源偏好（Tier A 加权）+ 意象关键词 + 选字倾向 |
+| 期待 | 12（MEANING_OPTIONS） | 3 | `meanings` | 选字硬前置（`_select_candidate_chars` 排序）+ 排序 |
+| 意象 | 7（IMAGERY_FAMILY_PRIORITY） | 2 | `imagery_families`（仅 `/pickable-chars`） | **只影响先字字表的排序** |
+
+### 13.2 意象族：为什么**不**作硬过滤（实测结论，勿再重试硬分区）
+
+7 族 = 日月星辰 / 草木 / 水 / 玉 / 金 / 火 / 土，由**部首**归属
+（`build_radical_family_map()`，冲突部首按 `IMAGERY_FAMILY_PRIORITY` 定序——
+「日」同属火与日月星辰，按序只归日月星辰，否则「星」会落进火族）。
+
+对候选池的覆盖（实测）：
+
+| 族 | female 池内 | male 池内 |
+|---|---|---|
+| 日明月星辰 | 20 | 16 |
+| 草木 | 85 | 83 |
+| 水 | 45 | 47 |
+| 玉 | 19 | 19 |
+| 金 | **4** | 10 |
+| 火 | 11 | 11 |
+| 土 | 12 | 18 |
+| **无族属** | **357（65%）** | **359（64%）** |
+
+- 硬过滤会砍掉 65% 的好字（诗/思/安/宜/清 这类无族属字），金族更只剩 4 字；
+- 所以意象族**只做两件事**：① 选中的族在字表里排到最前（`match` 加权）；
+  ② 字表页按族手动筛选（前端本地，即时）。
+- 「日」这类重叠部首必须在**前端提示里也去重**（火族不再列「日」），
+  否则用户会问「我选了火，怎么没有星」——由 `test_imagery_family_radicals_match_backend` 门禁。
+
+### 13.3 `POST /pickable-chars`：可选字表（新增）
+
+`NamingEngine.pickable_chars(...)` → 返回**真出得来名字**的字，不是字库铺满的候选。
+
+**入选判据是「真的出得来名字」（`name_hits > 0`），不是「有搭档字」。**
+反例（实测踩到）：姓林 + 「情」有 4 个已批准搭档（中/凝/兰/深），
+但 8 种字序**全部三连同调**，用户点到就是空结果。
+`partner_count` 只作展示（「组合力」），不参与入选。
+
+可行性镜像引擎的两条供给路径（A 出处组合 / B 随机组合），算一次 **~0.06s**，
+每请求实时计算、无需缓存。
+
+响应字段：
+- `total`（池内字数）/ `feasible`（真出得来名字的字数）/ `returned` / `truncated`
+- `families`：7 族概览 `{family, count, total, selected, sample}`
+- `no_family`：无族属字数（约 60%）
+- `chars`：`{char, pinyin, wuxing, family, partner_count, name_hits, match, xiyong, sample, meaning}`
+  - `match` = 意象族命中×4 + 寓意命中×2 + 风格意象命中×1 + 喜用神×2
+
+**契约（`tests/test_pickable_chars.py` + 400 字双向对拍强制）**：
+表内每个字都真的出得来名字（**0 假阳性**）；表外的字一个都出不来（**0 假阴性**）。
+初版入选条件写成「有搭档或出得来名字」，林/female 抽查 40 字出现 **10 个假阳性**，
+已修正。
+
+`scripts/diag_selected_chars.py --feasible` 现**委托** `pickable_chars`——
+此前那份独立镜像实现与 live 有 21/244 偏差（19 低估、2 高估），已废弃。
+
+### 13.4 顺带修掉的真缺陷：风格命中恒为 0
+
+`_rank_by_yunwei.style_hits` 与 `_pref_hits` 原先把 `STYLE_OPTIONS[...]["imagery_keywords"]`
+（「清雅」「壮阔」这类**裸关键词**）当成 `MEANING_OPTIONS` 的 **code** 传给
+`_meanings_match_score` → `MEANING_OPTIONS.get("清雅")` 恒为 `None` → **风格命中永远 0**。
+风格偏好实际只通过 `source_preference`（出处大类）起作用，意象关键词那一半是死代码。
+新增 `NamingEngine._keyword_hits(text, keywords)` 修掉。
+
+A/B 实测（各 2 轮）：
+- 「换一批变化」同输入两次重合 **50~57% → 40%**（越低越好，目标 <90%）——净收益；
+- 韵味 min/中位、同源、跨来源重合、八字匹配均在运行波动范围内（min 56~58 / 中位 63~66
+  是**基线自身的波动**，不是回归）。
+
+### 13.5 前端：三条路径的硬约束落点
+
+`pages/wizard/wizard`（原「挑一种感觉」→ 现「定偏好」）：
+
+| 路径 | 用户动作 | 后端硬约束 |
+|---|---|---|
+| 直接推荐 | 只挑标签 | `style` / `meanings` |
+| 从字出发 | 字表里点字（≤3） | `selected_chars`（名字必须含所选字） |
+| 从出处出发 | 选典籍（可多选） | `source_classes` |
+
+实现要点（改这个页面时别踩回去）：
+- 字表的 `picked` 用**路径式 setData**（`charView[i].picked`）单格更新；
+  整表重发 200+ 格会明显卡顿。
+- 字表按 `CHAR_PAGE = 48` 分页渲染（全量 200+ 格会撑爆 wxml 节点数）。
+- **气质/期待/避讳改了 → 字表作废**（置 `pickStale` + 提示「重新载入」），
+  因为这些是后端算字表时的入参；**意象改了 → 本地重排**（族归属在前端手里），即时无请求。
+- 回填路径：从结果页「调整偏好」返回时，按 `draft.selected_chars` / `draft.source_classes`
+  反推该停在哪条路上——否则界面停在「直接推荐」，一提交就把用户选的字静默丢掉。
+- 未出生（预产期）**只有直接推荐**：`PrenatalRequest` 不吃先字/先出处。
+
+### 13.6 行业字段
+
+宝宝起名主流程**不再暴露「行业」**（用户决定）：给小孩起名选行业本身就让用户困惑。
+`INDUSTRY_WUXING` 常量保留，归**商业起名**纵向（品牌/店名/公司名）；
+`NamingRequest.industry` 保留为透传位（引擎不消费）。
+
+### 13.7 待办（下一步）
+
+- **字辈**：不是「加个输入框」——它会改变整张字表（只有能配辈字的字可选），
+  要与 `pickable_chars` 一起设计（`generational_char` + 位置语义），故本轮未做。
+- 意象族若要影响**直接推荐**（而非只影响字表），机制是扩 `_char_affinity` +
+  `_rank_by_yunwei`，需独立 eval 证「硬分流且无回归」后才能上。

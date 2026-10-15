@@ -608,17 +608,18 @@
        * 通用步骤执行器。每个步骤都是「等某元素出现 → 对它做一个真实动作」，
        * 动作全部走页面自己的事件处理函数，不绕过业务逻辑。
        * steps 里可用的键：
-       *   wait:  处理器名（等它出现）
+       *   wait:  处理器名（等它出现；可选 timeout 毫秒，默认 15000）
        *   type:  { sel, value }  给 input 赋值并触发 bindinput
        *   pick:  { sel, value }  走原生 picker 弹层
        *   click: 处理器名
+       *   txt:   文本片段（点第一个含该文本的可点元素）
        *   sleep: 毫秒
        */
       function runSteps(steps) {
         return steps.reduce(function (chain, step) {
           return chain.then(function () {
             if (step.wait && !step.optional) {
-              return waitFor(function () { return handlerEl(step.wait) }, 15000)
+              return waitFor(function () { return handlerEl(step.wait) }, step.timeout || 15000)
             }
             return true
           }).then(function () {
@@ -634,29 +635,92 @@
       }
 
       /**
-       * 跑通真实起名流程：资料页 → 挑一种感觉 → 生成 → 结果页。
+       * 跑通真实起名流程：资料页 → 定偏好 → 生成 → 结果页。
        * 之所以要做这个：结果页/详情页依赖 globalData.lastResult，
        * 直接下拉跳过去只会被 navigateBack 弹回，看不到真实内容。
+       *
+       * opts.path：
+       *   'direct'（默认）    选个气质 → 直接生成
+       *   'chars'            选个气质 → 从字出发 → 载入字表 → 点一个字 → 生成
+       *   'sources'          选个气质 → 从出处出发 → 选诗经 → 生成
+       * chars/sources 两条会把「路径选择 → 硬约束真的生效」一并验掉。
        */
       function runFlow(opts) {
         opts = opts || {}
+        var path = opts.path || 'direct'
+        // 断言证据攒在这，最后一次性并入报告。
+        // 注意 writeReport 是**整份替换**不是合并——中途单独调一次，
+        // 会被后面那次 writeReport 覆盖掉，证据就没了（踩过）。
+        var flowExtra = {}
         panelMark = panel.length
-        log('[流程] 起名：资料页 → 挑一种感觉 → 生成', 'info')
+        log('[流程] 起名（' + path + '）：资料页 → 定偏好 → 生成', 'info')
         return startAt('pages/name/name').then(function () {
-          return runSteps([
+          var steps = [
             { wait: 'onSurnameInput' },
             { type: { sel: 'onSurnameInput', value: opts.surname || '林' } },
             { pick: { sel: 'onDateChange', value: opts.birthDate || '1994-05-20' } },
             { sleep: 200 },
             { click: 'onNext' },
-            { wait: 'onFeelTap' },
-            { click: 'onFeelTap' },
-            { sleep: 200 },
-            { click: 'onSubmit' }
-          ])
+            // 偏好页第一屏是三个标签区，先等「气质」区渲染出来
+            { wait: 'onStyleTap' },
+            { click: 'onStyleTap' }
+          ]
+          if (path === 'chars') {
+            steps = steps.concat([
+              { txt: '从字出发' },
+              { sleep: 300 },
+              // 字表要真的向后端算一遍（门槛感知可行性），给它时间
+              { wait: 'onCharTap', timeout: 20000 },
+              { sleep: 200 },
+              { click: 'onCharTap' }
+            ])
+          } else if (path === 'sources') {
+            steps = steps.concat([
+              { txt: '从出处出发' },
+              { sleep: 300 },
+              { wait: 'onSourceTap' },
+              { txt: '诗经' }
+            ])
+          }
+          steps = steps.concat([{ sleep: 200 }, { click: 'onSubmit' }])
+          return runSteps(steps)
         }).then(function () {
           return waitFor(function () { return currentPath === 'pages/result/result' }, 30000)
         }).then(function (ok) {
+          // 路径硬约束断言：从字出发时，结果里每个名字都必须含所点的字
+          if (ok && path === 'chars') {
+            var res = runtime.getApp().globalData.lastResult || {}
+            var params = runtime.getApp().globalData.lastParams || {}
+            var picked = params.selected_chars || []
+            var bad = (res.names || []).filter(function (n) {
+              return !picked.some(function (ch) { return n.given_name.indexOf(ch) !== -1 })
+            })
+            log('[流程] 先字约束：选了 ' + picked.join('/') + '，' +
+              (res.names || []).length + ' 个名字里违约 ' + bad.length + ' 个',
+              bad.length ? 'error' : 'info')
+            if (bad.length) {
+              log('[流程] 违约示例：' + bad.slice(0, 5).map(function (n) {
+                return n.given_name
+              }).join(' '), 'error')
+            }
+            flowExtra.flowPicked = picked
+            flowExtra.flowViolations = bad.length
+            if (bad.length) ok = false
+          }
+          if (ok && path === 'sources') {
+            var res2 = runtime.getApp().globalData.lastResult || {}
+            var wrong = {}
+            ;(res2.names || []).forEach(function (n) {
+              var src = (n.poetry || {}).source
+              if (src && src !== '诗经') wrong[src] = (wrong[src] || 0) + 1
+            })
+            var badSrc = Object.keys(wrong)
+            log('[流程] 先出处约束：非诗经出处 ' + badSrc.length + ' 种 ' +
+              badSrc.join('/'), badSrc.length ? 'error' : 'info')
+            flowExtra.flowSources = badSrc
+            flowExtra.flowSourceNames = (res2.names || []).length
+            if (badSrc.length) ok = false
+          }
           if (opts.thenDetail) {
             log(ok ? '[流程] 再进一个名字的详情页' : '[流程] 未到结果页，跳过详情', ok ? 'info' : 'warn')
             if (ok) {
@@ -668,7 +732,9 @@
           return ok
         }).then(function (ok) {
           log(ok ? '[流程] 已到 ' + currentPath : '[流程] 未到结果页（后端没起？）', ok ? 'info' : 'error')
-          writeReport({ flowDone: !!ok, flowAt: currentPath })
+          flowExtra.flowDone = !!ok
+          flowExtra.flowAt = currentPath
+          writeReport(flowExtra)
           return !!ok
         }).catch(function (err) {
           log('[流程] 失败：' + err.message, 'error')
@@ -687,8 +753,8 @@
             { pick: { sel: 'onDueDateChange', value: '2026-04-15' } },
             { sleep: 200 },
             { click: 'onNext' },
-            { wait: 'onFeelTap' },
-            { click: 'onFeelTap' },
+            { wait: 'onStyleTap' },
+            { click: 'onStyleTap' },
             { sleep: 200 },
             { click: 'onSubmit' }
           ])
@@ -806,14 +872,16 @@
       var _setNav = uiHooks.setNav
       uiHooks.setNav = function (info) { _setNav(info); writeReport() }
 
-      // ── 启动：支持 ?page=<路径> 与 ?flow=1|prenatal|analyze|detail ──
+      // ── 启动：支持 ?page=<路径> 与 ?flow=direct|chars|sources|prenatal|analyze|detail ──
       var params = new URLSearchParams(location.search)
       var startPage = params.get('page')
       var flow = params.get('flow')
       var flowOpts = {
         surname: params.get('surname') || undefined,
         birthDate: params.get('birth') || undefined,
-        thenDetail: flow === 'detail'
+        thenDetail: flow === 'detail',
+        // 路径选择：先字（chars）/ 先出处（sources）会额外断言硬约束真的生效
+        path: ['direct', 'chars', 'sources'].indexOf(flow) >= 0 ? flow : undefined
       }
       if (flow === 'prenatal') {
         runPrenatalFlow()

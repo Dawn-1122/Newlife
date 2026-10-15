@@ -25,27 +25,6 @@ Page({
     // 共享（性别）
     gender: 'male',
 
-    // 行业（产后可选，P0 透传）
-    industry: '',
-    industryName: '不限',
-    industryOptions: [
-      { code: '', name: '不限' },
-      { code: 'tech', name: '互联网/科技' },
-      { code: 'media', name: '传媒/文创' },
-      { code: 'catering', name: '餐饮' },
-      { code: 'energy', name: '能源' },
-      { code: 'finance', name: '金融/财会' },
-      { code: 'law', name: '法律' },
-      { code: 'manufacturing', name: '制造/工业' },
-      { code: 'education', name: '教育/文化' },
-      { code: 'medical', name: '医疗/健康' },
-      { code: 'art', name: '艺术' },
-      { code: 'agriculture', name: '农业' },
-      { code: 'realestate', name: '地产/建筑' },
-      { code: 'trade', name: '贸易/物流' },
-      { code: 'tourism', name: '旅游/服务' }
-    ],
-
     loading: false
   },
 
@@ -90,15 +69,6 @@ Page({
 
   onRangeTap(e) {
     this.setData({ rangeDays: Number(e.currentTarget.dataset.range) })
-  },
-
-  onIndustryChange(e) {
-    const index = Number(e.detail.value)
-    const opt = this.data.industryOptions[index]
-    this.setData({
-      industry: opt.code,
-      industryName: opt.name
-    })
   },
 
   onNext() {
@@ -150,8 +120,6 @@ Page({
         draft.day = Number(parts[2])
         draft.hour = hourMap[this.data.hourIndex]
       }
-      if (this.data.industry) draft.industry = this.data.industry
-
       app.globalData.draftParams = draft
       app.globalData.draftTab = 'postnatal'
     }

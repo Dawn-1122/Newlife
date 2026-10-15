@@ -109,114 +109,51 @@ def print_summary(coverage: dict, gender: str) -> None:
 
 
 def build_feasibility(engine: NamingEngine, surname: str, gender: str,
-                      source_classes: list | None = None) -> dict:
+                      source_classes: list | None = None) -> tuple[dict, list]:
     """门槛感知可行性：这个字和这个姓氏，能不能真的出名字。
 
     结构覆盖（build_coverage）只是上界——实际还有一道门槛层会拦下大量组合，
     且**与姓氏强相关**：如姓「林」（阳平）时，名字两字全平触发三连同调全灭
     （清扬/芙蓉/芳兰）；「林」+「诗」谐音「临时」被谐音禁则拦下。
 
-    本函数镜像引擎的**两条供给路径**，只跑门槛层、不做韵味评分/抽样：
-    A. 出处组合路径（compose_from_entry）：出处须过 _match_provenance 的可用性过滤；
-       有标注出处只产标注字对（字序按原文），未标注出处全交叉。
-    B. 随机组合路径：搭档 =「已批准字对 ∩ 候选池」（出处仅作挂载，不参与）。
-    两条路径任一能产出名字即视为可行。与 live 对拍（244 字）零偏差为验收标准。
+    **实现委托引擎的 `NamingEngine.pickable_chars`**（前端「先字」字表用的是同一个
+    方法）。此处不再自己实现一份——两套实现必然漂移，而漂移的代价是「前端给的字
+    实际点不动」。2026-10-15 之前本脚本有一份独立镜像实现，实测与 live 有 21/244
+    偏差（19 处低估、2 处高估），已废弃。
+
+    Returns:
+        (feas, dead)
+        feas: {字: {"partners","name_hits","sample"}}，**只含真出得来名字的字**
+        dead: 有已批准搭档、但该姓氏下门槛全灭的字（提示用户「换个姓/换个字」）
     """
-    blacklist = set(NEGATIVE_CHARS)
-    pool = {c["char"]: c for c in engine._select_candidate_chars(
-        None, gender, 2, blacklist, None
-    )}
-    hits: dict[str, list[str]] = defaultdict(list)
-    seen: dict[str, set] = defaultdict(set)
-
-    def gate_ok(first: dict, second: dict):
-        """过门槛层（三连同调 + 音律 + 五格 + 姓氏谐音/本义）→ 返回名字，否则 None。"""
-        gn = first["char"] + second["char"]
-        if engine.surname_fit.tri_tone_conflict(
-            surname, [first["char"], second["char"]]
-        ):
-            return None
-        ph = engine.phonetics.analyze(surname + gn)
-        try:
-            wg = engine.wuge.calculate(surname, gn)
-        except Exception:
-            wg = {"total_score": 60}
-        if not engine._pass_gate(surname, gn, ph, wg, None, [first, second]):
-            return None
-        return gn
-
-    def record(a: str, b: str, gn: str) -> None:
-        for ch in (a, b):
-            if gn not in seen[ch]:
-                seen[ch].add(gn)
-                hits[ch].append(gn)
-
-    # ── 供给 A：出处组合路径 ──
-    for entry, _tier in engine._match_provenance(
-        None, gender, None, None, blacklist, source_classes=source_classes
-    ):
-        by_char = {
-            c["char"]: c for c in
-            engine._get_valid_poem_chars(entry, gender, None, blacklist, None)
+    result = engine.pickable_chars(
+        surname=surname, gender=gender, source_classes=source_classes, limit=400,
+    )
+    feas = {
+        c["char"]: {
+            "partners": c["partner_count"],
+            "name_hits": c["name_hits"],
+            "sample": c["sample"],
         }
-        for pair in (entry.get("name_pairs") or []):
-            for ch in pair:
-                if ch in by_char or ch in blacklist:
-                    continue
-                ci = engine.char_db.get_char(ch)
-                if not ci:
-                    continue
-                if gender == "male" and ci["gender"] not in ("男", "中"):
-                    continue
-                if gender == "female" and ci["gender"] not in ("女", "中"):
-                    continue
-                by_char[ch] = ci
-        annotated = entry.get("name_pairs") or []
-        known = entry.get("name_pairs_known", bool(annotated))
-        if annotated:
-            pair_list = [tuple(p) for p in annotated if all(ch in by_char for ch in p)]
-        elif known:
-            pair_list = []
-        else:
-            chars = list(by_char)
-            pair_list = [
-                (a, b) for i, a in enumerate(chars) for b in chars[i + 1:]
-            ]
-        for a, b in pair_list:
-            first, second = engine._order_two_chars(entry, by_char[a], by_char[b])
-            gn = gate_ok(first, second)
-            if gn:
-                record(a, b, gn)
-
-    # ── 供给 B：随机组合路径（搭档 = 已批准字对 ∩ 候选池；音韵定序，同分两序均为候选）──
-    for ch, ci in pool.items():
-        for p in set(engine.poetry_db.approved_partners(ch)):
-            if p == ch or p not in pool:
-                continue
-            for first, second in engine._order_candidates(ci, pool[p]):
-                gn = gate_ok(first, second)
-                if gn:
-                    record(ch, p, gn)
-                    break
-
-    return {
-        ch: {
-            "partners": len(set(engine.poetry_db.approved_partners(ch)) & set(pool)),
-            "name_hits": len(hits[ch]),
-            "sample": sorted(hits[ch])[:8],
-        }
-        for ch in pool
-        if hits[ch] or set(engine.poetry_db.approved_partners(ch)) & set(pool)
+        for c in result["chars"]
     }
 
+    blacklist = set(NEGATIVE_CHARS)
+    pool = {
+        c["char"] for c in engine._select_candidate_chars(None, gender, 2, blacklist, None)
+    }
+    dead = sorted(
+        ch for ch in pool
+        if ch not in feas and (set(engine.poetry_db.approved_partners(ch)) & pool)
+    )
+    return feas, dead
 
-def print_feasibility(feas: dict, surname: str, gender: str) -> None:
-    ok = {ch: v for ch, v in feas.items() if v["name_hits"]}
+
+def print_feasibility(feas: dict, dead: list, surname: str, gender: str) -> None:
     print(f"\n===== {surname}姓 / {gender} · 门槛感知可行性 =====")
-    print(f"  池内有字对的字 {len(feas)} 个 → 实际出得来名字 {len(ok)} 个")
-    ranked = sorted(ok.items(), key=lambda kv: -kv[1]["name_hits"])
+    print(f"  有已批准搭档的字 {len(feas) + len(dead)} 个 → 实际出得来名字 {len(feas)} 个")
+    ranked = sorted(feas.items(), key=lambda kv: -kv[1]["name_hits"])
     print("  最可行 20 字:", " ".join(f"{ch}({v['name_hits']})" for ch, v in ranked[:20]))
-    dead = sorted(ch for ch, v in feas.items() if not v["name_hits"])
     print(f"  有字对但门槛全灭: {len(dead)} 字")
     if dead:
         print("   ", " ".join(dead))
@@ -269,8 +206,8 @@ def main():
     if args.feasible:
         import time
         t0 = time.time()
-        feas = build_feasibility(engine, args.surname, args.gender)
-        print_feasibility(feas, args.surname, args.gender)
+        feas, dead = build_feasibility(engine, args.surname, args.gender)
+        print_feasibility(feas, dead, args.surname, args.gender)
         print(f"  （可行性计算用时 {time.time() - t0:.2f}s）")
 
     if args.char:

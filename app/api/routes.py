@@ -13,6 +13,7 @@ from app.schemas.schemas import (
     RecommendCharsRequest, RecommendCharsResponse,
     RecommendSourcesRequest, RecommendSourcesResponse,
     SourceCharsRequest, SourceCharsResponse,
+    PickableCharsRequest, PickableCharsResponse,
 )
 from app.services.naming_engine import NamingEngine
 from app.services.char_database import CharDatabase
@@ -89,6 +90,45 @@ async def recommend_chars(request: RecommendCharsRequest):
         limit_per_group=request.limit_per_group,
     )
     return RecommendCharsResponse(**result)
+
+
+@router.post("/pickable-chars", response_model=PickableCharsResponse)
+async def pickable_chars(request: PickableCharsRequest):
+    """
+    「先字后出处」第一步：可选字表。
+
+    返回**真的组得出名字**的字（门槛感知可行性），而不是字库里铺满的候选。
+    先字模式的产能 = 该字在已批准字对里的搭档数，且与姓氏强相关（姓「林」时
+    名字两字全平触发三连同调，整类字全灭），故字表必须由后端算过再给前端。
+
+    意象族（日月星辰/草木/水/玉/金/火/土）只用于排序与分组，不作硬过滤——
+    实测 7 族仅覆盖池内约 35%，硬过滤会砍掉 65% 的好字。
+    用户点选的字最终以 selected_chars 传给 /generate（硬约束）。
+    """
+    engine = NamingEngine()
+    if request.use_bazi and not all([request.year, request.month, request.day]):
+        raise HTTPException(
+            status_code=400,
+            detail="使用八字分析需要提供完整的出生日期（年月日）"
+        )
+    result = engine.pickable_chars(
+        surname=request.surname,
+        gender=request.gender,
+        year=request.year,
+        month=request.month,
+        day=request.day,
+        hour=request.hour if request.hour is not None else 12,
+        minute=request.minute if request.minute is not None else 0,
+        use_bazi=request.use_bazi,
+        name_length=request.name_length,
+        style=request.style,
+        meanings=request.meanings,
+        imagery_families=request.imagery_families,
+        avoid_chars=request.avoid_chars,
+        source_classes=request.source_classes,
+        limit=request.limit,
+    )
+    return PickableCharsResponse(**result)
 
 
 @router.post("/recommend-sources", response_model=RecommendSourcesResponse)

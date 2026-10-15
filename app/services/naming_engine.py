@@ -15,6 +15,7 @@ scores.overall 语义变更 = 韵味分（主排序依据）；scores.phonetics/
 """
 
 import random
+from collections import defaultdict
 from typing import Optional
 from app.services.bazi_engine import BaziEngine
 from app.services.char_database import CharDatabase
@@ -28,7 +29,10 @@ from app.services.llm_service import LLMService
 from app.services.meaning_cache import MeaningCache
 from app.services.surname_fit import SurnameFit
 from app.services.char_sense_database import CharSenseDatabase
-from app.core.constants import NEGATIVE_CHARS, EMOTIONAL_CHARS, SAD_POETRY_TITLES, COMPOUND_SURNAMES, WUXING_LIST
+from app.core.constants import (
+    NEGATIVE_CHARS, EMOTIONAL_CHARS, SAD_POETRY_TITLES, COMPOUND_SURNAMES, WUXING_LIST,
+    IMAGERY_FAMILY_PRIORITY, build_radical_family_map,
+)
 from app.core.naming_options import (
     STYLE_OPTIONS,
     MEANING_OPTIONS,
@@ -440,7 +444,7 @@ class NamingEngine:
                 f"{char_text} {imagery} {scene}", meanings
             )
         if style and style in STYLE_OPTIONS:
-            hits += NamingEngine._meanings_match_score(
+            hits += NamingEngine._keyword_hits(
                 f"{imagery} {scene} {text}",
                 STYLE_OPTIONS[style].get("imagery_keywords", []),
             )
@@ -668,7 +672,7 @@ class NamingEngine:
             blob = " ".join(entry.get("imagery", []) or []) + " "
             blob += (entry.get("scene", "") or "") + " "
             blob += (entry.get("text", "") or "")
-            return NamingEngine._meanings_match_score(
+            return NamingEngine._keyword_hits(
                 blob, STYLE_OPTIONS[style].get("imagery_keywords", [])
             )
 
@@ -922,6 +926,252 @@ class NamingEngine:
             "bazi": bazi_result,
             "groups": groups,
             "total": sum(g["total"] for g in groups),
+        }
+
+    # ── 先字模式：可选字表（意象族 + 门槛感知可行性） ──
+
+    def pickable_chars(
+        self,
+        surname: str,
+        gender: str = "female",
+        year: int = None,
+        month: int = None,
+        day: int = None,
+        hour: int = 12,
+        minute: int = 0,
+        use_bazi: bool = False,
+        name_length: int = 2,
+        style: Optional[str] = None,
+        meanings: Optional[list[str]] = None,
+        imagery_families: Optional[list[str]] = None,
+        avoid_chars: Optional[list[str]] = None,
+        source_classes: Optional[list[str]] = None,
+        limit: int = 400,
+    ) -> dict:
+        """「先字后出处」的可选字表：哪些字真的能组出名字，以及按什么顺序摆。
+
+        为什么需要它（而不是让前端按字库直接铺满）：
+        先字模式的产能 = 「该字在已批准字对里的搭档数」，语料标注量决定供给上限。
+        池内 553 字里只有约一半出得来名字，且**与姓氏强相关**（姓「林」时名字两字
+        全平触发三连同调，整类字全灭）。前端若把 0 覆盖的字也铺出来，用户点到就是
+        「系统坏了」的体感。故字表必须由本接口按「门槛感知可行性」筛过。
+
+        可行性镜像引擎的两条供给路径（与 scripts/diag_selected_chars.py 对拍零偏差）：
+        A. 出处组合路径：出处须过 `_match_provenance` 可用性过滤；有标注出处只产标注
+           字对，标注跑过但为空则不产双字名，从未标注才退回全交叉。
+        B. 随机组合路径：搭档 =「已批准字对 ∩ 候选池」，音韵同分时两序都试。
+
+        意象族（radical → 7 族）**只用于排序与分组，不作硬过滤**：实测 7 族仅覆盖
+        池内 35%（196/553，金族仅 4 字），硬过滤会砍掉 65% 的好字（诗/思/安/宜
+        这类无族属的字）。族的真实作用域是「字表怎么摆」——用户在格子里的选择
+        （selected_chars）才是硬约束。
+
+        Returns:
+            {"bazi", "total", "feasible", "returned", "truncated",
+             "families": [{"family", "count", "total", "selected", "sample"}],
+             "no_family": int,
+             "chars": [{"char","pinyin","wuxing","family","partner_count",
+                        "name_hits","match","xiyong","sample","meaning"}]}
+
+        契约（由 tests/test_pickable_chars.py 与 live 对拍强制）：
+        chars 里每个字都能真的出名字；chars 之外的字一个都出不来。
+        partner_count 只作展示（「组合力」），不参与入选判定。
+        """
+        # 0. 会话黑名单 = 负面字 + 用户避讳字（硬过滤）
+        blacklist = set(NEGATIVE_CHARS)
+        for item in (avoid_chars or []):
+            if item:
+                blacklist.update(list(item))
+
+        # 1. 八字（可选）：喜用神用于标记，忌神用于门槛（名字全忌神硬排除）
+        bazi_result = None
+        xiyong_wuxing = None
+        gate_bazi = None
+        if use_bazi and year and month and day:
+            bazi_result = self.bazi.generate_bazi(
+                year, month, day, hour, minute, gender
+            )
+            xiyong_wuxing = bazi_result["xiyong"]["xi_wuxing"]
+            gate_bazi = {"xiyong": {"ji_wuxing": bazi_result["xiyong"]["ji_wuxing"]}}
+
+        # 2. 候选池（出处白名单 + 性别 + 非黑名单）
+        pool = {
+            c["char"]: c
+            for c in self._select_candidate_chars(
+                xiyong_wuxing, gender, name_length, blacklist, meanings
+            )
+        }
+        partner_index = {ch: set(self.poetry_db.approved_partners(ch)) & set(pool)
+                         for ch in pool}
+
+        # 3. 门槛层（与 _pass_gate 同源）：三连同调 + 音律 + 五格 + 姓氏谐音/本义 + 忌神
+        def gate_ok(chars_info: list[dict]) -> Optional[str]:
+            gn = "".join(c["char"] for c in chars_info)
+            if self.surname_fit.tri_tone_conflict(
+                surname, [c["char"] for c in chars_info]
+            ):
+                return None
+            ph = self.phonetics.analyze(surname + gn)
+            try:
+                wg = self.wuge.calculate(surname, gn)
+            except Exception:
+                wg = {"total_score": 60}
+            if not self._pass_gate(surname, gn, ph, wg, gate_bazi, chars_info):
+                return None
+            return gn
+
+        hits: dict[str, list[str]] = defaultdict(list)
+        seen: dict[str, set] = defaultdict(set)
+
+        def record(chars: list[str], gn: str) -> None:
+            for ch in chars:
+                if gn not in seen[ch]:
+                    seen[ch].add(gn)
+                    hits[ch].append(gn)
+
+        if name_length == 1:
+            # 单字名没有「搭档」概念，只问该字本身过不过门槛
+            for ch, ci in pool.items():
+                if gate_ok([ci]):
+                    record([ch], ch)
+        else:
+            # ── 供给 A：出处组合路径 ──
+            for entry, _tier in self._match_provenance(
+                xiyong_wuxing, gender, style, meanings, blacklist,
+                source_classes=source_classes,
+            ):
+                by_char = {
+                    c["char"]: c for c in self._get_valid_poem_chars(
+                        entry, gender, xiyong_wuxing, blacklist, meanings
+                    )
+                }
+                # 标注字对可能用到 recommend_chars 之外的字，一并补进可用字
+                for pair in (entry.get("name_pairs") or []):
+                    for ch in pair:
+                        if ch in by_char or ch in blacklist:
+                            continue
+                        ci = self.char_db.get_char(ch)
+                        if not ci:
+                            continue
+                        if gender == "male" and ci["gender"] not in ("男", "中"):
+                            continue
+                        if gender == "female" and ci["gender"] not in ("女", "中"):
+                            continue
+                        by_char[ch] = ci
+                annotated = entry.get("name_pairs") or []
+                known = entry.get("name_pairs_known", bool(annotated))
+                if annotated:
+                    pair_list = [
+                        tuple(p) for p in annotated
+                        if all(ch in by_char for ch in p)
+                    ]
+                elif known:
+                    pair_list = []      # 语义层已判定此出处无宜作名的组合
+                else:
+                    chars = list(by_char)
+                    pair_list = [
+                        (a, b) for i, a in enumerate(chars) for b in chars[i + 1:]
+                    ]
+                for a, b in pair_list:
+                    first, second = self._order_two_chars(entry, by_char[a], by_char[b])
+                    gn = gate_ok([first, second])
+                    if gn:
+                        record([a, b], gn)
+
+            # ── 供给 B：随机组合路径 ──
+            for ch, ci in pool.items():
+                for p in sorted(partner_index[ch]):
+                    if p == ch:
+                        continue
+                    for first, second in self._order_candidates(ci, pool[p]):
+                        gn = gate_ok([first, second])
+                        if gn:
+                            record([ch, p], gn)
+                            break
+
+        # 4. 组装字表（族归属 + 偏好命中排序键）
+        fam_map = build_radical_family_map()
+        fam_selected = set(imagery_families or [])
+        style_kws = (
+            STYLE_OPTIONS[style].get("imagery_keywords", [])
+            if style in STYLE_OPTIONS else []
+        )
+        rows = []
+        for ch, ci in pool.items():
+            names = sorted(set(hits.get(ch, [])))
+            partners = partner_index[ch]
+            # 入选门槛 = **真的出得来名字**，不是「有搭档字」。
+            # 反例（实测）：姓林 + 「情」有 4 个已批准搭档（中/凝/兰/深），
+            # 但 8 种字序全部三连同调全灭 → 用户点到就是空结果。
+            # 只按搭档数入选会把这类字放进表里，正是要避免的「系统坏了」体感。
+            if not names:
+                continue
+            family = fam_map.get(ci.get("radical", ""), "")
+            meaning_hit = NamingEngine._meanings_match_score(
+                f'{ci.get("meaning") or ""} {ci.get("detail") or ""}', meanings
+            )
+            style_hit = NamingEngine._keyword_hits(
+                f'{" ".join(ci.get("imagery") or [])} {ci.get("meaning") or ""}',
+                style_kws,
+            )
+            xi_hit = 1 if (xiyong_wuxing and ci.get("wuxing") in xiyong_wuxing) else 0
+            rows.append({
+                "char": ch,
+                "pinyin": ci.get("pinyin", ""),
+                "wuxing": ci.get("wuxing", ""),
+                "family": family,
+                "partner_count": len(partners),
+                "name_hits": len(names),
+                "match": (4 if (family and family in fam_selected) else 0)
+                         + meaning_hit * 2 + style_hit + xi_hit * 2,
+                "xiyong": bool(xi_hit),
+                "sample": names[:3],
+                "meaning": (ci.get("meaning") or "")[:50],
+            })
+
+        def row_key(r: dict) -> tuple:
+            """排序：偏好命中 → 真能出多少名字 → 搭档数 → 字（稳定收尾）。"""
+            return (-r["match"], -r["name_hits"], -r["partner_count"], r["char"])
+
+        rows.sort(key=row_key)
+
+        # 5. 截断（默认 400 已覆盖实测全员；若超限，保证每族至少留 2 字，
+        #    否则用户点「金」筛选时会看到空表——金族全池仅 4 字，按名次必被截掉）
+        limit = max(1, min(int(limit or 400), 400))
+        chars = rows[:limit]
+        kept = {r["char"] for r in chars}
+        backup: list[dict] = []
+        by_family: dict[str, list[dict]] = defaultdict(list)
+        for r in rows:
+            if r["family"]:
+                by_family[r["family"]].append(r)
+        for family in IMAGERY_FAMILY_PRIORITY:
+            present = sum(1 for r in chars if r["family"] == family)
+            for r in by_family.get(family, [])[: max(0, 2 - present)]:
+                if r["char"] not in kept:
+                    backup.append(r)
+                    kept.add(r["char"])
+        if backup:
+            chars = sorted(chars + backup, key=row_key)
+
+        return {
+            "bazi": bazi_result,
+            "total": len(pool),          # 池内字数（有出处、性别相符、非黑名单）
+            "feasible": len(rows),       # 真出得来名字的字数（字表实际可选范围）
+            "returned": len(chars),
+            "truncated": len(chars) < len(rows),
+            "no_family": sum(1 for r in chars if not r["family"]),
+            "families": [
+                {
+                    "family": family,
+                    "count": sum(1 for r in chars if r["family"] == family),
+                    "total": len(by_family.get(family, [])),
+                    "selected": family in fam_selected,
+                    "sample": [r["char"] for r in by_family.get(family, [])[:6]],
+                }
+                for family in IMAGERY_FAMILY_PRIORITY
+            ],
+            "chars": chars,
         }
 
     @staticmethod
@@ -1407,6 +1657,19 @@ class NamingEngine:
                 if kw in text:
                     score += 1
         return score
+
+    @staticmethod
+    def _keyword_hits(text: str, keywords: Optional[list[str]]) -> int:
+        """裸关键词命中数（用于风格意象词——它不是寓意 code，不能走 _meanings_match_score）。
+
+        修复背景：`_rank_by_yunwei.style_hits` 与 `_pref_hits` 原先把 STYLE_OPTIONS 的
+        `imagery_keywords`（如「清雅」「壮阔」）当成 MEANING_OPTIONS 的 code 去查表，
+        `MEANING_OPTIONS.get("清雅")` 恒为 None → 风格命中**恒为 0**。风格偏好实际只
+        通过 source_preference（出处大类）起作用，意象关键词那一半是死代码。
+        """
+        if not keywords or not text:
+            return 0
+        return sum(1 for kw in keywords if kw and kw in text)
 
     def _get_valid_poem_chars(
         self,

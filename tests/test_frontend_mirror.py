@@ -13,7 +13,18 @@ from pathlib import Path
 
 import pytest
 
-from app.core.naming_options import MEANING_OPTIONS, STYLE_OPTIONS
+from app.core.constants import (
+    FILTERABLE_IMAGERY_FAMILIES,
+    IMAGERY_FAMILY_PRIORITY,
+    build_radical_family_map,
+)
+from app.core.naming_options import (
+    IMAGERY_MAX_SELECT,
+    MEANING_MAX_SELECT,
+    MEANING_OPTIONS,
+    SOURCE_CLASSES,
+    STYLE_OPTIONS,
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 API_JS = PROJECT_ROOT / "miniprogram" / "utils" / "api.js"
@@ -30,7 +41,11 @@ def _load_frontend_enums() -> dict:
         "process.stdout.write(JSON.stringify({"
         "  styles: api.STYLE_OPTIONS,"
         "  meanings: api.MEANING_OPTIONS,"
-        "  map: api.SOURCE_STYLE_MAP"
+        "  map: api.SOURCE_STYLE_MAP,"
+        "  families: api.IMAGERY_FAMILIES,"
+        "  sources: api.SOURCE_CLASSES,"
+        "  meaningMax: api.MEANING_MAX_SELECT,"
+        "  imageryMax: api.IMAGERY_MAX_SELECT"
         "}));"
     )
     out = subprocess.run(
@@ -94,6 +109,59 @@ def test_schema_style_description_lists_all_codes():
     expected = "|".join(STYLE_OPTIONS)
     assert 'description="风格偏好: %s"' % expected in src, (
         f"schemas.py 的 style 描述串未列全 code，应为 {expected}"
+    )
+
+
+# ── 26 标签偏好体系（气质 8 + 期待 12 + 意象 7）的镜像 ──
+
+def test_select_limits_match_backend(frontend):
+    """多选上限必须与后端一致，否则前端放行、后端静默截断。"""
+    assert frontend["meaningMax"] == MEANING_MAX_SELECT
+    assert frontend["imageryMax"] == IMAGERY_MAX_SELECT
+    assert MEANING_MAX_SELECT == 3
+
+
+def test_imagery_families_match_backend(frontend):
+    """意象族 code 顺序必须等于后端 IMAGERY_FAMILY_PRIORITY。"""
+    assert [f["code"] for f in frontend["families"]] == list(IMAGERY_FAMILY_PRIORITY)
+    for item in frontend["families"]:
+        assert item.get("name") == item["code"]
+
+
+def test_imagery_family_radicals_match_backend(frontend):
+    """每族列出的部首必须等于**去重叠后的有效部首**。
+
+    重叠部首（「日」同属火与日月星辰）按优先级只归一族，前端若把被遮蔽的
+    部首也列出来，用户会问「我选了火，怎么没有星」。
+    """
+    effective: dict[str, list[str]] = {f: [] for f in IMAGERY_FAMILY_PRIORITY}
+    for radical, family in build_radical_family_map().items():
+        effective[family].append(radical)
+    for item in frontend["families"]:
+        expected = set(effective[item["code"]])
+        assert set(item["radicals"].split()) == expected, (
+            f"{item['code']} 的部首与后端不符：前端 {sorted(item['radicals'].split())} "
+            f"vs 后端 {sorted(expected)}"
+        )
+
+
+def test_source_classes_match_backend(frontend):
+    """出处类目镜像，且后端常量必须覆盖全部 source_preference 取值。"""
+    assert frontend["sources"] == list(SOURCE_CLASSES)
+    union: set[str] = set()
+    for opt in STYLE_OPTIONS.values():
+        union.update(opt["source_preference"])
+    assert union <= set(SOURCE_CLASSES), (
+        f"这些出处不在 SOURCE_CLASSES 里，先出处模式选不到：{sorted(union - set(SOURCE_CLASSES))}"
+    )
+
+
+def test_schema_source_classes_description_lists_all():
+    """先出处路径的 source_classes 文档串要列全类目（与风格描述串同类约束）。"""
+    src = (PROJECT_ROOT / "app" / "schemas" / "schemas.py").read_text(encoding="utf-8")
+    expected = "|".join(SOURCE_CLASSES)
+    assert src.count(expected) >= 2, (
+        f"schemas.py 里 source_classes 描述串未列全类目，应为 {expected}"
     )
 
 

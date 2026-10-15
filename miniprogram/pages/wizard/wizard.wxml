@@ -5,21 +5,155 @@
   </view>
 
   <view class="head">
-    <view class="head-title">挑一种感觉</view>
+    <view class="head-title">定偏好</view>
     <view class="head-meta">{{metaText}}</view>
   </view>
 
-  <!-- 感觉卡：8 张，一对一映射到一个风格 + 两个寓意 -->
-  <view class="feel-grid">
-    <view
-      class="feel-card {{item.selected ? 'active' : ''}}"
-      wx:for="{{feelings}}"
-      wx:key="code"
-      bindtap="onFeelTap"
-      data-code="{{item.code}}"
-    >
-      <view class="feel-title">{{item.title}}</view>
-      <view class="feel-imagery">{{item.imagery}}</view>
+  <!-- ① 气质：单选。一个词定整体调性 -->
+  <view class="block">
+    <view class="block-head">
+      <text class="block-title">气质</text>
+      <text class="block-tail">{{styleCode ? '已选' : '单选，可跳过'}}</text>
+    </view>
+    <view class="tag-row">
+      <view
+        class="tag {{item.selected ? 'active' : ''}}"
+        wx:for="{{styles}}"
+        wx:key="code"
+        bindtap="onStyleTap"
+        data-code="{{item.code}}"
+      >{{item.name}}</view>
+    </view>
+  </view>
+
+  <!-- ② 期待：≤3。要什么样的好 -->
+  <view class="block">
+    <view class="block-head">
+      <text class="block-title">期待</text>
+      <text class="block-tail">{{meaningCount}}/{{meaningMax}}</text>
+    </view>
+    <view class="tag-row">
+      <view
+        class="tag {{item.selected ? 'active' : ''}}"
+        wx:for="{{meanings}}"
+        wx:key="code"
+        bindtap="onMeaningTap"
+        data-code="{{item.code}}"
+      >{{item.name}}</view>
+    </view>
+  </view>
+
+  <!-- ③ 意象：≤2。只影响字表排序，不当作筛选 -->
+  <view class="block">
+    <view class="block-head">
+      <text class="block-title">意象</text>
+      <text class="block-tail">{{imageryCount}}/{{imageryMax}}</text>
+    </view>
+    <view class="tag-row">
+      <view
+        class="tag {{item.selected ? 'active' : ''}}"
+        wx:for="{{imageries}}"
+        wx:key="code"
+        bindtap="onImageryTap"
+        data-code="{{item.code}}"
+      >{{item.name}}</view>
+    </view>
+    <view class="block-note">挑了就把它这一路的字排在字表前面，不会把别的字筛掉。</view>
+  </view>
+
+  <!-- ④ 路径（未出生只有直接推荐：预产期给的是范围参考，不吃先字/先出处） -->
+  <view class="block" wx:if="{{tab === 'postnatal'}}">
+    <view class="block-head">
+      <text class="block-title">怎么挑</text>
+    </view>
+    <view class="path-row">
+      <view
+        class="path-card {{path === item.code ? 'active' : ''}}"
+        wx:for="{{paths}}"
+        wx:key="code"
+        bindtap="onPathTap"
+        data-code="{{item.code}}"
+      >
+        <view class="path-name">{{item.name}}</view>
+        <view class="path-desc">{{item.desc}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 路径 · 从字出发 -->
+  <view class="block" wx:if="{{tab === 'postnatal' && path === 'chars'}}">
+    <view class="block-head">
+      <text class="block-title">可选字</text>
+      <text class="block-tail" wx:if="{{pickLoaded}}">已选 {{pickedCount}}/{{pickMax}}</text>
+    </view>
+
+    <view class="pick-hint" wx:if="{{pickLoading}}">正在算这个姓氏下哪些字组得出名字…</view>
+
+    <block wx:elif="{{pickLoaded}}">
+      <view class="pick-stat">
+        池内 {{pickTotal}} 字 · 本姓组得出名字 {{pickFeasible}} 字
+      </view>
+      <view class="pick-warn" wx:if="{{pickStale}}">
+        偏好改过了，字表还是上一版的。
+        <text class="pick-warn-act" bindtap="onReloadPick">重新载入</text>
+      </view>
+
+      <view class="chip-row">
+        <view
+          class="chip {{item.selected ? 'active' : ''}}"
+          wx:for="{{familyChips}}"
+          wx:key="code"
+          bindtap="onFamilyTap"
+          data-code="{{item.code}}"
+        >{{item.name}} {{item.count}}</view>
+      </view>
+
+      <view class="char-grid">
+        <view
+          class="char-cell {{item.picked ? 'active' : ''}}"
+          wx:for="{{charView}}"
+          wx:key="char"
+          bindtap="onCharTap"
+          data-idx="{{index}}"
+        >
+          <view class="char-glyph">{{item.char}}</view>
+          <view class="char-sub">{{item.name_hits}} 名</view>
+        </view>
+      </view>
+
+      <view class="more" wx:if="{{charFiltered > charVisible}}" bindtap="onMoreChars">
+        还有 {{charFiltered - charVisible}} 个 · 显示更多
+      </view>
+
+      <view class="picked-bar" wx:if="{{pickedCount}}">
+        <text class="picked-text">已选 {{pickedText}}</text>
+        <text class="picked-clear" bindtap="onClearPicked">清空</text>
+      </view>
+      <view class="block-note" wx:else>
+        每个字下面写着「这个姓氏下它能组出多少个名字」——只列真的能用的字。
+      </view>
+    </block>
+
+    <view class="pick-hint" wx:else>点「从字出发」后载入可选字。</view>
+  </view>
+
+  <!-- 路径 · 从出处出发 -->
+  <view class="block" wx:if="{{tab === 'postnatal' && path === 'sources'}}">
+    <view class="block-head">
+      <text class="block-title">典籍范围</text>
+      <text class="block-tail">{{sourceCount}} 项</text>
+    </view>
+    <view class="tag-row">
+      <view
+        class="tag {{item.selected ? 'active' : ''}}"
+        wx:for="{{sources}}"
+        wx:key="code"
+        bindtap="onSourceTap"
+        data-code="{{item.code}}"
+      >{{item.name}}</view>
+    </view>
+    <view class="block-note">
+      名字只会从这里选的典籍里取。字源四部（周易/山海经/本草纲目/神农本草经）归在「经史子集」。
     </view>
   </view>
 
@@ -45,7 +179,9 @@
     <button class="btn-primary" bindtap="onSubmit" loading="{{loading}}">
       {{tab === 'prenatal' ? '查看孕期参考' : '生成名字'}}
     </button>
-    <view class="foot-note" wx:if="{{selected}}">已选「{{selectedTitle}}」</view>
-    <view class="foot-note" wx:else>不选也可以，将给出各方向的名字</view>
+    <view class="foot-note" wx:if="{{tab === 'prenatal'}}">预产期给的是范围参考，不用挑字</view>
+    <view class="foot-note" wx:elif="{{path === 'chars'}}">已选 {{pickedCount}} 个字，名字里会含其中之一</view>
+    <view class="foot-note" wx:elif="{{path === 'sources'}}">已选 {{sourceCount}} 类典籍</view>
+    <view class="foot-note" wx:else>什么都不选也行，会按韵味给出各方向的名字</view>
   </view>
 </view>

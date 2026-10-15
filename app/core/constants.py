@@ -154,3 +154,25 @@ RADICAL_IMAGERY_FAMILIES = {
     "土": {"土", "山", "田"},
     "日月星辰": {"日", "月", "星"},
 }
+
+# 用户面向的意象族筛选（先字卡片用）。
+# 与 RADICAL_IMAGERY_FAMILIES 同源派生，唯一差异：剔除「金」里的刀/刂——
+# 刀部字（初/利/刚/剑）在名内呼应维度算同族，但作为「金石意象」给用户筛会误导
+# （「初」归到金族，用户会困惑）。
+FILTERABLE_IMAGERY_FAMILIES = {
+    **RADICAL_IMAGERY_FAMILIES,
+    "金": RADICAL_IMAGERY_FAMILIES["金"] - {"刀", "刂"},
+}
+
+# 部首 → 意象族的归属优先级（RADICAL_IMAGERY_FAMILIES 里有重叠部首：
+# 「日」同属 火 与 日月星辰，须显式定序，否则「星」会被归进火族）。
+IMAGERY_FAMILY_PRIORITY = ("日月星辰", "草木", "水", "玉", "金", "火", "土")
+
+
+def build_radical_family_map() -> dict:
+    """部首 → 意象族（冲突部首按 IMAGERY_FAMILY_PRIORITY 取先）。"""
+    mapping: dict[str, str] = {}
+    for family in IMAGERY_FAMILY_PRIORITY:
+        for radical in FILTERABLE_IMAGERY_FAMILIES[family]:
+            mapping.setdefault(radical, family)
+    return mapping

@@ -54,27 +54,48 @@ const MEANING_OPTIONS = [
   { code: 'tranquil', name: '宁静' }
 ]
 
-// （旧版 STYLE_EXAMPLES / MEANING_EXAMPLES 已删除：起名偏好由单一 FEELING_CARDS 承载，
-//   两套面向用户的意象文案并存会互相漂移。）
-
-// 起名「感觉」卡（起名第二步的唯一选择，展示层概念，不新增后端枚举）
+// ── 偏好选择（27 个标签 = 气质 8 + 期待 12 + 意象 7）──
 //
 // 设计意图：用户不想先回答「寓意优先还是八字优先」这类算法口径问题，
-// 只想挑一种「感觉」。故把后端两个既有偏好维度合成一张卡：
-//   1 个 style（单选）+ 2 个 meanings（多选，上限 3）
-// 两者都是 NamingRequest / PrenatalRequest 的既有入参，无需改后端。
-// 每张卡保持「一卡一风格」的一对一映射，确保偏好能真正硬分流选池，
-// 而不是只做 tie-break（那样选不选结果都一样）。
-// 新增/调整卡时务必核对 code 同时存在于 STYLE_OPTIONS 与 MEANING_OPTIONS。
-const FEELING_CARDS = [
-  { code: 'classic', title: '古意', imagery: '典正清贵，字有来历', style: 'classic', meanings: ['virtue', 'talent'] },
-  { code: 'elegant', title: '清朗', imagery: '明净开阔，如秋长空', style: 'elegant', meanings: ['talent', 'wisdom'] },
-  { code: 'warm', title: '温润', imagery: '温厚含蓄，如玉在怀', style: 'warm', meanings: ['virtue', 'gentle'] },
-  { code: 'zen', title: '空灵', imagery: '疏朗留白，意远境幽', style: 'zen', meanings: ['tranquil', 'peace'] },
-  { code: 'fresh', title: '明媚', imagery: '草木山川，轻盈明净', style: 'fresh', meanings: ['beauty', 'health'] },
-  { code: 'grand', title: '峻拔', imagery: '格局开阔，气象不凡', style: 'grand', meanings: ['bravery', 'patriotic'] },
-  { code: 'plain', title: '静笃', imagery: '质朴醇厚，沉静踏实', style: 'plain', meanings: ['peace', 'virtue'] },
-  { code: 'modern', title: '简约', imagery: '明快自然，清简不繁', style: 'modern', meanings: ['wisdom', 'peace'] }
+// 只想从一片标签里挑出自己要的那几个感觉——像 B 站/小红书的兴趣画像一样。
+//
+// 三个维度的**作用域各不相同**，不要混着理解：
+//   气质（STYLE_OPTIONS，单选）  → 后端 style 参数：来源偏好 + 意象关键词 + 选字倾向
+//   期待（MEANING_OPTIONS，≤3）  → 后端 meanings 参数：选字硬前置 + 排序
+//   意象（IMAGERY_FAMILIES，≤2） → **只影响「先字」字表的排序**（见下）
+//
+// 旧版「感觉卡」FEELING_CARDS（1 风格 + 2 寓意打包成 8 张卡）已废除：
+// 它把气质与期待绑死成一对一，用户想「温润 + 勇敢」时无路可走。
+
+// 寓意/期待最多选几个（与后端 MEANING_MAX_SELECT 镜像）
+const MEANING_MAX_SELECT = 3
+
+// 字形意象族（与后端 IMAGERY_FAMILY_PRIORITY / FILTERABLE_IMAGERY_FAMILIES 镜像）
+//
+// 作用域：给「先字」字表排序与筛选——**不作硬分区**。
+// 实测 7 族只覆盖候选池约 35%（金族全池仅 4 字，女性向 2 字），硬过滤会砍掉
+// 65% 的好字（诗/思/安/宜 这类无族属字），所以它们不做后台硬筛选，
+// 只做两件事：① 偏好页点选后，把该族的字排到字表最前；② 字表页手动按族看。
+// radicals 是**去重后的有效部首**——「日」同时属于火与日月星辰，按优先级归日月星辰，
+// 故火族不再列「日」（否则用户会问「我选了火怎么没有星」）。
+const IMAGERY_FAMILIES = [
+  { code: '日月星辰', name: '日月星辰', radicals: '日 月 星' },
+  { code: '草木', name: '草木', radicals: '木 艹 艸 禾 竹' },
+  { code: '水', name: '水', radicals: '水 氵 雨' },
+  { code: '玉', name: '玉', radicals: '玉 王 石' },
+  { code: '金', name: '金', radicals: '金 钅 釒' },
+  { code: '火', name: '火', radicals: '火 灬' },
+  { code: '土', name: '土', radicals: '土 山 田' }
+]
+
+// 意象族最多选几个（与后端 IMAGERY_MAX_SELECT 镜像）
+const IMAGERY_MAX_SELECT = 2
+
+// 出处类目（与后端 SOURCE_CLASSES 镜像）——「先出处后字」路径的 8 个选项，
+// 也是 /generate 的 source_classes 合法取值。字源 4 部典籍（周易/山海经/
+// 本草纲目/神农本草经）归入「经史子集」，选它会一并纳入。
+const SOURCE_CLASSES = [
+  '诗经', '楚辞', '汉魏古诗', '唐诗', '五代词', '宋词', '清词', '经史子集'
 ]
 
 // 预产期浮动档位（与后端 RANGE_OPTIONS 镜像）
@@ -134,6 +155,17 @@ function recommendChars(params) {
 }
 
 /**
+ * 「先字后出处」第一步：可选字表
+ *
+ * 返回**真的组得出名字**的字（后端已算过门槛），不是字库铺满的候选。
+ * 字表与姓氏强相关（姓「林」时名字两字全平触发三连同调，整类字全灭），
+ * 故必须每次带 surname 请求，不要在前端缓存跨姓氏复用。
+ */
+function pickableChars(params) {
+  return request('/pickable-chars', 'POST', params)
+}
+
+/**
  * 两模式流程第一步：推荐意境来源（寓意优先 / 命格优先）
  */
 function recommendSources(params) {
@@ -171,6 +203,7 @@ module.exports = {
   prenatal,
   analyzeName,
   recommendChars,
+  pickableChars,
   recommendSources,
   sourceChars,
   nameMeaning,
@@ -179,7 +212,10 @@ module.exports = {
   SOURCE_STYLE_MAP,
   getStyleCodes,
   MEANING_OPTIONS,
-  FEELING_CARDS,
+  MEANING_MAX_SELECT,
+  IMAGERY_FAMILIES,
+  IMAGERY_MAX_SELECT,
+  SOURCE_CLASSES,
   RANGE_OPTIONS,
   DEFAULT_RANGE_DAYS
 }

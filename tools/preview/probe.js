@@ -19,7 +19,8 @@
  *   node tools/preview/probe.js                        # 巡检常用页面
  *   node tools/preview/probe.js --all                  # 连冷门页一起巡检
  *   node tools/preview/probe.js pages/bazi/bazi        # 只看一页
- *   node tools/preview/probe.js --flow                 # 跑通真实起名流程，再看结果页/详情页
+ *   node tools/preview/probe.js --flow                 # 跑通起名流程（直接推荐 + 从字出发），再看结果页/详情页
+ *   node tools/preview/probe.js --flow --flowall       # 再加一条「从出处出发」
  *   node tools/preview/probe.js --book                 # 验证名字本：起名落盘→收藏→记录恢复→删除→清空
  *   node tools/preview/probe.js --picker               # 验证 picker / switch 替身的命中区与回填
  *   node tools/preview/probe.js --out /tmp/shots
@@ -38,6 +39,7 @@ const argv = process.argv.slice(2)
 const outIdx = argv.indexOf('--out')
 const OUT_DIR = outIdx === -1 ? '/tmp/mingtang-shots' : argv[outIdx + 1]
 const WITH_FLOW = argv.includes('--flow')
+const WITH_FLOW_ALL = argv.includes('--flowall')
 const WITH_BOOK = argv.includes('--book')
 const WITH_PICKER = argv.includes('--picker')
 const ALL = argv.includes('--all')
@@ -359,27 +361,40 @@ async function inspect(page, note) {
   results.push({ page, note, reached: ok, rep, issues, shot, text, handlers: els })
 }
 
-async function runFlow() {
-  label = 'flow'
+async function runFlow(path = 'direct') {
+  label = path === 'direct' ? 'flow' : 'flow-' + path
   const before = consoleLines.length
-  console.log('[probe] 跑通真实起名流程（资料 → 感觉 → 生成 → 结果）…')
-  await evaluate('window.__wb.flow({ surname: "林", birthDate: "1994-05-20" })')
+  const NAMES = {
+    direct: '资料 → 定偏好 → 生成',
+    chars: '资料 → 定偏好 → 从字出发（点字）→ 生成',
+    sources: '资料 → 定偏好 → 从出处出发（限定诗经）→ 生成'
+  }
+  console.log(`[probe] 跑通起名流程 · ${path}（${NAMES[path]}）…`)
+  await evaluate(
+    `window.__wb.flow({ surname: "林", birthDate: "1994-05-20", path: ${JSON.stringify(path)} })`
+  )
+  // 先字/先出处两条要真的向后端算一遍字表，给久一点
   const done = await waitJs(
     '(function(){var r=window.__wb.report();return r && (r.flowDone === true || r.flowDone === false || r.flowError)})()',
-    90000,
+    path === 'direct' ? 90000 : 150000,
     400
   )
   await sleep(2000)
   const rep = JSON.parse((await report()) || '{}')
-  const shot = await screenshot('flow-result')
+  const shot = await screenshot('flow-' + path)
   const issues = consoleLines.slice(before)
   const text = await evaluate(
     '(function(){var m=document.getElementById("mount");return m?m.innerText.replace(/\\s+/g," ").slice(0,300):""})()'
   )
+  // 硬约束违约（flowViolations / flowSources）由 harness 写进报告，这里并成一条判定
+  const violated =
+    (rep.flowViolations || 0) > 0 || (rep.flowSources || []).length > 0
   results.push({
-    page: 'flow（资料→感觉→生成）',
-    note: '停在 ' + (rep.flowAt || rep.page || '?'),
-    reached: done && rep.flowDone === true,
+    page: `flow·${path}（${NAMES[path]}）`,
+    note: '停在 ' + (rep.flowAt || rep.page || '?') +
+      (rep.flowPicked ? ' · 点选 ' + rep.flowPicked.join('/') + ' · 违约 ' + (rep.flowViolations || 0) : '') +
+      (rep.flowSources ? ' · 出典越界 ' + rep.flowSources.length : ''),
+    reached: done && rep.flowDone === true && !violated,
     rep,
     issues,
     shot,
@@ -616,7 +631,10 @@ const pagesToRun = PAGES.length
     : [...COMMON_PAGES, ...CONTEXT_PAGES]
 
 if (WITH_FLOW) {
-  await runFlow()
+  // 直接推荐 + 从字出发：后者会把「载入可选字表 → 点字 → 硬约束生效」整条链路验掉
+  await runFlow('direct')
+  await runFlow('chars')
+  if (WITH_FLOW_ALL) await runFlow('sources')
 } else if (!WITH_BOOK && !WITH_PICKER) {
   console.log('[probe] 提示：结果页/详情页依赖起名结果，加 --flow 才能看到真实内容')
 }
