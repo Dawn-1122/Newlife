@@ -134,6 +134,7 @@ class NamingEngine:
         industry: Optional[str] = None,
         target_min: int = TARGET_MIN,
         selected_chars: Optional[list[str]] = None,
+        source_classes: Optional[list[str]] = None,
     ) -> dict:
         """
         生成名字候选列表
@@ -151,8 +152,13 @@ class NamingEngine:
             avoid_chars: 避讳字列表，硬剔除
             industry: 行业 code，P0 仅透传不参与打分
             target_min: 同源组名目标最小数量
-            selected_chars: 用户点选的候选字（两阶段流程：先选字再起名），
-                            非空时名字用字限定为该集合
+            selected_chars: 用户点选的候选字（两阶段流程「先字后出处」）。
+                            语义 = **名字必须含所选字**（任一位置），不是「名字只用所选字」——
+                            后者对单个字必然 0 结果（一个字无法自成字对），已废弃。
+                            搭档仍取「已批准字对」（语义层），空白处由语料覆盖情况决定。
+            source_classes: 出处类目限定（两阶段流程「先出处后字」）。
+                            取值为诗词 source（诗经/楚辞/唐诗/宋词/五代词/清词/汉魏古诗/经史子集）
+                            或 source_class（同左，字源 4 部典籍归入「经史子集」）。
 
         Returns:
             {"bazi": {...}, "names": [...], "total": int, "fallback_note": str|None}
@@ -163,6 +169,7 @@ class NamingEngine:
             max_results=max_results, use_bazi=use_bazi, use_poetry=use_poetry,
             style=style, meanings=meanings, avoid_chars=avoid_chars,
             target_min=target_min, selected_chars=selected_chars,
+            source_classes=source_classes,
         )
 
         fallback_note = None
@@ -173,10 +180,26 @@ class NamingEngine:
                 max_results=max_results, use_bazi=use_bazi, use_poetry=use_poetry,
                 style=None, meanings=None, avoid_chars=avoid_chars,
                 target_min=target_min, selected_chars=selected_chars,
+                source_classes=source_classes,
             )
             if len(fallback_names) > len(names):
                 names = fallback_names
                 fallback_note = "已尽量贴合偏好，其余按韵味评分补充"
+
+        if selected_chars and not names:
+            # 先字模式的显式降级，区分两种情况（前端据此给不同引导）：
+            # ① 该字全局没有已批准搭档 → 死胡同，必须换字；
+            # ② 有搭档但与本姓氏/性别条件组合不出（三连同调、谐音、五格等门槛拦下）
+            #    → 换字或改用「直接推荐」。正常流程不会走到这里——
+            #    字表由 scripts/diag_selected_chars.py 的覆盖/可行性表预先筛过。
+            no_partner = [
+                ch for ch in selected_chars
+                if not self.poetry_db.approved_partners(ch)
+            ]
+            if no_partner:
+                fallback_note = f"「{no_partner[0]}」没有可组名的搭档字，换一个字试试"
+            else:
+                fallback_note = "所选字与当前姓氏条件组合不出合适的名字，换一个字或直接推荐试试"
 
         return {
             "bazi": bazi_result,
@@ -203,6 +226,7 @@ class NamingEngine:
         avoid_chars: Optional[list[str]],
         target_min: int,
         selected_chars: Optional[list[str]] = None,
+        source_classes: Optional[list[str]] = None,
     ) -> tuple:
         """核心起名流程（八字 → 候选字 → 出处匹配 → 组名 → 门槛/韵味 → 排序/多样性/截取）。"""
         # 1. 八字分析（如提供生辰）
@@ -230,25 +254,22 @@ class NamingEngine:
             xiyong_wuxing, gender, name_length, blacklist, meanings
         )
 
-        # 2.5 用户点选字（两阶段流程）：限定候选字池为所选字
+        # 2.5 先字模式（用户点选候选字）：语义 = 「名字必须含所选字」（任一位置）。
+        #     关键：**不把 candidate_chars 缩成所选字**。缩池是旧实现，对单个字必然 0 结果
+        #     （一个字无法自成字对），实测「清/月/秋」等常用字全部空手。
+        #     此处只做「池外所选字补齐」（让随机组合路径也能拿到该字），
+        #     真正的「含所选字」约束在 _compose_names 内执行，两条路径都过语义层。
         if selected_chars:
-            selected_set = set(selected_chars)
-            selected_pool = [
-                c for c in candidate_chars if c["char"] in selected_set
-            ]
-            # 若所选字不全在喜用神池中，从全字库补齐（保证用户所选字可用）
-            if len(selected_pool) < len(selected_set):
-                have = {c["char"] for c in selected_pool}
-                for ch in selected_set - have:
-                    info = self.char_db.get_char(ch)
-                    if info and info["char"] not in blacklist:
-                        selected_pool.append(info)
-            candidate_chars = selected_pool
+            have = {c["char"] for c in candidate_chars}
+            for ch in set(selected_chars) - have:
+                info = self.char_db.get_char(ch)
+                if info and info["char"] not in blacklist:
+                    candidate_chars.append(info)
 
         # 3. 出处匹配（诗词 + 字源，统一出处抽象）
         provenance_matches = self._match_provenance(
             xiyong_wuxing, gender, style, meanings, blacklist,
-            use_poetry=use_poetry,
+            use_poetry=use_poetry, source_classes=source_classes,
         )
 
         # 4. 生成名字组合
@@ -256,7 +277,7 @@ class NamingEngine:
             surname, candidate_chars, provenance_matches,
             gender, name_length, bazi_result, blacklist, meanings,
             target_min=target_min, pool_size=max_results,
-            selected_chars=selected_chars,
+            selected_chars=selected_chars, source_classes=source_classes,
         )
 
         # 5. 韵味排序（韵味降序 → 喜用神 → 寓意 → 风格 tie-break）
@@ -270,6 +291,7 @@ class NamingEngine:
         )
         for n in names:
             n.pop("_tier", None)
+            n.pop("_selected_hits", None)
 
         return bazi_result, names
 
@@ -653,6 +675,8 @@ class NamingEngine:
         names.sort(
             key=lambda n: (
                 -n["scores"]["yunwei"],
+                # 先字模式：含更多所选字的组合优先（用户点选即意图，强于八字/寓意 tie-break）
+                -n.get("_selected_hits", 0),
                 -xiyong_hits(n),
                 -meaning_hits(n),
                 -style_hits(n),
@@ -801,16 +825,29 @@ class NamingEngine:
         return random.choice(usable)
 
     def _pair_entry(
-        self, a: str, b: str, gender: Optional[str] = None
+        self,
+        a: str,
+        b: str,
+        gender: Optional[str] = None,
+        source_classes: Optional[list[str]] = None,
     ) -> Optional[dict]:
         """取「已批准字对 (a,b)」所属的出处（性别口径内择优，取不到退回全集）。
 
         随机组合必须挂**字对真正被批准的那条出处**，否则详情页显示的出处里
         两字并不成对（cohesion 会退化成 same_clause/cross_clause），又回到旧问题。
+        source_classes 给定时（先出处模式）只在所选类目内取，避免挂到别的典籍上。
         """
         entries = self.poetry_db.entries_for_pair(a, b)
         if not entries:
             return None
+        if source_classes:
+            wanted = set(source_classes)
+            entries = [
+                e for e in entries
+                if e.get("source") in wanted or e.get("source_class") in wanted
+            ]
+            if not entries:
+                return None
         scoped = self._filter_by_gender(entries, gender) if gender else entries
         return (scoped or entries)[0]
 
@@ -1226,17 +1263,29 @@ class NamingEngine:
         meanings: Optional[list[str]] = None,
         blacklist: set = None,
         use_poetry: bool = True,
+        source_classes: Optional[list[str]] = None,
     ) -> list[tuple]:
         """
         统一出处匹配：合并诗词库 + 字源库条目，返回 [(entry, tier), ...]。
 
         去重后保留所有有可用推荐字的条目，tier ∈ {A, B, C} 仅用于候选池预算式引入顺序，
         不再决定最终排序（最终排序由韵味分决定）。
+
+        source_classes（先出处后字）：按「source 或 source_class ∈ 给定集合」硬过滤。
+        诗词库两类字段同值（诗经/楚辞/唐诗/宋词/五代词/清词/汉魏古诗/经史子集），
+        字源 4 部典籍 source_class 统一为「经史子集」，故选「经史子集」会同时纳入它们。
         """
         entries = []
         if use_poetry:
             entries.extend(self.poetry_db.get_by_gender(gender))
         entries.extend(self.source_db.get_by_gender(gender))
+
+        if source_classes:
+            wanted = set(source_classes)
+            entries = [
+                e for e in entries
+                if e.get("source") in wanted or e.get("source_class") in wanted
+            ]
 
         blacklist = blacklist or set()
         matched = []
@@ -1474,6 +1523,20 @@ class NamingEngine:
             return s
         return _score([c1["char"], c2["char"]]) >= _score([c2["char"], c1["char"]])
 
+    def _order_candidates(self, c1: dict, c2: dict) -> list[tuple]:
+        """随机组合的字序候选（无固定出处时）。
+
+        音韵优劣明确 → 只给更顺的一种序；
+        音韵同分 → **两序都作为候选**：此时字序本来就是自由的，交给门槛层筛。
+        旧实现同分时固定保留输入序，实测约 3% 的先字组合因此被无谓丢掉
+        （「宁耕」五格凶、同分的「耕宁」五格吉，整条路径空手）。
+        """
+        better = self._order_phonetic_better(c1, c2)
+        better_rev = self._order_phonetic_better(c2, c1)
+        if better and better_rev:
+            return [(c1, c2), (c2, c1)]
+        return [(c1, c2)] if better else [(c2, c1)]
+
     def _order_two_chars(self, entry: dict, c1: dict, c2: dict) -> tuple:
         """决定两字的最终前后顺序：原文成词语序 > 原文出现先后 > 音韵。
 
@@ -1507,12 +1570,14 @@ class NamingEngine:
         target_min: int = TARGET_MIN,
         pool_size: int = 30,
         selected_chars: Optional[list[str]] = None,
+        source_classes: Optional[list[str]] = None,
     ) -> list[dict]:
         """组合生成名字（预算式 + tier 标记）。"""
         names = []
         seen_names = set()
         blacklist = blacklist or set()
         selected_set = set(selected_chars) if selected_chars else None
+        source_wanted = set(source_classes) if source_classes else None
 
         xiyong_wuxing = None
         if bazi_result:
@@ -1527,6 +1592,19 @@ class NamingEngine:
             candidate_chars,
             key=lambda c: -self._char_affinity(surname, c, meanings),
         )
+
+        def emit(name_data: dict, tier: str) -> None:
+            """入库：打 tier + 先字命中数（让「含更多所选字」的名字在同分时靠前）。"""
+            name_data["_tier"] = tier
+            if selected_set:
+                name_data["_selected_hits"] = sum(
+                    1 for ch in name_data["given_name"] if ch in selected_set
+                )
+            names.append(name_data)
+
+        def pair_allowed(a: str, b: str) -> bool:
+            """先字模式：字对必须含所选字（任一位置）；非先字模式恒通过。"""
+            return not selected_set or a in selected_set or b in selected_set
 
         def compose_from_entry(entry: dict, tier: str) -> None:
             """从单条出处的推荐字里生成同源名字。"""
@@ -1554,8 +1632,11 @@ class NamingEngine:
                 valid_chars,
                 key=lambda c: -self._char_affinity(surname, c, meanings),
             )
-            # 两阶段流程：用户点选字后，出处组合也限定为所选字
-            if selected_set:
+            # 先字模式（selected_chars = 名字必须含所选字）：
+            # 单字名 → 该字本身须是所选字（此时「含」即「等于」）；
+            # 双字名 → **不收窄 valid_chars**（收窄会让单个所选字无法成对），
+            #          改为在下方字对筛选处只保留「含任一所选字」的字对。
+            if selected_set and name_length == 1:
                 valid_chars = [c for c in valid_chars if c["char"] in selected_set]
             index_of = {c["char"]: i for i, c in enumerate(valid_chars)}
 
@@ -1569,8 +1650,7 @@ class NamingEngine:
                         surname, given_name, [ci], entry, bazi_result
                     )
                     if name_data:
-                        name_data["_tier"] = tier
-                        names.append(name_data)
+                        emit(name_data, tier)
             else:
                 # 组合优先序：先出「LLM 判定宜作名的字对」，再出原文相邻/同句的两字，
                 # 最后才是跨句拼接。出处的推荐字是「一袋好字」，全交叉会产生大量
@@ -1592,9 +1672,13 @@ class NamingEngine:
                 pairs = []
                 if annotated:
                     for pair in annotated:
-                        # 注意：必须用 index_of（已按 selected_set 收窄）而非 by_char 判断，
-                        # 否则两阶段流程里用户点选字后，标注字对含未选字会 KeyError。
+                        # index_of 判断是索引安全网：字对含性别不符/黑名单字时不能索引
+                        # （这些字没进 valid_chars）。
                         if not all(ch in index_of for ch in pair):
+                            continue
+                        # 先字模式：字对须含所选字（任一位置）——「修远」式成对关系不因
+                        # 只选了其中一个字而作废。
+                        if not pair_allowed(pair[0], pair[1]):
                             continue
                         i, j = index_of[pair[0]], index_of[pair[1]]
                         pairs.append((COHESION_RANK.get("annotated", 0), min(i, j), max(i, j)))
@@ -1604,6 +1688,8 @@ class NamingEngine:
                 else:
                     for i in range(len(valid_chars)):
                         for j in range(i + 1, len(valid_chars)):
+                            if not pair_allowed(valid_chars[i]["char"], valid_chars[j]["char"]):
+                                continue
                             kind = self.yunwei._cohesion_kind(
                                 valid_chars[i]["char"], valid_chars[j]["char"], entry
                             )
@@ -1627,8 +1713,7 @@ class NamingEngine:
                         surname, given_name, [first, second], entry, bazi_result
                     )
                     if name_data:
-                        name_data["_tier"] = tier
-                        names.append(name_data)
+                        emit(name_data, tier)
 
         # 策略1：同源组名，按 tier 预算式（A → B → C），tier 内随机 shuffle + 总量封顶
         tier_groups: dict[str, list[dict]] = {"A": [], "B": [], "C": []}
@@ -1655,60 +1740,84 @@ class NamingEngine:
 
         # 策略2：随机组合（始终参与，补充多样性 + 姓氏/偏好引导）
         if candidate_chars:
+            # 先字模式：随机路径同样必须「含所选字」——起始字只从所选字里取
+            # （双字名再配已批准搭档，单字名即该字本身）。无可用所选字则跳过随机路径。
+            base_pool = (
+                [c for c in candidate_chars if c["char"] in selected_set]
+                if selected_set else candidate_chars
+            )
             budget = max(pool_size * self.RANDOM_BUDGET_FACTOR, 120)
             max_attempts = budget * 10
             attempts = 0
             random_count = 0
-            while random_count < budget and attempts < max_attempts:
+            while base_pool and random_count < budget and attempts < max_attempts:
                 attempts += 1
                 if name_length == 1:
-                    char_info = self._weighted_char_choice(candidate_chars)
-                    given_name = char_info["char"]
+                    ci = self._weighted_char_choice(base_pool)
+                    cands = [(ci, ci, ci["char"])]
                 else:
-                    c1 = self._weighted_char_choice(candidate_chars)
+                    c1 = self._weighted_char_choice(base_pool)
                     # 搭档只从「已批准字对」里取（语义层）；取不到就跳过，不退回机械拼接
                     c2 = self._same_source_partner(c1, candidate_chars)
                     if c2 is None:
                         continue
-                    # 字序决定（随机组合无固定出处）：音韵优选
-                    if not self._order_phonetic_better(c1, c2):
-                        c1, c2 = c2, c1
-                    # 姓氏结合：三连同调（全平/全仄）跳过
-                    if self.surname_fit.tri_tone_conflict(
-                        surname, [c1["char"], c2["char"]]
-                    ):
+                    # 字序决定（随机组合无固定出处）：音韵优选；同分时两序均为候选
+                    cands = []
+                    for first, second in self._order_candidates(c1, c2):
+                        # 姓氏结合：三连同调（全平/全仄）跳过
+                        if self.surname_fit.tri_tone_conflict(
+                            surname, [first["char"], second["char"]]
+                        ):
+                            continue
+                        cands.append((first, second, first["char"] + second["char"]))
+                    if not cands:
                         continue
-                    given_name = c1["char"] + c2["char"]
 
-                if given_name in seen_names:
-                    continue
-                seen_names.add(given_name)
+                # 同一次尝试：主序优先；主序被重复/门槛挡住时，再试同分的另一序
+                for first, second, given_name in cands:
+                    if given_name in seen_names:
+                        continue
+                    seen_names.add(given_name)
 
-                chars_info = []
-                for c in given_name:
-                    ci = self.char_db.get_char(c)
-                    if ci:
-                        chars_info.append(ci)
+                    chars_info = []
+                    for c in given_name:
+                        ci = self.char_db.get_char(c)
+                        if ci:
+                            chars_info.append(ci)
 
-                # 出处择优：优先挂「该字对真正被批准」的那条出处（保证详情页里两字成对），
-                # 其次才退回「推荐字含全部名字用字」的通用择优。
-                entry = (
-                    self._pair_entry(c1["char"], c2["char"], gender)
-                    if name_length == 2
-                    else None
-                )
-                if entry is None:
-                    entry = self._find_best_entry(given_name, chars_info, gender)
-                if entry is None and chars_info:
-                    entry = self._find_entry_for_char(chars_info[0]["char"], gender)
+                    # 出处择优：优先挂「该字对真正被批准」的那条出处（保证详情页里两字成对），
+                    # 其次才退回「推荐字含全部名字用字」的通用择优。
+                    entry = (
+                        self._pair_entry(first["char"], second["char"], gender, source_wanted)
+                        if name_length == 2
+                        else None
+                    )
+                    if entry is None:
+                        entry = self._find_best_entry(given_name, chars_info, gender)
+                    if entry is None and chars_info:
+                        entry = self._find_entry_for_char(chars_info[0]["char"], gender)
 
-                name_data = self._evaluate_name(
-                    surname, given_name, chars_info, entry, bazi_result
-                )
-                if name_data:
-                    name_data["_tier"] = "R"
-                    names.append(name_data)
-                    random_count += 1
+                    # 先出处模式兜底：出处必须落在所选类目内（通用择优可能取到别的典籍），
+                    # 否则跳过本次尝试——「有据可循」承诺的出处不能张冠李戴。
+                    if source_wanted:
+                        if not entry or not (
+                            entry.get("source") in source_wanted
+                            or entry.get("source_class") in source_wanted
+                        ):
+                            continue
+
+                    name_data = self._evaluate_name(
+                        surname, given_name, chars_info, entry, bazi_result
+                    )
+                    if name_data:
+                        emit(name_data, "R")
+                        random_count += 1
+                        break
+
+        # 先字模式契约兜底：所有产出必须含所选字（两条路径均已约束，此处保底，
+        # 防止未来新增路径漏出不符合用户点选的组合）。
+        if selected_set:
+            names = [n for n in names if n.get("_selected_hits")]
 
         return names
 
@@ -1819,6 +1928,8 @@ class NamingEngine:
                 "author": entry.get("author", "佚名"),
                 "dynasty": entry.get("dynasty", ""),
                 "text": entry.get("text", ""),
+                # 原文段落（三级溯源第二层用）：完整原诗/原文，缺字段时退回 text
+                "original_text": entry.get("original_text") or entry.get("text", ""),
                 "citation": entry.get("citation", ""),
                 "source_class": entry.get("source_class", entry.get("source", "")),
                 "imagery": entry.get("imagery", []),

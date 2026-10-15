@@ -23,7 +23,8 @@ class NamingRequest(BaseModel):
     meanings: Optional[list[str]] = Field(None, max_length=3, description="期望寓意（code 见 /chars 的 meanings 字段），最多3个，取值: wisdom|health|bravery|gentle|wealth|peace|talent|virtue|beauty|loyal|patriotic|tranquil")
     avoid_chars: Optional[list[str]] = Field(None, description="避讳字（单个汉字列表）")
     industry: Optional[str] = Field(None, description="行业 code，映射五行（P1 启用）")
-    selected_chars: Optional[list[str]] = Field(None, description="用户点选的候选字（两阶段流程）")
+    selected_chars: Optional[list[str]] = Field(None, description="用户点选的候选字（先字后出处）：语义为「名字必须含所选字」（任一位置）")
+    source_classes: Optional[list[str]] = Field(None, description="出处类目限定（先出处后字），可多选: 诗经|楚辞|唐诗|宋词|五代词|清词|汉魏古诗|经史子集（字源 4 部典籍归入经史子集）")
 
 
 class RecommendCharsRequest(BaseModel):

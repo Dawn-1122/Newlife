@@ -60,6 +60,7 @@ async def generate_names(request: NamingRequest):
         avoid_chars=request.avoid_chars,
         industry=request.industry,
         selected_chars=request.selected_chars,
+        source_classes=request.source_classes,
     )
 
     return NamingResponse(**result)

@@ -256,21 +256,43 @@ def test_compose_annotated_entry_only_emits_pairs(engine):
             )
 
 
-def test_compose_with_selected_chars_does_not_crash(engine):
-    """两阶段流程：用户点选字后，标注字对含未选字必须被跳过而非 KeyError。"""
-    entry = next(
-        p for p in engine.poetry_db._poems
-        if len(p.get("name_pairs") or []) >= 2
-        and len(p.get("recommend_chars") or []) >= 3
-    )
-    # 只选一个与某标注字对同字的字，必然触发「字对含未选字」
-    picked = entry["recommend_chars"][:2]
-    names = engine._compose_names(
-        "苏", [], [(entry, "A")], "female", 2, selected_chars=picked,
-    )
-    for n in names:
-        for ch in n["given_name"]:
-            assert ch in set(picked)
+def test_compose_with_selected_chars_must_contain(engine):
+    """先字模式：标注字对只要**含**所选字即可产出（不必整对都在所选集合内）。
+
+    回归两点（旧实现按「字对全部字都在所选集合」过滤，导致单字点选必然 0 结果）：
+    ① 字对含未选字不再 KeyError；② 产出必须含所选字。
+    """
+    tried = 0
+    produced = False
+    for poem in engine.poetry_db._poems:
+        if produced:
+            break
+        for pair in (poem.get("name_pairs") or []):
+            if len(pair) != 2 or pair[0] == pair[1]:
+                continue
+            usable = all(
+                (ci := engine.char_db.get_char(ch))
+                and ci.get("gender") in ("女", "中")
+                and ch not in NEGATIVE_CHARS
+                for ch in pair
+            )
+            if not usable:
+                continue
+            tried += 1
+            if tried > 120:
+                break
+            names = engine._compose_names(
+                "苏", [], [(poem, "A")], "female", 2, selected_chars=[pair[0]],
+            )
+            for n in names:
+                assert pair[0] in n["given_name"], (
+                    f"{n['given_name']} 不含所选字「{pair[0]}」—— 先字模式契约被破坏"
+                )
+            if names:
+                produced = True
+                break
+    assert tried > 0, "语料中应存在女性可用的标注字对"
+    assert produced, "所选字在标注字对里有搭档，应至少能从某条出处产出名字"
 
 
 def test_annotated_empty_entry_yields_no_two_char_names(engine):
