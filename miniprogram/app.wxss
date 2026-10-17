@@ -25,9 +25,13 @@ page {
   --wx-shui: #3E5A73;
   --wx-huo: #A6321F;
   --wx-tu: #7A6248;
-  /* 门楼牌匾（首页主视觉专用）：深木底 + 描金，金字仅限牌匾一处 */
+  /* 门楼牌匾：深木底 + 描金，金字仅限牌匾 */
   --plaque-wood: #4A3527;
   --plaque-gold: #C9A86A;
+  /* 首页门楼（纯代码绘制）：暖木结构 / 瓦顶 / 朱漆门扇，明亮不阴森 */
+  --gate-wood: #5C4630;
+  --gate-roof: #4A3624;
+  --gate-door: #A03A22;
   --r-sm: 3rpx;
   --r-md: 6rpx;
   --serif: "Songti SC", "STSong", "Noto Serif SC", "Source Han Serif SC", serif;

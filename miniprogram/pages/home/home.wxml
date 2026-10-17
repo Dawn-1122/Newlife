@@ -1,43 +1,72 @@
 <view class="page">
-  <!-- 门楼主视觉：插画承载建筑，牌匾宋体叠印在门楣留白处 -->
+  <!-- 整座门楼即首页：飞檐 → 牌匾 → 两扇朱漆对开门 → 门槛 -->
   <view class="gate">
-    <image class="gate-img" src="/images/ink-gate.jpg" mode="widthFix" />
-    <view class="plaque">
-      <text class="plaque-text">名堂</text>
+    <!-- 屋顶 -->
+    <view class="roof">
+      <view class="roof-ridge"></view>
+      <view class="roof-slope"></view>
+      <view class="roof-eave"></view>
     </view>
+
+    <!-- 门楣 + 牌匾 -->
+    <view class="lintel">
+      <view class="plaque">
+        <text class="plaque-text">名堂</text>
+      </view>
+    </view>
+
+    <!-- 门主体：立柱 + 两扇门（开门动画） -->
+    <view class="gate-body">
+      <view class="pillar"></view>
+
+      <view class="doors">
+        <view class="behind"><text>推门入堂</text></view>
+
+        <view class="door door-left {{opening === 'left' ? 'open' : ''}}"
+              bindtap="onDoorTap" data-door="left" data-url="/pages/name/name">
+          <view class="studs">
+            <view class="stud"></view>
+            <view class="stud"></view>
+          </view>
+          <view class="door-name">
+            <text class="door-char">起</text>
+            <text class="door-char">名</text>
+          </view>
+          <view class="ring-wrap">
+            <view class="ring"><view class="ring-dot"></view></view>
+          </view>
+        </view>
+
+        <view class="door door-right {{opening === 'right' ? 'open' : ''}}"
+              bindtap="onDoorTap" data-door="right" data-url="/pages/analyze/analyze">
+          <view class="studs">
+            <view class="stud"></view>
+            <view class="stud"></view>
+          </view>
+          <view class="door-name">
+            <text class="door-char">释</text>
+            <text class="door-char">名</text>
+          </view>
+          <view class="ring-wrap">
+            <view class="ring"><view class="ring-dot"></view></view>
+          </view>
+        </view>
+      </view>
+
+      <view class="pillar"></view>
+    </view>
+
+    <!-- 门槛 -->
+    <view class="threshold"></view>
   </view>
 
-  <!-- 两扇对开门即两个主入口：推门入堂，不做说明小字 -->
-  <view class="doors">
-    <view class="door" hover-class="door-hover" bindtap="onEntryTap" data-url="/pages/name/name">
-      <view class="door-studs">
-        <view class="stud"></view>
-        <view class="stud"></view>
-      </view>
-      <view class="door-name">起名</view>
-    </view>
-    <view class="door" hover-class="door-hover" bindtap="onEntryTap" data-url="/pages/analyze/analyze">
-      <view class="door-studs">
-        <view class="stud"></view>
-        <view class="stud"></view>
-      </view>
-      <view class="door-name">释名</view>
-    </view>
-  </view>
-
-  <view class="slogan">有据可循的起名工具</view>
-
-  <!-- 文字入口：细分功能收进二级菜单 -->
-  <view class="links">
-    <view class="more-link" bindtap="onBookTap" hover-class="more-link-hover">
-      <text>我的名字本</text>
-      <text class="link-count" wx:if="{{bookCount}}">{{bookCount}}</text>
-      <text class="more-arrow">›</text>
-    </view>
-
-    <view class="more-link" bindtap="onMoreTap" hover-class="more-link-hover">
-      <text>更多功能</text>
-      <text class="more-arrow">›</text>
+  <!-- 底部极简：slogan + 次级入口 -->
+  <view class="foot">
+    <view class="slogan">有据可循的起名工具</view>
+    <view class="foot-links">
+      <text class="foot-link" bindtap="onBookTap">我的名字本</text>
+      <text class="foot-sep">·</text>
+      <text class="foot-link" bindtap="onMoreTap">更多功能</text>
     </view>
   </view>
 </view>

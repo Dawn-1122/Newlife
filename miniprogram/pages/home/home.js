@@ -1,21 +1,27 @@
-// 主页只承载两个主功能：起名 / 释名。
-// 其余细分功能一律收进二级菜单 pages/more，主页不再挂说明小字。
+// 首页 = 一座门楼：两扇朱漆对开门即两个主入口（左「起名」右「释名」）。
+// 点门 → 门绕轴旋转打开 → 进入对应功能；次级入口收在门楼下方极简文字链。
 const share = require('../../utils/share')
 const namebook = require('../../utils/namebook')
 
 Page({
-  // 名字本的条数（记录 + 收藏）：只在从别的页回来时才会变，故在 onShow 里重算
-  data: { bookCount: 0 },
+  data: { bookCount: 0, opening: '' },
 
   onShow() {
+    // 从别的页返回时复位开门状态，并重算名字本条数
     this.setData({
-      bookCount: namebook.listRecords().length + namebook.listFavs().length
+      bookCount: namebook.listRecords().length + namebook.listFavs().length,
+      opening: ''
     })
   },
 
-  onEntryTap(e) {
-    const url = e.currentTarget.dataset.url
-    if (url) wx.navigateTo({ url })
+  onDoorTap(e) {
+    const { door, url } = e.currentTarget.dataset
+    if (this.data.opening) return // 已在开门动画中，防连点
+    this.setData({ opening: door })
+    // 等门完全打开再跳转，让动画完整呈现
+    setTimeout(() => {
+      if (url) wx.navigateTo({ url })
+    }, 560)
   },
 
   onBookTap() {
