@@ -56,6 +56,26 @@ def test_table_chars_really_produce_names(engine, table_female):
     assert not empty, f"可选字表里这些字实际产出为空：{empty}"
 
 
+def test_bazi_mode_contract(engine):
+    """开八字时的契约同样成立（这是资料页的默认状态，不能只测无八字口径）。
+
+    八字会把候选池收窄到喜用神五行（林/female 553 → 331），
+    门槛层还会排除「名字全忌神」的组合，两条变化都可能让字表与真实产出脱节。
+    """
+    bazi = dict(use_bazi=True, year=1994, month=5, day=20, hour=11, minute=0)
+    table = engine.pickable_chars(surname="林", gender="female", **bazi)
+    assert table["total"] < 553, "按喜用神筛过的池子应当更小"
+    inside = [c["char"] for c in table["chars"]][:10]
+    empty = [
+        ch for ch in inside
+        if engine.generate_names(
+            surname="林", gender="female", name_length=2, max_results=30,
+            selected_chars=[ch], **bazi,
+        )["total"] == 0
+    ]
+    assert not empty, f"八字模式下这些表内字实际产出为空：{empty}"
+
+
 def test_chars_outside_table_produce_nothing(engine, table_female):
     """表外抽 12 字：一个都不许出结果（无假阴性）。"""
     in_table = {c["char"] for c in table_female["chars"]}
