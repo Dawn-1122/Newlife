@@ -202,6 +202,41 @@ def test_single_char_names_use_single_char_gate(engine):
                for r in one["chars"])
 
 
+def test_generational_char_contract(engine):
+    """字辈模式：辈字固定第二字，字表里每个字 + 辈字都能真的出名字。
+
+    字辈组合不是诗词字对（「张志远」≠「婵娟」），只要求「第一个字有出处 +
+    整名过门槛」，故字表 = 与辈字能组成合格名字的第一个字；辈字本身不入表。
+    """
+    gen = "志"
+    table = engine.pickable_chars(
+        surname="李", gender="male", use_bazi=False,
+        name_length=2, generational_char=gen,
+    )
+    assert table["feasible"] > 0, "常见辈字「志」应有可选字"
+    assert gen not in {c["char"] for c in table["chars"]}, "辈字本身不应进可选字表"
+
+    # 表内抽 10 字：每个都能出名字，且名字都辈字收尾
+    inside = [c["char"] for c in table["chars"]][:10]
+    for ch in inside:
+        r = engine.generate_names(
+            surname="李", gender="male", name_length=2, max_results=20,
+            use_bazi=False, selected_chars=[ch], generational_char=gen,
+        )
+        assert r["total"] > 0, f"表内字 {ch} 配辈字「{gen}」出不来名字"
+        assert all(n["given_name"].endswith(gen) for n in r["names"]), (
+            f"字辈名未固定第二字：{[n['given_name'] for n in r['names']]}"
+        )
+
+    # 直接生成：所有名字辈字收尾
+    r = engine.generate_names(
+        surname="李", gender="male", name_length=2, max_results=30,
+        use_bazi=False, generational_char=gen,
+    )
+    assert r["total"] > 0
+    assert all(n["given_name"].endswith(gen) for n in r["names"])
+
+
 # ── 诊断脚本委托（防止两套实现漂移） ──
 
 def test_diag_script_delegates_to_engine(engine):

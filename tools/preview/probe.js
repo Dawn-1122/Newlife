@@ -368,8 +368,8 @@ async function runFlow(path = 'direct') {
   const before = consoleLines.length
   const NAMES = {
     direct: '资料 → 定偏好 → 生成',
-    chars: '资料 → 定偏好 → 从字出发（点字）→ 生成',
-    sources: '资料 → 定偏好 → 从出处出发（限定诗经）→ 生成'
+    chars: '资料 → 定偏好 → 先字后典（点字）→ 生成',
+    sources: '资料 → 定偏好 → 先典后字（限定诗经）→ 生成'
   }
   console.log(`[probe] 跑通起名流程 · ${path}（${NAMES[path]}）…`)
   await evaluate(

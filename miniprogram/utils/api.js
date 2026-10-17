@@ -38,58 +38,55 @@ function getStyleCodes(source) {
   return SOURCE_STYLE_MAP[source] || []
 }
 
-// 寓意枚举（与后端 MEANING_OPTIONS 镜像）
+// 寓意枚举（与后端 MEANING_OPTIONS 镜像；code + name + group）
+// name 是给用户看的标签（贴近父母话术，非字典词）；group 归入 MEANING_GROUPS 的期许方向。
 const MEANING_OPTIONS = [
-  { code: 'wisdom', name: '智慧' },
-  { code: 'health', name: '健康' },
-  { code: 'bravery', name: '勇敢' },
-  { code: 'gentle', name: '温婉' },
-  { code: 'wealth', name: '富贵' },
-  { code: 'peace', name: '平安' },
-  { code: 'talent', name: '才华' },
-  { code: 'virtue', name: '品德' },
-  { code: 'beauty', name: '美丽' },
-  { code: 'loyal', name: '忠义' },
-  { code: 'patriotic', name: '家国' },
-  { code: 'tranquil', name: '宁静' }
+  { code: 'wisdom', name: '聪慧睿智', group: 'intellect' },
+  { code: 'health', name: '健康长寿', group: 'wellbeing' },
+  { code: 'bravery', name: '坚毅勇敢', group: 'fortitude' },
+  { code: 'gentle', name: '温婉娴静', group: 'temperament' },
+  { code: 'wealth', name: '富贵荣华', group: 'achievement' },
+  { code: 'peace', name: '平安康泰', group: 'wellbeing' },
+  { code: 'talent', name: '才情出众', group: 'intellect' },
+  { code: 'virtue', name: '仁厚善良', group: 'character' },
+  { code: 'beauty', name: '俊美清雅', group: 'temperament' },
+  { code: 'loyal', name: '忠义赤诚', group: 'character' },
+  { code: 'patriotic', name: '志向远大', group: 'achievement' },
+  { code: 'tranquil', name: '宁静致远', group: 'mindset' },
+  { code: 'resilient', name: '坚韧不拔', group: 'fortitude' },
+  { code: 'optimistic', name: '乐观豁达', group: 'mindset' }
 ]
 
-// ── 偏好选择（27 个标签 = 气质 8 + 期待 12 + 意象 7）──
+// 期许方向（分组）：与后端 MEANING_GROUPS 镜像。前端按此顺序分块渲染：
+// 每块 = 一句人话（subtitle）+ 该组下的寓意标签，像小红书画像一样点选。
+const MEANING_GROUPS = [
+  { code: 'character', title: '品行', subtitle: '正直善良，心存仁厚' },
+  { code: 'intellect', title: '才识', subtitle: '聪慧灵秀，才情出众' },
+  { code: 'wellbeing', title: '康宁', subtitle: '平安健康，顺遂无忧' },
+  { code: 'achievement', title: '前程', subtitle: '志向远大，前程似锦' },
+  { code: 'temperament', title: '性情', subtitle: '温润得体，仪态大方' },
+  { code: 'fortitude', title: '风骨', subtitle: '坚毅有担当，扛得住事' },
+  { code: 'mindset', title: '心境', subtitle: '豁达从容，想得开' }
+]
+
+// ── 偏好选择（气质 8 + 期许 14）──
 //
 // 设计意图：用户不想先回答「寓意优先还是八字优先」这类算法口径问题，
 // 只想从一片标签里挑出自己要的那几个感觉——像 B 站/小红书的兴趣画像一样。
 //
-// 三个维度的**作用域各不相同**，不要混着理解：
+// 两个维度的**作用域各不相同**，不要混着理解：
 //   气质（STYLE_OPTIONS，单选）  → 后端 style 参数：来源偏好 + 意象关键词 + 选字倾向
-//   期待（MEANING_OPTIONS，≤3）  → 后端 meanings 参数：选字硬前置 + 排序
-//   意象（IMAGERY_FAMILIES，≤2） → **只影响「先字」字表的排序**（见下）
+//   期许（MEANING_OPTIONS，≤3）  → 后端 meanings 参数：选字硬前置 + 排序，按 MEANING_GROUPS 分块
+//
+// 意象（字形部首族：草木/水/玉/金…）**不再作为用户输入**：它是名字被读出来之后
+// 用户「感受到」的画面与余味，属于产出侧——挂在字卡与名字详情上展示，不让父母
+// 一开始就去勾「我要草木字」（没人会这么想）。后端仍会返回每个字的 family 标签。
 //
 // 旧版「感觉卡」FEELING_CARDS（1 风格 + 2 寓意打包成 8 张卡）已废除：
 // 它把气质与期待绑死成一对一，用户想「温润 + 勇敢」时无路可走。
 
-// 寓意/期待最多选几个（与后端 MEANING_MAX_SELECT 镜像）
+// 期许最多选几个（与后端 MEANING_MAX_SELECT 镜像）
 const MEANING_MAX_SELECT = 3
-
-// 字形意象族（与后端 IMAGERY_FAMILY_PRIORITY / FILTERABLE_IMAGERY_FAMILIES 镜像）
-//
-// 作用域：给「先字」字表排序与筛选——**不作硬分区**。
-// 实测 7 族只覆盖候选池约 35%（金族全池仅 4 字，女性向 2 字），硬过滤会砍掉
-// 65% 的好字（诗/思/安/宜 这类无族属字），所以它们不做后台硬筛选，
-// 只做两件事：① 偏好页点选后，把该族的字排到字表最前；② 字表页手动按族看。
-// radicals 是**去重后的有效部首**——「日」同时属于火与日月星辰，按优先级归日月星辰，
-// 故火族不再列「日」（否则用户会问「我选了火怎么没有星」）。
-const IMAGERY_FAMILIES = [
-  { code: '日月星辰', name: '日月星辰', radicals: '日 月 星' },
-  { code: '草木', name: '草木', radicals: '木 艹 艸 禾 竹' },
-  { code: '水', name: '水', radicals: '水 氵 雨' },
-  { code: '玉', name: '玉', radicals: '玉 王 石' },
-  { code: '金', name: '金', radicals: '金 钅 釒' },
-  { code: '火', name: '火', radicals: '火 灬' },
-  { code: '土', name: '土', radicals: '土 山 田' }
-]
-
-// 意象族最多选几个（与后端 IMAGERY_MAX_SELECT 镜像）
-const IMAGERY_MAX_SELECT = 2
 
 // 出处类目（与后端 SOURCE_CLASSES 镜像）——「先出处后字」路径的 8 个选项，
 // 也是 /generate 的 source_classes 合法取值。字源 4 部典籍（周易/山海经/
@@ -212,9 +209,8 @@ module.exports = {
   SOURCE_STYLE_MAP,
   getStyleCodes,
   MEANING_OPTIONS,
+  MEANING_GROUPS,
   MEANING_MAX_SELECT,
-  IMAGERY_FAMILIES,
-  IMAGERY_MAX_SELECT,
   SOURCE_CLASSES,
   RANGE_OPTIONS,
   DEFAULT_RANGE_DAYS

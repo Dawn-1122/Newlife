@@ -21,13 +21,14 @@ def engine():
 # ── 枚举扩充 ──
 
 def test_meaning_options_expanded():
-    """寓意扩到 12 个，新增美丽/忠义/家国/宁静。"""
-    assert len(MEANING_OPTIONS) == 12
-    for code in ["beauty", "loyal", "patriotic", "tranquil"]:
+    """寓意扩到 14 个，新增乐观豁达/坚韧不拔，且全部带分组。"""
+    assert len(MEANING_OPTIONS) == 14
+    for code in ["beauty", "loyal", "patriotic", "tranquil", "resilient", "optimistic"]:
         assert code in MEANING_OPTIONS
-    # 每个寓意都有意象词族（治本关键）
+    # 每个寓意都有意象词族（治本关键）+ 分组（前端按方向分块渲染）
     for code, opt in MEANING_OPTIONS.items():
         assert opt.get("imagery_words"), f"{code} 缺少 imagery_words"
+        assert opt.get("group"), f"{code} 缺少 group"
 
 
 def test_style_options_expanded():

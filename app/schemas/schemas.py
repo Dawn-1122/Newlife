@@ -20,11 +20,12 @@ class NamingRequest(BaseModel):
     use_bazi: bool = Field(True, description="是否使用八字分析")
     use_poetry: bool = Field(True, description="是否使用诗词典故")
     style: Optional[str] = Field(None, description="风格偏好: classic|modern|grand|fresh|warm|elegant|plain|zen")
-    meanings: Optional[list[str]] = Field(None, max_length=3, description="期望寓意（code 见 /chars 的 meanings 字段），最多3个，取值: wisdom|health|bravery|gentle|wealth|peace|talent|virtue|beauty|loyal|patriotic|tranquil")
+    meanings: Optional[list[str]] = Field(None, max_length=3, description="期望寓意（code 见 /chars 的 meanings 字段），最多3个，取值: wisdom|health|bravery|gentle|wealth|peace|talent|virtue|beauty|loyal|patriotic|tranquil|resilient|optimistic")
     avoid_chars: Optional[list[str]] = Field(None, description="避讳字（单个汉字列表）")
     industry: Optional[str] = Field(None, description="行业 code，映射五行（**商业起名**纵向使用；宝宝起名主流程不再暴露该字段，此处仅作透传位）")
     selected_chars: Optional[list[str]] = Field(None, description="用户点选的候选字（先字后出处）：语义为「名字必须含所选字」（任一位置）")
     source_classes: Optional[list[str]] = Field(None, description="出处类目限定（先出处后字），可多选: 诗经|楚辞|汉魏古诗|唐诗|五代词|宋词|清词|经史子集（字源 4 部典籍归入经史子集）")
+    generational_char: Optional[str] = Field(None, max_length=1, description="字辈（可选，仅双字名生效）：固定出现在名字第二个字，硬约束")
 
 
 class RecommendCharsRequest(BaseModel):
@@ -37,7 +38,7 @@ class RecommendCharsRequest(BaseModel):
     hour: Optional[int] = Field(12, ge=0, le=23, description="出生时")
     minute: Optional[int] = Field(0, ge=0, le=59, description="出生分")
     style: Optional[str] = Field(None, description="风格偏好: classic|modern|grand|fresh|warm|elegant|plain|zen")
-    meanings: Optional[list[str]] = Field(None, max_length=3, description="期望寓意（code 见 /chars 的 meanings 字段），最多3个，取值: wisdom|health|bravery|gentle|wealth|peace|talent|virtue|beauty|loyal|patriotic|tranquil")
+    meanings: Optional[list[str]] = Field(None, max_length=3, description="期望寓意（code 见 /chars 的 meanings 字段），最多3个，取值: wisdom|health|bravery|gentle|wealth|peace|talent|virtue|beauty|loyal|patriotic|tranquil|resilient|optimistic")
     avoid_chars: Optional[list[str]] = Field(None, description="避讳字（单个汉字列表）")
     limit_per_group: int = Field(8, ge=1, le=20, description="每个五行分组返回的字数上限")
 
@@ -59,7 +60,7 @@ class PrenatalRequest(BaseModel):
     range_days: int = Field(7, description="预产期前后浮动天数，取值 0|3|7|14")
     gender: Optional[str] = Field("male", pattern="^(male|female)$", description="性别，用于候选字推荐")
     style: Optional[str] = Field(None, description="风格偏好: classic|modern|grand|fresh|warm|elegant|plain|zen")
-    meanings: Optional[list[str]] = Field(None, max_length=3, description="期望寓意（code 见 /chars 的 meanings 字段），最多3个，取值: wisdom|health|bravery|gentle|wealth|peace|talent|virtue|beauty|loyal|patriotic|tranquil")
+    meanings: Optional[list[str]] = Field(None, max_length=3, description="期望寓意（code 见 /chars 的 meanings 字段），最多3个，取值: wisdom|health|bravery|gentle|wealth|peace|talent|virtue|beauty|loyal|patriotic|tranquil|resilient|optimistic")
     avoid_chars: Optional[list[str]] = Field(None, description="避讳字（单个汉字列表）")
 
 
@@ -195,6 +196,7 @@ class PickableCharsRequest(BaseModel):
     )
     avoid_chars: Optional[list[str]] = Field(None, description="避讳字（单个汉字列表）")
     source_classes: Optional[list[str]] = Field(None, description="出处类目限定（可选），可多选: 诗经|楚辞|汉魏古诗|唐诗|五代词|宋词|清词|经史子集（字源 4 部典籍归入经史子集）")
+    generational_char: Optional[str] = Field(None, max_length=1, description="字辈（可选，仅双字名生效）：固定出现在名字第二个字，硬约束")
     limit: int = Field(400, ge=1, le=400, description="返回字数上限")
 
 

@@ -740,8 +740,8 @@
        *
        * opts.path：
        *   'direct'（默认）    选个气质 → 直接生成
-       *   'chars'            选个气质 → 从字出发 → 载入字表 → 点一个字 → 生成
-       *   'sources'          选个气质 → 从出处出发 → 选诗经 → 生成
+       *   'chars'            选个气质 → 先字后典 → 载入字表 → 点一个字 → 生成
+       *   'sources'          选个气质 → 先典后字 → 选诗经 → 生成
        * chars/sources 两条会把「路径选择 → 硬约束真的生效」一并验掉。
        */
       function runFlow(opts) {
@@ -766,7 +766,7 @@
           ]
           if (path === 'chars') {
             steps = steps.concat([
-              { txt: '从字出发' },
+              { txt: '先字后典' },
               { sleep: 300 },
               // 字表要真的向后端算一遍（门槛感知可行性），给它时间
               { wait: 'onCharTap', timeout: 20000 },
@@ -775,7 +775,7 @@
             ])
           } else if (path === 'sources') {
             steps = steps.concat([
-              { txt: '从出处出发' },
+              { txt: '先典后字' },
               { sleep: 300 },
               { wait: 'onSourceTap' },
               { txt: '诗经' }

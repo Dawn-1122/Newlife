@@ -4,22 +4,19 @@ const namebook = require('../../utils/namebook')
 
 // 起名第二步（也是最后一步）：定偏好 → 选路径 → 生成。
 //
-// 三个偏好维度的**作用域各不相同**，不要混着理解：
-//   气质 8（单选）  → 后端 style：来源偏好 + 意象关键词 + 选字倾向
-//   期待 12（≤3）   → 后端 meanings：选字硬前置 + 排序
-//   意象 7（≤2）    → **只影响「先字」字表的排序**，后端不作硬筛选
-//                     （7 族只覆盖候选池约 35%，硬过滤会砍掉 65% 的好字）
+// 两个偏好维度的**作用域各不相同**，不要混着理解：
+//   气质 8（单选）   → 后端 style：来源偏好 + 意象关键词 + 选字倾向
+//   期许 14（≤3）    → 后端 meanings：选字硬前置 + 排序；按 7 个方向分块渲染
+//
+// 意象（字形部首族）**不再是用户输入**：它是名字读出来之后用户「感受到」的画面，
+// 属于产出侧——只在字卡上挂个小标签展示，不让父母一开始就勾「我要草木字」。
 //
 // 三条路径：
-//   直接推荐   → 按偏好直接出名字
-//   从字出发   → 选字表里点字（selected_chars，后端「名字必须含所选字」硬约束）
-//   从出处出发 → 限定典籍类目（source_classes 硬约束）
-//
-// 旧版「感觉卡」把气质与期待绑成一对一（8 张卡各带 1 风格 + 2 寓意），
-// 用户想「温润 + 勇敢」时无路可走；现拆成三层独立标签，与后端入参一一对应。
+//   直接推荐 → 按偏好直接出名字
+//   先字后典 → 先挑喜欢的字，再溯其出处（selected_chars 硬约束）
+//   先典后字 → 先圈定典籍，再从中择字（source_classes 硬约束）
 const MEANING_MAX = api.MEANING_MAX_SELECT || 3
-const IMAGERY_MAX = api.IMAGERY_MAX_SELECT || 2
-const PICK_MAX = 3          // 「从字出发」最多选几个字
+const PICK_MAX = 3          // 「先字后典」最多选几个字
 const CHAR_PAGE = 48        // 字表一次渲染多少个（全量 200+ 会撑爆 wxml 节点数）
 
 Page({
@@ -31,46 +28,42 @@ Page({
     styles: [],
     styleCode: '',
 
-    // 期待（≤3）
-    meanings: [],
+    // 期许（≤3，按 7 个方向分组）
+    meaningGroups: [],
     meaningCount: 0,
     meaningMax: MEANING_MAX,
 
-    // 意象（≤2，只排序不筛选）
-    imageries: [],
-    imageryCount: 0,
-    imageryMax: IMAGERY_MAX,
-
     // 路径
     paths: [
-      { code: 'direct', name: '直接推荐', desc: '按上面的偏好直接给名字' },
-      { code: 'chars', name: '从字出发', desc: '先挑喜欢的字，再回出处' },
-      { code: 'sources', name: '从出处出发', desc: '先圈定典籍，再挑字' }
+      { code: 'direct', name: '直接推荐', desc: '按你的期许与气质，直接荐名' },
+      { code: 'chars', name: '先字后典', desc: '先挑喜欢的字，再溯其出处' },
+      { code: 'sources', name: '先典后字', desc: '先定典籍，再从中择字' }
     ],
     path: 'direct',
 
-    // 从字出发：字表
+    // 先字后典：字表
     pickLoading: false,
     pickLoaded: false,
     pickStale: false,       // 偏好变了 → 字表需要重新载入
     pickTotal: 0,           // 池内字数
     pickFeasible: 0,        // 本姓真组得出名字的字数
-    familyChips: [],        // 意象族筛选（含「全部」）
-    familyFilter: '',
-    charView: [],           // 当前渲染的字（已过滤 + 分页）
+    charView: [],           // 当前渲染的字（分页）
     charFiltered: 0,        // 过滤后的总数
     charVisible: CHAR_PAGE,
     pickedCount: 0,
     pickedText: '',
     pickMax: PICK_MAX,
 
-    // 从出处出发
+    // 先典后字
     sources: [],
     sourceCount: 0,
 
     // 避讳
     avoidChars: '',
     avoidOpen: false,
+
+    // 字辈（只读展示：从资料页带过来，位置=第二个字）
+    genChar: '',
 
     loading: false
   },
@@ -83,8 +76,7 @@ Page({
 
     // 回填：从结果页「调整偏好」返回时 draft 里带着上次的 style/meanings/...
     this.picked = {}                                  // 先字已选（不进 data，避免大数组 setData）
-    this.imageryCodes = (app.globalData.draftImagery || []).slice()
-    this.charAtoms = []                               // 字表全量（未过滤）
+    this.charAtoms = []                               // 字表全量
 
     if (this.draft.selected_chars) {
       this.draft.selected_chars.forEach(function (ch) {
@@ -108,6 +100,7 @@ Page({
       sourceCodes: (this.draft.source_classes || []).slice()
     })
     view.path = path
+    view.genChar = this.draft.generational_char || ''
     this.setData(view)
 
     if (path === 'chars') this.loadPickable()
@@ -129,22 +122,19 @@ Page({
       }
     })
 
-    const meanings = api.MEANING_OPTIONS.map(function (o) {
-      return {
-        code: o.code,
-        name: o.name,
-        selected: meaningCodes.indexOf(o.code) >= 0
-      }
+    // 期许按 7 个方向分块：每块一句人话（subtitle）+ 该组下的标签
+    const meaningGroups = api.MEANING_GROUPS.map(function (g) {
+      const meanings = api.MEANING_OPTIONS
+        .filter(function (m) { return m.group === g.code })
+        .map(function (m) {
+          return {
+            code: m.code,
+            name: m.name,
+            selected: meaningCodes.indexOf(m.code) >= 0
+          }
+        })
+      return { code: g.code, title: g.title, subtitle: g.subtitle, meanings: meanings }
     })
-
-    const imageries = api.IMAGERY_FAMILIES.map(function (o) {
-      return {
-        code: o.code,
-        name: o.name,
-        radicals: o.radicals,
-        selected: this.imageryCodes.indexOf(o.code) >= 0
-      }
-    }.bind(this))
 
     const sources = api.SOURCE_CLASSES.map(function (name) {
       return {
@@ -159,10 +149,8 @@ Page({
       metaText: this.buildMeta(state.tab),
       styles: styles,
       styleCode: state.styleCode || '',
-      meanings: meanings,
-      meaningCount: meanings.filter(function (m) { return m.selected }).length,
-      imageries: imageries,
-      imageryCount: imageries.filter(function (i) { return i.selected }).length,
+      meaningGroups: meaningGroups,
+      meaningCount: meaningCodes.length,
       sources: sources,
       sourceCount: sources.filter(function (s) { return s.selected }).length,
       pickedCount: Object.keys(this.picked || {}).length,
@@ -180,11 +168,21 @@ Page({
     if (this.draft.surname) parts.push(this.draft.surname)
     parts.push(this.draft.gender === 'female' ? '女孩' : '男孩')
     parts.push(this.draft.name_length === 1 ? '单字名' : '双字名')
+    if (this.draft.generational_char) parts.push('辈字「' + this.draft.generational_char + '」')
     if (this.draft.use_bazi) parts.push('已合八字')
     return parts.join(' · ')
   },
 
-  // 当前选中的 codes（从 data 里读，避免再存一份状态导致不同步）
+  // 当前选中的期许 codes（从分组的 meaningGroups 里扁平读）
+  selectedMeaningCodes() {
+    const codes = []
+    this.data.meaningGroups.forEach(function (g) {
+      g.meanings.forEach(function (m) { if (m.selected) codes.push(m.code) })
+    })
+    return codes
+  },
+
+  // 当前选中的典籍 codes
   selectedCodes(key) {
     return this.data[key].filter(function (x) { return x.selected })
       .map(function (x) { return x.code })
@@ -199,12 +197,22 @@ Page({
     this.markPickStale()
   },
 
-  // ── 期待（≤3）──
+  // ── 期许（≤3，跨组累计）──
 
   onMeaningTap(e) {
     const code = e.currentTarget.dataset.code
-    const meanings = this.data.meanings.map(function (m) { return Object.assign({}, m) })
-    const target = meanings.filter(function (m) { return m.code === code })[0]
+    const meaningGroups = this.data.meaningGroups.map(function (g) {
+      return {
+        code: g.code,
+        title: g.title,
+        subtitle: g.subtitle,
+        meanings: g.meanings.map(function (m) { return Object.assign({}, m) })
+      }
+    })
+    let target = null
+    meaningGroups.forEach(function (g) {
+      g.meanings.forEach(function (m) { if (m.code === code) target = m })
+    })
     if (!target) return
 
     if (!target.selected && this.data.meaningCount >= MEANING_MAX) {
@@ -212,41 +220,11 @@ Page({
       return
     }
     target.selected = !target.selected
-    this.setData({ meanings: meanings, meaningCount: meanings.filter(function (m) {
-      return m.selected
-    }).length })
+    const meaningCount = meaningGroups.reduce(function (n, g) {
+      return n + g.meanings.filter(function (m) { return m.selected }).length
+    }, 0)
+    this.setData({ meaningGroups: meaningGroups, meaningCount: meaningCount })
     this.markPickStale()
-  },
-
-  // ── 意象（≤2，只影响字表排序）──
-
-  onImageryTap(e) {
-    const code = e.currentTarget.dataset.code
-    const idx = this.imageryCodes.indexOf(code)
-    if (idx >= 0) {
-      this.imageryCodes.splice(idx, 1)
-    } else {
-      if (this.imageryCodes.length >= IMAGERY_MAX) {
-        wx.showToast({ title: '最多选 ' + IMAGERY_MAX + ' 个', icon: 'none' })
-        return
-      }
-      this.imageryCodes.push(code)
-    }
-    getApp().globalData.draftImagery = this.imageryCodes.slice()
-    const imageries = this.data.imageries.map(function (o) {
-      return {
-        code: o.code,
-        name: o.name,
-        radicals: o.radicals,
-        selected: this.imageryCodes.indexOf(o.code) >= 0
-      }
-    }.bind(this))
-    this.setData({
-      imageries: imageries,
-      imageryCount: imageries.filter(function (i) { return i.selected }).length
-    })
-    // 意象只影响排序，字表已在手就本地重排，不必再请求
-    if (this.data.pickLoaded) this.sortAndRender()
   },
 
   mergeView(over) {
@@ -256,7 +234,7 @@ Page({
     return this.buildView({
       tab: this.data.tab,
       styleCode: next.styleCode,
-      meaningCodes: this.selectedCodes('meanings'),
+      meaningCodes: this.selectedMeaningCodes(),
       sourceCodes: this.selectedCodes('sources')
     })
   },
@@ -279,7 +257,7 @@ Page({
     this.loadPickable()
   },
 
-  // ── 从字出发：拉可选字表 ──
+  // ── 先字后典：拉可选字表 ──
 
   async loadPickable() {
     if (this.data.pickLoading) return
@@ -292,11 +270,9 @@ Page({
       })
       this.pickMeta = {
         total: res.total,
-        feasible: res.feasible,
-        families: res.families || []
+        feasible: res.feasible
       }
       this.setData({ pickLoading: false, pickLoaded: true, pickStale: false })
-      this.buildFamilyChips()
       this.sortAndRender()
     } catch (err) {
       this.setData({ pickLoading: false })
@@ -314,11 +290,11 @@ Page({
       name_length: this.draft.name_length || 2,
       use_bazi: !!this.draft.use_bazi && !!this.draft.year
     }
-    const style = this.data.styleCode || this.selectedCodes('styles')[0]
+    const style = this.data.styleCode
     if (style) p.style = style
-    const meanings = this.selectedCodes('meanings')
+    const meanings = this.selectedMeaningCodes()
     if (meanings.length) p.meanings = meanings
-    if (this.imageryCodes.length) p.imagery_families = this.imageryCodes.slice()
+    if (this.draft.generational_char) p.generational_char = this.draft.generational_char
     const avoid = this.parseAvoidChars()
     if (avoid.length) p.avoid_chars = avoid
     if (p.use_bazi) {
@@ -330,58 +306,10 @@ Page({
     return p
   },
 
-  // 意象族筛选条（含「全部」）：计数来自本次字表
-  buildFamilyChips() {
-    const counts = {}
-    this.charAtoms.forEach(function (c) {
-      if (c.family) counts[c.family] = (counts[c.family] || 0) + 1
-    })
-    // 该族在本姓氏下无可用字 → 不摆空筛选。
-    // 字表是重载过的，若上次选中的族这次没字了，筛选必须跟着松开，
-    // 否则会停在一个不存在的筛选上，显示一张空表。
-    let filter = this.data.familyFilter
-    if (filter && !counts[filter]) filter = ''
-
-    const chips = [{
-      code: '',
-      name: '全部',
-      count: this.charAtoms.length,
-      selected: filter === ''
-    }]
-    api.IMAGERY_FAMILIES.forEach(function (f) {
-      const n = counts[f.code] || 0
-      if (!n) return
-      chips.push({
-        code: f.code,
-        name: f.name,
-        count: n,
-        selected: filter === f.code
-      })
-    })
-    this.setData({ familyChips: chips, familyFilter: filter })
-  },
-
-  onFamilyTap(e) {
-    const code = e.currentTarget.dataset.code
-    const chips = this.data.familyChips.map(function (c) {
-      return Object.assign({}, c, { selected: c.code === code })
-    })
-    this.setData({ familyChips: chips, familyFilter: code })
-    this.sortAndRender()
-  },
-
-  // 排序规则（与后端 pickable_chars 一致）：选中的意象族优先，其次看真能出多少名字。
-  // 意象是「字面意象」，只该影响字表的摆放，不该把无族属的好字（诗/思/安/宜）筛掉。
+  // 排序：真能出多少名字优先（意象只作展示标签，不参与摆放）
   sortAndRender() {
-    const fam = this.imageryCodes
-    const filter = this.data.familyFilter
-    const list = this.charAtoms.filter(function (c) {
-      return !filter || c.family === filter
-    })
+    const list = this.charAtoms.slice()
     list.sort(function (a, b) {
-      const am = fam.indexOf(a.family) >= 0 ? 0 : 1
-      const bm = fam.indexOf(b.family) >= 0 ? 0 : 1
-      if (am !== bm) return am - bm
       if (a.name_hits !== b.name_hits) return b.name_hits - a.name_hits
       if (a.partner_count !== b.partner_count) return b.partner_count - a.partner_count
       return a.char < b.char ? -1 : 1
@@ -394,6 +322,7 @@ Page({
         return {
           char: c.char,
           name_hits: c.name_hits,
+          family: c.family || '',
           picked: !!this.picked[c.char]
         }
       }.bind(this)),
@@ -434,7 +363,7 @@ Page({
     this.sortAndRender()
   },
 
-  // ── 从出处出发 ──
+  // ── 先典后字 ──
 
   onSourceTap(e) {
     const code = e.currentTarget.dataset.code
@@ -485,18 +414,25 @@ Page({
     delete params.birthDate
     delete params.hourText
 
-    // 三层偏好 → 后端既有入参
+    // 气质 / 期许 → 后端既有入参
     const style = this.data.styleCode
     if (style) params.style = style
     else delete params.style
 
-    const meanings = this.selectedCodes('meanings')
+    const meanings = this.selectedMeaningCodes()
     if (meanings.length) params.meanings = meanings
     else delete params.meanings
 
     const avoid = this.parseAvoidChars()
     if (avoid.length) params.avoid_chars = avoid
     else delete params.avoid_chars
+
+    // 字辈（资料页带入，双字名生效）
+    if (this.draft.generational_char && this.draft.name_length === 2) {
+      params.generational_char = this.draft.generational_char
+    } else {
+      delete params.generational_char
+    }
 
     // 路径 → 硬约束
     if (path === 'chars') {

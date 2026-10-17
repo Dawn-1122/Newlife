@@ -58,6 +58,16 @@
         </view>
       </view>
 
+      <view class="form-item" wx:if="{{nameLength === 2}}">
+        <text class="form-label">字辈</text>
+        <input
+          class="form-input"
+          placeholder="选填，家族辈字，如：志"
+          value="{{generationalChar}}"
+          bindinput="onGenerationalInput"
+        />
+      </view>
+
     </block>
 
     <!-- 未出生 -->

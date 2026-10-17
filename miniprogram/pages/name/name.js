@@ -16,6 +16,7 @@ Page({
       '申时 (15-17点)', '酉时 (17-19点)', '戌时 (19-21点)', '亥时 (21-23点)'
     ],
     nameLength: 2,
+    generationalChar: '',
 
     // 产前（预产期）
     dueDate: '',
@@ -67,6 +68,10 @@ Page({
     this.setData({ nameLength: parseInt(e.currentTarget.dataset.length, 10) })
   },
 
+  onGenerationalInput(e) {
+    this.setData({ generationalChar: e.detail.value })
+  },
+
   onRangeTap(e) {
     this.setData({ rangeDays: Number(e.currentTarget.dataset.range) })
   },
@@ -110,6 +115,12 @@ Page({
         // 展示用字段（提交时会剥离，不透传给后端）
         birthDate: this.data.birthDate,
         hourText: this.data.hourOptions[this.data.hourIndex]
+      }
+
+      // 字辈：仅双字名生效，固定在名字第二个字
+      const genChar = (this.data.generationalChar || '').trim()
+      if (this.data.nameLength === 2 && genChar) {
+        draft.generational_char = genChar
       }
 
       if (this.data.useBazi && this.data.birthDate) {

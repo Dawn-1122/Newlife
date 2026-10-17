@@ -62,6 +62,7 @@ async def generate_names(request: NamingRequest):
         industry=request.industry,
         selected_chars=request.selected_chars,
         source_classes=request.source_classes,
+        generational_char=request.generational_char,
     )
 
     return NamingResponse(**result)
@@ -126,6 +127,7 @@ async def pickable_chars(request: PickableCharsRequest):
         imagery_families=request.imagery_families,
         avoid_chars=request.avoid_chars,
         source_classes=request.source_classes,
+        generational_char=request.generational_char,
         limit=request.limit,
     )
     return PickableCharsResponse(**result)

@@ -13,13 +13,8 @@ from pathlib import Path
 
 import pytest
 
-from app.core.constants import (
-    FILTERABLE_IMAGERY_FAMILIES,
-    IMAGERY_FAMILY_PRIORITY,
-    build_radical_family_map,
-)
 from app.core.naming_options import (
-    IMAGERY_MAX_SELECT,
+    MEANING_GROUPS,
     MEANING_MAX_SELECT,
     MEANING_OPTIONS,
     SOURCE_CLASSES,
@@ -41,11 +36,10 @@ def _load_frontend_enums() -> dict:
         "process.stdout.write(JSON.stringify({"
         "  styles: api.STYLE_OPTIONS,"
         "  meanings: api.MEANING_OPTIONS,"
+        "  groups: api.MEANING_GROUPS,"
         "  map: api.SOURCE_STYLE_MAP,"
-        "  families: api.IMAGERY_FAMILIES,"
         "  sources: api.SOURCE_CLASSES,"
-        "  meaningMax: api.MEANING_MAX_SELECT,"
-        "  imageryMax: api.IMAGERY_MAX_SELECT"
+        "  meaningMax: api.MEANING_MAX_SELECT"
         "}));"
     )
     out = subprocess.run(
@@ -112,37 +106,29 @@ def test_schema_style_description_lists_all_codes():
     )
 
 
-# ── 26 标签偏好体系（气质 8 + 期待 12 + 意象 7）的镜像 ──
+# ── 偏好标签体系（气质 8 + 期许 14，意象不再作为用户输入）的镜像 ──
 
 def test_select_limits_match_backend(frontend):
     """多选上限必须与后端一致，否则前端放行、后端静默截断。"""
     assert frontend["meaningMax"] == MEANING_MAX_SELECT
-    assert frontend["imageryMax"] == IMAGERY_MAX_SELECT
     assert MEANING_MAX_SELECT == 3
 
 
-def test_imagery_families_match_backend(frontend):
-    """意象族 code 顺序必须等于后端 IMAGERY_FAMILY_PRIORITY。"""
-    assert [f["code"] for f in frontend["families"]] == list(IMAGERY_FAMILY_PRIORITY)
-    for item in frontend["families"]:
-        assert item.get("name") == item["code"]
-
-
-def test_imagery_family_radicals_match_backend(frontend):
-    """每族列出的部首必须等于**去重叠后的有效部首**。
-
-    重叠部首（「日」同属火与日月星辰）按优先级只归一族，前端若把被遮蔽的
-    部首也列出来，用户会问「我选了火，怎么没有星」。
-    """
-    effective: dict[str, list[str]] = {f: [] for f in IMAGERY_FAMILY_PRIORITY}
-    for radical, family in build_radical_family_map().items():
-        effective[family].append(radical)
-    for item in frontend["families"]:
-        expected = set(effective[item["code"]])
-        assert set(item["radicals"].split()) == expected, (
-            f"{item['code']} 的部首与后端不符：前端 {sorted(item['radicals'].split())} "
-            f"vs 后端 {sorted(expected)}"
-        )
+def test_meaning_groups_match_backend(frontend):
+    """期许分组（方向）必须与后端 MEANING_GROUPS 一致：顺序、文案、组内成员归属。"""
+    assert [g["code"] for g in frontend["groups"]] == [g["code"] for g in MEANING_GROUPS]
+    by_code = {g["code"]: g for g in MEANING_GROUPS}
+    for fg in frontend["groups"]:
+        bg = by_code[fg["code"]]
+        assert fg["title"] == bg["title"]
+        assert fg["subtitle"] == bg["subtitle"]
+    # 每个寓意都归属某个已定义的分组，且没有空分组
+    valid_groups = {g["code"] for g in MEANING_GROUPS}
+    for m in frontend["meanings"]:
+        assert m.get("group") in valid_groups, f"寓意 {m['code']} 的 group 非法"
+    for bg in MEANING_GROUPS:
+        members = [m["code"] for m in frontend["meanings"] if m["group"] == bg["code"]]
+        assert members, f"分组 {bg['code']}({bg['title']}) 为空"
 
 
 def test_source_classes_match_backend(frontend):

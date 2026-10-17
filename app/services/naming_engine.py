@@ -139,6 +139,7 @@ class NamingEngine:
         target_min: int = TARGET_MIN,
         selected_chars: Optional[list[str]] = None,
         source_classes: Optional[list[str]] = None,
+        generational_char: Optional[str] = None,
     ) -> dict:
         """
         生成名字候选列表
@@ -163,6 +164,7 @@ class NamingEngine:
             source_classes: 出处类目限定（两阶段流程「先出处后字」）。
                             取值为诗词 source（诗经/楚辞/唐诗/宋词/五代词/清词/汉魏古诗/经史子集）
                             或 source_class（同左，字源 4 部典籍归入「经史子集」）。
+            generational_char: 字辈（可选，仅双字名生效）：固定出现在名字第二个字，硬约束。
 
         Returns:
             {"bazi": {...}, "names": [...], "total": int, "fallback_note": str|None}
@@ -173,7 +175,7 @@ class NamingEngine:
             max_results=max_results, use_bazi=use_bazi, use_poetry=use_poetry,
             style=style, meanings=meanings, avoid_chars=avoid_chars,
             target_min=target_min, selected_chars=selected_chars,
-            source_classes=source_classes,
+            source_classes=source_classes, generational_char=generational_char,
         )
 
         fallback_note = None
@@ -184,7 +186,7 @@ class NamingEngine:
                 max_results=max_results, use_bazi=use_bazi, use_poetry=use_poetry,
                 style=None, meanings=None, avoid_chars=avoid_chars,
                 target_min=target_min, selected_chars=selected_chars,
-                source_classes=source_classes,
+                source_classes=source_classes, generational_char=generational_char,
             )
             if len(fallback_names) > len(names):
                 names = fallback_names
@@ -231,6 +233,7 @@ class NamingEngine:
         target_min: int,
         selected_chars: Optional[list[str]] = None,
         source_classes: Optional[list[str]] = None,
+        generational_char: Optional[str] = None,
     ) -> tuple:
         """核心起名流程（八字 → 候选字 → 出处匹配 → 组名 → 门槛/韵味 → 排序/多样性/截取）。"""
         # 1. 八字分析（如提供生辰）
@@ -282,6 +285,7 @@ class NamingEngine:
             gender, name_length, bazi_result, blacklist, meanings,
             target_min=target_min, pool_size=max_results,
             selected_chars=selected_chars, source_classes=source_classes,
+            generational_char=generational_char,
         )
 
         # 5. 韵味排序（韵味降序 → 喜用神 → 寓意 → 风格 tie-break）
@@ -946,6 +950,7 @@ class NamingEngine:
         imagery_families: Optional[list[str]] = None,
         avoid_chars: Optional[list[str]] = None,
         source_classes: Optional[list[str]] = None,
+        generational_char: Optional[str] = None,
         limit: int = 400,
     ) -> dict:
         """「先字后出处」的可选字表：哪些字真的能组出名字，以及按什么顺序摆。
@@ -1034,6 +1039,17 @@ class NamingEngine:
             for ch, ci in pool.items():
                 if gate_ok([ci]):
                     record([ch], ch)
+        elif generational_char:
+            # ── 字辈模式：辈字固定第二个字 ──
+            # 可选字 = 「与辈字能组成合格名字」的第一个字。辈字本身不放进字表
+            # （它已由家族字辈锁定，不是用户要挑的），第一个字才是要挑的。
+            gen_ci = self.char_db.get_char(generational_char)
+            if gen_ci and generational_char not in blacklist:
+                for ch, ci in pool.items():
+                    if ch == generational_char:
+                        continue
+                    if gate_ok([ci, gen_ci]):
+                        record([ch], ch + generational_char)
         else:
             # ── 供给 A：出处组合路径 ──
             for entry, _tier in self._match_provenance(
@@ -1834,6 +1850,7 @@ class NamingEngine:
         pool_size: int = 30,
         selected_chars: Optional[list[str]] = None,
         source_classes: Optional[list[str]] = None,
+        generational_char: Optional[str] = None,
     ) -> list[dict]:
         """组合生成名字（预算式 + tier 标记）。"""
         names = []
@@ -1841,6 +1858,8 @@ class NamingEngine:
         blacklist = blacklist or set()
         selected_set = set(selected_chars) if selected_chars else None
         source_wanted = set(source_classes) if source_classes else None
+        # 字辈：仅双字名生效，固定第二个字（辈字 == given_name 最后一个字符）
+        gen_char = generational_char if (name_length == 2 and generational_char) else None
 
         xiyong_wuxing = None
         if bazi_result:
@@ -1868,6 +1887,38 @@ class NamingEngine:
         def pair_allowed(a: str, b: str) -> bool:
             """先字模式：字对必须含所选字（任一位置）；非先字模式恒通过。"""
             return not selected_set or a in selected_set or b in selected_set
+
+        # ── 字辈模式（双字名，辈字固定第二字）────────────────────────
+        # 家族字辈是硬规矩：名字 = 「有出处的第一个字」 + 辈字。这里不再走
+        # 同源名 / 随机组合的「诗词字对」逻辑——辈字组合不是诗词成对
+        # （「张志远」≠「婵娟」），只需第一个字有出处 + 整名过门槛（音律/五格/
+        # 谐音/忌神），故单独横扫候选字，早退。
+        if gen_char:
+            gen_ci = self.char_db.get_char(gen_char)
+            if gen_ci and gen_char not in blacklist:
+                for ci in candidate_chars:
+                    ch = ci["char"]
+                    if ch == gen_char:
+                        continue
+                    # 先字 + 字辈叠加：第一个字还须是用户点选的
+                    if selected_set and ch not in selected_set:
+                        continue
+                    if self.surname_fit.tri_tone_conflict(surname, [ch, gen_char]):
+                        continue
+                    given_name = ch + gen_char
+                    if given_name in seen_names:
+                        continue
+                    seen_names.add(given_name)
+                    chars_info = [ci, gen_ci]
+                    entry = self._find_best_entry(given_name, chars_info, gender)
+                    if entry is None:
+                        entry = self._find_entry_for_char(ch, gender)
+                    name_data = self._evaluate_name(
+                        surname, given_name, chars_info, entry, bazi_result
+                    )
+                    if name_data:
+                        emit(name_data, "R")
+            return names
 
         def compose_from_entry(entry: dict, tier: str) -> None:
             """从单条出处的推荐字里生成同源名字。"""

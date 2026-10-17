@@ -9,7 +9,34 @@
     <view class="head-meta">{{metaText}}</view>
   </view>
 
-  <!-- ① 气质：单选。一个词定整体调性 -->
+  <view class="intro">每个名字都从典籍里来，有出处、有讲头</view>
+
+  <!-- ① 期许：≤3，按 7 个方向分组。一句话定「希望孩子成为什么样的人」 -->
+  <view class="block">
+    <view class="block-head">
+      <text class="block-title">期许</text>
+      <text class="block-tail">{{meaningCount}}/{{meaningMax}}</text>
+    </view>
+    <view class="block-note">我希望 TA —— 挑几件最看重的事</view>
+    <view class="group" wx:for="{{meaningGroups}}" wx:for-item="grp" wx:key="code">
+      <view class="group-head">
+        <text class="group-title">{{grp.title}}</text>
+        <text class="group-sub">{{grp.subtitle}}</text>
+      </view>
+      <view class="tag-row">
+        <view
+          class="tag {{item.selected ? 'active' : ''}}"
+          wx:for="{{grp.meanings}}"
+          wx:for-item="item"
+          wx:key="code"
+          bindtap="onMeaningTap"
+          data-code="{{item.code}}"
+        >{{item.name}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ② 气质：单选。一个词定整体调性 -->
   <view class="block">
     <view class="block-head">
       <text class="block-title">气质</text>
@@ -26,45 +53,10 @@
     </view>
   </view>
 
-  <!-- ② 期待：≤3。要什么样的好 -->
-  <view class="block">
-    <view class="block-head">
-      <text class="block-title">期待</text>
-      <text class="block-tail">{{meaningCount}}/{{meaningMax}}</text>
-    </view>
-    <view class="tag-row">
-      <view
-        class="tag {{item.selected ? 'active' : ''}}"
-        wx:for="{{meanings}}"
-        wx:key="code"
-        bindtap="onMeaningTap"
-        data-code="{{item.code}}"
-      >{{item.name}}</view>
-    </view>
-  </view>
-
-  <!-- ③ 意象：≤2。只影响字表排序，不当作筛选 -->
-  <view class="block">
-    <view class="block-head">
-      <text class="block-title">意象</text>
-      <text class="block-tail">{{imageryCount}}/{{imageryMax}}</text>
-    </view>
-    <view class="tag-row">
-      <view
-        class="tag {{item.selected ? 'active' : ''}}"
-        wx:for="{{imageries}}"
-        wx:key="code"
-        bindtap="onImageryTap"
-        data-code="{{item.code}}"
-      >{{item.name}}</view>
-    </view>
-    <view class="block-note">挑了就把它这一路的字排在字表前面，不会把别的字筛掉。</view>
-  </view>
-
-  <!-- ④ 路径（未出生只有直接推荐：预产期给的是范围参考，不吃先字/先出处） -->
+  <!-- ③ 路径（未出生只有直接推荐：预产期给的是范围参考，不吃先字/先典） -->
   <view class="block" wx:if="{{tab === 'postnatal'}}">
     <view class="block-head">
-      <text class="block-title">怎么挑</text>
+      <text class="block-title">取名之法</text>
     </view>
     <view class="path-row">
       <view
@@ -80,7 +72,7 @@
     </view>
   </view>
 
-  <!-- 路径 · 从字出发 -->
+  <!-- 路径 · 先字后典 -->
   <view class="block" wx:if="{{tab === 'postnatal' && path === 'chars'}}">
     <view class="block-head">
       <text class="block-title">可选字</text>
@@ -92,20 +84,11 @@
     <block wx:elif="{{pickLoaded}}">
       <view class="pick-stat">
         池内 {{pickTotal}} 字 · 本姓组得出名字 {{pickFeasible}} 字
+        <text wx:if="{{genChar}}"> · 辈字「{{genChar}}」固定第二字</text>
       </view>
       <view class="pick-warn" wx:if="{{pickStale}}">
         偏好改过了，字表还是上一版的。
         <text class="pick-warn-act" bindtap="onReloadPick">重新载入</text>
-      </view>
-
-      <view class="chip-row">
-        <view
-          class="chip {{item.selected ? 'active' : ''}}"
-          wx:for="{{familyChips}}"
-          wx:key="code"
-          bindtap="onFamilyTap"
-          data-code="{{item.code}}"
-        >{{item.name}} {{item.count}}</view>
       </view>
 
       <view class="char-grid">
@@ -117,7 +100,7 @@
           data-idx="{{index}}"
         >
           <view class="char-glyph">{{item.char}}</view>
-          <view class="char-sub">{{item.name_hits}} 名</view>
+          <view class="char-sub">{{item.name_hits}} 名{{item.family ? ' · ' + item.family : ''}}</view>
         </view>
       </view>
 
@@ -134,10 +117,10 @@
       </view>
     </block>
 
-    <view class="pick-hint" wx:else>点「从字出发」后载入可选字。</view>
+    <view class="pick-hint" wx:else>点「先字后典」后载入可选字。</view>
   </view>
 
-  <!-- 路径 · 从出处出发 -->
+  <!-- 路径 · 先典后字 -->
   <view class="block" wx:if="{{tab === 'postnatal' && path === 'sources'}}">
     <view class="block-head">
       <text class="block-title">典籍范围</text>
