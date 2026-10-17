@@ -1,4 +1,4 @@
-// 二级菜单：主页只留「起名 / 名字测评」两个主入口，细分功能集中在这里。
+// 二级菜单：主页只留「起名 / 释名」两个主入口，细分功能集中在这里。
 // available:false 的行点按只提示「即将上线」。
 const share = require('../../utils/share')
 
@@ -17,9 +17,9 @@ Page({
         ]
       },
       {
-        title: '名字测评',
+        title: '释名',
         items: [
-          { key: 'analyze', name: '测评现有名字', url: '/pages/analyze/analyze', available: true },
+          { key: 'analyze', name: '释现有名', url: '/pages/analyze/analyze', available: true },
           { key: 'candidate', name: '测候选名', url: '', available: false },
           { key: 'compare', name: '双名对比', url: '', available: false },
           { key: 'special', name: '专项测评', url: '', available: false }

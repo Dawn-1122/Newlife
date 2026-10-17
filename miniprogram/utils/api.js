@@ -138,7 +138,7 @@ function prenatal(params) {
 }
 
 /**
- * 解析名字（名字测评）
+ * 解析名字（释名）
  */
 function analyzeName(params) {
   return request('/analyze', 'POST', params)

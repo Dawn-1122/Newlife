@@ -1,6 +1,6 @@
 <view class="container">
   <view class="header">
-    <view class="title">名字测评</view>
+    <view class="title">释名</view>
     <view class="subtitle">用字 · 音律 · 五格 · 诗词出处</view>
   </view>
 
@@ -38,7 +38,7 @@
     </view>
   </view>
 
-  <button class="btn-primary" bindtap="onSubmit" loading="{{loading}}">开始测评</button>
+  <button class="btn-primary" bindtap="onSubmit" loading="{{loading}}">开始释名</button>
 
   <view class="footer-note">
     <text>生辰为可选，提供后可分析八字匹配度</text>

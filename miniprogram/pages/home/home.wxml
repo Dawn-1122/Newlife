@@ -1,25 +1,33 @@
 <view class="page">
-  <!-- 泼墨主视觉：图在上、字在下的「诗堂」版式，不叠印 -->
-  <view class="hero">
-    <image class="hero-img" src="/images/ink-hero.jpg" mode="widthFix" />
-  </view>
-
-  <view class="hero-copy">
-    <view class="hero-title">名堂</view>
-    <view class="hero-sub">有据可循的起名工具</view>
-  </view>
-
-  <!-- 两大主功能：不加小字说明，细分功能进二级菜单 -->
-  <view class="entry-grid">
-    <view class="entry-card" bindtap="onEntryTap" data-url="/pages/name/name">
-      <view class="entry-name">起名</view>
-    </view>
-    <view class="entry-card" bindtap="onEntryTap" data-url="/pages/analyze/analyze">
-      <view class="entry-name">名字测评</view>
+  <!-- 门楼主视觉：插画承载建筑，牌匾宋体叠印在门楣留白处 -->
+  <view class="gate">
+    <image class="gate-img" src="/images/ink-gate.jpg" mode="widthFix" />
+    <view class="plaque">
+      <text class="plaque-text">名堂</text>
     </view>
   </view>
 
-  <!-- 文字入口：依然只有两行，不新增功能卡 -->
+  <!-- 两扇对开门即两个主入口：推门入堂，不做说明小字 -->
+  <view class="doors">
+    <view class="door" hover-class="door-hover" bindtap="onEntryTap" data-url="/pages/name/name">
+      <view class="door-studs">
+        <view class="stud"></view>
+        <view class="stud"></view>
+      </view>
+      <view class="door-name">起名</view>
+    </view>
+    <view class="door" hover-class="door-hover" bindtap="onEntryTap" data-url="/pages/analyze/analyze">
+      <view class="door-studs">
+        <view class="stud"></view>
+        <view class="stud"></view>
+      </view>
+      <view class="door-name">释名</view>
+    </view>
+  </view>
+
+  <view class="slogan">有据可循的起名工具</view>
+
+  <!-- 文字入口：细分功能收进二级菜单 -->
   <view class="links">
     <view class="more-link" bindtap="onBookTap" hover-class="more-link-hover">
       <text>我的名字本</text>

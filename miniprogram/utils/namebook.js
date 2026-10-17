@@ -37,7 +37,7 @@ const FAV_MAX_BYTES = 200 * 1024
 const KIND_LABEL = {
   postnatal: '起名',
   prenatal: '孕期参考',
-  analyze: '名字测评'
+  analyze: '释名'
 }
 
 // --------------------------------------------------------------------------- //

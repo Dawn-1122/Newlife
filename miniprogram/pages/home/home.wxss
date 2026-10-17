@@ -1,82 +1,106 @@
-/* 主页 · 山水泼墨
-   结构：泼墨主视觉 → 站名 → 两张大功能卡 → 更多功能
-   原则：主功能卡不挂小字说明；细分入口收进二级菜单。 */
+/* 主页 · 门楼牌匾
+   名堂 = 存放名字的殿堂：门楼悬匾，两扇对开门即两个主入口，推门入堂。
+   铁律：主入口不挂说明小字；细分入口收进 pages/more。 */
 
 .page {
   min-height: 100vh;
   padding-bottom: 60rpx;
 }
 
-/* ── 泼墨主视觉 ── */
-.hero {
+/* ── 门楼主视觉 ── */
+.gate {
+  position: relative;
   width: 100%;
-  overflow: hidden;
 }
 
-.hero-img {
+.gate-img {
   width: 100%;
   display: block;
 }
 
-/* ── 站名（图下留白处，居中排版） ── */
-.hero-copy {
-  padding: 48rpx 40rpx 0;
-  text-align: center;
+/* 牌匾：叠印在插画门楣的留白匾上（网格定标 x 42.5-55.5% / y 49-60%，CSS 略出血盖住） */
+.plaque {
+  position: absolute;
+  left: 42%;
+  top: 48%;
+  width: 15%;
+  height: 12.5%;
+  background: var(--plaque-wood);
+  border: 1rpx solid var(--plaque-gold);
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.hero-title {
+.plaque-text {
   font-family: var(--serif);
-  font-size: 62rpx;
-  font-weight: 500;
-  letter-spacing: 18rpx;
-  /* 末字字距补偿，视觉居中 */
-  text-indent: 18rpx;
-  color: var(--ink);
-  line-height: 1.3;
+  font-size: 26rpx;
+  letter-spacing: 8rpx;
+  text-indent: 8rpx;
+  color: var(--plaque-gold);
+  line-height: 1;
 }
 
-.hero-sub {
-  margin-top: 18rpx;
+/* ── 两扇门（主入口） ── */
+.doors {
+  display: flex;
+  justify-content: center;
+  gap: 28rpx;
+  padding: 56rpx 40rpx 0;
+}
+
+.door {
+  width: 240rpx;
+  height: 280rpx;
+  background: var(--card);
+  border: 1rpx solid var(--cinnabar);
+  border-radius: var(--r-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26rpx;
+}
+
+.door-hover {
+  background: var(--cinnabar-bg);
+}
+
+.door-studs {
+  display: flex;
+  gap: 16rpx;
+}
+
+.stud {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  border: 1rpx solid var(--cinnabar);
+}
+
+.door-name {
+  font-family: var(--serif);
+  font-size: 38rpx;
+  font-weight: 500;
+  letter-spacing: 10rpx;
+  text-indent: 10rpx;
+  color: var(--cinnabar);
+}
+
+/* ── slogan ── */
+.slogan {
+  margin-top: 40rpx;
+  text-align: center;
   font-size: 24rpx;
   letter-spacing: 6rpx;
   text-indent: 6rpx;
   color: var(--ink-3);
 }
 
-/* ── 两张大功能卡 ── */
-.entry-grid {
-  display: flex;
-  padding: 64rpx 40rpx 0;
-  gap: 20rpx;
-}
-
-.entry-card {
-  flex: 1;
-  height: 288rpx;
-  background: var(--card);
-  border: 1rpx solid var(--line);
-  border-radius: var(--r-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.entry-card:active {
-  background: var(--paper-deep);
-}
-
-.entry-name {
-  font-family: var(--serif);
-  font-size: 40rpx;
-  font-weight: 500;
-  letter-spacing: 8rpx;
-  text-indent: 8rpx;
-  color: var(--ink);
-}
-
 /* ── 文字入口（我的名字本 / 更多功能）── */
 .links {
-  margin-top: 64rpx;
+  margin-top: 72rpx;
 }
 
 .more-link {
