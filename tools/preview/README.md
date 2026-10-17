@@ -33,7 +33,8 @@ venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 venv/bin/python tools/preview/serve.py            # 默认 :8899
 ```
 
-然后打开 <http://127.0.0.1:8899/>。
+然后打开 <http://localhost:8899/>（**用 `localhost`，不要用 `127.0.0.1`** ——
+这台机器上代理策略按主机名区分，`127.0.0.1` 会被拦成空响应）。
 
 页面下拉可直达任意页；「跑通起名流程」按钮会**走真实 UI** 把
 资料页 → 感觉页 → 结果页跑一遍（结果页/详情页依赖 `globalData.lastResult`，
@@ -66,6 +67,9 @@ node tools/preview/probe.js --attach 9222 --book
 # 原生组件替身专项：picker / switch 命中区与回填
 node tools/preview/probe.js --attach 9222 --picker
 
+# 输入框专项：点击不误派发 → 真实键入 → 焦点保持
+node tools/preview/probe.js --attach 9222 --input
+
 # 只看一页 / 全部页
 node tools/preview/probe.js --attach 9222 pages/detail/detail
 node tools/preview/probe.js --attach 9222 --all
@@ -87,6 +91,18 @@ node tools/preview/probe.js --attach 9222 --all
 | `probe.js` | 自检探针：逐页巡检 + 截图 + 退出码判定 |
 
 ## 已知取舍
+
+- **渲染是增量补丁（morph），不是整块替换**。这是必须的，别改回去：
+  旧实现每次 `setData` 都 `mount.innerHTML = html`，会把**正在输入的 input 一起删掉**，
+  中文输入法（IME）的组字状态挂在那个 DOM 节点上，节点一换组字就断，
+  表现是「一个字都打不进去」。现在同标签就地改属性、不同标签才替换，
+  并且**对获得焦点的输入框跳过 `value` 属性**（交给浏览器持有）。
+  同时顺带保住了滚动位置与文本选区。
+- **点击只派发 `tap` / `longpress`，不派发 `bindinput` / `bindchange`**。
+  `data-wb-ev` 只表示「这个元素挂了某个事件」，不代表它是点击 ——
+  `<input bindinput>` 也带这个属性。旧实现点击就派发、`detail` 是 `{}`，
+  页面里 `e.detail.value` 为 `undefined` → `setData({surname: undefined})` → 整页重绘
+  → 输入框被换掉 → 点一下就失焦。（`picker` / `switch` 是替身，在类型判断之前单独处理。）
 
 - **picker / switch 是浏览器替身**：`<picker>` 映射到原生 `select`/`date` 弹层，
   `<switch>` 自绘。语义一致（`bindchange` 收到的 `detail.value` 类型相同），观感不同。

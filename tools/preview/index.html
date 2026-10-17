@@ -399,6 +399,18 @@
     }
   }
 
+  /**
+   * 取某个 data-wb-ev 编号对应的「小程序事件类型」（tap / input / change / longpress）。
+   * 必须做这层查表：data-wb-ev 只表示「这个元素挂了某个事件」，**不代表它是点击**。
+   * 反例见下面 click 监听里的注释。
+   */
+  function evTypeOf(idx) {
+    var cur = runtime && runtime.current
+    if (!cur || !cur.events || cur.instance !== currentInstance) return null
+    var ev = cur.events[idx]
+    return ev ? ev.type : null
+  }
+
   mount.addEventListener('click', function (e) {
     var el = e.target.closest('[data-wb-ev]')
     if (!el) return
@@ -413,20 +425,107 @@
       openPicker(el, function (value) { fire(idx, { currentTarget: el }, { value: value }) })
       return
     }
+
+    // 只有 tap / longpress 才该被「点击」触发。
+    // 反例：<input bindinput="onSurnameInput"> 也带 data-wb-ev，旧代码点击就派发，
+    //   detail 是 {}，页面里 e.detail.value === undefined → setData({surname: undefined})
+    //   → 整页重绘 → 输入框被换掉 → 点一下就失焦，用户永远打不进姓氏。
+    var t = evTypeOf(idx)
+    if (t && t !== 'tap' && t !== 'longpress') return
     fire(idx, { currentTarget: el }, {})
   })
 
   mount.addEventListener('input', function (e) {
     var el = e.target.closest('[data-wb-ev]')
     if (!el) return
-    fire(Number(el.getAttribute('data-wb-ev')), { currentTarget: el }, { value: e.target.value })
+    var idx = Number(el.getAttribute('data-wb-ev'))
+    var t = evTypeOf(idx)
+    if (t && t !== 'input') return
+    fire(idx, { currentTarget: el }, { value: e.target.value })
   })
 
   mount.addEventListener('change', function (e) {
     var el = e.target.closest('[data-wb-ev]')
     if (!el) return
-    fire(Number(el.getAttribute('data-wb-ev')), { currentTarget: el }, { value: e.target.value })
+    var idx = Number(el.getAttribute('data-wb-ev'))
+    var t = evTypeOf(idx)
+    if (t && t !== 'change') return
+    fire(idx, { currentTarget: el }, { value: e.target.value })
   })
+
+  // ── 增量挂载（morph）────────────────────────────────────────────
+  /**
+   * 为什么不直接 `mount.innerHTML = html`：
+   * 每次 setData 都重建整棵 DOM，会把**正在输入的 input 一起干掉** ——
+   * 编辑器（IME）的组字状态挂在那个 DOM 节点上，节点一换，组字中断，
+   * 表现就是「中文一个字都打不进去」。顺带还会丢滚动位置、丢文本选区。
+   *
+   * 所以改成按位置对齐的增量补丁：同标签就地改属性/递归，不同标签才替换。
+   * 对**当前获得焦点的输入框**额外跳过 value 属性 —— 它由浏览器持有，
+   * 中途改写会把用户刚打的字抹掉（morphdom 对 value 也是这么处理的）。
+   */
+  function syncAttrs(el, src) {
+    var tag = el.tagName
+    var editable = el === document.activeElement && (tag === 'INPUT' || tag === 'TEXTAREA')
+    var i, a
+    for (i = el.attributes.length - 1; i >= 0; i--) {
+      a = el.attributes[i]
+      if (editable && a.name === 'value') continue
+      if (!src.hasAttribute(a.name)) el.removeAttribute(a.name)
+    }
+    for (i = 0; i < src.attributes.length; i++) {
+      a = src.attributes[i]
+      if (editable && a.name === 'value') continue
+      if (tag === 'INPUT' && a.name === 'value') {
+        // input 的 value 是「脏属性」：只改 attribute 不会刷新已输入过的框，必须走 property
+        if (el.value !== a.value) el.value = a.value
+        continue
+      }
+      if (el.getAttribute(a.name) !== a.value) el.setAttribute(a.name, a.value)
+    }
+  }
+
+  /** 同标签就复用，返回 false 表示需要整节点替换 */
+  function patchNode(oldN, newN) {
+    if (newN.nodeType === 3) {
+      if (oldN.nodeType !== 3) return false
+      if (oldN.nodeValue !== newN.nodeValue) oldN.nodeValue = newN.nodeValue
+      return true
+    }
+    if (newN.nodeType !== 1) return false
+    if (oldN.nodeType !== 1 || oldN.tagName !== newN.tagName) return false
+    syncAttrs(oldN, newN)
+    patchChildren(oldN, newN)
+    return true
+  }
+
+  function patchChildren(oldP, newP) {
+    var oldKids = Array.prototype.slice.call(oldP.childNodes)
+    var newKids = Array.prototype.slice.call(newP.childNodes)
+    var i = 0
+    for (; i < newKids.length; i++) {
+      var o = oldKids[i]
+      var n = newKids[i]
+      if (!o) { oldP.appendChild(document.importNode(n, true)); continue }
+      if (!patchNode(o, n)) oldP.replaceChild(document.importNode(n, true), o)
+    }
+    for (; i < oldKids.length; i++) oldP.removeChild(oldKids[i])
+  }
+
+  var morphBroken = false
+  function morphMount(el, html) {
+    if (morphBroken) { el.innerHTML = html; return }
+    try {
+      var tpl = document.createElement('template')
+      tpl.innerHTML = html
+      patchChildren(el, tpl.content)
+    } catch (err) {
+      // 补丁失败退回整块替换：宁可丢焦点，也不能让页面卡在旧画面上
+      morphBroken = true
+      el.innerHTML = html
+      console.error('morph 失败，已退回整块替换:', err)
+    }
+  }
 
   // ── 样式注入 ──
   function styleTag(id, css) {
@@ -478,7 +577,7 @@
 
       var uiHooks = {
         mount: function (html, events, inst) {
-          mount.innerHTML = html
+          morphMount(mount, html)
           currentInstance = inst
         },
         setTitle: function (t) { if (t) navTitle.textContent = t },

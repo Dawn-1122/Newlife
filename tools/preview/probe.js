@@ -33,7 +33,8 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { setTimeout as sleep } from 'node:timers/promises'
 
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-const BASE = process.env.PREVIEW_BASE || 'http://127.0.0.1:8899'
+// 默认用 localhost：这台机器上 127.0.0.1 会被代理策略拦成空响应（curl 返回 000）
+const BASE = process.env.PREVIEW_BASE || 'http://localhost:8899'
 
 const argv = process.argv.slice(2)
 const outIdx = argv.indexOf('--out')
@@ -42,6 +43,7 @@ const WITH_FLOW = argv.includes('--flow')
 const WITH_FLOW_ALL = argv.includes('--flowall')
 const WITH_BOOK = argv.includes('--book')
 const WITH_PICKER = argv.includes('--picker')
+const WITH_INPUT = argv.includes('--input')
 const ALL = argv.includes('--all')
 const PAGES = argv.filter((a) => a.startsWith('pages/'))
 
@@ -624,6 +626,83 @@ async function runPicker() {
   return res
 }
 
+async function runInput() {
+  label = 'input'
+  const before = consoleLines.length
+  console.log('[probe] 验证输入框：点击不误派发 → 真实键入 → 焦点与数据都对 …')
+
+  await evaluate("window.__wb.goto('pages/name/name')")
+  const ok = await waitJs("!!document.querySelector('[data-wb-h=\"onSurnameInput\"]')", 20000)
+  if (!ok) {
+    results.push({ page: '输入框', note: '找不到姓氏输入框', reached: false, rep: {}, issues: [], shot: '', text: '', handlers: -1 })
+    return null
+  }
+
+  // 1) 点击输入框：旧缺陷下这里会把 bindinput 当 tap 派发，
+  //    detail={} → setData({surname: undefined}) → 整页重绘 → 输入框被换掉 → 永远打不进字。
+  const clickRes = await evaluate(`(function(){
+    var el = document.querySelector('[data-wb-h="onSurnameInput"]')
+    var r = el.getBoundingClientRect()
+    var x = r.x + r.width / 2, y = r.y + r.height / 2
+    var t = document.elementFromPoint(x, y)
+    ;['mousedown','mouseup','click'].forEach(function(k){
+      t.dispatchEvent(new MouseEvent(k, { bubbles: true, cancelable: true, clientX: x, clientY: y }))
+    })
+    var d = window.__wb.runtime.current.instance.data
+    return { 命中: t === el, 点击后值: String(d.surname), 有该字段: 'surname' in d }
+  })()`)
+
+  // 2) 真实键入（不是直接赋 value）：走浏览器默认行为，会触发 input 事件
+  const focusOk = await evaluate(`(function(){
+    var el = document.querySelector('[data-wb-h="onSurnameInput"]')
+    el.focus()
+    return document.activeElement === el
+  })()`)
+  await cdp.send('Input.insertText', { text: '林' })
+  await sleep(350)
+
+  const typed = await evaluate(`(function(){
+    var el = document.querySelector('[data-wb-h="onSurnameInput"]')
+    var d = window.__wb.runtime.current.instance.data
+    return {
+      焦点还在: document.activeElement === el,
+      输入框值: el.value,
+      数据值: String(d.surname),
+      节点还在页面里: document.body.contains(el)
+    }
+  })()`)
+
+  // 3) 再补一个字，确认连续输入不被重绘打断
+  await cdp.send('Input.insertText', { text: '溪' })
+  await sleep(350)
+  const typed2 = await evaluate(`(function(){
+    var el = document.querySelector('[data-wb-h="onSurnameInput"]')
+    var d = window.__wb.runtime.current.instance.data
+    return { 焦点还在: document.activeElement === el, 输入框值: el.value, 数据值: String(d.surname) }
+  })()`)
+
+  const shot = await screenshot('input')
+  const issues = consoleLines.slice(before)
+  const reached =
+    clickRes && clickRes.命中 && clickRes['点击后值'] === '' &&
+    focusOk === true &&
+    typed && typed['焦点还在'] && typed['节点还在页面里'] &&
+    typed2 && typed2['焦点还在'] && typed2['数据值'] === '林溪'
+
+  results.push({
+    page: '输入框（姓氏）',
+    note: `点击不误派发=${clickRes && clickRes['点击后值'] === ''} · 键入=${JSON.stringify(typed2 && typed2['数据值'])} · 焦点保持=${!!(typed2 && typed2['焦点还在'])}`,
+    reached: !!reached,
+    rep: {},
+    issues,
+    shot,
+    text: `姓氏输入框 = ${JSON.stringify(typed2 && typed2['输入框值'])}（data 同步=${typed2 && typed2['数据值']}）`,
+    handlers: -1,
+    input: { clickRes, typed, typed2 }
+  })
+  return { clickRes, typed, typed2 }
+}
+
 const pagesToRun = PAGES.length
   ? PAGES
   : ALL
@@ -635,12 +714,16 @@ if (WITH_FLOW) {
   await runFlow('direct')
   await runFlow('chars')
   if (WITH_FLOW_ALL) await runFlow('sources')
-} else if (!WITH_BOOK && !WITH_PICKER) {
+} else if (!WITH_BOOK && !WITH_PICKER && !WITH_INPUT) {
   console.log('[probe] 提示：结果页/详情页依赖起名结果，加 --flow 才能看到真实内容')
 }
 
 if (WITH_PICKER) {
   await runPicker()
+}
+
+if (WITH_INPUT) {
+  await runInput()
 }
 
 if (WITH_BOOK) {
@@ -725,6 +808,28 @@ for (const r of results) {
       )
       console.log(
         `  switch：点前=${p.switchBefore} 点后=${p.switchAfter} 日期行已收起=${p.dateRowHidden}`
+      )
+    }
+  }
+
+  if (r.input) {
+    const i = r.input
+    if (i.__err) {
+      console.log('  [ERR] 输入场景脚本异常: ' + String(i.__err).slice(0, 300))
+    } else {
+      console.log(
+        `  点击输入框：命中=${i.clickRes && i.clickRes.命中} ` +
+          `误派发后值=${JSON.stringify(i.clickRes && i.clickRes['点击后值'])}（应为空串）`
+      )
+      console.log(
+        `  真实键入：焦点保持=${i.typed && i.typed['焦点还在']} ` +
+          `输入框=${JSON.stringify(i.typed && i.typed['输入框值'])} ` +
+          `data=${JSON.stringify(i.typed && i.typed['数据值'])}`
+      )
+      console.log(
+        `  连续键入：焦点保持=${i.typed2 && i.typed2['焦点还在']} ` +
+          `输入框=${JSON.stringify(i.typed2 && i.typed2['输入框值'])} ` +
+          `data=${JSON.stringify(i.typed2 && i.typed2['数据值'])}`
       )
     }
   }
