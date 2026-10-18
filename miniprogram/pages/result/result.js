@@ -65,6 +65,10 @@ Page({
     loading: false,
     fallbackNote: '',
 
+    // 八字排盘卡默认折叠、筛选栏默认只显示五行
+    baziOpen: false,
+    filterOpen: false,
+
     // 已收藏的全名映射 { 全名: true }，供每张卡片显示收藏态
     favIds: {},
 
@@ -248,6 +252,16 @@ Page({
     wx.navigateTo({
       url: '/pages/detail/detail'
     })
+  },
+
+  // 展开 / 收起八字排盘卡
+  onBaziToggle() {
+    this.setData({ baziOpen: !this.data.baziOpen })
+  },
+
+  // 展开 / 收起筛选栏的其余维度
+  onToggleFilter() {
+    this.setData({ filterOpen: !this.data.filterOpen })
   },
 
   onBaziTap() {

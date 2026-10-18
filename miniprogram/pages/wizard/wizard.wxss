@@ -163,7 +163,7 @@
 
 .path-desc {
   margin-top: 10rpx;
-  font-size: 20rpx;
+  font-size: 22rpx;
   line-height: 1.5;
   color: var(--ink-3);
 }
@@ -234,7 +234,7 @@
 
 .char-sub {
   margin-top: 6rpx;
-  font-size: 18rpx;
+  font-size: 22rpx;
   line-height: 1.2;
   color: var(--ink-3);
 }

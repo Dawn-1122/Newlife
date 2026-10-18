@@ -52,26 +52,43 @@
 }
 
 .bazi-summary {
-  text-align: center;
+  position: relative;
+  text-align: left;
+}
+
+.bazi-head {
+  display: flex;
+  align-items: center;
 }
 
 .bazi-title {
   font-size: 30rpx;
   font-weight: 500;
   color: var(--ink);
-  margin-bottom: 20rpx;
+  flex-shrink: 0;
+}
+
+.bazi-sub {
+  flex: 1;
+  margin-left: 20rpx;
+  font-size: 24rpx;
+  color: var(--ink-3);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .bazi-more {
-  position: absolute;
-  top: 30rpx;
-  right: 30rpx;
+  flex-shrink: 0;
+  margin-left: 16rpx;
   font-size: 24rpx;
   color: var(--ink-2);
 }
 
-.bazi-summary {
-  position: relative;
+.bazi-body {
+  margin-top: 24rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid var(--line);
 }
 
 .bazi-pillars {
@@ -183,57 +200,6 @@
   letter-spacing: 4rpx;
 }
 
-.name-pinyin {
-  font-size: 24rpx;
-  color: var(--ink-2);
-  margin-top: 8rpx;
-}
-
-.name-poetry {
-  margin-top: 16rpx;
-  padding: 16rpx;
-  background: var(--paper);
-  border-radius: 3rpx;
-  border-left: 6rpx solid var(--ink-2);
-}
-
-.poetry-source {
-  font-size: 24rpx;
-  color: var(--ink);
-  font-weight: 500;
-  display: block;
-  margin-bottom: 4rpx;
-}
-
-.poetry-text {
-  font-size: 26rpx;
-  color: var(--ink-2);
-  display: block;
-}
-
-.name-scores {
-  display: flex;
-  gap: 30rpx;
-  margin-top: 16rpx;
-}
-
-.score-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.score-label {
-  font-size: 22rpx;
-  color: var(--ink-3);
-}
-
-.score-value {
-  font-size: 28rpx;
-  font-weight: 500;
-  color: var(--ink);
-}
-
 .name-meaning {
   margin-top: 16rpx;
   font-size: 26rpx;
@@ -272,6 +238,17 @@
 .filter-reset {
   font-size: 24rpx;
   color: var(--cinnabar);
+}
+
+.filter-head-right {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.filter-toggle {
+  font-size: 24rpx;
+  color: var(--ink-2);
 }
 
 .filter-row {

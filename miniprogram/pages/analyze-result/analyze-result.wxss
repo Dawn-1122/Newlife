@@ -68,7 +68,7 @@
 }
 
 .tag {
-  font-size: 20rpx;
+  font-size: 22rpx;
   padding: 4rpx 12rpx;
   border-radius: 6rpx;
   background: var(--paper-deep);

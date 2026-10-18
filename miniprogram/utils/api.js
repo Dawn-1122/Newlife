@@ -145,6 +145,45 @@ function analyzeName(params) {
 }
 
 /**
+ * 创意起名（网名昵称 / 宠物 / 商业）
+ *
+ * kind 枚举与后端 CREATIVE_KINDS 镜像：
+ *   platform 平台名称 / game 游戏昵称 / role 虚构角色 / pet 宠物 / business 商业名称
+ */
+const CREATIVE_KINDS = ['platform', 'game', 'role', 'pet', 'business']
+
+// 各 kind 的中文名（前端标题/副标题，与后端 KIND_NAMES 镜像）
+const CREATIVE_KIND_NAMES = {
+  platform: '平台名称',
+  game: '游戏昵称',
+  role: '虚构角色',
+  pet: '宠物起名',
+  business: '商业名称'
+}
+
+function creativeGenerate(params) {
+  return request('/creative/generate', 'POST', params)
+}
+
+// 行业枚举（与后端 INDUSTRY_WUXING 镜像，商业起名 picker 用；code 即后端行业 code）
+const INDUSTRY_OPTIONS = [
+  { code: 'tech', name: '互联网 / 科技' },
+  { code: 'media', name: '传媒 / 文创' },
+  { code: 'catering', name: '餐饮' },
+  { code: 'energy', name: '能源' },
+  { code: 'finance', name: '金融 / 财会' },
+  { code: 'law', name: '法律' },
+  { code: 'manufacturing', name: '制造 / 工业' },
+  { code: 'education', name: '教育 / 文化' },
+  { code: 'medical', name: '医疗 / 健康' },
+  { code: 'art', name: '艺术' },
+  { code: 'agriculture', name: '农业' },
+  { code: 'realestate', name: '地产 / 建筑' },
+  { code: 'trade', name: '贸易 / 物流' },
+  { code: 'tourism', name: '旅游 / 服务' }
+]
+
+/**
  * 两阶段第一步：推荐选字范围（按五行分组，喜用神优先）
  */
 function recommendChars(params) {
@@ -199,6 +238,7 @@ module.exports = {
   generateNames,
   prenatal,
   analyzeName,
+  creativeGenerate,
   recommendChars,
   pickableChars,
   recommendSources,
@@ -213,5 +253,8 @@ module.exports = {
   MEANING_MAX_SELECT,
   SOURCE_CLASSES,
   RANGE_OPTIONS,
-  DEFAULT_RANGE_DAYS
+  DEFAULT_RANGE_DAYS,
+  CREATIVE_KINDS,
+  CREATIVE_KIND_NAMES,
+  INDUSTRY_OPTIONS
 }

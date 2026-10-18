@@ -1,0 +1,87 @@
+<view class="page">
+  <!-- 窄幅泼墨页头 -->
+  <view class="band">
+    <image class="band-img" src="/images/ink-band.jpg" mode="widthFix" />
+  </view>
+
+  <view class="head">
+    <view class="head-title">{{title}}</view>
+    <view class="head-meta">{{sub}}</view>
+  </view>
+
+  <!-- 网名昵称：细分 tab -->
+  <view class="sub-tabs" wx:if="{{mode === 'netname'}}">
+    <view
+      wx:for="{{subTabs}}"
+      wx:key="code"
+      class="sub-tab {{subKind === item.code ? 'active' : ''}}"
+      bindtap="onSubTabTap"
+      data-kind="{{item.code}}"
+    >{{item.name}}</view>
+  </view>
+
+  <view class="form-card">
+    <!-- 宠物种类 -->
+    <view class="form-item" wx:if="{{mode === 'pet'}}">
+      <text class="form-label">毛孩子种类</text>
+      <view class="chip-row">
+        <view
+          wx:for="{{petTypes}}"
+          wx:key="code"
+          class="chip {{petType === item.code ? 'active' : ''}}"
+          bindtap="onPetTypeTap"
+          data-type="{{item.code}}"
+        >{{item.name}}</view>
+      </view>
+    </view>
+
+    <!-- 行业 -->
+    <view class="form-item" wx:if="{{mode === 'business'}}">
+      <text class="form-label">行业</text>
+      <picker mode="selector" range="{{industryNames}}" value="{{industryIndex}}" bindchange="onIndustryChange">
+        <view class="picker-value">{{industryNames[industryIndex]}}</view>
+      </picker>
+    </view>
+
+    <!-- 关键词 -->
+    <view class="form-item">
+      <text class="form-label">{{kwLabel}}</text>
+      <input
+        class="form-input"
+        placeholder="{{placeholder}}"
+        placeholder-class="ph"
+        value="{{keywords}}"
+        bindinput="onKeywordsInput"
+        confirm-type="done"
+        bindconfirm="onGenerate"
+      />
+    </view>
+  </view>
+
+  <view class="foot">
+    <button class="btn-primary" bindtap="onGenerate" loading="{{loading}}">
+      {{loading ? '正在生成' : (generated ? '再生成一批' : '生成名字')}}
+    </button>
+  </view>
+
+  <!-- 结果 -->
+  <view class="results" wx:if="{{generated}}">
+    <view class="results-title">{{names.length}} 个名字 · 点击即可复制</view>
+    <view
+      class="name-card"
+      wx:for="{{names}}"
+      wx:key="name"
+      hover-class="name-press"
+      hover-stay-time="60"
+      bindtap="onNameTap"
+      data-name="{{item.name}}"
+    >
+      <view class="name-row">
+        <text class="name-text">{{item.name}}</text>
+        <text class="name-tag">{{item.tag}}</text>
+      </view>
+      <text class="name-reason">{{item.reason}}</text>
+    </view>
+    <view class="empty-hint" wx:if="{{!names.length}}">没有生成到名字，换个输入试试</view>
+  </view>
+</view>

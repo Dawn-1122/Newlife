@@ -95,24 +95,28 @@ def test_required_tokens_present(app_src):
 
 
 def test_no_box_shadow():
-    """硬规则②：不用阴影，用细线 + 留白分层。"""
+    """硬规则②（2026-10-18 修订）：阴影集中在 app.wxss 统一定义（按钮立体感），
+    页面样式不得各自写 box-shadow，避免阴影失控与不一致。"""
     offenders = [
         str(f.relative_to(MINIPROGRAM))
         for f in _all_wxss()
-        if "box-shadow" in f.read_text(encoding="utf-8")
+        if "box-shadow" in f.read_text(encoding="utf-8") and f.resolve() != APP_WXSS.resolve()
     ]
-    assert not offenders, f"以下样式用了 box-shadow（违反「不用阴影」）：{offenders}"
+    assert not offenders, f"以下页面样式用了 box-shadow（阴影应集中在 app.wxss）：{offenders}"
 
 
 def test_border_radius_within_limit():
-    """硬规则③：圆角收敛 —— 禁 16rpx 以上与胶囊。"""
+    """硬规则③（2026-10-18 修订）：圆角收敛 —— 按钮允许胶囊（999rpx），
+    其余仍禁 16rpx 以上与胶囊。"""
     offenders: list[str] = []
     for f in _all_wxss():
         for line in f.read_text(encoding="utf-8").splitlines():
             m = RADIUS_RE.search(line)
             if not m:
                 continue
-            value = m.group(1)
+            value = m.group(1).strip()
+            if value == "999rpx":
+                continue  # 按钮胶囊圆角，允许
             for num in re.findall(r"(\d+(?:\.\d+)?)rpx", value):
                 if float(num) > 16:
                     offenders.append(f"{f.relative_to(MINIPROGRAM)}: {value.strip()}")
@@ -122,7 +126,7 @@ def test_border_radius_within_limit():
                     offenders.append(f"{f.relative_to(MINIPROGRAM)}: {value.strip()}")
             if re.search(r"\d{3,}rpx|9999|\b\dp\b", value):
                 offenders.append(f"{f.relative_to(MINIPROGRAM)}: {value.strip()}")
-    assert not offenders, f"以下圆角违反「禁 16rpx 以上与胶囊」：{offenders}"
+    assert not offenders, f"以下圆角违反「除按钮胶囊外禁 16rpx 以上」：{offenders}"
 
 
 def test_wuxing_colors_are_mineral_not_material(app_src):

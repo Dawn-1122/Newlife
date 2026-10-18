@@ -11,9 +11,9 @@ Page({
           { key: 'baby', name: '给宝宝起名', url: '/pages/name/name', available: true },
           { key: 'prenatal', name: '孕期参考起名', url: '/pages/name/name?tab=prenatal', available: true },
           { key: 'rename', name: '成人改名', url: '', available: false },
-          { key: 'creative', name: '创意起名', url: '', available: false },
-          { key: 'pet', name: '宠物名', url: '', available: false },
-          { key: 'brand', name: '品牌店名', url: '', available: false }
+          { key: 'creative', name: '网名昵称', url: '/pages/creative/creative?mode=netname', available: true },
+          { key: 'pet', name: '宠物名', url: '/pages/creative/creative?mode=pet', available: true },
+          { key: 'brand', name: '品牌店名', url: '/pages/creative/creative?mode=business', available: true }
         ]
       },
       {

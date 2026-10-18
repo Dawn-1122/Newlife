@@ -262,3 +262,33 @@ class SourceCharsResponse(BaseModel):
     bazi: Optional[dict] = None
     sources: list[dict] = Field(default_factory=list, description="各来源内的推荐字")
     total: int = 0
+
+
+class CreativeRequest(BaseModel):
+    """创意起名请求（网名昵称 / 宠物 / 商业）"""
+    kind: str = Field(..., pattern="^(platform|game|role|pet|business)$",
+                      description="起名类型: platform(平台名称)|game(游戏昵称)|role(虚构角色)|pet(宠物)|business(商业名称)")
+    keywords: str = Field("", max_length=100,
+                          description="自由输入：身份/兴趣/关键词/设定，空格或逗号分隔")
+    style: Optional[str] = Field(None, description="风格偏好（复用 STYLE_OPTIONS code，暂作透传）")
+    pet_type: Optional[str] = Field(None, pattern="^(cat|dog|other)$",
+                                    description="宠物种类（kind=pet 时用）: cat|dog|other")
+    gender: Optional[str] = Field(None, pattern="^(male|female)$",
+                                  description="性别（kind=role/pet 时用）: male|female")
+    industry: Optional[str] = Field(None, description="行业 code（kind=business 时用，见 INDUSTRY_WUXING）")
+    count: int = Field(12, ge=1, le=30, description="返回名字数量")
+
+
+class CreativeNameResult(BaseModel):
+    """单个创意名字"""
+    name: str
+    tag: str = ""
+    reason: str = ""
+
+
+class CreativeResponse(BaseModel):
+    """创意起名响应"""
+    kind: str
+    total: int
+    names: list[CreativeNameResult] = Field(default_factory=list)
+    fallback_note: Optional[str] = None

@@ -14,6 +14,7 @@ from app.schemas.schemas import (
     RecommendSourcesRequest, RecommendSourcesResponse,
     SourceCharsRequest, SourceCharsResponse,
     PickableCharsRequest, PickableCharsResponse,
+    CreativeRequest, CreativeResponse,
 )
 from app.services.naming_engine import NamingEngine
 from app.services.char_database import CharDatabase
@@ -22,6 +23,7 @@ from app.services.bazi_engine import BaziEngine
 from app.services.phonetics import PhoneticsScorer
 from app.services.wuge import WugeScorer
 from app.services.prenatal_engine import PrenatalEngine
+from app.services.creative_service import CreativeNamingService
 from app.core.constants import RANGE_OPTIONS
 
 router = APIRouter()
@@ -371,6 +373,31 @@ async def query_poetry(
         "total": len(poems),
         "poems": poems[:limit],
     }
+
+
+@router.post("/creative/generate", response_model=CreativeResponse)
+async def creative_generate(request: CreativeRequest):
+    """
+    创意起名（网名昵称 / 宠物 / 商业）
+
+    覆盖 xmind「起名」大类除宝宝起名外的全部能力：
+    kind=platform 平台名称 / game 游戏昵称 / role 虚构角色 / pet 宠物 / business 商业名称。
+    本地词库离线生成，确定性输出；LLM 未接入时 fallback_note 会如实标注。
+    """
+    service = CreativeNamingService()
+    try:
+        result = service.generate(
+            kind=request.kind,
+            keywords=request.keywords,
+            style=request.style,
+            pet_type=request.pet_type,
+            gender=request.gender,
+            industry=request.industry,
+            count=request.count,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    return CreativeResponse(**result)
 
 
 @router.get("/bazi")

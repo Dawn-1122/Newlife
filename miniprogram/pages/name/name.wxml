@@ -28,12 +28,14 @@
     <block wx:if="{{tab === 'postnatal'}}">
       <view class="form-item">
         <text class="form-label">姓氏</text>
-        <input class="form-input" placeholder="支持复姓，如 欧阳" value="{{surname}}" bindinput="onSurnameInput" />
+        <input class="form-input" value="{{surname}}" bindinput="onSurnameInput" />
       </view>
 
       <view class="form-item">
         <text class="form-label">八字分析</text>
-        <switch checked="{{useBazi}}" bindchange="onBaziSwitch" color="#16181A" />
+        <view class="switch {{useBazi ? 'on' : ''}}" bindtap="onBaziToggle">
+          <view class="switch-knob"></view>
+        </view>
       </view>
 
       <view class="form-item" wx:if="{{useBazi}}">
@@ -62,7 +64,7 @@
         <text class="form-label">字辈</text>
         <input
           class="form-input"
-          placeholder="选填，家族辈字，如：志"
+          placeholder="选填"
           value="{{generationalChar}}"
           bindinput="onGenerationalInput"
         />

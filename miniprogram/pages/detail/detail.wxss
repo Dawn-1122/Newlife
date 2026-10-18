@@ -36,10 +36,11 @@
 }
 
 .section-title {
-  font-size: 30rpx;
+  font-size: 32rpx;
   font-weight: 500;
+  letter-spacing: 2rpx;
   color: var(--ink);
-  margin-bottom: 20rpx;
+  margin-bottom: 24rpx;
   padding-left: 16rpx;
   border-left: 6rpx solid var(--ink-2);
 }
@@ -48,7 +49,7 @@
 .char-item {
   display: flex;
   gap: 24rpx;
-  padding: 20rpx 0;
+  padding: 28rpx 0;
   border-bottom: 1rpx solid var(--line);
 }
 
@@ -87,7 +88,7 @@
 }
 
 .tag {
-  font-size: 20rpx;
+  font-size: 22rpx;
   padding: 4rpx 12rpx;
   border-radius: 6rpx;
   background: var(--paper-deep);
@@ -109,10 +110,9 @@
 /* 说文解字 */
 .char-shuowen {
   margin-top: 12rpx;
-  padding: 16rpx 20rpx;
+  padding: 18rpx 20rpx;
   background: var(--paper);
   border-radius: 4rpx;
-  border-left: 4rpx solid var(--ink-2);
 }
 
 .shuowen-label {
@@ -152,7 +152,6 @@
   padding: 20rpx;
   background: var(--paper);
   border-radius: 4rpx;
-  border-left: 6rpx solid var(--ink-2);
 }
 
 .poetry-header {
@@ -381,7 +380,6 @@
   padding: 20rpx 24rpx;
   background: var(--paper);
   border-radius: 4rpx;
-  border-left: 4rpx solid var(--ink-2);
 }
 
 .ctx-title {
@@ -419,7 +417,7 @@
 }
 
 .ctx-mark {
-  font-size: 20rpx;
+  font-size: 22rpx;
   color: var(--ink-3);
   border: 1rpx solid var(--line-strong);
   border-radius: 6rpx;

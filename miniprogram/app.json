@@ -1,6 +1,8 @@
 {
   "pages": [
     "pages/home/home",
+    "pages/naming/naming",
+    "pages/creative/creative",
     "pages/more/more",
     "pages/name/name",
     "pages/wizard/wizard",

@@ -1,0 +1,107 @@
+/* 起名类型选择页 · 山水泼墨
+   起名是大类：宝宝起名 / 网名昵称 / 宠物起名 / 商业名称。
+   已实现的宝宝起名可点，其余灰显「即将上线」。 */
+
+.page {
+  min-height: 100vh;
+  padding-bottom: 60rpx;
+}
+
+/* ── 窄幅泼墨页头 ── */
+.band {
+  width: 100%;
+  overflow: hidden;
+}
+
+.band-img {
+  width: 100%;
+  display: block;
+}
+
+.head {
+  padding: 40rpx 40rpx 8rpx;
+}
+
+.head-title {
+  font-family: var(--serif);
+  font-size: 46rpx;
+  font-weight: 500;
+  letter-spacing: 8rpx;
+  color: var(--ink);
+}
+
+.head-meta {
+  margin-top: 14rpx;
+  font-size: 24rpx;
+  letter-spacing: 2rpx;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+
+/* ── 类型卡 ── */
+.types {
+  padding: 32rpx 40rpx 0;
+}
+
+.type {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 34rpx 30rpx;
+  margin-bottom: 20rpx;
+  background: var(--card);
+  border: 2rpx solid var(--line-strong);
+  border-radius: var(--r-md);
+}
+
+.type-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.type-name {
+  font-family: var(--serif);
+  font-size: 34rpx;
+  font-weight: 500;
+  letter-spacing: 4rpx;
+  color: var(--ink);
+}
+
+.type-sub {
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  letter-spacing: 1rpx;
+  color: var(--ink-3);
+}
+
+.type-arrow {
+  font-size: 32rpx;
+  line-height: 1;
+  color: var(--ink-2);
+}
+
+/* 未实现：降级灰显 */
+.type.disabled {
+  border-color: var(--line);
+}
+
+.type.disabled .type-name {
+  color: var(--ink-3);
+}
+
+.type-badge {
+  flex-shrink: 0;
+  margin-left: 20rpx;
+  font-size: 22rpx;
+  letter-spacing: 1rpx;
+  color: var(--ink-3);
+  border: 1rpx solid var(--line-strong);
+  border-radius: var(--r-sm);
+  padding: 4rpx 14rpx;
+}
+
+/* 按压反馈：可点卡片淡朱框 */
+.type-press {
+  background: var(--cinnabar-bg);
+  border-color: var(--cinnabar);
+}

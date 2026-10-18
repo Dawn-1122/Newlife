@@ -25,8 +25,8 @@ Page({
     this.setData({ gender: e.currentTarget.dataset.gender })
   },
 
-  onBaziSwitch(e) {
-    this.setData({ useBazi: e.detail.value })
+  onBaziToggle() {
+    this.setData({ useBazi: !this.data.useBazi })
   },
 
   onDateChange(e) {

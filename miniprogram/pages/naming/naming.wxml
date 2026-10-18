@@ -1,0 +1,50 @@
+<view class="page">
+  <!-- 窄幅泼墨页头 -->
+  <view class="band">
+    <image class="band-img" src="/images/ink-band.jpg" mode="widthFix" />
+  </view>
+
+  <view class="head">
+    <view class="head-title">起名</view>
+    <view class="head-meta">给宝宝、给网名、给宠物、给生意，取一个有来处的名</view>
+  </view>
+
+  <!-- 起名类型 -->
+  <view class="types">
+    <view class="type" hover-class="type-press" hover-stay-time="80"
+          bindtap="onTypeTap" data-url="/pages/name/name">
+      <view class="type-main">
+        <text class="type-name">宝宝起名</text>
+        <text class="type-sub">从生辰八字与典籍，取一个孩子的名</text>
+      </view>
+      <text class="type-arrow">›</text>
+    </view>
+
+    <view class="type" hover-class="type-press" hover-stay-time="80"
+          bindtap="onTypeTap" data-url="/pages/creative/creative?mode=netname">
+      <view class="type-main">
+        <text class="type-name">网名昵称</text>
+        <text class="type-sub">平台 · 游戏 · 角色</text>
+      </view>
+      <text class="type-arrow">›</text>
+    </view>
+
+    <view class="type" hover-class="type-press" hover-stay-time="80"
+          bindtap="onTypeTap" data-url="/pages/creative/creative?mode=pet">
+      <view class="type-main">
+        <text class="type-name">宠物起名</text>
+        <text class="type-sub">给毛孩子一个有讲头的名</text>
+      </view>
+      <text class="type-arrow">›</text>
+    </view>
+
+    <view class="type" hover-class="type-press" hover-stay-time="80"
+          bindtap="onTypeTap" data-url="/pages/creative/creative?mode=business">
+      <view class="type-main">
+        <text class="type-name">商业名称</text>
+        <text class="type-sub">店名 · 品牌 · 字号</text>
+      </view>
+      <text class="type-arrow">›</text>
+    </view>
+  </view>
+</view>

@@ -20,7 +20,9 @@
 
     <view class="form-item">
       <text class="form-label">补充生辰</text>
-      <switch checked="{{useBazi}}" bindchange="onBaziSwitch" color="#1F1F1F" />
+      <view class="switch {{useBazi ? 'on' : ''}}" bindtap="onBaziToggle">
+        <view class="switch-knob"></view>
+      </view>
     </view>
 
     <view class="form-item" wx:if="{{useBazi}}">
