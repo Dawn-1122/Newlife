@@ -330,6 +330,29 @@ def test_source_entries_in_provenance():
     assert "杜若" in titles
 
 
+def test_single_char_name_prefers_shuowen():
+    """单字名出处优先「说文解字」：字有《说文》本义时，出处用字源本义而非诗词。
+
+    单字名讲不了「成句/成对」的诗词叙事，用字源讲「本义」更贴切。
+    凡单字名的字在字库里有 shuowen 本义，其出处必须是「说文解字·某部」。
+    """
+    engine = NamingEngine()
+    for gender in ("male", "female"):
+        result = engine.generate_names(
+            surname="林", gender=gender, name_length=1,
+            max_results=40, use_bazi=False,
+        )
+        assert result["total"] > 0
+        for name in result["names"]:
+            ci = (name.get("chars_info") or [{}])[0]
+            if (ci.get("shuowen") or "").strip():
+                poetry = name.get("poetry") or {}
+                assert poetry.get("source") == "说文解字", (
+                    f"单字名「{name['given_name']}」有《说文》本义，出处应为说文解字，"
+                    f"实为 {poetry.get('source')}"
+                )
+
+
 # ── 漏斗门槛回归 ──
 
 def test_gate_cacophonous():

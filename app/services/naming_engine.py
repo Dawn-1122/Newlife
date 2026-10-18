@@ -43,6 +43,14 @@ from app.core.naming_options import (
     COHESION_RANK,
 )
 
+# 康熙部首异体归一化（单字名「说文解字」出处的 title 用主部首名，如 氵→水）。
+# 与 scripts/expand_source_shuowen.py 的 RADICAL_ALIAS 保持一致。
+_RADICAL_TITLE_ALIAS = {
+    "氵": "水", "艸": "艹", "钅": "金", "釒": "金", "灬": "火",
+    "忄": "心", "扌": "手", "亻": "人", "纟": "糸", "糹": "糸",
+    "讠": "言", "王": "玉", "罒": "网",
+}
+
 
 class NamingEngine:
     """起名核心引擎"""
@@ -774,6 +782,36 @@ class NamingEngine:
                 chars.update(entry.get("recommend_chars") or [])
             self._provenance_char_set = chars
         return self._provenance_char_set
+
+    def _shuowen_entry_for(self, ci: dict) -> Optional[dict]:
+        """单字名的「说文解字」出处（字有《说文》本义时优先使用）。
+
+        单字名讲不了「成句/成对」的诗词叙事，用字源讲「本义」更贴切。
+        构造一个轻量「说文解字·某部」条目（text=该字本义），优先于诗词出处展示。
+        """
+        shuowen = (ci.get("shuowen") or "").strip()
+        if not shuowen:
+            return None
+        raw_radical = ci.get("radical", "") or ""
+        radical = _RADICAL_TITLE_ALIAS.get(raw_radical, raw_radical) or "某"
+        fam = build_radical_family_map().get(raw_radical, "")
+        return {
+            "id": None,
+            "source": "说文解字",
+            "source_class": "经史子集",
+            "category": "字源",
+            "title": f"{radical}部",
+            "author": "许慎",
+            "dynasty": "东汉",
+            "text": shuowen,
+            "original_text": shuowen,
+            "citation": f"《说文解字·{radical}部》",
+            "recommend_chars": [ci["char"]],
+            "imagery": [fam] if fam else [],
+            "scene": "",
+            "emotion": "中性",
+            "gender": "中",
+        }
 
     def _char_affinity(
         self,
@@ -1960,8 +1998,14 @@ class NamingEngine:
                     if given_name in seen_names:
                         continue
                     seen_names.add(given_name)
+                    # 单字名出处优先「说文解字」：字有《说文》本义时用字源本义作出处
+                    # （比硬套诗词更贴切），否则退回原诗词/字源条目。
+                    # 先出处模式（source_classes）下尊重用户指定，不强行覆盖。
+                    entry_for_name = entry
+                    if not source_wanted:
+                        entry_for_name = self._shuowen_entry_for(ci) or entry
                     name_data = self._evaluate_name(
-                        surname, given_name, [ci], entry, bazi_result
+                        surname, given_name, [ci], entry_for_name, bazi_result
                     )
                     if name_data:
                         emit(name_data, tier)
@@ -2106,6 +2150,10 @@ class NamingEngine:
                         if name_length == 2
                         else None
                     )
+                    if entry is None:
+                        # 单字名：无先出处约束时，优先「说文解字」字源（字有《说文》本义更贴切）
+                        if name_length == 1 and not source_wanted and chars_info:
+                            entry = self._shuowen_entry_for(chars_info[0])
                     if entry is None:
                         entry = self._find_best_entry(given_name, chars_info, gender)
                     if entry is None and chars_info:
