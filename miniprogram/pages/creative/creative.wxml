@@ -43,8 +43,21 @@
       </picker>
     </view>
 
-    <!-- 虚拟角色：小说类型 + 性格特征 + 自定义描述 -->
+    <!-- 虚拟角色：性别 + 小说类型 + 性格特征 + 自定义描述 -->
     <block wx:if="{{mode === 'netname' && subKind === 'role'}}">
+      <view class="form-item form-item-col">
+        <text class="form-label">角色性别</text>
+        <view class="chip-row-wrap">
+          <view
+            wx:for="{{roleGenders}}"
+            wx:key="code"
+            class="chip {{roleGender === item.code ? 'active' : ''}}"
+            bindtap="onRoleGenderTap"
+            data-code="{{item.code}}"
+          >{{item.name}}</view>
+        </view>
+      </view>
+
       <view class="form-item form-item-col">
         <text class="form-label">小说类型</text>
         <view class="chip-row-wrap">

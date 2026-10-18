@@ -45,7 +45,12 @@ Page({
     industryNames: api.INDUSTRY_OPTIONS.map(i => i.name),
     industryIndex: 0,
 
-    // 虚拟角色：小说类型 + 性格特征 + 自定义描述（AI）
+    // 虚拟角色：性别 + 小说类型 + 性格特征 + 自定义描述（AI）
+    roleGenders: [
+      { code: 'male', name: '男' },
+      { code: 'female', name: '女' }
+    ],
+    roleGender: '', // 选中性别 code（单选，再点取消；空=不限）
     genres: api.NOVEL_GENRES,
     traits: api.CHARACTER_TRAITS,
     genre: '',      // 选中的小说类型 code（单选，再点取消）
@@ -106,6 +111,11 @@ Page({
     this.setData({ genre: this.data.genre === code ? '' : code })
   },
 
+  onRoleGenderTap(e) {
+    const code = e.currentTarget.dataset.code
+    this.setData({ roleGender: this.data.roleGender === code ? '' : code })
+  },
+
   onTraitTap(e) {
     const code = e.currentTarget.dataset.code
     this.setData({ trait: this.data.trait === code ? '' : code })
@@ -153,6 +163,7 @@ Page({
       params.kind = d.subKind
       params.keywords = (d.keywords || '').trim()
       if (d.subKind === 'role') {
+        if (d.roleGender) params.gender = d.roleGender
         if (d.genre) params.genre = d.genre
         if (d.trait) params.trait = d.trait
       }
@@ -214,6 +225,7 @@ Page({
       description: (d.customDesc || '').trim(),
       count: 18
     }
+    if (d.roleGender) params.gender = d.roleGender
     if (d.genre) params.genre = d.genre
     if (d.trait) params.trait = d.trait
 

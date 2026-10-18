@@ -77,6 +77,19 @@ CREATIVE_BANKS = {
         "望舒", "青黛", "未晞", "扶苏", "采薇", "南絮", "芷若", "听澜", "疏影",
         "晚棠", "知微", "清和", "亦舒", "怀瑾", "叙白", "鹤归", "砚秋",
     ],
+    # 按性别分库（gender 指定时用）；未指定回退中性 role_given
+    "role_given_male": [
+        "砚白", "昭默", "青梧", "之恒", "云鹤", "景行", "修远", "承砚", "明枢",
+        "怀瑾", "叙白", "鹤归", "砚秋", "凌云", "承泽", "景铄", "泽川", "亦清",
+    ],
+    "role_given_female": [
+        "青黛", "未晞", "扶苏", "采薇", "南絮", "芷若", "听澜", "疏影",
+        "晚棠", "知微", "清和", "亦舒", "望舒", "若汐", "云舒", "初雪",
+        "清欢", "落微", "凝霜",
+    ],
+    # 单字性别气质字（与类型核 / 性格字组合成三字名，突出男女气质）
+    "role_male_chars": ["昭", "砚", "鹤", "岳", "辰", "衡", "启", "承", "铭", "朔", "毅", "峥", "凌", "川", "泽", "峻"],
+    "role_female_chars": ["黛", "薇", "棠", "芷", "疏", "汐", "璃", "婉", "清", "芙", "笙", "瑶", "柔", "雪", "初", "凝"],
     "role_codes": [
         "守阈者", "契文使", "夜巡·零", "静默·观测", "归墟引渡人", "燃灯者",
         "摘星人", "织梦师", "摆渡人", "观棋者", "守夜人", "解铃人", "燃烛", "拾光者",
@@ -481,13 +494,13 @@ class CreativeNamingService:
         g = self._find(NOVEL_GENRES, genre)
         t = self._find(CHARACTER_TRAITS, trait)
 
-        # 有类型/性格时，走「类型核 × 性格字」组合
+        # 有类型/性格时，走「类型核 × 性格字」组合（性别字融入）
         if g or t:
-            return self._role_typed(toks, g, t, count, seed)
+            return self._role_typed(toks, g, t, gender, count, seed)
 
-        # 无类型/性格：退回原「姓+名 + 代号」逻辑
+        # 无类型/性格：退回原「姓+名 + 代号」逻辑，按性别选名库
         surnames = _shuffled(banks["role_surnames"], seed)
-        givens = _shuffled(banks["role_given"], seed + 1)
+        givens = self._role_givens(gender, seed + 1)
         out = []
         for i in range(min(count, len(surnames))):
             out.append(f"{surnames[i]}{givens[i % len(givens)]}")
@@ -499,19 +512,48 @@ class CreativeNamingService:
             out.append(code)
         return self._dedup(out, count)
 
-    def _role_typed(self, toks, genre, trait, count, seed) -> list[str]:
-        """类型/性格驱动的虚拟人物起名：类型核字 × 性格气质字 → 姓+名 与 字号。"""
+    @staticmethod
+    def _role_givens(gender, seed):
+        """按性别选名库（未指定回退中性 role_given）。"""
+        banks = CREATIVE_BANKS
+        if gender == "male":
+            pool = banks["role_given_male"]
+        elif gender == "female":
+            pool = banks["role_given_female"]
+        else:
+            pool = banks["role_given"]
+        return _shuffled(pool, seed)
+
+    @staticmethod
+    def _gender_chars(gender):
+        """指定性别时的单字气质字（未指定返回空，不参与组合）。"""
+        banks = CREATIVE_BANKS
+        if gender == "male":
+            return banks["role_male_chars"]
+        if gender == "female":
+            return banks["role_female_chars"]
+        return []
+
+    def _role_typed(self, toks, genre, trait, gender, count, seed) -> list[str]:
+        """类型/性格驱动的虚拟人物起名：类型核字 × 性格气质字 → 姓+名 与 字号（含性别字）。"""
         banks = CREATIVE_BANKS
         surnames = _shuffled(banks["role_surnames"], seed)
         g_nuclei = (genre or {}).get("nuclei", [])
         t_atoms = (trait or {}).get("atoms", [])
+        gender_chars = self._gender_chars(gender)
         out = []
 
         if g_nuclei and t_atoms:
-            # 主输出：姓 + 类型核 + 性格字（如「沈云白」），正反字序各出一组
             gn = _shuffled(g_nuclei, seed + 3)
             ta = _shuffled(t_atoms, seed + 4)
             n = min(len(surnames), len(gn), len(ta))
+            # 性别字组合优先（最贴性别）：姓 + 类型核 + 性别字 / 姓 + 性格字 + 性别字（如「沈云衡」「沈白黛」）
+            if gender_chars:
+                gc = _shuffled(gender_chars, seed + 7)
+                for i in range(n):
+                    out.append(f"{surnames[i]}{gn[i]}{gc[i % len(gc)]}")
+                    out.append(f"{surnames[i]}{ta[i]}{gc[i % len(gc)]}")
+            # 类型核 × 性格字（正反字序各出一组，如「沈云白」）
             for i in range(n):
                 out.append(f"{surnames[i]}{gn[i]}{ta[i]}")
                 out.append(f"{surnames[i]}{ta[i]}{gn[i]}")
@@ -520,10 +562,15 @@ class CreativeNamingService:
                 for tch in _shuffled(t_atoms, seed + 6, 4):
                     out.append(f"{gch}{tch}")
         elif g_nuclei:
-            # 仅类型：姓 + 类型核 + 类型核（双核错位，如「沈玄昊」）
             gn = _shuffled(g_nuclei, seed + 3)
             gn2 = _shuffled(g_nuclei, seed + 4)
             n = min(len(surnames), len(gn), len(gn2))
+            # 性别字组合优先：姓 + 类型核 + 性别字（如「沈玄衡」）
+            if gender_chars:
+                gc = _shuffled(gender_chars, seed + 7)
+                for i in range(n):
+                    out.append(f"{surnames[i]}{gn[i]}{gc[i % len(gc)]}")
+            # 仅类型：姓 + 类型核 + 类型核（双核错位，如「沈玄昊」）
             for i in range(n):
                 if gn[i] != gn2[i]:
                     out.append(f"{surnames[i]}{gn[i]}{gn2[i]}")
@@ -532,10 +579,15 @@ class CreativeNamingService:
                     if gch != gch2:
                         out.append(f"{gch}{gch2}")
         elif t_atoms:
-            # 仅性格：姓 + 性格字 + 性格字（如「沈寒素」）
             ta = _shuffled(t_atoms, seed + 3)
             ta2 = _shuffled(t_atoms, seed + 4)
             n = min(len(surnames), len(ta), len(ta2))
+            # 性别字组合优先：姓 + 性格字 + 性别字（如「沈寒黛」）
+            if gender_chars:
+                gc = _shuffled(gender_chars, seed + 7)
+                for i in range(n):
+                    out.append(f"{surnames[i]}{ta[i]}{gc[i % len(gc)]}")
+            # 仅性格：姓 + 性格字 + 性格字（如「沈寒素」）
             for i in range(n):
                 if ta[i] != ta2[i]:
                     out.append(f"{surnames[i]}{ta[i]}{ta2[i]}")

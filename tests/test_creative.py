@@ -112,6 +112,54 @@ def test_role_genre_only_dedup(svc):
     assert len(names) == len(set(names)), "类型驱动结果出现重复名字"
 
 
+def test_role_gender_distinguishes_names(svc):
+    """性别应参与角色起名：男/女产出不同。"""
+    male = [n["name"] for n in svc.generate(
+        kind="role", genre="xianxia", trait="qingleng", gender="male", count=12
+    )["names"]]
+    female = [n["name"] for n in svc.generate(
+        kind="role", genre="xianxia", trait="qingleng", gender="female", count=12
+    )["names"]]
+    assert male != female, "男/女产出完全相同，性别未参与区分"
+
+
+def test_role_gender_chars_in_names(svc):
+    """指定性别时，产出名应含对应性别气质字。"""
+    from app.services.creative_service import CREATIVE_BANKS
+    male_chars = set(CREATIVE_BANKS["role_male_chars"])
+    female_chars = set(CREATIVE_BANKS["role_female_chars"])
+    male = svc.generate(kind="role", genre="xianxia", trait="qingleng", gender="male", count=20)
+    female = svc.generate(kind="role", genre="xianxia", trait="qingleng", gender="female", count=20)
+    assert any(any(c in male_chars for c in n["name"]) for n in male["names"]), \
+        "男名未含男性气质字"
+    assert any(any(c in female_chars for c in n["name"]) for n in female["names"]), \
+        "女名未含女性气质字"
+
+
+def test_role_gender_deterministic(svc):
+    """同性别 + 同输入必须同输出（性别参与种子，不破坏确定性）。"""
+    a = svc.generate(kind="role", genre="kehuan", gender="female", count=10)
+    b = svc.generate(kind="role", genre="kehuan", gender="female", count=10)
+    assert [n["name"] for n in a["names"]] == [n["name"] for n in b["names"]]
+
+
+def test_role_llm_passes_gender(svc, monkeypatch):
+    """LLM 路径也应把性别传进 prompt（约束里带「男/女」）。"""
+    from app.services import creative_service as cs
+    monkeypatch.setattr(cs.settings, "LLM_API_KEY", "sk-test")
+    captured = {}
+
+    async def fake_chat(self, messages, temperature, max_tokens, json_mode):
+        captured["prompt"] = messages[-1]["content"]
+        return {"names": [{"name": "沈云衡", "reason": "仙侠男"}]}
+    monkeypatch.setattr(cs.LLMService, "chat", fake_chat)
+
+    asyncio.run(svc.generate_llm(
+        description="修仙剑客", genre="xianxia", gender="male", count=3
+    ))
+    assert "角色性别：男" in captured["prompt"]
+
+
 # ── 虚拟人物：LLM 自定义描述（配置驱动） ──
 
 def test_llm_fallback_when_unconfigured(svc, monkeypatch):
