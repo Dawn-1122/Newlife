@@ -276,6 +276,8 @@ class CreativeRequest(BaseModel):
     gender: Optional[str] = Field(None, pattern="^(male|female)$",
                                   description="性别（kind=role/pet 时用）: male|female")
     industry: Optional[str] = Field(None, description="行业 code（kind=business 时用，见 INDUSTRY_WUXING）")
+    genre: Optional[str] = Field(None, description="小说类型 code（kind=role 时用，见 NOVEL_GENRES）")
+    trait: Optional[str] = Field(None, description="性格特征 code（kind=role 时用，见 CHARACTER_TRAITS）")
     count: int = Field(12, ge=1, le=30, description="返回名字数量")
 
 
@@ -291,4 +293,24 @@ class CreativeResponse(BaseModel):
     kind: str
     total: int
     names: list[CreativeNameResult] = Field(default_factory=list)
+    fallback_note: Optional[str] = None
+
+
+class CreativeLLMRequest(BaseModel):
+    """创意起名 LLM 请求（虚拟人物自定义描述，看广告解锁后调用）"""
+    description: str = Field(..., min_length=1, max_length=300,
+                             description="自定义描述：人物设定 / 世界观 / 关键词等自由文本")
+    genre: Optional[str] = Field(None, description="小说类型 code（kind=role 时用，见 NOVEL_GENRES）")
+    trait: Optional[str] = Field(None, description="性格特征 code（kind=role 时用，见 CHARACTER_TRAITS）")
+    gender: Optional[str] = Field(None, pattern="^(male|female)$", description="角色性别")
+    count: int = Field(12, ge=1, le=20, description="返回名字数量")
+
+
+class CreativeLLMResponse(BaseModel):
+    """创意起名 LLM 响应（source=llm 为 AI 生成，local 为本地词库降级）"""
+    source: str = Field("llm", description="llm=AI 生成 / local=本地词库降级")
+    total: int
+    names: list[CreativeNameResult] = Field(default_factory=list)
+    provider: Optional[str] = None
+    model: Optional[str] = None
     fallback_note: Optional[str] = None

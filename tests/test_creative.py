@@ -1,12 +1,14 @@
-"""创意起名服务测试（网名昵称 / 宠物 / 商业）。
+"""创意起名服务测试（网名昵称 / 宠物 / 商业 / 虚拟人物）。
 
 覆盖：
 - 5 类 kind 都能产出结构化结果（name/tag/reason）
 - 确定性：同输入同输出（刷新不跳变）
 - 数量钳制、去重、关键词注入、宠物/行业差异化
+- 虚拟人物：类型/性格驱动 + LLM 自定义描述（未配置降级本地）
 - 非法 kind 抛 ValueError；HTTP 层非法 kind 422
 """
 
+import asyncio
 import json
 import shutil
 import subprocess
@@ -94,6 +96,74 @@ def test_invalid_kind_raises(svc):
         svc.generate(kind="nope")
 
 
+# ── 虚拟人物：类型/性格驱动 ──
+
+def test_role_genre_trait_drives_names(svc):
+    """类型+性格驱动的虚拟人物起名：应产三字「姓+核+字」名，reason 带类型/性格名。"""
+    r = svc.generate(kind="role", genre="xianxia", trait="qingleng", count=12)
+    names = [n["name"] for n in r["names"]]
+    assert any(len(n) == 3 for n in names), f"缺少三字名: {names}"
+    assert any("仙侠" in n["reason"] and "清冷" in n["reason"] for n in r["names"])
+
+
+def test_role_genre_only_dedup(svc):
+    r = svc.generate(kind="role", genre="moshi", count=20)
+    names = [n["name"] for n in r["names"]]
+    assert len(names) == len(set(names)), "类型驱动结果出现重复名字"
+
+
+# ── 虚拟人物：LLM 自定义描述（配置驱动） ──
+
+def test_llm_fallback_when_unconfigured(svc, monkeypatch):
+    """LLM 未配置时降级本地词库，source=local 且附 fallback_note。"""
+    from app.services import creative_service as cs
+    monkeypatch.setattr(cs.settings, "LLM_API_KEY", "")
+    r = asyncio.run(svc.generate_llm(
+        description="修仙界落难女剑仙", genre="xianxia", trait="qingleng", count=8
+    ))
+    assert r["source"] == "local"
+    assert r["total"] == 8
+    assert r["provider"] is None and r["model"] is None
+    assert "本地词库" in (r["fallback_note"] or "")
+    for n in r["names"]:
+        assert n["name"].strip() and n["tag"] == KIND_NAMES["role"] and n["reason"]
+
+
+def test_llm_configured_parses_names(svc, monkeypatch):
+    """LLM 配置后调 chat（json_mode），正常解析为结构化名字。"""
+    from app.services import creative_service as cs
+    monkeypatch.setattr(cs.settings, "LLM_API_KEY", "sk-test")
+
+    async def fake_chat(self, messages, temperature, max_tokens, json_mode):
+        assert json_mode is True
+        return {"names": [
+            {"name": "沈云白", "reason": "仙侠清冷"},
+            {"name": "顾听澜", "reason": "温润如玉"},
+        ]}
+    monkeypatch.setattr(cs.LLMService, "chat", fake_chat)
+
+    r = asyncio.run(svc.generate_llm(
+        description="修仙界女剑仙", genre="xianxia", trait="qingleng", count=5
+    ))
+    assert r["source"] == "llm"
+    assert [n["name"] for n in r["names"]] == ["沈云白", "顾听澜"]
+    assert r["fallback_note"] is None
+
+
+def test_llm_empty_result_falls_back(svc, monkeypatch):
+    """LLM 返回空/垃圾时降级本地词库。"""
+    from app.services import creative_service as cs
+    monkeypatch.setattr(cs.settings, "LLM_API_KEY", "sk-test")
+
+    async def bad_chat(self, messages, temperature, max_tokens, json_mode):
+        return {"names": []}
+    monkeypatch.setattr(cs.LLMService, "chat", bad_chat)
+
+    r = asyncio.run(svc.generate_llm(description="修仙", genre="xianxia", count=6))
+    assert r["source"] == "local"
+    assert r["total"] == 6
+
+
 # ── HTTP 层 ──
 
 def test_creative_endpoint_ok():
@@ -115,6 +185,32 @@ def test_creative_endpoint_invalid_kind_422():
     from app.main import app
     client = TestClient(app)
     resp = client.post("/api/v1/creative/generate", json={"kind": "nope"})
+    assert resp.status_code == 422
+
+
+def test_creative_llm_endpoint_ok(monkeypatch):
+    """/creative/llm 未配置 LLM 时应 200 + source=local 降级。"""
+    from app.services import creative_service as cs
+    monkeypatch.setattr(cs.settings, "LLM_API_KEY", "")
+    from fastapi.testclient import TestClient
+    from app.main import app
+    client = TestClient(app)
+    resp = client.post("/api/v1/creative/llm", json={
+        "description": "赛博朋克义体医生", "genre": "kehuan", "trait": "chenwen", "count": 5,
+    })
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["source"] == "local"
+    assert data["total"] == 5
+    assert len(data["names"]) == 5
+
+
+def test_creative_llm_endpoint_missing_description_422():
+    """/creative/llm 缺 description 时 422。"""
+    from fastapi.testclient import TestClient
+    from app.main import app
+    client = TestClient(app)
+    resp = client.post("/api/v1/creative/llm", json={"count": 5})
     assert resp.status_code == 422
 
 

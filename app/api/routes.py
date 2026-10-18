@@ -15,6 +15,7 @@ from app.schemas.schemas import (
     SourceCharsRequest, SourceCharsResponse,
     PickableCharsRequest, PickableCharsResponse,
     CreativeRequest, CreativeResponse,
+    CreativeLLMRequest, CreativeLLMResponse,
 )
 from app.services.naming_engine import NamingEngine
 from app.services.char_database import CharDatabase
@@ -393,11 +394,32 @@ async def creative_generate(request: CreativeRequest):
             pet_type=request.pet_type,
             gender=request.gender,
             industry=request.industry,
+            genre=request.genre,
+            trait=request.trait,
             count=request.count,
         )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     return CreativeResponse(**result)
+
+
+@router.post("/creative/llm", response_model=CreativeLLMResponse)
+async def creative_llm(request: CreativeLLMRequest):
+    """
+    创意起名 · AI 生成（虚拟人物自定义描述）
+
+    用户输入自定义设定描述，看广告解锁后调用。调用 LLM 生成贴合设定的角色名；
+    LLM 未配置（或调用失败）时降级本地词库，source="local" 并附 fallback_note。
+    """
+    service = CreativeNamingService()
+    result = await service.generate_llm(
+        description=request.description,
+        genre=request.genre,
+        trait=request.trait,
+        gender=request.gender,
+        count=request.count,
+    )
+    return CreativeLLMResponse(**result)
 
 
 @router.get("/bazi")

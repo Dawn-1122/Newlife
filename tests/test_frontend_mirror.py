@@ -20,6 +20,7 @@ from app.core.naming_options import (
     SOURCE_CLASSES,
     STYLE_OPTIONS,
 )
+from app.services.creative_service import CHARACTER_TRAITS, NOVEL_GENRES
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 API_JS = PROJECT_ROOT / "miniprogram" / "utils" / "api.js"
@@ -158,3 +159,36 @@ def test_schema_meaning_description_lists_all_codes():
     assert expected in src, (
         f"schemas.py 的 meanings 描述串未列全 code，应为 {expected}"
     )
+
+
+# ── 创意起名（虚拟人物）：小说类型 + 性格特征枚举镜像 ──
+
+def _load_creative_enums() -> dict:
+    if not _NODE:
+        pytest.skip("未找到 node，跳过前端枚举镜像测试")
+    script = (
+        "const api = require(process.argv[1]);"
+        "process.stdout.write(JSON.stringify({"
+        "  genres: api.NOVEL_GENRES,"
+        "  traits: api.CHARACTER_TRAITS"
+        "}));"
+    )
+    out = subprocess.run(
+        [_NODE, "-e", script, str(API_JS)],
+        capture_output=True, text=True, timeout=30, check=True,
+    )
+    return json.loads(out.stdout)
+
+
+def test_novel_genres_mirror_backend():
+    frontend = _load_creative_enums()["genres"]
+    assert [(g["code"], g["name"]) for g in frontend] == [
+        (g["code"], g["name"]) for g in NOVEL_GENRES
+    ], "api.js 的 NOVEL_GENRES 与后端不一致"
+
+
+def test_character_traits_mirror_backend():
+    frontend = _load_creative_enums()["traits"]
+    assert [(t["code"], t["name"]) for t in frontend] == [
+        (t["code"], t["name"]) for t in CHARACTER_TRAITS
+    ], "api.js 的 CHARACTER_TRAITS 与后端不一致"

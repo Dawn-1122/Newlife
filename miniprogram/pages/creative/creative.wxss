@@ -127,6 +127,47 @@
   color: var(--paper);
 }
 
+/* ── 虚拟角色分支：纵向表单 + 可换行标签 ── */
+.form-item-col {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.form-item-col .form-label {
+  width: auto;
+  margin-bottom: 16rpx;
+}
+
+.chip-row-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.chip-row-wrap .chip {
+  margin: 0 14rpx 14rpx 0;
+}
+
+.form-textarea {
+  width: 100%;
+  min-height: 120rpx;
+  padding: 20rpx;
+  box-sizing: border-box;
+  font-size: 28rpx;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--card);
+  border: 1rpx solid var(--line);
+  border-radius: var(--r-sm);
+}
+
+.form-hint {
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  letter-spacing: 1rpx;
+  color: var(--ochre);
+}
+
 /* ── 主行动 ── */
 .foot {
   padding: 48rpx 40rpx 0;

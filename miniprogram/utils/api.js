@@ -165,6 +165,55 @@ function creativeGenerate(params) {
   return request('/creative/generate', 'POST', params)
 }
 
+// 小说类型枚举（与后端 NOVEL_GENRES 镜像；code + name，虚拟人物起名用）
+const NOVEL_GENRES = [
+  { code: 'xuanhuan', name: '玄幻' },
+  { code: 'xianxia', name: '仙侠' },
+  { code: 'wuxia', name: '武侠' },
+  { code: 'dushi', name: '都市' },
+  { code: 'kehuan', name: '科幻' },
+  { code: 'lishi', name: '历史' },
+  { code: 'junshi', name: '军事' },
+  { code: 'xuanyi', name: '悬疑灵异' },
+  { code: 'youxi', name: '游戏竞技' },
+  { code: 'erciyuan', name: '二次元' },
+  { code: 'yanqing', name: '言情' },
+  { code: 'qihuan', name: '奇幻' },
+  { code: 'moshi', name: '末世' }
+]
+
+// 性格特征枚举（与后端 CHARACTER_TRAITS 镜像；code + name，虚拟人物起名用）
+const CHARACTER_TRAITS = [
+  { code: 'qingleng', name: '清冷' },
+  { code: 'wenrun', name: '温润' },
+  { code: 'fuhei', name: '腹黑' },
+  { code: 'aojiao', name: '傲娇' },
+  { code: 'yangguang', name: '阳光' },
+  { code: 'lengjun', name: '冷峻' },
+  { code: 'wenrou', name: '温柔' },
+  { code: 'satuo', name: '洒脱' },
+  { code: 'guao', name: '孤傲' },
+  { code: 'chenwen', name: '沉稳' },
+  { code: 'rexue', name: '热血' },
+  { code: 'jiaoxie', name: '狡黠' },
+  { code: 'jianyi', name: '坚毅' },
+  { code: 'lanyang', name: '慵懒' },
+  { code: 'shenmi', name: '神秘' }
+]
+
+// 激励视频广告位（配置驱动）：填入微信小程序流量主的广告位 ID 后，
+// 「看广告解锁 AI 生成」才生效；留空表示未配置，前端提示「广告位未配置」。
+const REWARDED_AD_UNIT_ID = ''
+
+/**
+ * 创意起名 · AI 生成（虚拟人物自定义描述，看广告解锁后调用）
+ *
+ * 后端 LLM 未配置时会降级本地词库（source="local"），并附 fallback_note。
+ */
+function llmGenerate(params) {
+  return request('/creative/llm', 'POST', params)
+}
+
 // 行业枚举（与后端 INDUSTRY_WUXING 镜像，商业起名 picker 用；code 即后端行业 code）
 const INDUSTRY_OPTIONS = [
   { code: 'tech', name: '互联网 / 科技' },
@@ -239,6 +288,7 @@ module.exports = {
   prenatal,
   analyzeName,
   creativeGenerate,
+  llmGenerate,
   recommendChars,
   pickableChars,
   recommendSources,
@@ -256,5 +306,8 @@ module.exports = {
   DEFAULT_RANGE_DAYS,
   CREATIVE_KINDS,
   CREATIVE_KIND_NAMES,
-  INDUSTRY_OPTIONS
+  INDUSTRY_OPTIONS,
+  NOVEL_GENRES,
+  CHARACTER_TRAITS,
+  REWARDED_AD_UNIT_ID
 }

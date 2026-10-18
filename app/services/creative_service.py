@@ -21,7 +21,9 @@ import random
 import re
 from typing import Optional
 
+from app.core.config import settings
 from app.core.naming_options import INDUSTRY_WUXING
+from app.services.llm_service import LLMError, LLMService
 
 # 创意起名 kind 枚举（前端 api.js 需镜像）
 CREATIVE_KINDS = ("platform", "game", "role", "pet", "business")
@@ -110,6 +112,45 @@ CREATIVE_BANKS = {
     ],
 }
 
+# ── 虚拟人物：小说类型 + 性格特征（单一事实来源，前端 api.js 镜像） ──
+# 小说类型参考主流网络小说平台（起点/番茄/晋江）分类；nuclei 为该类型「世界观底色」意象核字，
+# 用于与性格气质字组合成「姓 + 名」。整体遵循积极、雅致、不碰低俗/宗教/历史原型专名。
+
+NOVEL_GENRES = [
+    {"code": "xuanhuan", "name": "玄幻", "nuclei": ["玄", "昊", "辰", "苍", "渊", "冥", "荒", "穹", "曜", "焱", "霆", "霄"]},
+    {"code": "xianxia", "name": "仙侠", "nuclei": ["剑", "云", "仙", "灵", "道", "凌", "羽", "霜", "御", "青", "星", "月"]},
+    {"code": "wuxia", "name": "武侠", "nuclei": ["侠", "风", "刀", "剑", "义", "萧", "尘", "岳", "浪", "客", "孤", "影"]},
+    {"code": "dushi", "name": "都市", "nuclei": ["城", "澜", "景", "川", "墨", "泽", "宁", "楚", "然", "熙", "凡", "尘"]},
+    {"code": "kehuan", "name": "科幻", "nuclei": ["星", "宇", "光", "时", "空", "辰", "恒", "纪", "极", "维", "遥", "冥"]},
+    {"code": "lishi", "name": "历史", "nuclei": ["谋", "策", "昭", "承", "启", "弘", "渊", "邦", "衡", "铭", "肃", "徵"]},
+    {"code": "junshi", "name": "军事", "nuclei": ["锋", "锐", "戈", "岳", "征", "铁", "城", "疆", "骁", "策", "峙", "战"]},
+    {"code": "xuanyi", "name": "悬疑灵异", "nuclei": ["幽", "冥", "晦", "谜", "隐", "缄", "夜", "雾", "玄", "寂", "墨", "岚"]},
+    {"code": "youxi", "name": "游戏竞技", "nuclei": ["曜", "锋", "决", "燃", "竞", "岚", "刃", "飒", "弈", "胜", "驰", "锐"]},
+    {"code": "erciyuan", "name": "二次元", "nuclei": ["樱", "星", "梦", "璃", "汐", "千", "奈", "月", "光", "音", "晓", "瞳"]},
+    {"code": "yanqing", "name": "言情", "nuclei": ["瑾", "婉", "思", "慕", "柔", "汐", "念", "暖", "霖", "安", "遥", "初"]},
+    {"code": "qihuan", "name": "奇幻", "nuclei": ["灵", "晶", "焰", "霜", "影", "幻", "秘", "曜", "幽", "星", "辉", "翼"]},
+    {"code": "moshi", "name": "末世", "nuclei": ["烬", "荒", "孤", "朔", "寂", "霜", "刃", "夜", "霆", "野", "铁", "风"]},
+]
+
+# 性格特征（人物气质）；atoms 为气质字，与类型核字组合成「姓 + 名」。
+CHARACTER_TRAITS = [
+    {"code": "qingleng", "name": "清冷", "atoms": ["白", "寒", "素", "霜", "雪", "月", "冰", "寂"]},
+    {"code": "wenrun", "name": "温润", "atoms": ["玉", "暖", "和", "润", "熙", "沐", "柔", "安"]},
+    {"code": "fuhei", "name": "腹黑", "atoms": ["墨", "玄", "暗", "策", "谋", "隐", "藏", "深"]},
+    {"code": "aojiao", "name": "傲娇", "atoms": ["骄", "傲", "矜", "倔", "颖", "俏", "烈"]},
+    {"code": "yangguang", "name": "阳光", "atoms": ["阳", "明", "朗", "灿", "曜", "晴", "燃", "暖"]},
+    {"code": "lengjun", "name": "冷峻", "atoms": ["冷", "峻", "寒", "肃", "凛", "锐", "锋", "峭"]},
+    {"code": "wenrou", "name": "温柔", "atoms": ["柔", "婉", "软", "和", "暖", "绵", "静", "安"]},
+    {"code": "satuo", "name": "洒脱", "atoms": ["逸", "纵", "舒", "放", "云", "风", "野", "遥"]},
+    {"code": "guao", "name": "孤傲", "atoms": ["孤", "傲", "独", "冷", "寒", "霜", "影", "寂"]},
+    {"code": "chenwen", "name": "沉稳", "atoms": ["沉", "稳", "恒", "厚", "笃", "深", "渊", "岳"]},
+    {"code": "rexue", "name": "热血", "atoms": ["燃", "烈", "焰", "炽", "勇", "战", "锋", "昂"]},
+    {"code": "jiaoxie", "name": "狡黠", "atoms": ["黠", "灵", "慧", "俏", "机", "敏", "巧", "颖"]},
+    {"code": "jianyi", "name": "坚毅", "atoms": ["坚", "毅", "韧", "刚", "恒", "笃", "铮", "铁"]},
+    {"code": "lanyang", "name": "慵懒", "atoms": ["慵", "闲", "缓", "迟", "眠", "松", "宁"]},
+    {"code": "shenmi", "name": "神秘", "atoms": ["玄", "幽", "隐", "秘", "冥", "邃", "谜", "岚"]},
+]
+
 # 商业：行业 → 取名侧重点（用于 reason 文案，不参与硬过滤）
 INDUSTRY_HINT = {
     "tech": "取「新、锐、通达」之意，利科技感",
@@ -127,6 +168,13 @@ INDUSTRY_HINT = {
     "trade": "取「通、达、顺」之意，利流通往来",
     "tourism": "取「游、悦、和」之意，利宾至如归",
 }
+
+
+# ── LLM 增强（虚拟人物自定义描述，看广告解锁） ──
+_ROLE_LLM_SYSTEM = (
+    "你是资深网络小说人设命名专家，擅长为虚构角色起「有来历、可展开」的中文名。"
+    "只输出合法 JSON，不输出任何解释文字。"
+)
 
 
 def _seed(*parts) -> int:
@@ -190,6 +238,11 @@ def _reason(kind, name, ctx) -> str:
     if kind == "game":
         return "意象与机制语汇交织，辨识度高、社区二创友好"
     if kind == "role":
+        g_name = ctx.get("genre_name")
+        t_name = ctx.get("trait_name")
+        if g_name or t_name:
+            flavor = " · ".join(p for p in (g_name, t_name) if p)
+            return f"{flavor}底色下的名字：读来有来历，可作人设展开的支点"
         return "名中有戏：读来有来历，可作人设展开的支点"
     if kind == "pet":
         pt = ctx.get("pet_type")
@@ -218,14 +271,20 @@ class CreativeNamingService:
         pet_type: Optional[str] = None,
         gender: Optional[str] = None,
         industry: Optional[str] = None,
+        genre: Optional[str] = None,
+        trait: Optional[str] = None,
         count: int = 12,
     ) -> dict:
         if kind not in CREATIVE_KINDS:
             raise ValueError(f"kind 仅支持 {CREATIVE_KINDS}")
 
         toks = _tokenize(keywords)
-        seed = _seed(kind, keywords, pet_type, gender, industry)
-        names = self._dispatch(kind, toks, pet_type, gender, industry, count, seed)
+        seed = _seed(kind, keywords, pet_type, gender, industry, genre, trait)
+        names = self._dispatch(kind, toks, pet_type, gender, industry, genre, trait, count, seed)
+
+        # 类型/性格的中文名（reason 文案用）
+        genre_name = self._genre_name(genre) if genre else ""
+        trait_name = self._trait_name(trait) if trait else ""
 
         return {
             "kind": kind,
@@ -238,6 +297,8 @@ class CreativeNamingService:
                         "keywords": toks,
                         "pet_type": pet_type,
                         "industry": industry,
+                        "genre_name": genre_name,
+                        "trait_name": trait_name,
                     }),
                 }
                 for n in names
@@ -246,18 +307,155 @@ class CreativeNamingService:
             "fallback_note": "当前为本地词库生成（未接入大模型）",
         }
 
-    def _dispatch(self, kind, toks, pet_type, gender, industry, count, seed) -> list[str]:
+    async def generate_llm(
+        self,
+        description: str,
+        genre: Optional[str] = None,
+        trait: Optional[str] = None,
+        gender: Optional[str] = None,
+        count: int = 12,
+    ) -> dict:
+        """
+        自定义描述 → LLM 生成虚拟人物名（看广告解锁后调用）。
+
+        LLM 未配置（settings.LLM_API_KEY 为空）或调用失败时，降级为本地词库生成，
+        并以 source="local" 标注；成功时 source="llm"，附 provider/model。
+
+        返回结构统一为：
+            {"source", "total", "names": [{"name","tag","reason"}], "provider", "model", "fallback_note"}
+        """
+        genre_name = self._genre_name(genre)
+        trait_name = self._trait_name(trait)
+
+        # LLM 未配置：降级本地词库（尊重类型/性格；描述仅作随机种子）
+        if not settings.LLM_API_KEY:
+            return self._local_role_result(
+                description, gender, genre, trait, count,
+                "未配置大模型，已用本地词库生成；配置后可由用户看广告解锁 AI 生成",
+            )
+
+        llm = LLMService()
+        prompt = self._build_role_llm_prompt(
+            description, genre_name, trait_name, gender, count
+        )
+        try:
+            response = await llm.chat(
+                messages=[
+                    {"role": "system", "content": _ROLE_LLM_SYSTEM},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.85,
+                max_tokens=2048,
+                json_mode=True,
+            )
+            pairs = self._parse_llm_names(response, count)
+            if not pairs:
+                raise LLMError("LLM 未产出有效名字")
+        except LLMError as e:
+            return self._local_role_result(
+                description, gender, genre, trait, count,
+                f"AI 生成失败（{e}），已降级为本地词库",
+            )
+
+        return {
+            "source": "llm",
+            "total": len(pairs),
+            "names": [
+                {"name": name, "tag": KIND_NAMES["role"], "reason": reason}
+                for name, reason in pairs
+            ],
+            "provider": llm.provider,
+            "model": llm.model,
+            "fallback_note": None,
+        }
+
+    def _local_role_result(
+        self, description, gender, genre, trait, count, note
+    ) -> dict:
+        """LLM 降级路径：本地词库生成 + 统一响应结构。"""
+        local = self.generate(
+            kind="role", keywords=description, gender=gender,
+            genre=genre, trait=trait, count=count,
+        )
+        return {
+            "source": "local",
+            "total": local["total"],
+            "names": local["names"],
+            "provider": None,
+            "model": None,
+            "fallback_note": note,
+        }
+
+    @staticmethod
+    def _build_role_llm_prompt(
+        description, genre_name, trait_name, gender, count
+    ) -> str:
+        """构建虚拟人物起名的 LLM prompt（贴合设定 + 类型/性格约束）。"""
+        genre_line = f"小说类型：{genre_name}" if genre_name else "小说类型：未指定，请根据设定自行把握"
+        trait_line = f"性格特征：{trait_name}" if trait_name else "性格特征：未指定，请根据设定自行把握"
+        gender_text = {"male": "男", "female": "女"}.get(gender, "未指定")
+        return (
+            "请为下面这个虚构角色起名。\n\n"
+            f"【角色设定】\n{description.strip()}\n\n"
+            f"【约束】\n- {genre_line}\n- {trait_line}\n- 角色性别：{gender_text}\n\n"
+            f"请生成 {count} 个候选名字，要求：\n"
+            "1. 以「姓 + 名」的中式人名为主（单姓），名字 1-2 字、整体 2-3 字；可少量附「字号 / 代号」式名字\n"
+            "2. 名字贴合设定与类型底色，读来有画面、可作人设支点\n"
+            "3. 不碰低俗、宗教、真实历史人物专名，不用生僻到打不出的字\n"
+            "4. 每个名字给一句简短、不空泛的「为什么适合」理由\n\n"
+            "按以下 JSON 格式输出（不要用代码块包裹，必须是合法 JSON）：\n"
+            '{"names": [{"name": "沈云白", "reason": "仙侠底色、清冷气质，可作人设展开的支点"}]}'
+        )
+
+    @staticmethod
+    def _parse_llm_names(response: dict, count: int) -> list[tuple[str, str]]:
+        """把 LLM 返回的 JSON 解析成 [(name, reason)]，过滤空名/去重。"""
+        raw = response.get("names") if isinstance(response, dict) else None
+        if not isinstance(raw, list):
+            return []
+        out, seen = [], set()
+        for item in raw:
+            if not isinstance(item, dict):
+                continue
+            name = re.sub(r"\s+", "", str(item.get("name") or ""))
+            if not name or name in seen or len(name) > 6:
+                continue
+            reason = str(item.get("reason") or "").strip()
+            seen.add(name)
+            out.append((name, reason))
+            if len(out) >= count:
+                break
+        return out
+
+    def _dispatch(self, kind, toks, pet_type, gender, industry, genre, trait, count, seed) -> list[str]:
         if kind == "platform":
             return self._platform(toks, count, seed)
         if kind == "game":
             return self._game(toks, count, seed)
         if kind == "role":
-            return self._role(toks, gender, count, seed)
+            return self._role(toks, gender, genre, trait, count, seed)
         if kind == "pet":
             return self._pet(pet_type, count, seed)
         if kind == "business":
             return self._business(industry, count, seed)
         return []
+
+    @staticmethod
+    def _find(options: list[dict], code: Optional[str]) -> Optional[dict]:
+        """按 code 在词库列表里查（返回 None 表示未匹配）。"""
+        if not code:
+            return None
+        return next((o for o in options if o["code"] == code), None)
+
+    @classmethod
+    def _genre_name(cls, code: Optional[str]) -> str:
+        found = cls._find(NOVEL_GENRES, code)
+        return found["name"] if found else ""
+
+    @classmethod
+    def _trait_name(cls, code: Optional[str]) -> str:
+        found = cls._find(CHARACTER_TRAITS, code)
+        return found["name"] if found else ""
 
     # ── 各 kind 组合逻辑 ──
 
@@ -278,18 +476,77 @@ class CreativeNamingService:
         out = _compose(banks["game_nuclei"], banks["game_tails"], count, seed)
         return self._dedup(out, count)
 
-    def _role(self, toks, gender, count, seed) -> list[str]:
+    def _role(self, toks, gender, genre, trait, count, seed) -> list[str]:
         banks = CREATIVE_BANKS
+        g = self._find(NOVEL_GENRES, genre)
+        t = self._find(CHARACTER_TRAITS, trait)
+
+        # 有类型/性格时，走「类型核 × 性格字」组合
+        if g or t:
+            return self._role_typed(toks, g, t, count, seed)
+
+        # 无类型/性格：退回原「姓+名 + 代号」逻辑
         surnames = _shuffled(banks["role_surnames"], seed)
         givens = _shuffled(banks["role_given"], seed + 1)
         out = []
-        # 姓 + 名（中式，主输出）
         for i in range(min(count, len(surnames))):
             out.append(f"{surnames[i]}{givens[i % len(givens)]}")
-        # 2 字关键词可作代号式补充（如「守阈」），长设定仅作 reason 语境
         for kw in [t for t in toks if len(t) == 2]:
             out.append(kw)
-        # 代号补充到够数
+        for code in _shuffled(banks["role_codes"], seed + 2):
+            if len(out) >= count:
+                break
+            out.append(code)
+        return self._dedup(out, count)
+
+    def _role_typed(self, toks, genre, trait, count, seed) -> list[str]:
+        """类型/性格驱动的虚拟人物起名：类型核字 × 性格气质字 → 姓+名 与 字号。"""
+        banks = CREATIVE_BANKS
+        surnames = _shuffled(banks["role_surnames"], seed)
+        g_nuclei = (genre or {}).get("nuclei", [])
+        t_atoms = (trait or {}).get("atoms", [])
+        out = []
+
+        if g_nuclei and t_atoms:
+            # 主输出：姓 + 类型核 + 性格字（如「沈云白」），正反字序各出一组
+            gn = _shuffled(g_nuclei, seed + 3)
+            ta = _shuffled(t_atoms, seed + 4)
+            n = min(len(surnames), len(gn), len(ta))
+            for i in range(n):
+                out.append(f"{surnames[i]}{gn[i]}{ta[i]}")
+                out.append(f"{surnames[i]}{ta[i]}{gn[i]}")
+            # 字号：类型核 + 性格字（2 字，如「云白」）
+            for gch in _shuffled(g_nuclei, seed + 5, 4):
+                for tch in _shuffled(t_atoms, seed + 6, 4):
+                    out.append(f"{gch}{tch}")
+        elif g_nuclei:
+            # 仅类型：姓 + 类型核 + 类型核（双核错位，如「沈玄昊」）
+            gn = _shuffled(g_nuclei, seed + 3)
+            gn2 = _shuffled(g_nuclei, seed + 4)
+            n = min(len(surnames), len(gn), len(gn2))
+            for i in range(n):
+                if gn[i] != gn2[i]:
+                    out.append(f"{surnames[i]}{gn[i]}{gn2[i]}")
+            for gch in _shuffled(g_nuclei, seed + 5, 4):
+                for gch2 in _shuffled(g_nuclei, seed + 6, 4):
+                    if gch != gch2:
+                        out.append(f"{gch}{gch2}")
+        elif t_atoms:
+            # 仅性格：姓 + 性格字 + 性格字（如「沈寒素」）
+            ta = _shuffled(t_atoms, seed + 3)
+            ta2 = _shuffled(t_atoms, seed + 4)
+            n = min(len(surnames), len(ta), len(ta2))
+            for i in range(n):
+                if ta[i] != ta2[i]:
+                    out.append(f"{surnames[i]}{ta[i]}{ta2[i]}")
+            for tch in _shuffled(t_atoms, seed + 5, 4):
+                for tch2 in _shuffled(t_atoms, seed + 6, 4):
+                    if tch != tch2:
+                        out.append(f"{tch}{tch2}")
+
+        # 2 字关键词补充 + 代号兜底
+        for kw in [t for t in toks if len(t) == 2]:
+            out.append(kw)
         for code in _shuffled(banks["role_codes"], seed + 2):
             if len(out) >= count:
                 break
