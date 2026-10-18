@@ -1,68 +1,16 @@
 <view class="page">
-  <!-- 整座门楼即首页：飞檐 → 牌匾 → 两扇朱漆对开门 → 门槛 -->
-  <view class="gate">
-    <!-- 屋顶 -->
-    <view class="roof">
-      <view class="roof-ridge"></view>
-      <view class="roof-slope"></view>
-      <view class="roof-eave"></view>
-    </view>
+  <!-- 主视觉：门楼水墨画，两个小人即入口（左「起名」右「释名」透明热区） -->
+  <view class="hero">
+    <image class="hero-img" src="/images/home-hero.jpg" mode="widthFix" />
 
-    <!-- 门楣 + 牌匾 -->
-    <view class="lintel">
-      <view class="plaque">
-        <text class="plaque-text">名堂</text>
-      </view>
-    </view>
-
-    <!-- 门主体：立柱 + 两扇门（开门动画） -->
-    <view class="gate-body">
-      <view class="pillar"></view>
-
-      <view class="doors">
-        <view class="behind"><text>推门入堂</text></view>
-
-        <view class="door door-left {{opening === 'left' ? 'open' : ''}}"
-              bindtap="onDoorTap" data-door="left" data-url="/pages/name/name">
-          <view class="studs">
-            <view class="stud"></view>
-            <view class="stud"></view>
-          </view>
-          <view class="door-name">
-            <text class="door-char">起</text>
-            <text class="door-char">名</text>
-          </view>
-          <view class="ring-wrap">
-            <view class="ring"><view class="ring-dot"></view></view>
-          </view>
-        </view>
-
-        <view class="door door-right {{opening === 'right' ? 'open' : ''}}"
-              bindtap="onDoorTap" data-door="right" data-url="/pages/analyze/analyze">
-          <view class="studs">
-            <view class="stud"></view>
-            <view class="stud"></view>
-          </view>
-          <view class="door-name">
-            <text class="door-char">释</text>
-            <text class="door-char">名</text>
-          </view>
-          <view class="ring-wrap">
-            <view class="ring"><view class="ring-dot"></view></view>
-          </view>
-        </view>
-      </view>
-
-      <view class="pillar"></view>
-    </view>
-
-    <!-- 门槛 -->
-    <view class="threshold"></view>
+    <view class="hotspot hotspot-left" hover-class="hotspot-press" hover-stay-time="80"
+          bindtap="onEntryTap" data-url="/pages/naming/naming" aria-label="起名" />
+    <view class="hotspot hotspot-right" hover-class="hotspot-press" hover-stay-time="80"
+          bindtap="onEntryTap" data-url="/pages/analyze/analyze" aria-label="释名" />
   </view>
 
-  <!-- 底部极简：slogan + 次级入口 -->
+  <!-- 底部次级入口 -->
   <view class="foot">
-    <view class="slogan">有据可循的起名工具</view>
     <view class="foot-links">
       <text class="foot-link" bindtap="onBookTap">我的名字本</text>
       <text class="foot-sep">·</text>

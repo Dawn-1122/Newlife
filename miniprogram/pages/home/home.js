@@ -1,27 +1,12 @@
-// 首页 = 一座门楼：两扇朱漆对开门即两个主入口（左「起名」右「释名」）。
-// 点门 → 门绕轴旋转打开 → 进入对应功能；次级入口收在门楼下方极简文字链。
+// 首页 = 一幅门楼水墨画：牌匾题「名堂」，两个小人即入口——
+// 左小人（书案+「起名」旗）进起名流程，右小人（「释名」签+八卦布）进释名。
+// 热区透明覆盖在画上（见 home.wxss .hotspot-*），按压显淡朱细框。
 const share = require('../../utils/share')
-const namebook = require('../../utils/namebook')
 
 Page({
-  data: { bookCount: 0, opening: '' },
-
-  onShow() {
-    // 从别的页返回时复位开门状态，并重算名字本条数
-    this.setData({
-      bookCount: namebook.listRecords().length + namebook.listFavs().length,
-      opening: ''
-    })
-  },
-
-  onDoorTap(e) {
-    const { door, url } = e.currentTarget.dataset
-    if (this.data.opening) return // 已在开门动画中，防连点
-    this.setData({ opening: door })
-    // 等门完全打开再跳转，让动画完整呈现
-    setTimeout(() => {
-      if (url) wx.navigateTo({ url })
-    }, 560)
+  onEntryTap(e) {
+    const { url } = e.currentTarget.dataset
+    if (url) wx.navigateTo({ url })
   },
 
   onBookTap() {

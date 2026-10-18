@@ -1,6 +1,7 @@
-/* 首页 · 通栏门楼
-   整页即一座朱漆门楼：飞檐 → 牌匾「名堂」→ 两扇对开门（起名 / 释名）→ 门槛。
-   门即主入口，点击绕门轴旋转打开；暖木 + 朱漆 + 描金，明亮不阴森。 */
+/* 首页 · 门楼水墨版式
+   整个首页就是一幅门楼画：牌匾题「名堂」，左小人（书案+「起名」旗）= 起名入口，
+   右小人（「释名」签+八卦布）= 释名入口。热区透明覆盖在画上，按压显淡朱细框。
+   <image> 承载主视觉（WXSS 不支持本地背景图）。 */
 
 .page {
   min-height: 100vh;
@@ -8,226 +9,50 @@
   flex-direction: column;
 }
 
-/* ── 门楼主体 ── */
-.gate {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 72vh;
-}
-
-/* ── 屋顶 ── */
-.roof {
+/* ── 主视觉 + 双热区 ── */
+.hero {
   position: relative;
-  height: 168rpx;
 }
 
-.roof-slope {
+.hero-img {
+  display: block;
+  width: 100%;
+}
+
+.hotspot {
   position: absolute;
-  left: 2%;
-  right: 2%;
-  top: 56rpx;
-  bottom: 14rpx;
-  background: var(--gate-roof);
-  clip-path: polygon(9% 0, 91% 0, 100% 100%, 0 100%);
+  border: 2rpx solid transparent;
 }
 
-.roof-ridge {
-  position: absolute;
-  left: 7%;
-  right: 7%;
-  top: 28rpx;
-  height: 32rpx;
-  background: var(--gate-wood);
-  border-radius: var(--r-sm) var(--r-sm) 0 0;
+/* 左小人（书案 + 「起名」旗幡） */
+.hotspot-left {
+  left: 1%;
+  bottom: 3%;
+  width: 41%;
+  height: 35%;
 }
 
-/* 出檐：檐口横条贯穿且比瓦坡更宽，形成挑出感 */
-.roof-eave {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 16rpx;
-  background: var(--gate-wood);
+/* 右小人（「释名」签 + 八卦布） */
+.hotspot-right {
+  right: 1%;
+  bottom: 1%;
+  width: 43%;
+  height: 39%;
 }
 
-/* ── 门楣 + 牌匾 ── */
-.lintel {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 168rpx;
-  background: var(--gate-wood);
+/* 按压反馈：淡朱细框点睛 */
+.hotspot-press {
+  border-color: var(--cinnabar);
+  background: var(--cinnabar-bg);
+  opacity: 0.55;
 }
 
-.plaque {
-  width: 250rpx;
-  height: 104rpx;
-  background: var(--plaque-wood);
-  border: 2rpx solid var(--plaque-gold);
-  border-radius: var(--r-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.plaque-text {
-  font-family: var(--serif);
-  font-size: 46rpx;
-  letter-spacing: 14rpx;
-  text-indent: 14rpx;
-  color: var(--plaque-gold);
-  line-height: 1;
-}
-
-/* ── 门主体 ── */
-.gate-body {
-  flex: 1;
-  display: flex;
-  min-height: 440rpx;
-}
-
-.pillar {
-  width: 36rpx;
-  background: var(--gate-wood);
-}
-
-.doors {
-  flex: 1;
-  position: relative;
-  display: flex;
-  background: var(--paper-deep);
-  perspective: 1400rpx;
-  overflow: hidden;
-}
-
-/* 门打开后露出的内侧 */
-.behind {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.behind text {
-  font-family: var(--serif);
-  font-size: 30rpx;
-  letter-spacing: 8rpx;
-  color: var(--ink-3);
-}
-
-/* 单扇门 */
-.door {
-  flex: 1;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: var(--gate-door);
-  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.door-left {
-  transform-origin: left center;
-  border-right: 2rpx solid var(--gate-wood);
-}
-
-.door-right {
-  transform-origin: right center;
-  border-left: 2rpx solid var(--gate-wood);
-}
-
-.door-left.open {
-  transform: rotateY(-70deg);
-}
-
-.door-right.open {
-  transform: rotateY(70deg);
-}
-
-/* 门钉 */
-.studs {
-  position: absolute;
-  top: 48rpx;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  gap: 28rpx;
-}
-
-.stud {
-  width: 16rpx;
-  height: 16rpx;
-  border-radius: 50%;
-  background: var(--plaque-gold);
-}
-
-/* 门上竖排二字 */
-.door-name {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14rpx;
-}
-
-.door-char {
-  font-family: var(--serif);
-  font-size: 56rpx;
-  line-height: 1.1;
-  color: var(--plaque-gold);
-}
-
-/* 门环 */
-.ring-wrap {
-  position: absolute;
-  bottom: 64rpx;
-}
-
-.ring {
-  width: 64rpx;
-  height: 64rpx;
-  border: 6rpx solid var(--plaque-gold);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ring-dot {
-  width: 18rpx;
-  height: 18rpx;
-  border-radius: 50%;
-  background: var(--plaque-gold);
-}
-
-/* ── 门槛 ── */
-.threshold {
-  height: 40rpx;
-  background: var(--gate-wood);
-}
-
-/* ── 底部极简 ── */
+/* ── 底部次级入口 ── */
 .foot {
-  padding: 28rpx 0 40rpx;
-}
-
-.slogan {
-  text-align: center;
-  font-size: 24rpx;
-  letter-spacing: 6rpx;
-  text-indent: 6rpx;
-  color: var(--ink-3);
+  padding: 36rpx 0 40rpx;
 }
 
 .foot-links {
-  margin-top: 20rpx;
   display: flex;
   align-items: center;
   justify-content: center;
