@@ -126,13 +126,13 @@ RANGE_OPTIONS = [0, 3, 7, 14]
 DEFAULT_RANGE_DAYS = 7
 
 
-# ── 字源扩展（周易 / 本草纲目 / 神农本草经 / 山海经） ──
+# ── 字源扩展（周易 / 本草纲目 / 神农本草经 / 山海经 / 说文解字） ──
 # 字源典籍名（source 字段合法枚举）
-SOURCE_ENUM = {"周易", "本草纲目", "神农本草经", "山海经"}
+SOURCE_ENUM = {"周易", "本草纲目", "神农本草经", "山海经", "说文解字"}
 # 字源大类（source_class 字段，归入「经史子集」以兼容 STYLE_OPTIONS.source_preference）
 SOURCE_CLASS = "经史子集"
 # 字源条目类别（category 字段合法枚举）
-SOURCE_CATEGORY_ENUM = {"中药名", "神兽", "植物", "地名", "典籍章句"}
+SOURCE_CATEGORY_ENUM = {"中药名", "神兽", "植物", "地名", "典籍章句", "字源"}
 
 # 生僻字等级（仅数据治理用途，绝不参与评分）
 RARE_CHAR_LEVELS = ("一", "二", "扩展")

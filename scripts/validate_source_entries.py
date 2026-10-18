@@ -31,9 +31,9 @@ DEFAULT_INPUT = PROJECT_ROOT / "data" / "source" / "source_entries.json"
 
 EMOTION_ENUM = {"喜庆", "中性", "哀伤"}
 GENDER_ENUM = {"男", "女", "中"}
-SOURCE_ENUM = {"周易", "本草纲目", "神农本草经", "山海经"}
+SOURCE_ENUM = {"周易", "本草纲目", "神农本草经", "山海经", "说文解字"}
 SOURCE_CLASS = "经史子集"
-CATEGORY_ENUM = {"中药名", "神兽", "植物", "地名", "典籍章句"}
+CATEGORY_ENUM = {"中药名", "神兽", "植物", "地名", "典籍章句", "字源"}
 
 
 def is_cjk(ch: str) -> bool:

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "total": 36,
+  "total": 46,
   "entries": [
     {
       "id": "src_0001",
@@ -1001,6 +1001,316 @@
         "草木"
       ],
       "provenance": "manual/shan-hai-jing"
+    },
+    {
+      "id": "src_0037",
+      "source": "说文解字",
+      "source_class": "经史子集",
+      "category": "字源",
+      "title": "金部",
+      "author": "许慎",
+      "dynasty": "东汉",
+      "text": "鑫：《说文解字》未收此字。字形由三「金」叠成，取金多之意。。锐：芒也。从金，兑声。。锋：兵专也。从金，逢声。。铭：记也。从金，名声。。钰：《说文解字》未收此字。从金，玉声。。钧：三十斤也。从金，匀声。。鉴：大盆也。一曰监诸也。可以取明水于月。从金，监声。。铉：举鼎也。《易》谓铉，大鼎耳也。从金，弦声。。铠：《说文解字》未收此字。从金，凯声。。铮：金声也。从金，争声。",
+      "original_text": null,
+      "citation": "《说文解字·金部》",
+      "recommend_chars": [
+        "鑫",
+        "锐",
+        "锋",
+        "铭",
+        "钰",
+        "钧",
+        "鉴",
+        "铉",
+        "铠",
+        "铮"
+      ],
+      "emotion": "中性",
+      "imagery": [
+        "金"
+      ],
+      "gender": "中",
+      "scene": "",
+      "tags": [
+        "字源",
+        "说文解字"
+      ],
+      "provenance": ""
+    },
+    {
+      "id": "src_0038",
+      "source": "说文解字",
+      "source_class": "经史子集",
+      "category": "字源",
+      "title": "木部",
+      "author": "许慎",
+      "dynasty": "东汉",
+      "text": "森：木多貌。从林，从木。。楠：梅也。从木，南方声。。楷：木也。从木，皆声。。栋：极也。从木，东声。。梓：楸也。从木，宰声。。榕：《说文解字》未收此字。从木，容声。。枫：木也。从木，风声。",
+      "original_text": null,
+      "citation": "《说文解字·木部》",
+      "recommend_chars": [
+        "森",
+        "楠",
+        "楷",
+        "栋",
+        "梓",
+        "榕",
+        "枫"
+      ],
+      "emotion": "中性",
+      "imagery": [
+        "草木"
+      ],
+      "gender": "中",
+      "scene": "",
+      "tags": [
+        "字源",
+        "说文解字"
+      ],
+      "provenance": ""
+    },
+    {
+      "id": "src_0039",
+      "source": "说文解字",
+      "source_class": "经史子集",
+      "category": "字源",
+      "title": "艹部",
+      "author": "许慎",
+      "dynasty": "东汉",
+      "text": "芸：芸草也。似目宿。从艸，云声。。萱：令人忘忧之草。从艸，宣声。。菲：芴也。从艸，非声。。茗：茶芽也。从艸，名声。。茂：草丰盛。从艸，戊声。。蔚：牡蒿也。从艸，尉声。。萧：艾蒿也。从艸，肃声。。艺：种也。从艸，埶声。",
+      "original_text": null,
+      "citation": "《说文解字·艹部》",
+      "recommend_chars": [
+        "芸",
+        "萱",
+        "菲",
+        "茗",
+        "茂",
+        "蔚",
+        "萧",
+        "艺"
+      ],
+      "emotion": "中性",
+      "imagery": [
+        "草木"
+      ],
+      "gender": "中",
+      "scene": "",
+      "tags": [
+        "字源",
+        "说文解字"
+      ],
+      "provenance": ""
+    },
+    {
+      "id": "src_0040",
+      "source": "说文解字",
+      "source_class": "经史子集",
+      "category": "字源",
+      "title": "水部",
+      "author": "许慎",
+      "dynasty": "东汉",
+      "text": "淼：大水也。从三水。。浩：浇也。从水，告声。。瀚：《说文解字》未收此字。从水，翰声。。渊：回水也。从水，象形。左右岸也，中象水貌。。澜：大波也。从水，阑声。。涵：水泽多也。从水，函声。。源：水泉本也。从水，原声。。沁：水出壶关。从水，心声。。淳：渌也。从水，享声。。渤：《说文解字》未收此字。从水，勃声。。洛：洛水。出弘农上洛。从水，各声。。洋：水。出齐临朐高山。从水，羊声。。汐：《说文解字》未收此字。从水，夕声。。渝：水。出巴郡。从水，俞声。",
+      "original_text": null,
+      "citation": "《说文解字·水部》",
+      "recommend_chars": [
+        "淼",
+        "浩",
+        "瀚",
+        "渊",
+        "澜",
+        "涵",
+        "源",
+        "沁",
+        "淳",
+        "渤",
+        "洛",
+        "洋",
+        "汐",
+        "渝"
+      ],
+      "emotion": "中性",
+      "imagery": [
+        "水"
+      ],
+      "gender": "中",
+      "scene": "",
+      "tags": [
+        "字源",
+        "说文解字"
+      ],
+      "provenance": ""
+    },
+    {
+      "id": "src_0041",
+      "source": "说文解字",
+      "source_class": "经史子集",
+      "category": "字源",
+      "title": "火部",
+      "author": "许慎",
+      "dynasty": "东汉",
+      "text": "炎：火光上也。从重火。。焱：火华也。从三火。。煜：熠也。从火，昱声。。炜：盛赤也。从火，韦声。。炫：耀也。从火，玄声。。烁：《说文解字》作「爍」。灼也。从火，乐声。。焕：《说文解字》作「煥」。火光也。从火，奂声。。烽：《说文解字》未收此字。从火，逢声。。焰：《说文解字》未收此字。从火，臽声。",
+      "original_text": null,
+      "citation": "《说文解字·火部》",
+      "recommend_chars": [
+        "炎",
+        "焱",
+        "煜",
+        "炜",
+        "炫",
+        "烁",
+        "焕",
+        "烽",
+        "焰"
+      ],
+      "emotion": "中性",
+      "imagery": [
+        "火"
+      ],
+      "gender": "中",
+      "scene": "",
+      "tags": [
+        "字源",
+        "说文解字"
+      ],
+      "provenance": ""
+    },
+    {
+      "id": "src_0042",
+      "source": "说文解字",
+      "source_class": "经史子集",
+      "category": "字源",
+      "title": "日部",
+      "author": "许慎",
+      "dynasty": "东汉",
+      "text": "旭：日旦出貌。从日，九声。。曦：《说文解字》未收此字。从日，羲声。。昕：旦明，日将出也。从日，斤声。。晖：光也。从日，军声。",
+      "original_text": null,
+      "citation": "《说文解字·日部》",
+      "recommend_chars": [
+        "旭",
+        "曦",
+        "昕",
+        "晖"
+      ],
+      "emotion": "中性",
+      "imagery": [
+        "火"
+      ],
+      "gender": "中",
+      "scene": "",
+      "tags": [
+        "字源",
+        "说文解字"
+      ],
+      "provenance": ""
+    },
+    {
+      "id": "src_0043",
+      "source": "说文解字",
+      "source_class": "经史子集",
+      "category": "字源",
+      "title": "土部",
+      "author": "许慎",
+      "dynasty": "东汉",
+      "text": "培：《说文解字》未收此字。从土，咅声。。垣：墙也。从土，亘声。。坦：安也。从土，旦声。",
+      "original_text": null,
+      "citation": "《说文解字·土部》",
+      "recommend_chars": [
+        "培",
+        "垣",
+        "坦"
+      ],
+      "emotion": "中性",
+      "imagery": [
+        "土"
+      ],
+      "gender": "中",
+      "scene": "",
+      "tags": [
+        "字源",
+        "说文解字"
+      ],
+      "provenance": ""
+    },
+    {
+      "id": "src_0044",
+      "source": "说文解字",
+      "source_class": "经史子集",
+      "category": "字源",
+      "title": "山部",
+      "author": "许慎",
+      "dynasty": "东汉",
+      "text": "峥：《说文解字》未收此字。从山，争声。。岩：岸也。从山，严声。。岭：《说文解字》未收此字。从山，领声。",
+      "original_text": null,
+      "citation": "《说文解字·山部》",
+      "recommend_chars": [
+        "峥",
+        "岩",
+        "岭"
+      ],
+      "emotion": "中性",
+      "imagery": [
+        "土"
+      ],
+      "gender": "中",
+      "scene": "",
+      "tags": [
+        "字源",
+        "说文解字"
+      ],
+      "provenance": ""
+    },
+    {
+      "id": "src_0045",
+      "source": "说文解字",
+      "source_class": "经史子集",
+      "category": "字源",
+      "title": "石部",
+      "author": "许慎",
+      "dynasty": "东汉",
+      "text": "磊：众石也。从三石。",
+      "original_text": null,
+      "citation": "《说文解字·石部》",
+      "recommend_chars": [
+        "磊"
+      ],
+      "emotion": "中性",
+      "imagery": [
+        "玉"
+      ],
+      "gender": "中",
+      "scene": "",
+      "tags": [
+        "字源",
+        "说文解字"
+      ],
+      "provenance": ""
+    },
+    {
+      "id": "src_0046",
+      "source": "说文解字",
+      "source_class": "经史子集",
+      "category": "字源",
+      "title": "玉部",
+      "author": "许慎",
+      "dynasty": "东汉",
+      "text": "瑰：瑰，玫瑰也。从玉，鬼声。",
+      "original_text": null,
+      "citation": "《说文解字·玉部》",
+      "recommend_chars": [
+        "瑰"
+      ],
+      "emotion": "中性",
+      "imagery": [
+        "玉"
+      ],
+      "gender": "中",
+      "scene": "",
+      "tags": [
+        "字源",
+        "说文解字"
+      ],
+      "provenance": ""
     }
   ]
 }
