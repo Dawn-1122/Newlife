@@ -32,6 +32,14 @@ Page({
     subTabs: NETNAME_SUBTABS,
     subKind: 'platform',
 
+    // 平台名称：目标平台（平台基因）
+    platformTypes: api.PLATFORM_TYPES,
+    platformType: 'xiaohongshu',
+
+    // 游戏昵称：游戏类型（游戏文化生态）
+    gameTypes: api.GAME_TYPES,
+    gameType: 'fantasy',
+
     // 宠物
     petTypes: [
       { code: 'cat', name: '猫' },
@@ -106,6 +114,14 @@ Page({
     this.setData({ keywords: e.detail.value })
   },
 
+  onPlatformTypeTap(e) {
+    this.setData({ platformType: e.currentTarget.dataset.code })
+  },
+
+  onGameTypeTap(e) {
+    this.setData({ gameType: e.currentTarget.dataset.code })
+  },
+
   onGenreTap(e) {
     const code = e.currentTarget.dataset.code
     this.setData({ genre: this.data.genre === code ? '' : code })
@@ -162,7 +178,11 @@ Page({
     if (d.mode === 'netname') {
       params.kind = d.subKind
       params.keywords = (d.keywords || '').trim()
-      if (d.subKind === 'role') {
+      if (d.subKind === 'platform') {
+        if (d.platformType) params.platform_type = d.platformType
+      } else if (d.subKind === 'game') {
+        if (d.gameType) params.game_type = d.gameType
+      } else if (d.subKind === 'role') {
         if (d.roleGender) params.gender = d.roleGender
         if (d.genre) params.genre = d.genre
         if (d.trait) params.trait = d.trait

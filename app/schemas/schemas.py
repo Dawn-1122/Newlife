@@ -278,6 +278,8 @@ class CreativeRequest(BaseModel):
     industry: Optional[str] = Field(None, description="行业 code（kind=business 时用，见 INDUSTRY_WUXING）")
     genre: Optional[str] = Field(None, description="小说类型 code（kind=role 时用，见 NOVEL_GENRES）")
     trait: Optional[str] = Field(None, description="性格特征 code（kind=role 时用，见 CHARACTER_TRAITS）")
+    platform_type: Optional[str] = Field(None, description="目标平台 code（kind=platform 时用，见 PLATFORM_TYPES）")
+    game_type: Optional[str] = Field(None, description="游戏类型 code（kind=game 时用，见 GAME_TYPES）")
     count: int = Field(12, ge=1, le=30, description="返回名字数量")
 
 

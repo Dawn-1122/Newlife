@@ -80,6 +80,49 @@ def test_game_does_not_inject_long_keywords(svc):
         assert "讲师" not in n["name"]
 
 
+# ── 平台名称：平台基因分库 ──
+
+def test_platform_type_distinguishes_names(svc):
+    """不同平台应产出不同风格（小红书 ≠ 知乎）。"""
+    xhs = [n["name"] for n in svc.generate(kind="platform", platform_type="xiaohongshu", count=8)["names"]]
+    zh = [n["name"] for n in svc.generate(kind="platform", platform_type="zhihu", count=8)["names"]]
+    assert xhs != zh
+
+
+def test_platform_type_reason_names_platform(svc):
+    """平台 reason 应带平台名。"""
+    r = svc.generate(kind="platform", platform_type="zhihu", count=5)
+    assert any("知乎" in n["reason"] for n in r["names"])
+
+
+def test_platform_type_deterministic(svc):
+    """同平台同输入必须同输出。"""
+    a = svc.generate(kind="platform", platform_type="douyin", count=10)
+    b = svc.generate(kind="platform", platform_type="douyin", count=10)
+    assert [n["name"] for n in a["names"]] == [n["name"] for n in b["names"]]
+
+
+# ── 游戏昵称：游戏类型分库 + 职业关键词注入 ──
+
+def test_game_type_distinguishes_names(svc):
+    """不同游戏类型应产出不同风格（仙侠奇幻 ≠ 科幻）。"""
+    fantasy = [n["name"] for n in svc.generate(kind="game", game_type="fantasy", count=8)["names"]]
+    scifi = [n["name"] for n in svc.generate(kind="game", game_type="scifi", count=8)["names"]]
+    assert fantasy != scifi
+
+
+def test_game_injects_career_keywords(svc):
+    """游戏昵称应把 2 字职业关键词 + 游戏机制语汇组合（职业×机制双轨）。"""
+    r = svc.generate(kind="game", keywords="温控", game_type="scifi", count=8)
+    assert any(n["name"].startswith("温控") for n in r["names"])
+
+
+def test_game_type_reason_names_type(svc):
+    """游戏 reason 应带游戏类型名。"""
+    r = svc.generate(kind="game", game_type="tactical", count=5)
+    assert any("硬核战术" in n["reason"] for n in r["names"])
+
+
 def test_pet_respects_type(svc):
     cat = [n["name"] for n in svc.generate(kind="pet", pet_type="cat", count=8)["names"]]
     dog = [n["name"] for n in svc.generate(kind="pet", pet_type="dog", count=8)["names"]]

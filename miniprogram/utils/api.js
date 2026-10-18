@@ -201,6 +201,23 @@ const CHARACTER_TRAITS = [
   { code: 'shenmi', name: '神秘' }
 ]
 
+// 平台名称枚举（与后端 PLATFORM_TYPES 镜像；code + name，平台名称起名用）
+const PLATFORM_TYPES = [
+  { code: 'xiaohongshu', name: '小红书' },
+  { code: 'zhihu', name: '知乎' },
+  { code: 'douyin', name: '抖音' },
+  { code: 'bilibili', name: 'B站' },
+  { code: 'wechat', name: '微信' }
+]
+
+// 游戏类型枚举（与后端 GAME_TYPES 镜像；code + name，游戏昵称起名用）
+const GAME_TYPES = [
+  { code: 'fantasy', name: '仙侠奇幻' },
+  { code: 'scifi', name: '科幻' },
+  { code: 'tactical', name: '硬核战术' },
+  { code: 'casual', name: '休闲经营' }
+]
+
 // 激励视频广告位（配置驱动）：填入微信小程序流量主的广告位 ID 后，
 // 「看广告解锁 AI 生成」才生效；留空表示未配置，前端提示「广告位未配置」。
 const REWARDED_AD_UNIT_ID = ''
@@ -309,5 +326,7 @@ module.exports = {
   INDUSTRY_OPTIONS,
   NOVEL_GENRES,
   CHARACTER_TRAITS,
+  PLATFORM_TYPES,
+  GAME_TYPES,
   REWARDED_AD_UNIT_ID
 }

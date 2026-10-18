@@ -20,7 +20,12 @@ from app.core.naming_options import (
     SOURCE_CLASSES,
     STYLE_OPTIONS,
 )
-from app.services.creative_service import CHARACTER_TRAITS, NOVEL_GENRES
+from app.services.creative_service import (
+    CHARACTER_TRAITS,
+    GAME_TYPES,
+    NOVEL_GENRES,
+    PLATFORM_TYPES,
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 API_JS = PROJECT_ROOT / "miniprogram" / "utils" / "api.js"
@@ -170,7 +175,9 @@ def _load_creative_enums() -> dict:
         "const api = require(process.argv[1]);"
         "process.stdout.write(JSON.stringify({"
         "  genres: api.NOVEL_GENRES,"
-        "  traits: api.CHARACTER_TRAITS"
+        "  traits: api.CHARACTER_TRAITS,"
+        "  platforms: api.PLATFORM_TYPES,"
+        "  gameTypes: api.GAME_TYPES"
         "}));"
     )
     out = subprocess.run(
@@ -192,3 +199,17 @@ def test_character_traits_mirror_backend():
     assert [(t["code"], t["name"]) for t in frontend] == [
         (t["code"], t["name"]) for t in CHARACTER_TRAITS
     ], "api.js 的 CHARACTER_TRAITS 与后端不一致"
+
+
+def test_platform_types_mirror_backend():
+    frontend = _load_creative_enums()["platforms"]
+    assert [(p["code"], p["name"]) for p in frontend] == [
+        (p["code"], p["name"]) for p in PLATFORM_TYPES
+    ], "api.js 的 PLATFORM_TYPES 与后端不一致"
+
+
+def test_game_types_mirror_backend():
+    frontend = _load_creative_enums()["gameTypes"]
+    assert [(g["code"], g["name"]) for g in frontend] == [
+        (g["code"], g["name"]) for g in GAME_TYPES
+    ], "api.js 的 GAME_TYPES 与后端不一致"

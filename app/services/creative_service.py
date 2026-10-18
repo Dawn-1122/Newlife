@@ -54,6 +54,16 @@ CREATIVE_BANKS = {
         "未命名", "缓冲区", "观测站", "研究日志", "修理中", "营业中", "迟归",
         "观测记录", "收藏夹", "备忘录", "放映室", "茶水间", "手记", "邮差", "寻呼",
     ],
+    # 平台专属词库（platform_type 指定时用；未指定回退 platform_bases/suffixes）。
+    # 小红书复用通用库（自然意象 + 生活肌理，见上）。
+    "platform_bases_zhihu": ["接口", "拓扑", "热力学", "现象学", "温湿度", "剂量", "编码", "病理", "场论", "算法"],
+    "platform_suffixes_zhihu": ["未报错", "煮面中", "观测站", "未校准", "待验证", "笔记", "在岗", "未定义"],
+    "platform_bases_douyin": ["今天也在", "深夜还在", "凌晨", "下班后", "周末", "雨天"],
+    "platform_suffixes_douyin": ["修空调", "搬砖", "营业", "整活", "做菜", "遛狗", "存钱", "搞钱"],
+    "platform_bases_bili": ["404", "编译", "次元", "弹幕", "番剧", "中二", "像素", "幽灵"],
+    "platform_suffixes_bili": ["NotFound但心动", "成功·心跳", "加载中", "破壁", "觉醒", "附身", "转生", "走位"],
+    "platform_bases_wechat": ["林工", "苏律师", "陈医生", "王老师", "李会计", "周码农", "吴设计", "郑记者"],
+    "platform_suffixes_wechat": ["·光伏在逃焊工", "·合同里找糖", "·夜班中", "·批作业中", "·对账中", "·改稿中", "·在现场", "·搬砖中"],
 
     # 游戏昵称：意象核（2 字）+ 状态尾（2 字），如「霜痕」+「未晞」= 霜痕未晞
     "game_nuclei": [
@@ -66,6 +76,15 @@ CREATIVE_BANKS = {
         "判决", "纪元", "挽歌", "归途", "无赦", "碎镜", "重燃", "弥留", "拾荒",
         "折返", "未卜", "归墟", "燃尽", "无眠", "长夜", "余烬", "归鞘",
     ],
+    # 游戏类型专属词库（game_type 指定时用；未指定回退 game_nuclei/tails）
+    "game_scifi_nuclei": ["熵减", "琥珀纪", "星港", "跃迁", "奇点", "轨道", "曲率", "维度", "脉冲", "坐标"],
+    "game_scifi_tails": ["观测员", "存档", "协议", "日志", "未抵达", "偏移", "静默", "回响", "过载", "待命"],
+    "game_tactical_nuclei": ["弹道", "温控", "战术", "火力", "精度", "防线", "侦查", "压制", "突袭", "狙击"],
+    "game_tactical_tails": ["修正", "协议", "部署", "在岗", "锁定", "待命", "零点", "收束", "校准", "推进"],
+    "game_casual_nuclei": ["好感度", "收成", "工坊", "客栈", "菜园", "钓鱼", "咖啡", "烘焙", "花园", "牧场"],
+    "game_casual_tails": ["阈值", "满仓", "营业中", "今日份", "养成中", "攻略", "日记", "日常", "加点", "存档"],
+    # 游戏机制语汇：与用户「职业/身份」关键词组合（职业×游戏机制双轨，如「温控」+「协议」）
+    "game_mech_tails": ["协议", "加点", "存档", "阈值", "观测员", "校准", "部署", "未加载", "待命", "v2.3.1", "DLC已加载", "攻略中"],
 
     # 虚构角色：中式「姓 + 名」为主，另附代号式（供设定/代号场景）
     "role_surnames": [
@@ -164,6 +183,25 @@ CHARACTER_TRAITS = [
     {"code": "shenmi", "name": "神秘", "atoms": ["玄", "幽", "隐", "秘", "冥", "邃", "谜", "岚"]},
 ]
 
+# ── 平台名称：按「平台基因」分库（单一事实来源，前端 api.js 镜像） ──
+# 小红书=自然意象+生活肌理；知乎=术语+自嘲专业感；抖音=口语张力；B站=梗+次元；微信=职业+真实感。
+PLATFORM_TYPES = [
+    {"code": "xiaohongshu", "name": "小红书"},
+    {"code": "zhihu", "name": "知乎"},
+    {"code": "douyin", "name": "抖音"},
+    {"code": "bilibili", "name": "B站"},
+    {"code": "wechat", "name": "微信"},
+]
+
+# ── 游戏昵称：按「游戏类型」分库（单一事实来源，前端 api.js 镜像） ──
+# 仙侠奇幻=元素+意象+留白（原神风）；科幻=诗学；硬核战术=战术；休闲经营=经营。
+GAME_TYPES = [
+    {"code": "fantasy", "name": "仙侠奇幻"},
+    {"code": "scifi", "name": "科幻"},
+    {"code": "tactical", "name": "硬核战术"},
+    {"code": "casual", "name": "休闲经营"},
+]
+
 # 商业：行业 → 取名侧重点（用于 reason 文案，不参与硬过滤）
 INDUSTRY_HINT = {
     "tech": "取「新、锐、通达」之意，利科技感",
@@ -242,13 +280,30 @@ def _compose(bases, suffixes, count, seed):
     return out
 
 
+# 平台调性描述（reason 文案用，key 对应 PLATFORM_TYPES 的 name）
+_PLATFORM_FLAVOR = {
+    "小红书": "自然意象、生活肌理",
+    "知乎": "术语感、自嘲式专业",
+    "抖音": "口语张力、记忆锚点",
+    "B站": "有梗、次元穿透",
+    "微信": "真实感、职业辨识度",
+}
+
+
 def _reason(kind, name, ctx) -> str:
     """给出一条简短、不空泛的「为什么适合」文案。"""
     kw = ctx.get("keywords")
     if kind == "platform":
+        p_name = ctx.get("platform_name")
         base = f"贴合「{kw[0]}」的定位，" if kw else ""
+        if p_name:
+            flavor = _PLATFORM_FLAVOR.get(p_name, "有调性")
+            return f"{base}{p_name}调性：{flavor}，好记也耐读"
         return f"{base}意象克制、留有生活肌理，好记也耐读"
     if kind == "game":
+        g_name = ctx.get("game_name")
+        if g_name:
+            return f"{g_name}风格：意象与机制语汇交织，辨识度高、社区二创友好"
         return "意象与机制语汇交织，辨识度高、社区二创友好"
     if kind == "role":
         g_name = ctx.get("genre_name")
@@ -286,18 +341,25 @@ class CreativeNamingService:
         industry: Optional[str] = None,
         genre: Optional[str] = None,
         trait: Optional[str] = None,
+        platform_type: Optional[str] = None,
+        game_type: Optional[str] = None,
         count: int = 12,
     ) -> dict:
         if kind not in CREATIVE_KINDS:
             raise ValueError(f"kind 仅支持 {CREATIVE_KINDS}")
 
         toks = _tokenize(keywords)
-        seed = _seed(kind, keywords, pet_type, gender, industry, genre, trait)
-        names = self._dispatch(kind, toks, pet_type, gender, industry, genre, trait, count, seed)
+        seed = _seed(kind, keywords, pet_type, gender, industry, genre, trait, platform_type, game_type)
+        names = self._dispatch(
+            kind, toks, pet_type, gender, industry, genre, trait,
+            platform_type, game_type, count, seed,
+        )
 
-        # 类型/性格的中文名（reason 文案用）
+        # 类型/性格/平台/游戏类型的中文名（reason 文案用）
         genre_name = self._genre_name(genre) if genre else ""
         trait_name = self._trait_name(trait) if trait else ""
+        platform_name = self._platform_name(platform_type) if platform_type else ""
+        game_name = self._game_type_name(game_type) if game_type else ""
 
         return {
             "kind": kind,
@@ -312,6 +374,8 @@ class CreativeNamingService:
                         "industry": industry,
                         "genre_name": genre_name,
                         "trait_name": trait_name,
+                        "platform_name": platform_name,
+                        "game_name": game_name,
                     }),
                 }
                 for n in names
@@ -440,11 +504,12 @@ class CreativeNamingService:
                 break
         return out
 
-    def _dispatch(self, kind, toks, pet_type, gender, industry, genre, trait, count, seed) -> list[str]:
+    def _dispatch(self, kind, toks, pet_type, gender, industry, genre, trait,
+                  platform_type, game_type, count, seed) -> list[str]:
         if kind == "platform":
-            return self._platform(toks, count, seed)
+            return self._platform(toks, platform_type, count, seed)
         if kind == "game":
-            return self._game(toks, count, seed)
+            return self._game(toks, game_type, count, seed)
         if kind == "role":
             return self._role(toks, gender, genre, trait, count, seed)
         if kind == "pet":
@@ -470,24 +535,67 @@ class CreativeNamingService:
         found = cls._find(CHARACTER_TRAITS, code)
         return found["name"] if found else ""
 
+    @classmethod
+    def _platform_name(cls, code: Optional[str]) -> str:
+        found = cls._find(PLATFORM_TYPES, code)
+        return found["name"] if found else ""
+
+    @classmethod
+    def _game_type_name(cls, code: Optional[str]) -> str:
+        found = cls._find(GAME_TYPES, code)
+        return found["name"] if found else ""
+
     # ── 各 kind 组合逻辑 ──
 
-    def _platform(self, toks, count, seed) -> list[str]:
+    def _platform(self, toks, platform_type, count, seed) -> list[str]:
         banks = CREATIVE_BANKS
+        bases, suffixes = self._platform_banks(platform_type)
         out = []
         # 关键词注入：仅 2-4 字的「名词感」输入作基底（放最前，让用户觉得被听见）
         for kw in [t for t in toks if 2 <= len(t) <= 4]:
-            for suffix in _shuffled(banks["platform_suffixes"], seed + 3, 3):
+            for suffix in _shuffled(suffixes, seed + 3, 3):
                 out.append(f"{kw}{suffix}")
-        out += _compose(banks["platform_bases"], banks["platform_suffixes"], count, seed)
+        out += _compose(bases, suffixes, count, seed)
         return self._dedup(out, count)
 
-    def _game(self, toks, count, seed) -> list[str]:
-        # 游戏昵称的关键词多为「身份/品类」长语义描述，缺 LLM 时无法安全组词，
-        # 故不作字面注入，只取意象核×状态尾的词库组合，保证质量。
+    @staticmethod
+    def _platform_banks(platform_type):
+        """按平台类型选词库（未指定回退通用 platform_bases/suffixes）。"""
         banks = CREATIVE_BANKS
-        out = _compose(banks["game_nuclei"], banks["game_tails"], count, seed)
+        key_map = {
+            "xiaohongshu": ("platform_bases", "platform_suffixes"),
+            "zhihu": ("platform_bases_zhihu", "platform_suffixes_zhihu"),
+            "douyin": ("platform_bases_douyin", "platform_suffixes_douyin"),
+            "bilibili": ("platform_bases_bili", "platform_suffixes_bili"),
+            "wechat": ("platform_bases_wechat", "platform_suffixes_wechat"),
+        }
+        bk, sk = key_map.get(platform_type, ("platform_bases", "platform_suffixes"))
+        return banks[bk], banks[sk]
+
+    def _game(self, toks, game_type, count, seed) -> list[str]:
+        banks = CREATIVE_BANKS
+        nuclei, tails = self._game_banks(game_type)
+        out = []
+        # 职业×游戏机制双轨：2 字「身份/职业」关键词 + 游戏机制语汇（如「温控」+「协议」）
+        for kw in [t for t in toks if len(t) == 2]:
+            for tail in _shuffled(banks["game_mech_tails"], seed + 3, 3):
+                out.append(f"{kw}{tail}")
+        # 游戏类型词库组合
+        out += _compose(nuclei, tails, count, seed)
         return self._dedup(out, count)
+
+    @staticmethod
+    def _game_banks(game_type):
+        """按游戏类型选词库（未指定回退 game_nuclei/tails）。"""
+        banks = CREATIVE_BANKS
+        key_map = {
+            "fantasy": ("game_nuclei", "game_tails"),
+            "scifi": ("game_scifi_nuclei", "game_scifi_tails"),
+            "tactical": ("game_tactical_nuclei", "game_tactical_tails"),
+            "casual": ("game_casual_nuclei", "game_casual_tails"),
+        }
+        nk, tk = key_map.get(game_type, ("game_nuclei", "game_tails"))
+        return banks[nk], banks[tk]
 
     def _role(self, toks, gender, genre, trait, count, seed) -> list[str]:
         banks = CREATIVE_BANKS

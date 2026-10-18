@@ -396,6 +396,8 @@ async def creative_generate(request: CreativeRequest):
             industry=request.industry,
             genre=request.genre,
             trait=request.trait,
+            platform_type=request.platform_type,
+            game_type=request.game_type,
             count=request.count,
         )
     except ValueError as exc:
