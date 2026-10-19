@@ -1,5 +1,6 @@
 const api = require('../../utils/api')
 const namebook = require('../../utils/namebook')
+const share = require('../../utils/share')
 
 Page({
   data: {
@@ -125,11 +126,18 @@ Page({
 
   onCopyTap() {
     const name = this.data.name
-    const poetry = name.poetry
-      ? `\n出处：「${name.poetry.source}·${name.poetry.title}」\n${name.poetry.text}`
-      : ''
+    let poetry = ''
 
-    const text = `${name.full_name}\n综合评分: ${name.scores.overall}分${poetry}\n${name.meaning}`
+    if (name.poetry) {
+      // 优先用诗库自带的 citation（《诗经·秦风·蒹葭》），它比「来源·篇名」拼串准确
+      const citation = name.poetry.citation
+        || `「${name.poetry.source}·${name.poetry.title}」`
+      poetry = '\n出处：' + citation + '\n' + name.poetry.text
+    }
+
+    // 不写分数：推荐分只用于起名时的排序，落到「被复制出去的那段文字」上
+    // 就成了给名字定等级（见 MEMORY.md 的产品原则）。
+    const text = `${name.full_name}${poetry}\n${name.meaning}`
 
     wx.setClipboardData({
       data: text,
@@ -150,19 +158,19 @@ Page({
     //    ⚠️ 代价：用户在分享面板里点取消也会解锁 —— 平台层面无法区分，属于已知取舍。
     this.markUnlocked()
 
-    const name = this.data.name
-    return {
-      title: `「${name.full_name}」综合评分${name.scores.overall}分`,
-      path: '/pages/home/home'
-    }
+    // 落地页指向 /pages/share/share 并带上名字与整条出处：
+    // 指向 home 会把「他分享的是哪个名字」丢干净，指向 detail 则因冷启动没有
+    // globalData.selectedName 而白屏（见 share.js 顶部注释）。
+    const app = getApp()
+    const params = app.globalData.lastParams || {}
+    return share.nameShare(this.data.name.full_name, this.data.name.poetry, params.gender)
   },
 
   // 分享到朋友圈同样解锁（该场景不支持自定义 path，只能带 query）
   onShareTimeline() {
     this.markUnlocked()
-    const name = this.data.name
-    return {
-      title: `「${name.full_name}」综合评分${name.scores.overall}分`
-    }
+    const app = getApp()
+    const params = app.globalData.lastParams || {}
+    return share.nameTimeline(this.data.name.full_name, this.data.name.poetry, params.gender)
   }
 })

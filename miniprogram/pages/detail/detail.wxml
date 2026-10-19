@@ -7,14 +7,11 @@
   }
 </wxs>
 <view class="container">
-  <!-- 名字展示区 -->
+  <!-- 名字展示区（不显示评分：推荐分只用于起名时的排序，
+       落到这里就成了给名字定等级，见 MEMORY.md 的产品原则） -->
   <view class="card name-display">
     <view class="name-main">{{name.full_name}}</view>
     <view class="name-pinyin">{{pinyinText}}</view>
-    <view class="name-score">
-      <text class="score-label">综合评分</text>
-      <text class="score-number">{{name.scores.overall}}</text>
-    </view>
   </view>
 
   <!-- 用字解析 -->

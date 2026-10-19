@@ -307,7 +307,8 @@ Page({
     wx.showToast({ title: ret.added ? '已收藏' : '已取消收藏', icon: 'none' })
   },
 
-  onShareAppMessage: share.defaultShare,
+  // 结果页是一批名字，分享其中单个会以偏概全，故落到起名入口
+  onShareAppMessage: share.namingShare,
 
-  onShareTimeline: share.defaultTimeline
+  onShareTimeline: share.namingTimeline
 })

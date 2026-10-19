@@ -16,25 +16,6 @@
   margin-top: 12rpx;
 }
 
-.name-score {
-  margin-top: 24rpx;
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 12rpx;
-}
-
-.score-label {
-  font-size: 26rpx;
-  color: var(--ink-3);
-}
-
-.score-number {
-  font-size: 48rpx;
-  font-weight: 500;
-  color: var(--ink);
-}
-
 .section-title {
   font-size: 32rpx;
   font-weight: 500;

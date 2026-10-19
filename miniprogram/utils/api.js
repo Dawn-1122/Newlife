@@ -289,6 +289,32 @@ function nameMeaning(params) {
 }
 
 /**
+ * 分享页小程序码（PNG）
+ *
+ * 返回本地临时文件路径，供 <image src> 直接使用。
+ * 后端未配置 WX_APPID / WX_SECRET 时返回 501，这里按失败处理 ——
+ * 调用方（分享页）显示占位印即可，属于开发期的正常状态，不是故障。
+ */
+function shareQrcode() {
+  const app = getApp()
+  return new Promise((resolve, reject) => {
+    wx.downloadFile({
+      url: app.globalData.apiBase + '/share/qrcode',
+      success(res) {
+        if (res.statusCode >= 200 && res.statusCode < 300 && res.tempFilePath) {
+          resolve(res.tempFilePath)
+        } else {
+          reject({ message: '小程序码未启用' })
+        }
+      },
+      fail() {
+        reject({ message: '小程序码获取失败' })
+      }
+    })
+  })
+}
+
+/**
  * 查询八字
  */
 function queryBazi(params) {
@@ -311,6 +337,7 @@ module.exports = {
   recommendSources,
   sourceChars,
   nameMeaning,
+  shareQrcode,
   queryBazi,
   STYLE_OPTIONS,
   SOURCE_STYLE_MAP,

@@ -4,7 +4,7 @@ API 路由
 提供起名、名字解析、字库查询、诗词查询等接口
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
 from app.schemas.schemas import (
     NamingRequest, NamingResponse,
     NameAnalysisRequest, ApiResponse,
@@ -25,6 +25,11 @@ from app.services.phonetics import PhoneticsScorer
 from app.services.wuge import WugeScorer
 from app.services.prenatal_engine import PrenatalEngine
 from app.services.creative_service import CreativeNamingService
+from app.services.wx_qrcode import (
+    WxQrcodeService,
+    WxQrcodeError,
+    WxQrcodeNotConfigured,
+)
 from app.core.constants import RANGE_OPTIONS
 
 router = APIRouter()
@@ -330,6 +335,30 @@ async def analyze_name(request: NameAnalysisRequest):
         "poetry": poetry_matches[0] if poetry_matches else None,
         "poetry_list": poetry_matches[:3],
     }
+
+
+@router.get("/share/qrcode")
+async def share_qrcode(width: int = 430):
+    """
+    分享页小程序码（PNG）
+
+    未配置 WX_APPID / WX_SECRET 时返回 501 —— 当前处于开发期（未提审），
+    这是**正常状态**：前端据 501 显示占位印，不当作故障。
+    配置后返回指向起名入口的小程序码（scene 不支持中文，故不指向具体名字）。
+    """
+    try:
+        png = await WxQrcodeService.get_entry_qrcode(width)
+    except WxQrcodeNotConfigured as exc:
+        raise HTTPException(status_code=501, detail=str(exc))
+    except WxQrcodeError as exc:
+        raise HTTPException(status_code=502, detail=str(exc))
+
+    # 码图不含用户隐私，可短缓存；CDN/客户端都能省一次往返
+    return Response(
+        content=png,
+        media_type="image/png",
+        headers={"Cache-Control": "public, max-age=3600"},
+    )
 
 
 @router.get("/chars")

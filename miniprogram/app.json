@@ -11,6 +11,7 @@
     "pages/analyze-result/analyze-result",
     "pages/result/result",
     "pages/detail/detail",
+    "pages/share/share",
     "pages/history/history",
     "pages/bazi/bazi",
     "pages/index/index"

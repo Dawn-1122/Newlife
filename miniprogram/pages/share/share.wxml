@@ -1,0 +1,108 @@
+<view class="page">
+
+  <!-- ── 加载态 ── -->
+  <view class="state" wx:if="{{status === 'loading'}}">
+    <view class="state-mark">名</view>
+    <view class="state-text">正在释名…</view>
+  </view>
+
+  <!-- ── 错误态：名字读不出来，不留白屏 ── -->
+  <view class="state" wx:elif="{{status === 'error'}}">
+    <view class="state-mark">缺</view>
+    <view class="state-text">{{errMsg}}</view>
+    <button class="btn-primary state-btn" bindtap="onStartNaming">去起一个名字</button>
+  </view>
+
+  <!-- ── 正文 ── -->
+  <block wx:else>
+
+    <!-- ① 名字主卡（不显示任何评分） -->
+    <view class="hero">
+      <view class="hero-kicker">{{fromCard ? '友人分享的名字' : '释名'}}</view>
+
+      <view class="hero-name">{{fullName}}</view>
+      <view class="hero-pinyin" wx:if="{{pinyinText}}">{{pinyinText}}</view>
+
+      <view class="hero-rule"></view>
+
+      <view class="hero-cite" wx:if="{{poem && poem.citation}}">{{poem.citation}}</view>
+      <view class="hero-cite hero-cite-quiet" wx:else>名字用字见于本地字库</view>
+    </view>
+
+    <!-- ② 出处卡 -->
+    <view class="card" wx:if="{{poem}}">
+      <view class="sec-title">出处</view>
+
+      <view class="poem-head">
+        <text class="poem-cite" wx:if="{{poem.citation}}">{{poem.citation}}</text>
+        <text class="poem-meta" wx:if="{{poem.author}}">{{poem.author}}<text wx:if="{{poem.dynasty}}">（{{poem.dynasty}}）</text></text>
+      </view>
+
+      <view class="poem-text" wx:if="{{poemText}}">
+        <text wx:for="{{poemSegs}}" wx:key="i" class="{{item.hit ? 'poem-hit' : ''}}">{{item.t}}</text>
+      </view>
+
+      <view class="poem-note" wx:if="{{poemNote}}">{{poemNote}}</view>
+    </view>
+
+    <!-- ③ 逐字解析 -->
+    <view class="card" wx:if="{{chars.length}}">
+      <view class="sec-title">名字用字</view>
+
+      <view class="char" wx:for="{{chars}}" wx:key="char">
+        <view class="char-head">
+          <text class="char-glyph">{{item.char}}</text>
+          <view class="char-meta">
+            <text class="char-pinyin" wx:if="{{item.pinyin}}">{{item.pinyin}}</text>
+            <view class="char-tags">
+              <text class="tag {{item.wuxingClass}}" wx:if="{{item.wuxing}}">五行·{{item.wuxing}}</text>
+              <text class="tag" wx:if="{{item.strokes}}">康熙·{{item.strokes}}画</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="char-senses" wx:if="{{item.sensesText}}">
+          <text class="senses-label">语境取义</text>
+          <text class="senses-value">{{item.sensesText}}</text>
+        </view>
+
+        <view class="char-meaning" wx:if="{{item.meaning}}">{{item.meaning}}</view>
+      </view>
+    </view>
+
+    <!-- ④ 余味 teaser -->
+    <view class="mellow" wx:if="{{teaser}}">
+      <view class="mellow-label">余 味</view>
+      <view class="mellow-text">{{teaser}}</view>
+      <view class="mellow-more" bindtap="onOpenDetail">看完整解读 ›</view>
+    </view>
+
+    <!-- ⑤ 小程序码（预留位；未配置出码能力时显示印章占位） -->
+    <view class="qr-block">
+      <view class="qr-box">
+        <image
+          class="qr-img"
+          wx:if="{{qrUrl}}"
+          src="{{qrUrl}}"
+          mode="aspectFill"
+          show-menu-by-longpress
+        />
+        <view class="qr-placeholder" wx:else>
+          <view class="qr-mark">名</view>
+          <view class="qr-hint">小程序码</view>
+        </view>
+      </view>
+      <view class="qr-copy">长按识别 · 给自己的孩子起一个有出处的名字</view>
+    </view>
+
+    <!-- ⑥⑦ 双 CTA -->
+    <view class="cta">
+      <button class="btn-primary" bindtap="onStartNaming">我也要起名</button>
+      <button class="btn-secondary cta-second" bindtap="onAnalyzeMine">释名 · 测测我的名字</button>
+    </view>
+
+    <!-- ⑧ 页脚 -->
+    <view class="foot">名堂 · 有据可循</view>
+
+  </block>
+</view>

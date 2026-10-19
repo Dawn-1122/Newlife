@@ -42,6 +42,14 @@ class Settings(BaseSettings):
     LLM_BASE_URL: str = ""
     LLM_MODEL: str = ""
 
+    # 微信小程序（生成小程序码需要 AppID/AppSecret；未配置时 /share/qrcode 返回 501）
+    # 密钥只走 .env / 环境变量，不要写进仓库。
+    WX_APPID: str = ""
+    WX_SECRET: str = ""
+    # 小程序码指向的页面（相对 app.json 的 pages 条目，不带前导斜杠）
+    WX_QRCODE_PAGE: str = "pages/name/name"
+    WX_QRCODE_SCENE: str = "entry"
+
     # 起名参数
     MAX_NAME_RESULTS: int = 30  # 单次返回最大名字数
     DEFAULT_NAME_LENGTH: int = 2  # 默认名字字数（不含姓）
