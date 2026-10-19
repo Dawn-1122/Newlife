@@ -115,6 +115,9 @@ node tools/preview/probe.js --attach 9222 --all
   循环引用与缺失文件各留一条 CSS 注释。**新写共用样式时记得给 `transformWxss` 传 fromPath**。
 - **`wx.request` 的 `timeout` 在替身里不生效**（走的是 `fetch`，没有超时）。
   页面对超时不能只依赖宿主：`utils/api.js` 的探活自带 1500ms 兜底定时器。
+- **`position: fixed` 在预览里相对整个浏览器窗口，不是手机壳**：日期弹层的遮罩会
+  铺满整个预览区（真机与开发者工具里只有设备宽）。判定弹层「能不能开、能不能选、
+  能不能回填」以探针 `--picker` 为准，别以截图里的宽度为准。
 - **后台页面的 setData 只更新数据、不重绘**（与真机一致）。这是刻意做的：
   感觉页 `onSubmit` 的 `finally { setData({loading:false}) }` 在 `navigateTo` 之后执行，
   若允许它重绘，会把已打开的结果页画面覆盖回感觉页。
