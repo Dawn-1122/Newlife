@@ -50,7 +50,6 @@ Page({
 
     // 商业
     industries: api.INDUSTRY_OPTIONS,
-    industryNames: api.INDUSTRY_OPTIONS.map(i => i.name),
     industryIndex: 0,
 
     // 虚拟角色：性别 + 小说类型 + 性格特征 + 自定义描述（AI）
@@ -149,8 +148,8 @@ Page({
     this.setData({ petType: e.currentTarget.dataset.type })
   },
 
-  onIndustryChange(e) {
-    this.setData({ industryIndex: Number(e.detail.value) })
+  onIndustryTap(e) {
+    this.setData({ industryIndex: Number(e.currentTarget.dataset.index) })
   },
 
   // 角色分支是否走「看广告解锁 AI 生成」：仅当处于 role 子页且填了自定义描述

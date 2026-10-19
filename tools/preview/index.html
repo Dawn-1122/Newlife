@@ -547,7 +547,10 @@
     'scroll-view[scroll-y] { overflow-y: auto; }',
     'img { display: block; max-width: 100%; }',
     'input { border: 0; outline: 0; background: transparent; font: inherit; color: inherit; width: 100%; padding: 0; }',
-    'button { font: inherit; }',
+    // 微信的 <button> 是块级、默认占满整行；浏览器里它是 inline-block，会缩成文字宽，
+    // 页面只写 .btn-primary（不给 width）时预览里就变成一个窄药丸，看着像布局坏了。
+    // 必须限定在 #mount 内：预览外壳自己的工具条也用 button，全局改会把它一起撑满。
+    '#mount button { font: inherit; display: block; width: 100%; margin: 0; }',
     'picker { cursor: pointer; }',
     'picker:active { background: rgba(0,0,0,.05); }',
     // 预览里 flex 行右侧的 picker/input 会缩成文字宽，点空白处没反应；
@@ -572,7 +575,10 @@
 
       styleTag('wb-base-style', W.transformWxss(BASE_CSS))
       if (files[root + 'app.wxss']) {
-        styleTag('wb-app-style', W.transformWxss(files[root + 'app.wxss']))
+        styleTag(
+          'wb-app-style',
+          W.transformWxss(files[root + 'app.wxss'], { fromPath: 'app.wxss', files: files, root: root })
+        )
       }
 
       var uiHooks = {
@@ -587,7 +593,12 @@
           navBack.style.visibility = info.canBack ? 'visible' : 'hidden'
           if (info.title) navTitle.textContent = info.title
           var pageWxss = files[root + info.path + '.wxss']
-          styleTag('wb-page-style', pageWxss ? W.transformWxss(pageWxss) : '')
+          styleTag(
+            'wb-page-style',
+            pageWxss
+              ? W.transformWxss(pageWxss, { fromPath: info.path + '.wxss', files: files, root: root })
+              : ''
+          )
           pagePicker.value = info.path
           writeReport()
         },
@@ -756,14 +767,28 @@
         return startAt('pages/name/name').then(function () {
           var steps = [
             { wait: 'onSurnameInput' },
-            { type: { sel: 'onSurnameInput', value: opts.surname || '林' } },
-            { pick: { sel: 'onDateChange', value: opts.birthDate || '1994-05-20' } },
-            { sleep: 200 },
+            { type: { sel: 'onSurnameInput', value: opts.surname || '林' } }
+          ]
+          // 八字默认关（日期是选填项），所以流程本身不需要填生日。
+          // 要连八字一起跑时，改成「开开关 → 打开自绘弹层 → 直接用默认日期确定」——
+          // 不再有原生 picker，`pick` 那套选择器填值的方式已经用不上了。
+          if (opts.birthDate) {
+            steps = steps.concat([
+              { click: 'onBaziToggle' },
+              { sleep: 300 },
+              { wait: 'onOpenBirthDate' },
+              { click: 'onOpenBirthDate' },
+              { sleep: 400 },
+              { click: 'onSheetConfirm' },
+              { sleep: 300 }
+            ])
+          }
+          steps = steps.concat([
             { click: 'onNext' },
             // 偏好页第一屏是三个标签区，先等「气质」区渲染出来
             { wait: 'onStyleTap' },
             { click: 'onStyleTap' }
-          ]
+          ])
           if (path === 'chars') {
             steps = steps.concat([
               { txt: '先字后典' },
@@ -848,8 +873,11 @@
         log('[流程] 孕期起名：未出生 → 预产期 → 生成', 'info')
         return startAt('pages/name/name?tab=prenatal').then(function () {
           return runSteps([
-            { wait: 'onDueDateChange' },
-            { pick: { sel: 'onDueDateChange', value: '2026-04-15' } },
+            // 预产期也是自绘弹层：点开 → 用默认日期（今天 +90 天）直接确定
+            { wait: 'onOpenDueDate' },
+            { click: 'onOpenDueDate' },
+            { sleep: 400 },
+            { click: 'onSheetConfirm' },
             { sleep: 200 },
             { click: 'onNext' },
             { wait: 'onStyleTap' },
@@ -874,7 +902,7 @@
           return runSteps([
             { wait: 'onNameInput' },
             { type: { sel: 'onNameInput', value: '林海深' } },
-            { pick: { sel: 'onDateChange', value: '1994-05-20' } },
+            // 释名页的「补充生辰」默认关，不填生辰也能测评
             { sleep: 200 },
             { click: 'onSubmit' }
           ])

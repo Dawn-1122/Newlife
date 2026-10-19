@@ -99,26 +99,153 @@ const SOURCE_CLASSES = [
 const RANGE_OPTIONS = [0, 3, 7, 14]
 const DEFAULT_RANGE_DAYS = 7
 
+// ── 后端基址解析 ──
+//
+// 预览（浏览器）、开发者工具、真机跑在三套不同的网络口径里，写死一个基址必然有场景连不上：
+//   - 预览器在本机跑，后端就是 localhost:8000
+//   - 真机必须走局域网 IP（手机与电脑同一 WiFi）
+//   - 沙箱里 192.168.x.x 与 127.0.0.1 都可能不可达
+// 故先探一次 /health，选第一个真的应答的，并记进本地缓存供下次先用。
+//
+// ⚠️ 探活不能只看状态码。这台机器上 127.0.0.1 会被代理拦成**空响应**，
+//    状态码仍然是 200 —— 只看 200 就会错锁到它，之后每条业务请求都拿到空 body，
+//    报出来的错和真实原因毫无关系。所以必须校验响应体里确实有 status: ok。
+const API_LOCAL_BASE = 'http://localhost:8000/api/v1'
+const API_LOOPBACK_BASES = [
+  'http://127.0.0.1:8000/api/v1',
+  'http://host.docker.internal:8000/api/v1'
+]
+
+// 单条候选的等待上限。wx.request 的 timeout 在部分宿主里不生效（预览器的
+// fetch 替身就不带超时），被代理挂住的连接会一直不回来，故自己兜一层。
+const API_PROBE_TIMEOUT = 1500
+
+const API_BASE_CACHE_KEY = 'api_base'
+
+let baseReady = null
+
+function isHealthy(data) {
+  return !!(data && data.status === 'ok')
+}
+
+function probeApiBase() {
+  if (baseReady) return baseReady
+
+  const app = getApp()
+  const candidates = []
+  const push = function (base) {
+    if (base && candidates.indexOf(base) === -1) candidates.push(base)
+  }
+  push(wx.getStorageSync(API_BASE_CACHE_KEY))
+  // localhost 排在配置值之前：预览环境里配置值已被预览器改写成 127.0.0.1，
+  // 而真机上 localhost 会立刻被拒（不等超时），不会拖慢流程。
+  push(API_LOCAL_BASE)
+  push(app.globalData.apiBase)
+  API_LOOPBACK_BASES.forEach(push)
+
+  baseReady = new Promise(function (resolve) {
+    let i = 0
+    let settled = false
+    let timer = null
+
+    const finish = function (base) {
+      if (settled) return
+      settled = true
+      if (timer) {
+        clearTimeout(timer)
+        timer = null
+      }
+      if (base) {
+        app.globalData.apiBase = base
+        try {
+          wx.setStorageSync(API_BASE_CACHE_KEY, base)
+        } catch (e) {
+          // 存不下不影响本次使用
+        }
+        console.log('[api] 后端基址 = ' + base)
+      }
+      // 全都不通：保留配置值，让真正的业务请求去暴露具体错误
+      resolve(app.globalData.apiBase)
+    }
+
+    const next = function () {
+      if (timer) {
+        clearTimeout(timer)
+        timer = null
+      }
+      if (settled) return
+      if (i >= candidates.length) {
+        finish(null)
+        return
+      }
+      const base = candidates[i++]
+      timer = setTimeout(function () {
+        timer = null
+        next()
+      }, API_PROBE_TIMEOUT)
+      wx.request({
+        url: base + '/health',
+        method: 'GET',
+        timeout: API_PROBE_TIMEOUT,
+        success: function (res) {
+          if (res.statusCode === 200 && isHealthy(res.data)) finish(base)
+          else next()
+        },
+        fail: function () {
+          next()
+        }
+      })
+    }
+
+    next()
+  })
+
+  return baseReady
+}
+
 function request(url, method = 'GET', data = {}) {
   const app = getApp()
-  return new Promise((resolve, reject) => {
-    wx.request({
-      url: app.globalData.apiBase + url,
-      method: method,
-      data: data,
-      header: {
-        'Content-Type': 'application/json'
-      },
-      success(res) {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          resolve(res.data)
-        } else {
-          reject(res.data || { message: '请求失败' })
+  return probeApiBase().then(function () {
+    return new Promise((resolve, reject) => {
+      wx.request({
+        url: app.globalData.apiBase + url,
+        method: method,
+        data: data,
+        timeout: 30000,
+        header: {
+          'Content-Type': 'application/json'
+        },
+        success(res) {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            resolve(res.data)
+          } else {
+            const detail = res.data && (res.data.detail || res.data.message)
+            reject({
+              message: typeof detail === 'string' ? detail : '请求失败（' + res.statusCode + '）',
+              statusCode: res.statusCode
+            })
+          }
+        },
+        fail(err) {
+          // 预览器的 wx.request 替身把非 2xx 也走 fail，并带上 statusCode / data；
+          // 真机则是 errMsg。两条都要能读出有用的原因，否则只剩一句「网络错误」。
+          const code = err && err.statusCode
+          if (code) {
+            const detail = err.data && (err.data.detail || err.data.message)
+            reject({
+              message: typeof detail === 'string' ? detail : '请求失败（' + code + '）',
+              statusCode: code
+            })
+            return
+          }
+          // 把平台给的 errMsg 原样透出：是「域名不在白名单」还是「连不上」，
+          // 只有这条信息能区分，笼统的「网络错误」等于没说。
+          const raw = (err && err.errMsg) || ''
+          reject({
+            message: raw ? '连接失败：' + raw : '连接失败：后端未启动或地址不通'
+          })
         }
-      },
-      fail(err) {
-        reject({ message: '网络错误，请检查网络连接' })
-      }
+      })
     })
   })
 }
@@ -296,20 +423,22 @@ function nameMeaning(params) {
  * 调用方（分享页）显示占位印即可，属于开发期的正常状态，不是故障。
  */
 function shareQrcode() {
-  const app = getApp()
-  return new Promise((resolve, reject) => {
-    wx.downloadFile({
-      url: app.globalData.apiBase + '/share/qrcode',
-      success(res) {
-        if (res.statusCode >= 200 && res.statusCode < 300 && res.tempFilePath) {
-          resolve(res.tempFilePath)
-        } else {
-          reject({ message: '小程序码未启用' })
+  return probeApiBase().then(function () {
+    const app = getApp()
+    return new Promise((resolve, reject) => {
+      wx.downloadFile({
+        url: app.globalData.apiBase + '/share/qrcode',
+        success(res) {
+          if (res.statusCode >= 200 && res.statusCode < 300 && res.tempFilePath) {
+            resolve(res.tempFilePath)
+          } else {
+            reject({ message: '小程序码未启用' })
+          }
+        },
+        fail() {
+          reject({ message: '小程序码获取失败' })
         }
-      },
-      fail() {
-        reject({ message: '小程序码获取失败' })
-      }
+      })
     })
   })
 }

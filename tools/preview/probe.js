@@ -285,11 +285,22 @@ await cdp.send('Emulation.setDeviceMetricsOverride', {
 async function evaluate(expr) {
   // 注意：CDP.send 返回的已经是 Runtime.evaluate 的 result 对象
   //（形如 { result: {type,value}, exceptionDetails? }），别再往里剥一层。
-  const r = await cdp.send('Runtime.evaluate', {
-    expression: expr,
-    returnByValue: true,
-    awaitPromise: true
-  })
+  //
+  // 必须自带超时：awaitPromise 遇到「页面 JS 卡在死循环 / 弹层把线程占住」时
+  // 协议层不会回包，整条巡检会静默挂死 —— 之前排查一次就耗在这上面。
+  const r = await Promise.race([
+    cdp.send('Runtime.evaluate', {
+      expression: expr,
+      returnByValue: true,
+      awaitPromise: true
+    }),
+    new Promise((resolve) => {
+      setTimeout(() => resolve({ evaluateTimeout: true }), 30000)
+    })
+  ])
+  if (r && r.evaluateTimeout) {
+    return { __err: 'evaluate 超时（30s）：页面可能卡死或弹层阻塞' }
+  }
   if (r.exceptionDetails) {
     const d = r.exceptionDetails
     return { __err: d.text + ' ' + (d.exception?.description || '') }
@@ -303,7 +314,16 @@ async function screenshot(name) {
   await evaluate(
     '(function(){var s=document.querySelector(".screen");if(s){s.dataset.h=s.style.height;s.style.height="auto"}return 1})()'
   ).catch(() => 1)
-  const r = await cdp.send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true })
+  // 截图也要有上限：页面主线程一旦被卡住，Page.captureScreenshot 不会回包，
+  // 整条巡检会静默挂死（比报错更难查）。
+  const r = await Promise.race([
+    cdp.send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true }),
+    new Promise((resolve) => setTimeout(() => resolve({ captureTimeout: true }), 20000))
+  ])
+  if (r.captureTimeout) {
+    console.log('[probe] 截图超时：页面主线程可能被卡住')
+    return ''
+  }
   const file = `${OUT_DIR}/${name.replace(/\//g, '_')}.png`
   writeFileSync(file, Buffer.from(r.data, 'base64'))
   await evaluate(
@@ -538,84 +558,159 @@ async function runBook() {
 }
 
 /**
- * 验证原生 picker / switch 替身在浏览器里真的能点、能选、能回填。
+ * 验证自绘日期弹层与十二时辰格真的能点、能选、能回填。
  *
- * 真机上它们是微信原生组件，所占区域就是整行右侧；但浏览器里 <picker>
- * 是未知名元素，默认会被 flex 布局压成文字宽度，出现「点空白处没反应」。
- * 此场景专门守卫命中区 + 弹层选择 + bindchange 回填这一整条链。
+ * 以前这一项守的是原生 `<picker>` 替身的命中区 —— 但原生 picker 在预览里点不开，
+ * 用户根本选不了日期，所以页面已改成自绘三列 scroll-view + 12 格时辰。
+ * 现在要守的是：
+ *   1. 页面上**不再有** `<picker>`（有就说明改动被回退了）
+ *   2. 点「出生日期」整行能打开弹层，弹层是三列
+ *   3. 点年/月/日能选中，点确定能回填成 YYYY-MM-DD 并关掉弹层
+ *   4. 点时辰格能高亮，且第 4 格是卯
  */
 async function runPicker() {
-  label = 'picker'
+  label = 'date'
   const before = consoleLines.length
-  console.log('[probe] 验证 picker / switch 替身：真鼠标点击 → 弹层 → 选择 → 回填 …')
+  console.log('[probe] 验证自绘日期弹层与时辰格：点击 → 弹层 → 选年月日 → 回填 …')
 
-  const script = `(async () => {
-    var wb = window.__wb
-    var out = {}
-    var wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms) }) }
-    function clickAt(x, y) {
-      var t = document.elementFromPoint(x, y)
-      if (!t) return false
-      ;['mousedown', 'mouseup', 'click'].forEach(function (type) {
-        t.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, clientX: x, clientY: y }))
-      })
-      return true
-    }
-    function pickerValue(idx) {
-      var p = document.querySelectorAll('.form-item picker')[idx]
-      return p ? p.textContent.trim() : ''
-    }
+  // 每一步都是一次独立、同步的 evaluate，等待放在 Node 侧（sleep）。
+  // 早先写成「一个 async IIFE 里连做十几步」，会把整串动作压进一次
+  // Runtime.evaluate(awaitPromise)，任何一步抛错都表现为整条巡检静默挂死，
+  // 也定位不到卡在哪一步。
+  const CLICK = `function clickEl(el) {
+    if (!el) return false
+    try { el.scrollIntoView({ block: 'center' }) } catch (e) {}
+    var r = el.getBoundingClientRect()
+    var x = r.left + r.width / 2
+    var y = r.top + r.height / 2
+    var t = document.elementFromPoint(x, y) || el
+    ;['mousedown', 'mouseup', 'click'].forEach(function (type) {
+      t.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, clientX: x, clientY: y }))
+    })
+    return true
+  }`
 
-    await wb.goto('pages/name/name')
-    await wait(700)
+  const pickInCol = (colIdx, text) =>
+    evaluate(`(function () {
+      ${CLICK}
+      var col = document.querySelectorAll('.sheet-col')[${colIdx}]
+      if (!col) return 'NO_COL_${colIdx}'
+      var kids = col.children
+      for (var i = 0; i < kids.length; i++) {
+        if (kids[i].innerText.trim() === '${text}') return clickEl(kids[i])
+      }
+      return 'NOT_FOUND_${text}_N' + kids.length
+    })()`)
 
-    // 1) 出生日期：点最右侧空白处，必须命中 picker 并打开弹层
-    var dateEl = document.querySelectorAll('.form-item picker')[0]
-    var r = dateEl.getBoundingClientRect()
-    var hit = document.elementFromPoint(r.right - 6, r.top + r.height / 2)
-    out.dateHitOnRight = !!(hit && hit.closest('picker') === dateEl)
-    clickAt(r.right - 6, r.top + r.height / 2)
-    await wait(400)
-    out.dateModalOpen = document.getElementById('modal-mask').classList.contains('on')
-    var input = document.getElementById('modal-body').querySelector('input')
-    if (input) input.value = '1994-05-20'
-    document.getElementById('modal-ok').click()
-    await wait(400)
-    out.dateAfterPick = pickerValue(0)
+  const out = {}
 
-    // 2) 出生时辰（selector）
-    var hourEl = document.querySelectorAll('.form-item picker')[1]
-    var hr = hourEl.getBoundingClientRect()
-    clickAt(hr.right - 6, hr.top + hr.height / 2)
-    await wait(400)
-    out.hourModalOpen = document.getElementById('modal-mask').classList.contains('on')
-    var sel = document.getElementById('modal-body').querySelector('select')
-    out.hourOptions = sel ? sel.options.length : 0
-    if (sel) sel.value = '3'
-    document.getElementById('modal-ok').click()
-    await wait(400)
-    out.hourAfterPick = pickerValue(1)
+  console.log('[probe]   · goto name 页')
+  await evaluate("window.__wb.goto('pages/name/name')")
+  await sleep(900)
 
-    // 3) switch：点一次应触发 bindchange，收起八字行
-    var sw = document.querySelector('.wb-switch')
-    out.switchBefore = sw && sw.classList.contains('wb-switch-on')
-    var sr = sw.getBoundingClientRect()
-    clickAt(sr.left + sr.width / 2, sr.top + sr.height / 2)
-    await wait(400)
-    out.switchAfter = document.querySelector('.wb-switch').classList.contains('wb-switch-on')
-    out.dateRowHidden = document.body.innerText.indexOf('出生日期') === -1
+  out.nativePickers = await evaluate("document.querySelectorAll('picker').length")
+  console.log('[probe]   · 原生 picker 个数 = ' + out.nativePickers)
 
-    return out
-  })()`
+  // 0) 八字默认是关的：先确认此时没有日期行，再打开开关
+  out.dateRowHiddenByDefault =
+    (await evaluate("document.querySelectorAll('[data-wb-h=\"onOpenBirthDate\"]').length")) === 0
+  await evaluate(`(function () { ${CLICK}; return clickEl(document.querySelector('[data-wb-h="onBaziToggle"]')) })()`)
+  await sleep(700)
+  out.baziOnAfterClick = await evaluate(
+    "(function(){var s=document.querySelector('[data-wb-h=\"onBaziToggle\"]');return s? s.classList.contains('on'): null})()"
+  )
+  console.log('[probe]   · 八字默认关 = ' + out.dateRowHiddenByDefault + '，开关后 = ' + out.baziOnAfterClick)
 
-  const res = await evaluate(script)
+  // 1) 打开日期弹层
+  out.dateRowFound = (await evaluate("document.querySelectorAll('[data-wb-h=\"onOpenBirthDate\"]').length")) === 1
+  console.log('[probe]   · 日期行找到 = ' + out.dateRowFound)
+  await evaluate(`(function () { ${CLICK}; return clickEl(document.querySelector('[data-wb-h="onOpenBirthDate"]')) })()`)
+  await sleep(600)
+  console.log('[probe]   · 弹层已打开')
+  out.sheetOpen = (await evaluate("document.querySelectorAll('.sheet-mask').length")) === 1
+  out.colCount = await evaluate("document.querySelectorAll('.sheet-col').length")
+  out.dayCountBefore = await evaluate(
+    "(function(){var c=document.querySelectorAll('.sheet-col')[2];return c?c.children.length:0})()"
+  )
+
+  // 2) 选 1994-05-20（先换年，大小月天数会跟着重算）
+  out.pickYear = await pickInCol(0, 1994)
   await sleep(500)
-  const shot = await screenshot('picker')
+  out.pickMonth = await pickInCol(1, 5)
+  await sleep(500)
+  out.pickDay = await pickInCol(2, 20)
+  await sleep(500)
+  console.log('[probe]   · 选年月日 = ' + out.pickYear + '/' + out.pickMonth + '/' + out.pickDay)
+  out.dayCountAfter = await evaluate(
+    "(function(){var c=document.querySelectorAll('.sheet-col')[2];return c?c.children.length:0})()"
+  )
+  out.onCount = await evaluate("document.querySelectorAll('.sheet-item.on').length")
+  out.onText = await evaluate(
+    "Array.prototype.map.call(document.querySelectorAll('.sheet-item.on'),function(n){return n.innerText.trim()}).join('/')"
+  )
+
+  // 3) 确定 → 回填
+  await evaluate(`(function () { ${CLICK}; return clickEl(document.querySelector('[data-wb-h="onSheetConfirm"]')) })()`)
+  await sleep(700)
+  out.sheetClosed = (await evaluate("document.querySelectorAll('.sheet-mask').length")) === 0
+  out.dateAfterPick = await evaluate(
+    "(function(){var r=document.querySelector('[data-wb-h=\"onOpenBirthDate\"]');var v=r&&r.querySelector('.picker-value');return v?v.innerText.trim():''})()"
+  )
+  console.log('[probe]   · 回填 = ' + out.dateAfterPick + '（弹层已关=' + out.sheetClosed + '）')
+
+  // 4) 时辰格：第 4 格（卯 5-7）
+  out.hourCellCount = await evaluate("document.querySelectorAll('.hour-cell').length")
+  await evaluate(`(function () { ${CLICK}; return clickEl(document.querySelectorAll('.hour-cell')[3]) })()`)
+  await sleep(700)
+  out.hourOnIndex = await evaluate(
+    "(function(){var all=document.querySelectorAll('.hour-cell');var on=document.querySelectorAll('.hour-cell.on')[0];return on?Array.prototype.indexOf.call(all,on):-1})()"
+  )
+  out.hourOnText = await evaluate(
+    "(function(){var on=document.querySelectorAll('.hour-cell.on')[0];return on?on.innerText.replace(/\\s+/g,''):''})()"
+  )
+  console.log('[probe]   · 时辰选中 = ' + out.hourOnIndex + ' ' + out.hourOnText)
+
+  // 5) 关掉八字 → 日期行应消失
+  //    找挂了 onBaziToggle 的元素，而不是 .wb-switch —— 那个类名是 runner 给
+  //    原生 <switch> 生成的替身，本页用的是自绘 <view>，没有这个类。
+  out.switchFound = (await evaluate("document.querySelectorAll('[data-wb-h=\"onBaziToggle\"]').length")) === 1
+  out.switchBefore = await evaluate(
+    "(function(){var s=document.querySelector('[data-wb-h=\"onBaziToggle\"]');return s?s.classList.contains('on'):null})()"
+  )
+  console.log('[probe]   · 开关找到 = ' + out.switchFound + '，点前 = ' + out.switchBefore)
+  await evaluate(`(function () { ${CLICK}; return clickEl(document.querySelector('[data-wb-h="onBaziToggle"]')) })()`)
+  await sleep(700)
+  console.log('[probe]   · 已点开关')
+  out.switchAfter = await evaluate(
+    "(function(){var s=document.querySelector('[data-wb-h=\"onBaziToggle\"]');return s?s.classList.contains('on'):null})()"
+  )
+  out.dateRowHidden = (await evaluate("document.querySelectorAll('[data-wb-h=\"onOpenBirthDate\"]').length")) === 0
+  console.log('[probe]   · 点后 = ' + out.switchAfter + '，日期行已收起 = ' + out.dateRowHidden)
+
+  const res = out
+  await sleep(300)
+  const shot = await screenshot('date-sheet')
   const issues = consoleLines.slice(before)
+  const pass =
+    res.nativePickers === 0 &&
+    res.dateRowHiddenByDefault === true &&
+    res.baziOnAfterClick === true &&
+    res.dateRowFound &&
+    res.sheetOpen &&
+    res.colCount === 3 &&
+    res.pickYear === true &&
+    res.pickMonth === true &&
+    res.pickDay === true &&
+    res.sheetClosed &&
+    res.dateAfterPick === '1994-05-20' &&
+    res.hourCellCount === 12 &&
+    res.hourOnIndex === 3 &&
+    res.switchAfter === false &&
+    res.dateRowHidden === true
   results.push({
-    page: 'picker / switch 替身',
-    note: '日期/时辰选择器命中区与回填',
-    reached: !!(res && res.dateModalOpen && res.hourModalOpen && res.dateAfterPick === '1994-05-20' && res.hourAfterPick.indexOf('卯时') !== -1),
+    page: '自绘日期弹层 / 时辰格',
+    note: '日期行 → 三列弹层 → 回填；时辰 12 格；八字开关联动',
+    reached: !!pass,
     rep: {},
     issues,
     shot,
@@ -798,16 +893,27 @@ for (const r of results) {
   if (r.picker) {
     const p = r.picker
     if (p.__err) {
-      console.log('  [ERR] picker 场景脚本异常: ' + String(p.__err).slice(0, 300))
+      console.log('  [ERR] 日期/时辰场景脚本异常: ' + String(p.__err).slice(0, 300))
     } else {
       console.log(
-        `  日期：最右侧命中 picker=${p.dateHitOnRight} modal=${p.dateModalOpen} 回填=${p.dateAfterPick}`
+        `  页面上原生 picker 个数=${p.nativePickers}（应为 0）`
       )
       console.log(
-        `  时辰：modal=${p.hourModalOpen} 选项数=${p.hourOptions} 回填=${p.hourAfterPick}`
+        `  八字默认关=${p.dateRowHiddenByDefault} 打开后=${p.baziOnAfterClick}`
       )
       console.log(
-        `  switch：点前=${p.switchBefore} 点后=${p.switchAfter} 日期行已收起=${p.dateRowHidden}`
+        `  日期行：找到=${p.dateRowFound} 弹层开=${p.sheetOpen} 列数=${p.colCount} ` +
+          `当月天数 ${p.dayCountBefore}→${p.dayCountAfter}`
+      )
+      console.log(
+        `  选年月日=${p.pickYear}/${p.pickMonth}/${p.pickDay} 高亮格=${p.onCount} ` +
+          `弹层关=${p.sheetClosed} 回填=${p.dateAfterPick}`
+      )
+      console.log(
+        `  时辰格：格数=${p.hourCellCount} 选中序号=${p.hourOnIndex} 文案=${p.hourOnText}`
+      )
+      console.log(
+        `  八字开关：点前=${p.switchBefore} 点后=${p.switchAfter} 日期行已收起=${p.dateRowHidden}`
       )
     }
   }

@@ -350,9 +350,42 @@
   // 4. WXSS 处理
   // ══════════════════════════════════════════════════════════════
 
-  /** rpx → calc(N * var(--rpx))；page 选择器 → .wb-page-root；image 元素选择器 → img */
-  function transformWxss(css) {
-    return String(css)
+  /**
+   * 展开 WXSS 的 @import
+   *
+   * 真机的编译链会把 `@import "../../styles/x.wxss";` 内联进来，**浏览器不认识它**：
+   * 浏览器会把它当普通样式表引用去请求 `/styles/x.wxss`，而那个路径在预览服务里
+   * 并不存在（预览器是按 `miniprogram/` 的清单取文件的），于是 404 + 样式整段丢失。
+   * 表现是「预览里页面像没样式，真机却是好的」—— 这种偏差最容易把人带偏。
+   *
+   * 故在预览侧按文件路径递归内联。循环引用用 seen 挡住，缺失文件留一条注释。
+   */
+  function inlineWxssImports(css, fromPath, files, root, seen) {
+    var guard = seen || {}
+    return String(css).replace(
+      /@import\s+(?:url\()?\s*["']([^"']+)["']\s*\)?\s*;/g,
+      function (whole, rel) {
+        var target = joinPath(fromPath, rel)
+        var key = root + target
+        if (guard[key]) return '/* @import 循环引用，已跳过: ' + rel + ' */'
+        if (!files[key]) return '/* @import 找不到文件: ' + rel + ' */'
+        guard[key] = 1
+        return inlineWxssImports(files[key], target, files, root, guard)
+      }
+    )
+  }
+
+  /**
+   * rpx → calc(N * var(--rpx))；page 选择器 → .wb-page-root；image 元素选择器 → img
+   *
+   * opts 给齐时（{fromPath, files, root}）先把 @import 内联进来，见上面的说明。
+   */
+  function transformWxss(css, opts) {
+    var src = css
+    if (opts && opts.files && opts.fromPath) {
+      src = inlineWxssImports(css, opts.fromPath, opts.files, opts.root || ROOT)
+    }
+    return String(src)
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/(^|[^.\w#-])page(\s*[{,])/g, '$1.wb-page-root$2')
       .replace(/(^|[\s,>+~])(image|cover-image)(?=[\s,{.:>+~\[])/g, '$1img')

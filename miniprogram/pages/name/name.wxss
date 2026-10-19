@@ -1,5 +1,9 @@
 /* 起名第一步 · 填资料（山水泼墨） */
 
+/* 日期弹层与时辰格样式与 analyze 页共用，避免两处各写一份走样 */
+@import "../../styles/date-sheet.wxss";
+@import "../../styles/hour-grid.wxss";
+
 .page {
   min-height: 100vh;
   padding-bottom: 60rpx;
@@ -28,29 +32,6 @@
   color: var(--ink);
 }
 
-/* ── 已出生 / 未出生 ── */
-.tab-bar {
-  display: flex;
-  margin: 0 40rpx 16rpx;
-  border-bottom: 1rpx solid var(--line);
-}
-
-.tab {
-  flex: 1;
-  text-align: center;
-  padding: 20rpx 0;
-  font-size: 28rpx;
-  letter-spacing: 2rpx;
-  color: var(--ink-3);
-  border-bottom: 3rpx solid transparent;
-  margin-bottom: -1rpx;
-}
-
-.tab.active {
-  color: var(--ink);
-  border-bottom-color: var(--cinnabar);
-}
-
 /* ── 表单 ── */
 .form-card {
   padding: 8rpx 40rpx 0;
@@ -68,12 +49,51 @@
   border-bottom: none;
 }
 
+/* 纵向布局：标签在上，选项在下（选项一多就不能挤在一行里） */
+.form-item-col {
+  display: block;
+}
+
 .form-label {
   font-size: 28rpx;
   letter-spacing: 2rpx;
   color: var(--ink-3);
   width: 170rpx;
   flex-shrink: 0;
+}
+
+.form-label-inline {
+  width: auto;
+}
+
+.form-label-block {
+  display: block;
+  width: auto;
+  margin-bottom: 16rpx;
+}
+
+/* 开关那一行：左边「标题 + 一句解释」上下排，右边开关 */
+.form-item-switch {
+  align-items: center;
+}
+
+.switch-label {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.form-hint {
+  font-size: 22rpx;
+  color: var(--ink-3);
+  line-height: 1.5;
+  letter-spacing: 1rpx;
+}
+
+.hint-block {
+  display: block;
+  margin-top: 14rpx;
 }
 
 .form-input {
@@ -88,12 +108,30 @@
   text-align: right;
   font-size: 30rpx;
   color: var(--ink);
+  letter-spacing: 1rpx;
 }
 
+.picker-value.placeholder {
+  color: var(--line-strong);
+}
+
+/* 可点击字段右侧的小箭头，暗示"这里能点开" */
+.field-arrow {
+  margin-left: 12rpx;
+  font-size: 30rpx;
+  color: var(--line-strong);
+  line-height: 1;
+}
+
+/* ── 选项 ── */
 .chip-row {
   display: flex;
   flex: 1;
   justify-content: flex-end;
+}
+
+.chip-row.start {
+  justify-content: flex-start;
 }
 
 .chip-row .chip + .chip {
@@ -124,6 +162,8 @@
   background: var(--ink);
   color: var(--paper);
 }
+
+/* ── 时辰格见 styles/hour-grid.wxss ── */
 
 /* ── 主行动 ── */
 .foot {

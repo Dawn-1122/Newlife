@@ -8,14 +8,15 @@
     <view class="head-title">填一下资料</view>
   </view>
 
-  <!-- 已出生 / 未出生 -->
-  <view class="tab-bar">
-    <view class="tab {{tab === 'postnatal' ? 'active' : ''}}" bindtap="onTabTap" data-tab="postnatal">已出生</view>
-    <view class="tab {{tab === 'prenatal' ? 'active' : ''}}" bindtap="onTabTap" data-tab="prenatal">未出生</view>
-  </view>
-
   <view class="form-card">
-    <!-- 性别（共享） -->
+    <!-- ── 一、与八字无关的部分：先填完，不用回答"出生没有" ── -->
+
+    <!-- 未出生分支只出五行参考，不出名字，故不问姓氏 -->
+    <view class="form-item" wx:if="{{!(useBazi && !born)}}">
+      <text class="form-label">姓氏</text>
+      <input class="form-input" value="{{surname}}" bindinput="onSurnameInput" placeholder="如 沈" />
+    </view>
+
     <view class="form-item">
       <text class="form-label">宝宝性别</text>
       <view class="chip-row">
@@ -24,80 +25,150 @@
       </view>
     </view>
 
-    <!-- 已出生 -->
-    <block wx:if="{{tab === 'postnatal'}}">
-      <view class="form-item">
-        <text class="form-label">姓氏</text>
-        <input class="form-input" value="{{surname}}" bindinput="onSurnameInput" />
+    <view class="form-item">
+      <text class="form-label">名字字数</text>
+      <view class="chip-row">
+        <view class="chip {{nameLength === 1 ? 'active' : ''}}" bindtap="onLengthTap" data-length="1">单字名</view>
+        <view class="chip {{nameLength === 2 ? 'active' : ''}}" bindtap="onLengthTap" data-length="2">双字名</view>
       </view>
+    </view>
 
-      <view class="form-item">
-        <text class="form-label">八字分析</text>
-        <view class="switch {{useBazi ? 'on' : ''}}" bindtap="onBaziToggle">
-          <view class="switch-knob"></view>
+    <view class="form-item" wx:if="{{nameLength === 2}}">
+      <text class="form-label">字辈</text>
+      <input
+        class="form-input"
+        placeholder="选填，如 德"
+        value="{{generationalChar}}"
+        bindinput="onGenerationalInput"
+      />
+    </view>
+
+    <!-- ── 二、八字：只有打开时才追问出生状态 ── -->
+
+    <view class="form-item form-item-switch">
+      <view class="switch-label">
+        <text class="form-label form-label-inline">八字分析</text>
+        <text class="form-hint">按出生时间补五行喜用（选填）</text>
+      </view>
+      <view class="switch {{useBazi ? 'on' : ''}}" bindtap="onBaziToggle">
+        <view class="switch-knob"></view>
+      </view>
+    </view>
+
+    <block wx:if="{{useBazi}}">
+      <view class="form-item form-item-col">
+        <text class="form-label form-label-block">宝宝出生了吗</text>
+        <view class="chip-row start">
+          <view class="chip {{born ? 'active' : ''}}" bindtap="onBornTap" data-born="true">已出生</view>
+          <view class="chip {{!born ? 'active' : ''}}" bindtap="onBornTap" data-born="false">还没出生</view>
         </view>
+        <text class="form-hint hint-block" wx:if="{{!born}}">还没出生只能排出五行参考；名字等出生后再定更准</text>
       </view>
 
-      <view class="form-item" wx:if="{{useBazi}}">
-        <text class="form-label">出生日期</text>
-        <picker mode="date" value="{{birthDate}}" start="1900-01-01" end="2100-12-31" bindchange="onDateChange">
-          <view class="picker-value">{{birthDate || '请选择'}}</view>
-        </picker>
-      </view>
-
-      <view class="form-item" wx:if="{{useBazi}}">
-        <text class="form-label">出生时辰</text>
-        <picker mode="selector" range="{{hourOptions}}" value="{{hourIndex}}" bindchange="onHourChange">
-          <view class="picker-value">{{hourOptions[hourIndex]}}</view>
-        </picker>
-      </view>
-
-      <view class="form-item">
-        <text class="form-label">名字字数</text>
-        <view class="chip-row">
-          <view class="chip {{nameLength === 1 ? 'active' : ''}}" bindtap="onLengthTap" data-length="1">单字名</view>
-          <view class="chip {{nameLength === 2 ? 'active' : ''}}" bindtap="onLengthTap" data-length="2">双字名</view>
+      <!-- 已出生：明确日期 + 时辰 -->
+      <block wx:if="{{born}}">
+        <view class="form-item" bindtap="onOpenBirthDate">
+          <text class="form-label">出生日期</text>
+          <view class="picker-value {{birthDate ? '' : 'placeholder'}}">{{birthDate || '请选择'}}</view>
+          <text class="field-arrow">›</text>
         </view>
-      </view>
 
-      <view class="form-item" wx:if="{{nameLength === 2}}">
-        <text class="form-label">字辈</text>
-        <input
-          class="form-input"
-          placeholder="选填"
-          value="{{generationalChar}}"
-          bindinput="onGenerationalInput"
-        />
-      </view>
-
-    </block>
-
-    <!-- 未出生 -->
-    <block wx:if="{{tab === 'prenatal'}}">
-      <view class="form-item">
-        <text class="form-label">预产期</text>
-        <picker mode="date" value="{{dueDate}}" start="2020-01-01" end="2100-12-31" bindchange="onDueDateChange">
-          <view class="picker-value">{{dueDate || '请选择'}}</view>
-        </picker>
-      </view>
-
-      <view class="form-item">
-        <text class="form-label">浮动范围</text>
-        <view class="chip-row wrap">
-          <view
-            class="chip {{rangeDays === item ? 'active' : ''}}"
-            wx:for="{{rangeOptions}}"
-            wx:key="*this"
-            bindtap="onRangeTap"
-            data-range="{{item}}"
-          >±{{item}}天</view>
+        <view class="form-item form-item-col">
+          <text class="form-label form-label-block">出生时辰</text>
+          <view class="hour-grid">
+            <view
+              class="hour-cell {{hourIndex === index ? 'on' : ''}}"
+              wx:for="{{hours}}"
+              wx:key="label"
+              bindtap="onHourTap"
+              data-idx="{{index}}"
+            >
+              <text class="hour-name">{{item.label}}</text>
+              <text class="hour-span">{{item.span}}</text>
+            </view>
+          </view>
+          <text class="form-hint hint-block">不确定就选个大概，时辰只影响五行配比</text>
         </view>
-      </view>
+      </block>
+
+      <!-- 还没出生：预产期 + 浮动区间 -->
+      <block wx:else>
+        <view class="form-item" bindtap="onOpenDueDate">
+          <text class="form-label">预产期</text>
+          <view class="picker-value {{dueDate ? '' : 'placeholder'}}">{{dueDate || '请选择'}}</view>
+          <text class="field-arrow">›</text>
+        </view>
+
+        <view class="form-item form-item-col">
+          <text class="form-label form-label-block">浮动范围</text>
+          <view class="chip-row start wrap">
+            <view
+              class="chip {{rangeDays === item ? 'active' : ''}}"
+              wx:for="{{rangeOptions}}"
+              wx:key="*this"
+              bindtap="onRangeTap"
+              data-range="{{item}}"
+            >±{{item}}天</view>
+          </view>
+        </view>
+      </block>
     </block>
   </view>
 
   <!-- 下一步：定偏好 -->
   <view class="foot">
     <button class="btn-primary" bindtap="onNext" loading="{{loading}}">下一步 · 定偏好</button>
+  </view>
+</view>
+
+<!-- ── 自绘日期弹层（不依赖原生 picker） ── -->
+<view class="sheet-mask" wx:if="{{sheet}}" bindtap="onSheetCancel">
+  <view class="sheet" catchtap="noop">
+    <view class="sheet-head">
+      <text class="sheet-act" bindtap="onSheetCancel">取消</text>
+      <text class="sheet-title">{{sheet.title}}</text>
+      <text class="sheet-act sheet-ok" bindtap="onSheetConfirm">确定</text>
+    </view>
+
+    <view class="sheet-units">
+      <text class="sheet-unit">年</text>
+      <text class="sheet-unit">月</text>
+      <text class="sheet-unit">日</text>
+    </view>
+
+    <view class="sheet-cols">
+      <scroll-view class="sheet-col" scroll-y scroll-into-view="{{sheet.yearAnchor}}" scroll-with-animation>
+        <view
+          class="sheet-item {{sheet.year === item ? 'on' : ''}}"
+          wx:for="{{sheet.years}}"
+          wx:key="*this"
+          id="y{{item}}"
+          bindtap="onPickYear"
+          data-v="{{item}}"
+        >{{item}}</view>
+      </scroll-view>
+
+      <scroll-view class="sheet-col" scroll-y scroll-into-view="{{sheet.monthAnchor}}" scroll-with-animation>
+        <view
+          class="sheet-item {{sheet.month === item ? 'on' : ''}}"
+          wx:for="{{sheet.months}}"
+          wx:key="*this"
+          id="m{{item}}"
+          bindtap="onPickMonth"
+          data-v="{{item}}"
+        >{{item}}</view>
+      </scroll-view>
+
+      <scroll-view class="sheet-col" scroll-y scroll-into-view="{{sheet.dayAnchor}}" scroll-with-animation>
+        <view
+          class="sheet-item {{sheet.day === item ? 'on' : ''}}"
+          wx:for="{{sheet.days}}"
+          wx:key="*this"
+          id="d{{item}}"
+          bindtap="onPickDay"
+          data-v="{{item}}"
+        >{{item}}</view>
+      </scroll-view>
+    </view>
   </view>
 </view>

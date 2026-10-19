@@ -25,24 +25,87 @@
       </view>
     </view>
 
-    <view class="form-item" wx:if="{{useBazi}}">
-      <text class="form-label">出生日期</text>
-      <picker mode="date" value="{{birthDate}}" start="1900-01-01" end="2100-12-31" bindchange="onDateChange">
-        <view class="picker-value">{{birthDate || '请选择日期'}}</view>
-      </picker>
-    </view>
+    <block wx:if="{{useBazi}}">
+      <view class="form-item" bindtap="onOpenBirthDate">
+        <text class="form-label">出生日期</text>
+        <view class="picker-value {{birthDate ? '' : 'placeholder'}}">{{birthDate || '请选择'}}</view>
+        <text class="field-arrow">›</text>
+      </view>
 
-    <view class="form-item" wx:if="{{useBazi}}">
-      <text class="form-label">出生时辰</text>
-      <picker mode="selector" range="{{hourOptions}}" value="{{hourIndex}}" bindchange="onHourChange">
-        <view class="picker-value">{{hourOptions[hourIndex]}}</view>
-      </picker>
-    </view>
+      <view class="form-item form-item-col">
+        <text class="form-label form-label-block">出生时辰</text>
+        <view class="hour-grid">
+          <view
+            class="hour-cell {{hourIndex === index ? 'on' : ''}}"
+            wx:for="{{hours}}"
+            wx:key="label"
+            bindtap="onHourTap"
+            data-idx="{{index}}"
+          >
+            <text class="hour-name">{{item.label}}</text>
+            <text class="hour-span">{{item.span}}</text>
+          </view>
+        </view>
+        <text class="form-hint hint-block">不确定就选个大概，时辰只影响五行配比</text>
+      </view>
+    </block>
   </view>
 
   <button class="btn-primary" bindtap="onSubmit" loading="{{loading}}">开始释名</button>
 
   <view class="footer-note">
     <text>生辰为可选，提供后可分析八字匹配度</text>
+  </view>
+</view>
+
+<!-- ── 自绘日期弹层（不依赖原生 picker） ── -->
+<view class="sheet-mask" wx:if="{{sheet}}" bindtap="onSheetCancel">
+  <view class="sheet" catchtap="noop">
+    <view class="sheet-head">
+      <text class="sheet-act" bindtap="onSheetCancel">取消</text>
+      <text class="sheet-title">{{sheet.title}}</text>
+      <text class="sheet-act sheet-ok" bindtap="onSheetConfirm">确定</text>
+    </view>
+
+    <view class="sheet-units">
+      <text class="sheet-unit">年</text>
+      <text class="sheet-unit">月</text>
+      <text class="sheet-unit">日</text>
+    </view>
+
+    <view class="sheet-cols">
+      <scroll-view class="sheet-col" scroll-y scroll-into-view="{{sheet.yearAnchor}}" scroll-with-animation>
+        <view
+          class="sheet-item {{sheet.year === item ? 'on' : ''}}"
+          wx:for="{{sheet.years}}"
+          wx:key="*this"
+          id="y{{item}}"
+          bindtap="onPickYear"
+          data-v="{{item}}"
+        >{{item}}</view>
+      </scroll-view>
+
+      <scroll-view class="sheet-col" scroll-y scroll-into-view="{{sheet.monthAnchor}}" scroll-with-animation>
+        <view
+          class="sheet-item {{sheet.month === item ? 'on' : ''}}"
+          wx:for="{{sheet.months}}"
+          wx:key="*this"
+          id="m{{item}}"
+          bindtap="onPickMonth"
+          data-v="{{item}}"
+        >{{item}}</view>
+      </scroll-view>
+
+      <scroll-view class="sheet-col" scroll-y scroll-into-view="{{sheet.dayAnchor}}" scroll-with-animation>
+        <view
+          class="sheet-item {{sheet.day === item ? 'on' : ''}}"
+          wx:for="{{sheet.days}}"
+          wx:key="*this"
+          id="d{{item}}"
+          bindtap="onPickDay"
+          data-v="{{item}}"
+        >{{item}}</view>
+      </scroll-view>
+    </view>
   </view>
 </view>

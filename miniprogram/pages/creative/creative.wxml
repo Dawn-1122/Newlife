@@ -35,12 +35,18 @@
       </view>
     </view>
 
-    <!-- 行业 -->
-    <view class="form-item" wx:if="{{mode === 'business'}}">
+    <!-- 行业：14 项，用可点标签而不是原生 picker（预览里 picker 点不开） -->
+    <view class="form-item form-item-col" wx:if="{{mode === 'business'}}">
       <text class="form-label">行业</text>
-      <picker mode="selector" range="{{industryNames}}" value="{{industryIndex}}" bindchange="onIndustryChange">
-        <view class="picker-value">{{industryNames[industryIndex]}}</view>
-      </picker>
+      <view class="chip-row-wrap">
+        <view
+          wx:for="{{industries}}"
+          wx:key="code"
+          class="chip {{industryIndex === index ? 'active' : ''}}"
+          bindtap="onIndustryTap"
+          data-index="{{index}}"
+        >{{item.name}}</view>
+      </view>
     </view>
 
     <!-- 平台名称：目标平台 -->

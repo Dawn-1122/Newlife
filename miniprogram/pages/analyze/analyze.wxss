@@ -1,3 +1,9 @@
+/* 释名 · 填姓名（可选补生辰） */
+
+/* 日期弹层与时辰格与「起名」页共用，避免两处各写一份走样 */
+@import "../../styles/date-sheet.wxss";
+@import "../../styles/hour-grid.wxss";
+
 .header {
   text-align: center;
   padding: 30rpx 0 20rpx;
@@ -32,11 +38,34 @@
   border-bottom: none;
 }
 
+/* 纵向布局：标签在上，选项在下（12 格时辰挤不进一行） */
+.form-item-col {
+  display: block;
+}
+
 .form-label {
   font-size: 28rpx;
   color: var(--ink-2);
   width: 160rpx;
   flex-shrink: 0;
+}
+
+.form-label-block {
+  display: block;
+  width: auto;
+  margin-bottom: 16rpx;
+}
+
+.form-hint {
+  font-size: 22rpx;
+  color: var(--ink-3);
+  line-height: 1.5;
+  letter-spacing: 1rpx;
+}
+
+.hint-block {
+  display: block;
+  margin-top: 14rpx;
 }
 
 .form-input {
@@ -51,13 +80,30 @@
   text-align: right;
   font-size: 28rpx;
   color: var(--ink);
+  letter-spacing: 1rpx;
+}
+
+.picker-value.placeholder {
+  color: var(--line-strong);
+}
+
+/* 可点击字段右侧的小箭头，暗示"这里能点开" */
+.field-arrow {
+  margin-left: 12rpx;
+  font-size: 30rpx;
+  color: var(--line-strong);
+  line-height: 1;
 }
 
 .chip-row {
   display: flex;
-  gap: 16rpx;
   flex: 1;
   justify-content: flex-end;
+}
+
+/* 换行间距用 margin 而非 gap，兼容旧 WebView */
+.chip-row .chip + .chip {
+  margin-left: 16rpx;
 }
 
 .chip {

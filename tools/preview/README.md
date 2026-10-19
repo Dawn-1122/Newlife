@@ -64,7 +64,7 @@ node tools/preview/probe.js --attach 9222 --flow
 # 名字本专项：起名落盘 → 收藏 → 名字本 → 恢复 → 删除 → 清空
 node tools/preview/probe.js --attach 9222 --book
 
-# 原生组件替身专项：picker / switch 命中区与回填
+# 自绘日期弹层专项：日期行 → 三列滚选 → 回填，以及十二时辰格与八字开关联动
 node tools/preview/probe.js --attach 9222 --picker
 
 # 输入框专项：点击不误派发 → 真实键入 → 焦点保持
@@ -104,11 +104,17 @@ node tools/preview/probe.js --attach 9222 --all
   页面里 `e.detail.value` 为 `undefined` → `setData({surname: undefined})` → 整页重绘
   → 输入框被换掉 → 点一下就失焦。（`picker` / `switch` 是替身，在类型判断之前单独处理。）
 
-- **picker / switch 是浏览器替身**：`<picker>` 映射到原生 `select`/`date` 弹层，
-  `<switch>` 自绘。语义一致（`bindchange` 收到的 `detail.value` 类型相同），观感不同。
-  但 `<picker>` 在浏览器里是未知名元素，会被 flex 压成文字宽度，出现「点空白处没反应」。
-  预览器给 `.form-item > picker/input` 加了 `flex: 1; text-align: right` 把它撑成通栏，
-  视觉上与真机一致，**点击区域比真机更宽**（方便预览调试）。
+- **`<picker>` 在预览里点不开，页面已全部改成自绘**：日期用三列 `scroll-view`
+  （`utils/date-sheet.js` + `styles/date-sheet.wxss`），时辰用十二格
+  （`utils/hours.js` + `styles/hour-grid.wxss`），行业等多选项用可点标签。
+  预览器仍保留 `<picker>` 替身（映射到原生 `select`/`date`），但**不要再往页面里加** ——
+  `tests/test_profile_page.py` 里有一条测试会扫全站 wxml。
+- **WXSS 的 `@import` 会被内联**：真机编译链本来就把 `@import` 展开，浏览器不认识它，
+  会去请求 `/styles/x.wxss` 拿到 404，样式整段丢失 —— 预览看着「没样式」、真机却是好的，
+  最容易把人带偏。`transformWxss(css, {fromPath, files, root})` 负责递归内联，
+  循环引用与缺失文件各留一条 CSS 注释。**新写共用样式时记得给 `transformWxss` 传 fromPath**。
+- **`wx.request` 的 `timeout` 在替身里不生效**（走的是 `fetch`，没有超时）。
+  页面对超时不能只依赖宿主：`utils/api.js` 的探活自带 1500ms 兜底定时器。
 - **后台页面的 setData 只更新数据、不重绘**（与真机一致）。这是刻意做的：
   感觉页 `onSubmit` 的 `finally { setData({loading:false}) }` 在 `navigateTo` 之后执行，
   若允许它重绘，会把已打开的结果页画面覆盖回感觉页。
