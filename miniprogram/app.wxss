@@ -388,21 +388,18 @@ button::after {
   font-weight: 500;
 }
 
-/* 时辰用同一个弹层：只占一列，居中，左「子时」右「23:00–01:00」。
-   宽度收窄而不是铺满，否则一行只有两个字太空旷。 */
-.sheet-cols-hour {
-  justify-content: center;
-}
-
+/* 时辰用同一个弹层：只占一列，左「子时」右「23:00–01:00」。
+   这一列占满整宽（不做居中窄列）：鼠标 / 手指落在两侧空白处滚不动，
+   会被当成「列表不能滚」。 */
 .sheet-cols-hour .sheet-col {
-  flex: 0 0 420rpx;
+  flex: 1;
 }
 
 .sheet-item-hour {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 30rpx;
+  padding: 0 40rpx;
 }
 
 .sheet-item-hour .sheet-item-name {

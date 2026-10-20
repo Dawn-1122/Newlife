@@ -252,6 +252,24 @@ def test_preview_runner_inlines_wxss_import():
     assert "fromPath" in index, "预览外壳没把 fromPath 传给 transformWxss，@import 无法解析"
 
 
+def test_preview_scroll_views_can_be_dragged():
+    """预览里的 scroll-view 要能用鼠标拖。
+
+    预览是手机形态，用户会按住列表往上拖；桌面浏览器不会因此滚动，反馈就是
+    「列表滚不动」。index.html 里的拖拽垫片负责这件事（真机本来就能触摸滚动）。
+    另外手机壳高度必须跟窗口走：写死高度时窗口一矮，底部弹层会落到可视区外，
+    看上去同样像「滚不动」。
+    """
+    index = _read(PROJECT_ROOT / "tools" / "preview" / "index.html")
+    assert "function enableDragScroll" in index, "预览器缺少 scroll-view 的拖拽滚动"
+    assert re.search(r"^\s*enableDragScroll\(\)", index, re.M), "enableDragScroll 定义了却没调用"
+    assert "closest('scroll-view')" in index, "拖拽滚动要限定在 scroll-view 上"
+
+    phone = re.search(r"\.phone\s*\{(.*?)\}", index, re.S)
+    assert phone, "index.html 找不到 .phone"
+    assert "calc(100vh" in phone.group(1), "手机壳高度应随窗口变化，否则弹层会被顶出可视区"
+
+
 # --------------------------------------------------------------------------- #
 # 4. 后端基址：探活必须校验响应体
 # --------------------------------------------------------------------------- #

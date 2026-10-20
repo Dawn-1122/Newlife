@@ -52,8 +52,14 @@
   }
 
   /* 手机壳 */
+  /* 高度跟着窗口走：写死 760px 时，窗口一矮手机壳就高出可视区，
+     底部弹层（日期 / 时辰）会落到屏幕外，看着像「点不开、也滚不动」。
+     --nav-h 是外壳头的高度，--stage-pad 是 .stage 的上下留白。 */
   .phone {
     width: var(--frame-w); flex: 0 0 auto;
+    height: calc(100vh - 96px);
+    min-height: 420px;
+    max-height: 820px;
     background: #fff; border: 1px solid #D7D4CE; border-radius: 14px;
     overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.07);
     display: flex; flex-direction: column;
@@ -73,7 +79,11 @@
   .navbar .badge { font-size: 11px; color: var(--ink-3); }
 
   .screen {
-    height: 760px; overflow: hidden; overflow-x: hidden;
+    /* 不再写死高度：交给 .phone 的 flex 分配，窗口变矮时手机壳跟着缩，
+       弹层才不会被顶到可视区之外 */
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden; overflow-x: hidden;
     background: #F7F6F3; position: relative;
     /* 关键：给 .screen 一个 transform，让它成为 position:fixed 后代的包含块。
        不加这行，页面里的 fixed 弹层会相对**整个浏览器窗口**定位 —— 日期选择器
@@ -606,6 +616,50 @@
         }
       }
 
+      // scroll-view 的拖拽滚动。
+      // 预览是手机形态，用户会下意识按住列表往上拖；桌面浏览器不会因此滚动，
+      // 于是反馈成「列表滚不动」。这里补一层：按住拖动改 scrollTop；
+      // 拖超过 4px 就在松手后吞掉那次 click，免得误选中一项。
+      function enableDragScroll() {
+        var active = null, startY = 0, startTop = 0, moved = false, swallowClick = false
+        document.addEventListener('mousedown', function (e) {
+          if (e.button !== 0) return
+          var sv = e.target && e.target.closest ? e.target.closest('scroll-view') : null
+          if (!sv || sv.scrollHeight <= sv.clientHeight) return
+          active = sv; startY = e.clientY; startTop = sv.scrollTop; moved = false
+          e.preventDefault()
+        }, true)
+        document.addEventListener('mousemove', function (e) {
+          if (!active) return
+          var dy = e.clientY - startY
+          if (Math.abs(dy) > 4) {
+            moved = true
+            active.style.cursor = 'grabbing'
+          }
+          if (moved) {
+            active.scrollTop = startTop - dy
+            e.preventDefault()
+          }
+        }, true)
+        document.addEventListener('mouseup', function () {
+          if (!active) return
+          var wasMoved = moved
+          active.style.cursor = ''
+          active = null
+          moved = false
+          if (wasMoved) {
+            swallowClick = true
+            setTimeout(function () { swallowClick = false }, 0)
+          }
+        }, true)
+        document.addEventListener('click', function (e) {
+          if (!swallowClick) return
+          swallowClick = false
+          e.stopPropagation()
+          e.preventDefault()
+        }, true)
+      }
+
       var uiHooks = {
         mount: function (html, events, inst) {
           morphMount(mount, html)
@@ -631,6 +685,8 @@
         toast: toast,
         modal: showModal
       }
+
+      enableDragScroll()
 
       runtime = W.createRuntime({
         files: files,
