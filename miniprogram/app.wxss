@@ -239,27 +239,32 @@ button::after {
 
 /* ── 自绘开关（替代原生 switch）：胶囊轨道 + 圆形滑块 ──
    关=浅灰轨道，开=墨色轨道，滑块纸白；用 border-radius 50% 做胶囊与圆 */
+/* 开关：方角描边 + 墨块
+   原先用 border-radius:50% 把 88×48 的盒子拉成椭圆，白点在浅底上几乎看不见，
+   看着像一条空胶囊。改成与页面其它控件同一套直角语言：关=细线空框，开=墨色实心。 */
 .switch {
   position: relative;
   flex-shrink: 0;
   box-sizing: border-box;
-  width: 88rpx;
-  height: 48rpx;
-  border-radius: 50%;
+  width: 84rpx;
+  height: 44rpx;
+  border-radius: var(--r-sm);
+  /* 关：淡纸底 + 灰墨描边；开：实心墨 + 纸白点。
+     关态若用 transparent，44rpx 高的细线在纸底上几乎看不见，像一处空白。 */
   background: var(--paper-deep);
-  border: 2rpx solid var(--line-strong);
+  border: 1rpx solid var(--ink-3);
   transition: background 0.2s, border-color 0.2s;
 }
 
 .switch-knob {
   position: absolute;
-  top: 2rpx;
-  left: 2rpx;
-  width: 40rpx;
-  height: 40rpx;
-  border-radius: 50%;
-  background: var(--card);
-  transition: left 0.2s;
+  top: 5rpx;
+  left: 5rpx;
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 1rpx;
+  background: var(--ink-2);
+  transition: left 0.2s, background 0.2s;
 }
 
 .switch.on {
@@ -268,7 +273,8 @@ button::after {
 }
 
 .switch.on .switch-knob {
-  left: 42rpx;
+  left: 45rpx;
+  background: var(--paper);
 }
 
 /* ── 页头（无泼墨时的文字页头） ── */
@@ -283,4 +289,11 @@ button::after {
   text-align: center;
   font-size: 26rpx;
   color: var(--ink-3);
+}
+
+/* ── 浮层投影 ── */
+/* 规范②要求阴影只写在这里；下拉面板的布局在 styles/select-panel.wxss。
+   浮层需要比卡片更重的投影，才能从表单里「浮起来」。 */
+.select-panel {
+  box-shadow: 0 12rpx 30rpx rgba(22, 24, 26, 0.14);
 }

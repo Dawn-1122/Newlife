@@ -2,11 +2,12 @@
 """
 名堂 · 小程序 Web 预览服务
 
-作用（三件事，不做别的）：
+作用（五件事，不做别的）：
   1. `/`            → 吐出 tools/preview/index.html（预览外壳）
   2. `/runner.js`   → 吐出预览运行时
   3. `/__manifest`  → 把 miniprogram/ 下的 js/wxml/wxss/json **原文**打包成 JSON
-  4. `/mp/<path>`   → 静态映射 miniprogram/（图片等二进制资源）
+  4. `/__sig`       → 源码签名（文件 mtime+size 的摘要），供外壳轮询自动重载
+  5. `/mp/<path>`   → 静态映射 miniprogram/（图片等二进制资源）
 
 设计要点：预览外壳**不复制任何页面内容**，它拿到的就是 miniprogram/ 里的原始
 文件（单源，改页面不用同步改预览）。后端由页面 JS 直接请求
@@ -20,6 +21,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import mimetypes
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -37,6 +39,16 @@ SKIP_DIRS = {"miniprogram_npm", "node_modules"}
 def build_manifest() -> dict:
     """miniprogram/ 下所有文本文件的原文（键带 miniprogram/ 前缀）。"""
     files: dict[str, str] = {}
+    for path in _iter_sources():
+        rel = path.relative_to(PROJECT_ROOT).as_posix()
+        try:
+            files[rel] = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
+    return {"root": "miniprogram/", "files": files}
+
+
+def _iter_sources():
     for path in sorted(MP_ROOT.rglob("*")):
         if not path.is_file():
             continue
@@ -46,12 +58,25 @@ def build_manifest() -> dict:
             continue
         if any(part in SKIP_DIRS for part in path.parts):
             continue
-        rel = path.relative_to(PROJECT_ROOT).as_posix()
-        try:
-            files[rel] = path.read_text(encoding="utf-8")
-        except UnicodeDecodeError:
-            continue
-    return {"root": "miniprogram/", "files": files}
+        yield path
+
+
+def source_sig() -> str:
+    """源码签名。
+
+    为什么需要：预览外壳在页面加载时把 `/__manifest` 拉进内存，之后切页面都读内存。
+    改完 miniprogram 的文件、浏览器不重载，看到的就还是**旧页面** —— 表现成
+    「点了没反应 / 明明改了却没生效」，非常容易误判成功能坏了。
+    外壳轮询这个签名，一变就自动重载。预览器自己的 index.html / runner.js 也算在内。
+    """
+    h = hashlib.md5()
+    for path in _iter_sources():
+        st = path.stat()
+        h.update(f"{path.as_posix()}:{st.st_mtime_ns}:{st.st_size}\n".encode())
+    for extra in (HERE / "index.html", HERE / "runner.js"):
+        st = extra.stat()
+        h.update(f"{extra.name}:{st.st_mtime_ns}:{st.st_size}\n".encode())
+    return h.hexdigest()
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -83,6 +108,9 @@ class Handler(SimpleHTTPRequestHandler):
         if path == "/__manifest":
             payload = json.dumps(build_manifest(), ensure_ascii=False).encode("utf-8")
             return self._send(payload, "application/json; charset=utf-8")
+        if path == "/__sig":
+            payload = json.dumps({"sig": source_sig()}).encode("utf-8")
+            return self._send(payload, "application/json; charset=utf-8")
         if path == "/favicon.ico":
             return self._send(b"", "image/x-icon", 204)
         if path.startswith("/mp/"):
@@ -104,8 +132,8 @@ def main() -> None:
     parser.add_argument("--host", default="127.0.0.1")
     args = parser.parse_args()
 
-    manifest = build_manifest()
-    print(f"[preview] miniprogram 文本文件 {len(manifest['files'])} 个已入内存清单")
+    count = sum(1 for _ in _iter_sources())
+    print(f"[preview] miniprogram 文本文件 {count} 个（每次请求实时读取，改完刷新生效）")
     print(f"[preview] 打开 http://{args.host}:{args.port}/  （后端需另起 uvicorn :8000）")
 
     ThreadingHTTPServer((args.host, args.port), Handler).serve_forever()

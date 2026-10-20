@@ -1,0 +1,103 @@
+/* 点开式下拉（时辰等单列选择）· 共用样式
+   被 pages/name/name.wxss 与 pages/analyze/analyze.wxss 通过 @import 引用。
+
+   为什么不用原生 <picker mode="selector">：预览环境里原生 picker 点不开，
+   用户选不了时辰。这里换成「点一行 → 就地展开一列」，只用 view / scroll-view。
+   也不走全屏遮罩：面板跟着行一起滚，不会像 fixed 弹层那样在预览里糊满整个窗口。 */
+
+.select-wrap {
+  position: relative;
+}
+
+.select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 18rpx 24rpx;
+  border: 1rpx solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--card);
+}
+
+.select-value {
+  font-size: 30rpx;
+  color: var(--ink);
+  letter-spacing: 1rpx;
+}
+
+/* 右端小三角：展开时朝上 */
+.select-caret {
+  display: inline-block;
+  width: 12rpx;
+  height: 12rpx;
+  margin-top: -8rpx;
+  border-right: 2rpx solid var(--ink-3);
+  border-bottom: 2rpx solid var(--ink-3);
+  transform: rotate(45deg);
+  transition: transform 0.2s, margin-top 0.2s;
+}
+
+.select-caret.up {
+  margin-top: 4rpx;
+  transform: rotate(-135deg);
+}
+
+.select-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* 向上展开：这两页的时辰行都在表单下半部，向下开会顶出屏幕底部被裁掉，
+     表现正好是「点了没反应」。向上翻则上方永远有空间。 */
+  bottom: 100%;
+  z-index: 20;
+  margin-bottom: 8rpx;
+  background: var(--card);
+  border: 1rpx solid var(--line-strong);
+  border-radius: var(--r-sm);
+  /* 投影按规范②集中在 app.wxss 的 .select-panel 里，本文件只管布局 */
+  overflow: hidden;
+}
+
+/* 12 个时辰不必全都露出来，七格高度既能一眼看到多数选项，又不至于盖住整屏 */
+.select-scroll {
+  height: 520rpx;
+}
+
+.select-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 24rpx;
+  border-bottom: 1rpx solid var(--line);
+}
+
+.select-option:last-child {
+  border-bottom: none;
+}
+
+.select-option-name {
+  font-family: var(--serif);
+  font-size: 30rpx;
+  color: var(--ink-2);
+  letter-spacing: 2rpx;
+}
+
+.select-option-span {
+  font-size: 22rpx;
+  color: var(--ink-3);
+  letter-spacing: 1rpx;
+}
+
+.select-option.on {
+  background: var(--cinnabar-bg);
+}
+
+.select-option.on .select-option-name {
+  color: var(--cinnabar);
+  font-weight: 500;
+}
+
+.select-option.on .select-option-span {
+  color: var(--cinnabar);
+}

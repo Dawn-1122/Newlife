@@ -1,8 +1,8 @@
 /* 起名第一步 · 填资料（山水泼墨） */
 
-/* 日期弹层与时辰格样式与 analyze 页共用，避免两处各写一份走样 */
+/* 日期弹层与下拉面板样式与 analyze 页共用，避免两处各写一份走样 */
 @import "../../styles/date-sheet.wxss";
-@import "../../styles/hour-grid.wxss";
+@import "../../styles/select-panel.wxss";
 
 .page {
   min-height: 100vh;
@@ -163,7 +163,7 @@
   color: var(--paper);
 }
 
-/* ── 时辰格见 styles/hour-grid.wxss ── */
+/* ── 时辰下拉见 styles/select-panel.wxss ── */
 
 /* ── 主行动 ── */
 .foot {

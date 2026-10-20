@@ -73,13 +73,20 @@
   .navbar .badge { font-size: 11px; color: var(--ink-3); }
 
   .screen {
-    height: 760px; overflow-y: auto; overflow-x: hidden;
+    height: 760px; overflow: hidden; overflow-x: hidden;
     background: #F7F6F3; position: relative;
+    /* 关键：给 .screen 一个 transform，让它成为 position:fixed 后代的包含块。
+       不加这行，页面里的 fixed 弹层会相对**整个浏览器窗口**定位 —— 日期选择器
+       会铺满预览区（真机上只有设备宽），用户看着就是「点了没反应 / 页面坏了」。
+       滚动随之交给里面的 .wb-page-root，这样 fixed 弹层既在手机壳内、又不随内容滚。 */
+    transform: translateZ(0);
   }
 
-  /* 名堂页面根：承接 app.wxss 里的 page 选择器 */
+  /* 名堂页面根：承接 app.wxss 里的 page 选择器，同时是手机壳里的滚动视口 */
   .wb-page-root {
-    min-height: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
     position: relative;
   }
 
@@ -1029,6 +1036,29 @@
       log('启动失败：' + err.message, 'error')
       writeReport({ bootFailed: String(err && err.message) })
     })
+
+  // ── 源码变更自动重载 ──
+  //
+  // 外壳在页面加载时把 miniprogram 的源码一次性拉进内存，之后切页面都读内存。
+  // 改完文件而浏览器不重载，看到的就还是**旧页面** —— 表现成「点了没反应」
+  // 「明明改了却没生效」，最容易把人带偏去查功能。这里轮询一个几十字节的签名，
+  // 一变就重载；开发期「改完即见」比保住当前操作状态重要。
+  var bootSig = null
+  function pollSig() {
+    fetch('/__sig', { cache: 'no-store' })
+      .then(function (r) { return r.json() })
+      .then(function (d) {
+        if (!d || !d.sig) return
+        if (!bootSig) { bootSig = d.sig; return }
+        if (d.sig !== bootSig) {
+          console.log('[preview] 源码已变更，自动重载 …')
+          location.reload()
+        }
+      })
+      .catch(function () {})
+  }
+  pollSig()
+  setInterval(pollSig, 2000)
 })()
 </script>
 </body>

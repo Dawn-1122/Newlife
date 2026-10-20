@@ -34,16 +34,25 @@
 
       <view class="form-item form-item-col">
         <text class="form-label form-label-block">出生时辰</text>
-        <view class="hour-grid">
-          <view
-            class="hour-cell {{hourIndex === index ? 'on' : ''}}"
-            wx:for="{{hours}}"
-            wx:key="label"
-            bindtap="onHourTap"
-            data-idx="{{index}}"
-          >
-            <text class="hour-name">{{item.label}}</text>
-            <text class="hour-span">{{item.span}}</text>
+        <view class="select-wrap">
+          <view class="select-trigger" bindtap="onHourToggle">
+            <text class="select-value">{{hourText}}</text>
+            <text class="select-caret {{hourOpen ? 'up' : ''}}"></text>
+          </view>
+
+          <view class="select-panel" wx:if="{{hourOpen}}">
+            <scroll-view class="select-scroll" scroll-y>
+              <view
+                class="select-option {{hourIndex === index ? 'on' : ''}}"
+                wx:for="{{hours}}"
+                wx:key="label"
+                data-idx="{{index}}"
+                bindtap="onHourPick"
+              >
+                <text class="select-option-name">{{item.label}}时</text>
+                <text class="select-option-span">{{item.span}}</text>
+              </view>
+            </scroll-view>
           </view>
         </view>
         <text class="form-hint hint-block">不确定就选个大概，时辰只影响五行配比</text>

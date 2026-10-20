@@ -309,10 +309,15 @@ async function evaluate(expr) {
 }
 
 async function screenshot(name) {
-  // .screen 是内部滚动容器（760px），captureBeyondViewport 只能展开页面本身，
-  // 展不开容器 —— 截图前临时把它撑开，才能截到完整页面内容。
+  // 手机壳里有两层会截断内容：.screen（760px，且是 fixed 的包含块）与里面的
+  // .wb-page-root（滚动视口）。截图前把两层都撑开，才能截到整页内容。
   await evaluate(
-    '(function(){var s=document.querySelector(".screen");if(s){s.dataset.h=s.style.height;s.style.height="auto"}return 1})()'
+    '(function(){' +
+      'var s=document.querySelector(".screen"),m=document.querySelector(".wb-page-root");' +
+      'if(s){s.dataset.h=s.style.height;s.style.height="auto"}' +
+      'if(m){m.dataset.h=m.style.height;m.style.height="auto"' +
+      ';m.dataset.o=m.style.overflow;m.style.overflow="visible"}' +
+      'return 1})()'
   ).catch(() => 1)
   // 截图也要有上限：页面主线程一旦被卡住，Page.captureScreenshot 不会回包，
   // 整条巡检会静默挂死（比报错更难查）。
@@ -327,7 +332,11 @@ async function screenshot(name) {
   const file = `${OUT_DIR}/${name.replace(/\//g, '_')}.png`
   writeFileSync(file, Buffer.from(r.data, 'base64'))
   await evaluate(
-    '(function(){var s=document.querySelector(".screen");if(s&&s.dataset.h!==undefined){s.style.height=s.dataset.h}return 1})()'
+    '(function(){' +
+      'var s=document.querySelector(".screen"),m=document.querySelector(".wb-page-root");' +
+      'if(s&&s.dataset.h!==undefined){s.style.height=s.dataset.h}' +
+      'if(m&&m.dataset.h!==undefined){m.style.height=m.dataset.h;m.style.overflow=m.dataset.o}' +
+      'return 1})()'
   ).catch(() => 1)
   return file
 }
@@ -620,6 +629,12 @@ async function runPicker() {
     "(function(){var s=document.querySelector('[data-wb-h=\"onBaziToggle\"]');return s? s.classList.contains('on'): null})()"
   )
   console.log('[probe]   · 八字默认关 = ' + out.dateRowHiddenByDefault + '，开关后 = ' + out.baziOnAfterClick)
+  out.switchBox = await evaluate(
+    "(function(){var s=document.querySelector('[data-wb-h=\"onBaziToggle\"]');" +
+      "if(!s)return null;var r=s.getBoundingClientRect();" +
+      "return {w:Math.round(r.width),h:Math.round(r.height),cls:s.className}})()"
+  )
+  await screenshot('bazi-on')
 
   // 1) 打开日期弹层
   out.dateRowFound = (await evaluate("document.querySelectorAll('[data-wb-h=\"onOpenBirthDate\"]').length")) === 1
@@ -658,17 +673,26 @@ async function runPicker() {
   )
   console.log('[probe]   · 回填 = ' + out.dateAfterPick + '（弹层已关=' + out.sheetClosed + '）')
 
-  // 4) 时辰格：第 4 格（卯 5-7）
-  out.hourCellCount = await evaluate("document.querySelectorAll('.hour-cell').length")
-  await evaluate(`(function () { ${CLICK}; return clickEl(document.querySelectorAll('.hour-cell')[3]) })()`)
+  // 4) 时辰：自绘下拉（原 12 格已废弃）。点行 → 展开 12 项 → 选第 4 项（卯时）→ 收起
+  out.hourGridGone = (await evaluate("document.querySelectorAll('.hour-cell').length")) === 0
+  out.hourTriggerFound = (await evaluate("document.querySelectorAll('[data-wb-h=\"onHourToggle\"]').length")) === 1
+  out.hourPanelClosedBefore =
+    (await evaluate("document.querySelectorAll('.select-panel').length")) === 0
+  console.log('[probe]   · 时辰触发区找到 = ' + out.hourTriggerFound)
+  await evaluate(`(function () { ${CLICK}; return clickEl(document.querySelector('[data-wb-h="onHourToggle"]')) })()`)
+  await sleep(600)
+  out.hourPanelOpen = (await evaluate("document.querySelectorAll('.select-panel').length")) === 1
+  out.hourOptionCount = await evaluate("document.querySelectorAll('.select-option').length")
+  console.log('[probe]   · 下拉已开 = ' + out.hourPanelOpen + '，选项数 = ' + out.hourOptionCount)
+  const hourShot = await screenshot('hour-select')
+  await evaluate(`(function () { ${CLICK}; return clickEl(document.querySelectorAll('.select-option')[3]) })()`)
   await sleep(700)
-  out.hourOnIndex = await evaluate(
-    "(function(){var all=document.querySelectorAll('.hour-cell');var on=document.querySelectorAll('.hour-cell.on')[0];return on?Array.prototype.indexOf.call(all,on):-1})()"
+  out.hourText = await evaluate(
+    "(function(){var v=document.querySelector('.select-value');return v?v.innerText.trim():''})()"
   )
-  out.hourOnText = await evaluate(
-    "(function(){var on=document.querySelectorAll('.hour-cell.on')[0];return on?on.innerText.replace(/\\s+/g,''):''})()"
-  )
-  console.log('[probe]   · 时辰选中 = ' + out.hourOnIndex + ' ' + out.hourOnText)
+  out.hourPanelClosedAfter =
+    (await evaluate("document.querySelectorAll('.select-panel').length")) === 0
+  console.log('[probe]   · 选后时辰 = ' + out.hourText + '（下拉已收=' + out.hourPanelClosedAfter + '）')
 
   // 5) 关掉八字 → 日期行应消失
   //    找挂了 onBaziToggle 的元素，而不是 .wb-switch —— 那个类名是 runner 给
@@ -689,7 +713,7 @@ async function runPicker() {
 
   const res = out
   await sleep(300)
-  const shot = await screenshot('date-sheet')
+  await screenshot('date-sheet')
   const issues = consoleLines.slice(before)
   const pass =
     res.nativePickers === 0 &&
@@ -703,17 +727,21 @@ async function runPicker() {
     res.pickDay === true &&
     res.sheetClosed &&
     res.dateAfterPick === '1994-05-20' &&
-    res.hourCellCount === 12 &&
-    res.hourOnIndex === 3 &&
+    res.hourGridGone === true &&
+    res.hourTriggerFound === true &&
+    res.hourPanelOpen === true &&
+    res.hourOptionCount === 12 &&
+    res.hourText === '卯时' &&
+    res.hourPanelClosedAfter === true &&
     res.switchAfter === false &&
     res.dateRowHidden === true
   results.push({
-    page: '自绘日期弹层 / 时辰格',
-    note: '日期行 → 三列弹层 → 回填；时辰 12 格；八字开关联动',
+    page: '自绘日期弹层 / 时辰下拉',
+    note: '日期行 → 三列弹层 → 回填；时辰点开下拉选卯时；八字开关联动',
     reached: !!pass,
     rep: {},
     issues,
-    shot,
+    shot: hourShot,
     text: '',
     handlers: -1,
     picker: res
@@ -910,7 +938,9 @@ for (const r of results) {
           `弹层关=${p.sheetClosed} 回填=${p.dateAfterPick}`
       )
       console.log(
-        `  时辰格：格数=${p.hourCellCount} 选中序号=${p.hourOnIndex} 文案=${p.hourOnText}`
+        `  时辰下拉：旧格已移除=${p.hourGridGone} 触发区=${p.hourTriggerFound} ` +
+          `展开=${p.hourPanelOpen} 选项数=${p.hourOptionCount} ` +
+          `选后=${p.hourText} 收起=${p.hourPanelClosedAfter}`
       )
       console.log(
         `  八字开关：点前=${p.switchBefore} 点后=${p.switchAfter} 日期行已收起=${p.dateRowHidden}`

@@ -8,7 +8,7 @@
  *
  *   八字关 → 不选任何日期，只按字形、出处与偏好出名字
  *   八字开 + 已出生 → 出生日期 + 时辰 → /generate（带八字）
- *   八字开 + 还没出生 → 预产期 + 浮动区间 → /prenatal（只出五行参考，不出名字）
+ *   八字开 + 未出生 → 预产期 + 浮动区间 → /prenatal（只出五行参考，不出名字）
  *
  * 为什么日期不用原生 picker：
  *   预览环境里 `<picker mode="date">` 点不开，用户选不了日期，点「下一步」只会收到
@@ -35,9 +35,11 @@ Page({
     // 默认关：八字是加分项，不该在用户还没表达意愿时就拦着「下一步」要生日。
     // 关着也能出名字（按字形、音律与出处），开了才追问出生状态与生辰。
     useBazi: false,
-    born: true, // 仅 useBazi 时有意义：已出生 / 还没出生
+    born: true, // 仅 useBazi 时有意义：已出生 / 未出生
     birthDate: '',
     hourIndex: 8,
+    hourText: hours.labelOf(8),
+    hourOpen: false, // 时辰下拉是否展开
     hours: HOURS,
     dueDate: '',
     rangeDays: api.DEFAULT_RANGE_DAYS,
@@ -50,7 +52,7 @@ Page({
   },
 
   onLoad(options) {
-    // 兼容旧的深链「孕期参考起名」：等价于 开八字 + 还没出生
+    // 兼容旧的深链「孕期参考起名」：等价于 开八字 + 未出生
     if (options && options.tab === 'prenatal') {
       this.setData({ useBazi: true, born: false })
     }
@@ -79,15 +81,21 @@ Page({
   onBaziToggle() {
     const next = !this.data.useBazi
     // 关掉八字时保留已选日期：用户可能只是临时对比，不想丢掉填过的生辰
-    this.setData({ useBazi: next })
+    this.setData({ useBazi: next, hourOpen: false })
   },
 
   onBornTap(e) {
-    this.setData({ born: e.currentTarget.dataset.born === 'true' })
+    this.setData({ born: e.currentTarget.dataset.born === 'true', hourOpen: false })
   },
 
-  onHourTap(e) {
-    this.setData({ hourIndex: Number(e.currentTarget.dataset.idx) })
+  // 时辰：点「出生时辰」展开列表，点一项即选中并收起
+  onHourToggle() {
+    this.setData({ hourOpen: !this.data.hourOpen })
+  },
+
+  onHourPick(e) {
+    const idx = Number(e.currentTarget.dataset.idx)
+    this.setData({ hourIndex: idx, hourText: hours.labelOf(idx), hourOpen: false })
   },
 
   onRangeTap(e) {

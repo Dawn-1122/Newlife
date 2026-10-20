@@ -22,6 +22,8 @@ Page({
     gender: 'male',
     birthDate: '',
     hourIndex: 8,
+    hourText: hours.labelOf(8),
+    hourOpen: false, // 时辰下拉是否展开
     hours: hours.HOURS,
 
     // 自绘日期弹层（null 表示未打开）
@@ -40,11 +42,17 @@ Page({
 
   onBaziToggle() {
     // 关掉八字时保留已选日期：用户可能只是临时对比，不想丢掉填过的生辰
-    this.setData({ useBazi: !this.data.useBazi })
+    this.setData({ useBazi: !this.data.useBazi, hourOpen: false })
   },
 
-  onHourTap(e) {
-    this.setData({ hourIndex: Number(e.currentTarget.dataset.idx) })
+  // 时辰：点开下拉，点一项即选中并收起
+  onHourToggle() {
+    this.setData({ hourOpen: !this.data.hourOpen })
+  },
+
+  onHourPick(e) {
+    const idx = Number(e.currentTarget.dataset.idx)
+    this.setData({ hourIndex: idx, hourText: hours.labelOf(idx), hourOpen: false })
   },
 
   // ── 日期弹层 ──
