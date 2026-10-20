@@ -1,13 +1,5 @@
 <view class="page">
-  <!-- 窄幅泼墨页头 -->
-  <view class="band">
-    <image class="band-img" src="/images/ink-band.jpg" mode="widthFix" />
-  </view>
-
-  <view class="band-title-wrap">
-    <view class="band-title">名字本</view>
-  </view>
-
+  <!-- 页标题交给导航栏（「名字本」），页内不再重复一遍 -->
   <!-- 分段：起名记录 / 收藏 -->
   <view class="seg-wrap">
     <view class="seg">
@@ -66,7 +58,7 @@
     >
       <view class="fav-head">
         <text class="fav-name">{{item.full_name}}</text>
-        <view class="score-badge {{item.overall >= 85 ? 'score-high' : item.overall >= 70 ? 'score-mid' : 'score-low'}}">{{item.overall}}分</view>
+        <view class="score-badge {{item.tier}}"><text class="score-label">推荐值</text><text class="score-num">{{item.recommend}}</text></view>
       </view>
 
       <view class="fav-pinyin">{{item.pinyinText}}</view>

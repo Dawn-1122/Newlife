@@ -6,32 +6,9 @@
   padding-bottom: 60rpx;
 }
 
-/* ── 窄幅泼墨页头 ── */
-.band {
-  width: 100%;
-  overflow: hidden;
-}
-
-.band-img {
-  width: 100%;
-  display: block;
-}
-
-.band-title-wrap {
-  padding: 36rpx 40rpx 8rpx;
-}
-
-.band-title {
-  font-family: var(--serif);
-  font-size: 44rpx;
-  font-weight: 500;
-  letter-spacing: 8rpx;
-  color: var(--ink);
-}
-
 /* ── 分段切换：选中态用朱砂，与「选中」语义一致 ── */
 .seg-wrap {
-  padding: 28rpx 40rpx 0;
+  padding: 40rpx 40rpx 0;
 }
 
 .seg {

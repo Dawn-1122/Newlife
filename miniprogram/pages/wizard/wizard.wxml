@@ -1,9 +1,4 @@
 <view class="page">
-  <!-- 窄幅泼墨页头 -->
-  <view class="band">
-    <image class="band-img" src="/images/ink-band.jpg" mode="widthFix" />
-  </view>
-
   <view class="head">
     <view class="head-title">定偏好</view>
     <view class="head-meta">{{metaText}}</view>

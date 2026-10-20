@@ -1,6 +1,7 @@
 const api = require('../../utils/api')
 const share = require('../../utils/share')
 const namebook = require('../../utils/namebook')
+const score = require('../../utils/score')
 
 // 结果页风格筛选条：全部 + 8 个风格（与后端 STYLE_OPTIONS 同源，见 utils/api.js）
 const styleFilters = [{ code: '', name: '全部' }].concat(
@@ -114,6 +115,8 @@ Page({
     // 给每个名字加上拼音展示文本，作为全量候选池
     const allNames = (result.names || []).map(function (n) {
       n.pinyinText = (n.phonetics && n.phonetics.pinyins) ? n.phonetics.pinyins.join(' · ') : ''
+      // 推荐值 = 韵味原分折算到可达满分后的展示刻度（换算见 utils/score.js）
+      Object.assign(n, score.badge(n.scores && n.scores.overall))
       return n
     })
 

@@ -5,17 +5,6 @@
   padding-bottom: 60rpx;
 }
 
-/* ── 窄幅泼墨页头 ── */
-.band {
-  width: 100%;
-  overflow: hidden;
-}
-
-.band-img {
-  width: 100%;
-  display: block;
-}
-
 .head {
   padding: 40rpx 40rpx 20rpx;
 }

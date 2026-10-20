@@ -1,11 +1,6 @@
 <view class="page">
-  <!-- 窄幅泼墨页头 -->
-  <view class="band">
-    <image class="band-img" src="/images/ink-band.jpg" mode="widthFix" />
-  </view>
-
   <view class="head">
-    <view class="head-title">起名</view>
+    <!-- 标题「起名」交给导航栏，页内只留一句引子 -->
     <view class="head-meta">给宝宝、给网名、给宠物、给生意，取一个有来处的名</view>
   </view>
 

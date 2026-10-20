@@ -5,16 +5,6 @@
   padding-bottom: 60rpx;
 }
 
-.band {
-  width: 100%;
-  overflow: hidden;
-}
-
-.band-img {
-  width: 100%;
-  display: block;
-}
-
 .container {
   padding: 32rpx 40rpx 0;
   box-sizing: border-box;

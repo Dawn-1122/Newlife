@@ -10,6 +10,7 @@
 //   2. 收藏 → 设置 selectedName 后进详情页，与从结果页点进去是同一条路径
 const namebook = require('../../utils/namebook')
 const share = require('../../utils/share')
+const score = require('../../utils/score')
 
 Page({
   data: {
@@ -30,7 +31,11 @@ Page({
   refresh() {
     this.setData({
       records: namebook.listRecords(),
-      favs: namebook.listFavs()
+      // 收藏项只存了 overall 原分，展示用的推荐值在读的时候算，
+      // 这样旧记录和新记录是同一把尺子（换算见 utils/score.js）
+      favs: namebook.listFavs().map(function (f) {
+        return Object.assign({}, f, score.badge(f.overall))
+      })
     })
   },
 

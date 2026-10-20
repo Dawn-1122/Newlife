@@ -6,11 +6,6 @@
 </wxs>
 
 <view class="page">
-  <!-- 窄幅泼墨页头 -->
-  <view class="band">
-    <image class="band-img" src="/images/ink-band.jpg" mode="widthFix" />
-  </view>
-
   <view class="container">
     <!-- 强加权降级提示 -->
     <view class="fallback-note" wx:if="{{fallbackNote}}">
@@ -133,14 +128,14 @@
       <text class="adjust-more">›</text>
     </view>
 
-    <!-- 名字列表（精简：名字 + 综合分 + 一句寓意，细节收进详情页） -->
+    <!-- 名字列表（精简：名字 + 推荐值 + 一句寓意，细节收进详情页） -->
     <view class="name-list">
       <view class="card name-card" wx:for="{{names}}" wx:key="full_name" bindtap="onNameTap" data-index="{{index}}">
         <view class="name-header">
           <text class="name-text">{{item.full_name}}</text>
           <view class="name-header-right">
-            <view class="score-badge {{item.scores.overall >= 85 ? 'score-high' : item.scores.overall >= 70 ? 'score-mid' : 'score-low'}}">
-              {{item.scores.overall}}分
+            <view class="score-badge {{item.tier}}">
+              <text class="score-label">推荐值</text><text class="score-num">{{item.recommend}}</text>
             </view>
             <text
               class="fav-btn {{item.fav ? 'fav-on' : ''}}"

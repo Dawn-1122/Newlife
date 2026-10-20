@@ -92,6 +92,24 @@ class NamingEngine:
     # 但 3 的「高频常客」更稳（多轮 5/5/5 vs 5/5/6）。
     STRATIFY_BAND_MIN_FACTOR = 3
 
+    # ── 偏好层参数（用户明确选了寓意/风格时，见 _stratified_sample 步骤 1） ──
+    # 为什么偏好层要单独一套：通用层温度 36 是为「没选偏好时也要每批不同」而调的，
+    # 但用户一旦选了寓意/风格，意图就是「给我贴合这个风格的」——此时还按近均匀
+    # 抽样，结果就成了「换了 6 个碰巧命中偏好的随机名」，用户体感「选不选差不多」。
+    # 另外原实现里 pref_pool 先按命中数排序，进 take() 又被 -韵味 重排，
+    # 命中 1 项与命中 4 项待遇相同 —— 偏好只剩「过滤器」作用，没有被「优先」。
+    # 故：层内权重 = 韵味 + 命中数 × PREF_HIT_BONUS，温度降到 PREF_TEMPERATURE。
+    # 取值来自配对实测（同一随机种子，4 组输入 × 12 批 × 6 名，只改这两个参数）：
+    #   旧 0/36 → 新 6/28：命中 ≥2 项的占比 53/72/81% → 64/81/92%，
+    #   命中 ≤1 项（「跟没选一样」的体感来源）47/28/19% → 36/19/8%；
+    #   代价是批间不同名比例 0.50/0.38/0.56 → 0.44/0.36/0.44（换一批重合 +6pt）。
+    # 再压温度（T=24）命中率只涨 2~3pt 而重合度继续升，故取 28。
+    # 注：寓意/风格命中判定本身是字面匹配（出处 imagery/scene 文本），
+    # 区分度有限——「李」这类姓氏的池子偏窄，效果最弱（53%→50%），
+    # 要再往上只能靠标注数据，不是调参能解决的。
+    PREF_HIT_BONUS = 6.0
+    PREF_TEMPERATURE = 28.0
+
     # 组合成立度门槛：抽样前先把窗口收窄到「两字在原文中成对」的同源名。
     # 出处的推荐字是「一袋好字」，两字组合由全交叉产生，实测 65% 的配对在原诗中
     # 分处不同分句——即「只是从同一句里抠了两个不相干的字」（萸橘/红黄式）。
@@ -593,19 +611,26 @@ class NamingEngine:
                 w += self.STRATIFY_COVER_BONUS * len(covered)
             return w
 
-        def take(pool: list[dict], n: int) -> None:
+        def take(
+            pool: list[dict],
+            n: int,
+            weight=None,
+            temperature: Optional[float] = None,
+        ) -> None:
             if n <= 0:
                 return
             avail = [x for x in pool if id(x) not in picked_ids]
             if not avail:
                 return
-            avail.sort(key=lambda x: -weight_of(x))
+            w = weight or weight_of
+            t = temp if temperature is None else temperature
+            avail.sort(key=lambda x: -w(x))
             cap = max(
                 int(k * self.STRATIFY_POOL_FACTOR), self.STRATIFY_POOL_MIN
             )  # 扩大参与抽样的候选池，避免总是同样的高分区
             window = self._banded_window(avail[:cap], n)
             for g in NamingEngine._weighted_pick(
-                window, n, temp, weight_of=weight_of
+                window, n, t, weight_of=w
             ):
                 picked_ids.add(id(g))
                 picked.append(g)
@@ -613,13 +638,22 @@ class NamingEngine:
         # 1) 偏好硬分流
         has_pref = bool(meanings or (style and style in STYLE_OPTIONS))
         if has_pref:
-            pref_pool = [n for n in names if self._pref_hits(n, meanings, style) > 0]
+            hits_of = {id(n): self._pref_hits(n, meanings, style) for n in names}
+            pref_pool = [n for n in names if hits_of[id(n)] > 0]
             pref_pool.sort(
-                key=lambda n: (-self._pref_hits(n, meanings, style),
-                               -n["scores"]["yunwei"])
+                key=lambda n: (-hits_of[id(n)], -n["scores"]["yunwei"])
             )
             if pref_pool:
-                take(pref_pool, min(k, TARGET_MIN))
+                def pref_weight(n: dict) -> float:
+                    """偏好层权重：韵味 + 命中项数加成（命中越多越靠前）。"""
+                    return weight_of(n) + self.PREF_HIT_BONUS * hits_of[id(n)]
+
+                take(
+                    pref_pool,
+                    min(k, TARGET_MIN),
+                    weight=pref_weight,
+                    temperature=self.PREF_TEMPERATURE,
+                )
 
         # 2) 八字分层配额
         remaining = k - len(picked)

@@ -173,6 +173,21 @@ button::after {
 .score-mid { background: var(--paper-deep); color: var(--ink-2); }
 .score-low { background: var(--paper-deep); color: var(--ink-3); }
 
+/* 徽章内「推荐值」标签与数字：标签弱化、数字加重，
+   读起来是「推荐值 91」，而不是「推荐值91分」一串等重的字。 */
+.score-label {
+  font-size: 20rpx;
+  letter-spacing: 1rpx;
+  margin-right: 8rpx;
+  opacity: 0.8;
+}
+
+.score-num {
+  font-family: var(--serif);
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
 /* ── 朱砂印章 ── */
 .seal {
   display: flex;

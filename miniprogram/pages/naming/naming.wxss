@@ -7,31 +7,12 @@
   padding-bottom: 60rpx;
 }
 
-/* ── 窄幅泼墨页头 ── */
-.band {
-  width: 100%;
-  overflow: hidden;
-}
-
-.band-img {
-  width: 100%;
-  display: block;
-}
-
 .head {
-  padding: 40rpx 40rpx 8rpx;
-}
-
-.head-title {
-  font-family: var(--serif);
-  font-size: 46rpx;
-  font-weight: 500;
-  letter-spacing: 8rpx;
-  color: var(--ink);
+  padding: 44rpx 40rpx 8rpx;
 }
 
 .head-meta {
-  margin-top: 14rpx;
+  margin-top: 0;
   font-size: 24rpx;
   letter-spacing: 2rpx;
   line-height: 1.6;
