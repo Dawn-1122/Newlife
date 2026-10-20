@@ -109,6 +109,8 @@ Page({
     const now = new Date()
 
     this.setData({
+      // 开日期弹层前先收起时辰下拉，否则它的面板浮在上面挡住日期行
+      hourOpen: false,
       sheet: Object.assign(
         ds.build({
           value: isBirth ? this.data.birthDate : this.data.dueDate,

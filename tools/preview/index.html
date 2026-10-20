@@ -588,9 +588,28 @@
         )
       }
 
+      // scroll-view 的 scroll-into-view 是微信原生能力，浏览器没有。
+      // 日期弹层靠它把年 / 月 / 列滚到当前选中项；不实现的话三列都停在第一项
+      // （1900 年），用户得自己往下翻一百多行 —— 看起来就像「日期选择坏了」。
+      function applyScrollIntoView(root) {
+        var views = root.querySelectorAll('scroll-view[scroll-into-view]')
+        for (var i = 0; i < views.length; i++) {
+          var sv = views[i]
+          var id = sv.getAttribute('scroll-into-view')
+          if (!id) continue
+          var t = sv.querySelector('#' + (window.CSS && CSS.escape ? CSS.escape(id) : id))
+          if (!t) continue
+          var delta = t.getBoundingClientRect().top - sv.getBoundingClientRect().top
+          // 居中：把选中项放到列中间，上下都留出上下文
+          var center = Math.max(0, (sv.clientHeight - t.clientHeight) / 2)
+          sv.scrollTop = sv.scrollTop + delta - center
+        }
+      }
+
       var uiHooks = {
         mount: function (html, events, inst) {
           morphMount(mount, html)
+          applyScrollIntoView(mount)
           currentInstance = inst
         },
         setTitle: function (t) { if (t) navTitle.textContent = t },

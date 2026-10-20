@@ -105,14 +105,17 @@ node tools/preview/probe.js --attach 9222 --all
   → 输入框被换掉 → 点一下就失焦。（`picker` / `switch` 是替身，在类型判断之前单独处理。）
 
 - **`<picker>` 在预览里点不开，页面已全部改成自绘**：日期用三列 `scroll-view`
-  （`utils/date-sheet.js` + `styles/date-sheet.wxss`），时辰用十二格
-  （`utils/hours.js` + `styles/hour-grid.wxss`），行业等多选项用可点标签。
+  （`utils/date-sheet.js` + `app.wxss` 里的 `.sheet-*`），时辰用点开式下拉
+  （`utils/hours.js` + `app.wxss` 里的 `.select-*`），行业等多选项用可点标签。
   预览器仍保留 `<picker>` 替身（映射到原生 `select`/`date`），但**不要再往页面里加** ——
   `tests/test_profile_page.py` 里有一条测试会扫全站 wxml。
-- **WXSS 的 `@import` 会被内联**：真机编译链本来就把 `@import` 展开，浏览器不认识它，
-  会去请求 `/styles/x.wxss` 拿到 404，样式整段丢失 —— 预览看着「没样式」、真机却是好的，
-  最容易把人带偏。`transformWxss(css, {fromPath, files, root})` 负责递归内联，
-  循环引用与缺失文件各留一条 CSS 注释。**新写共用样式时记得给 `transformWxss` 传 fromPath**。
+- **浮层样式一律写在 `app.wxss`，不要放进页面再 `@import`**：日期弹层与时辰下拉
+  全靠 `position: fixed` 撑着，样式少加载一次就会掉回文档流 —— 表现是「点了没反应，
+  页面底部多出一长串年份」，很容易被当成交互 bug 查半天。`app.wxss` 每页必加载，
+  没有这层不确定性。（`transformWxss` 仍会内联 `@import`，留作兜底。）
+- **`scroll-into-view` 需要预览器自己实现**：它是微信原生能力，浏览器没有。
+  日期弹层的年/月/日三列靠它滚到当前选中项，不实现就会停在 1900 年，
+  用户得往下翻一百多行。见 `index.html` 的 `applyScrollIntoView()`。
 - **`wx.request` 的 `timeout` 在替身里不生效**（走的是 `fetch`，没有超时）。
   页面对超时不能只依赖宿主：`utils/api.js` 的探活自带 1500ms 兜底定时器。
 - **`position: fixed` 在预览里相对整个浏览器窗口，不是手机壳**：日期弹层的遮罩会

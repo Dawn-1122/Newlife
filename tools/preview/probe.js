@@ -308,21 +308,39 @@ async function evaluate(expr) {
   return r.result ? r.result.value : undefined
 }
 
-async function screenshot(name) {
+async function screenshot(name, opts) {
   // 手机壳里有两层会截断内容：.screen（760px，且是 fixed 的包含块）与里面的
   // .wb-page-root（滚动视口）。截图前把两层都撑开，才能截到整页内容。
-  await evaluate(
-    '(function(){' +
-      'var s=document.querySelector(".screen"),m=document.querySelector(".wb-page-root");' +
-      'if(s){s.dataset.h=s.style.height;s.style.height="auto"}' +
-      'if(m){m.dataset.h=m.style.height;m.style.height="auto"' +
-      ';m.dataset.o=m.style.overflow;m.style.overflow="visible"}' +
-      'return 1})()'
-  ).catch(() => 1)
+  //
+  // 但撑开 .screen 会把 fixed 弹层一起「带到」长页面的底部 —— 那是截图假象，
+  // 会让人误判成「弹层掉回文档流」。要看浮层真实位置时传 { raw: true }，
+  // 按屏幕原样截，不撑高、也不截视口外的内容。
+  const raw = !!(opts && opts.raw)
+  if (!raw) {
+    await evaluate(
+      '(function(){' +
+        'var s=document.querySelector(".screen"),m=document.querySelector(".wb-page-root");' +
+        'if(s){s.dataset.h=s.style.height;s.style.height="auto"}' +
+        'if(m){m.dataset.h=m.style.height;m.style.height="auto"' +
+        ';m.dataset.o=m.style.overflow;m.style.overflow="visible"}' +
+        'return 1})()'
+    ).catch(() => 1)
+  }
+  // raw：按手机壳的真实几何裁剪，不受外层视口高度影响，也不改 .screen 高度
+  const clip = raw
+    ? await evaluate(
+        '(function(){var p=document.querySelector(".phone");if(!p)return null;' +
+          'var r=p.getBoundingClientRect();' +
+          'return {x:r.x+window.scrollX,y:r.y+window.scrollY,width:r.width,height:r.height,scale:1}})()'
+      ).catch(() => null)
+    : null
   // 截图也要有上限：页面主线程一旦被卡住，Page.captureScreenshot 不会回包，
   // 整条巡检会静默挂死（比报错更难查）。
+  const shotParams = clip
+    ? { format: 'png', captureBeyondViewport: true, clip }
+    : { format: 'png', captureBeyondViewport: true }
   const r = await Promise.race([
-    cdp.send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true }),
+    cdp.send('Page.captureScreenshot', shotParams),
     new Promise((resolve) => setTimeout(() => resolve({ captureTimeout: true }), 20000))
   ])
   if (r.captureTimeout) {
@@ -331,13 +349,15 @@ async function screenshot(name) {
   }
   const file = `${OUT_DIR}/${name.replace(/\//g, '_')}.png`
   writeFileSync(file, Buffer.from(r.data, 'base64'))
-  await evaluate(
-    '(function(){' +
-      'var s=document.querySelector(".screen"),m=document.querySelector(".wb-page-root");' +
-      'if(s&&s.dataset.h!==undefined){s.style.height=s.dataset.h}' +
-      'if(m&&m.dataset.h!==undefined){m.style.height=m.dataset.h;m.style.overflow=m.dataset.o}' +
-      'return 1})()'
-  ).catch(() => 1)
+  if (!raw) {
+    await evaluate(
+      '(function(){' +
+        'var s=document.querySelector(".screen"),m=document.querySelector(".wb-page-root");' +
+        'if(s&&s.dataset.h!==undefined){s.style.height=s.dataset.h}' +
+        'if(m&&m.dataset.h!==undefined){m.style.height=m.dataset.h;m.style.overflow=m.dataset.o}' +
+        'return 1})()'
+    ).catch(() => 1)
+  }
   return file
 }
 
@@ -647,6 +667,9 @@ async function runPicker() {
   out.dayCountBefore = await evaluate(
     "(function(){var c=document.querySelectorAll('.sheet-col')[2];return c?c.children.length:0})()"
   )
+  // 弹层开着的样子要留档：这一屏出过「弹层掉回文档流」的事故，肉眼可查最省事。
+  // 用 raw 模式：撑高 .screen 会把 fixed 弹层带到长页面底部，那是假象。
+  await screenshot('date-sheet-open', { raw: true })
 
   // 2) 选 1994-05-20（先换年，大小月天数会跟着重算）
   out.pickYear = await pickInCol(0, 1994)

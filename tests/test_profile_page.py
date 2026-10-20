@@ -14,8 +14,9 @@
 3. **两页的日期/时辰交互必须共用同一份实现。**
    分头维护的下场是闰月、大小月、子时落在 23 点这类细节各说各话。
 
-另外守住「视图与样式同源」：日期弹层 / 时辰下拉的样式只在 styles/ 下写一份，
-页面通过 @import 引用 —— 预览器已支持 @import 内联，两处各抄一份必然走样。
+另外守住「视图与样式同源」：日期弹层 / 时辰下拉的样式只在 app.wxss 写一份 ——
+它们全靠 position:fixed 撑着，样式一旦没加载就会掉回文档流，看上去就是
+「点了没反应，页面底部多出一长串年份」。全局样式表每页必加载，比 @import 稳。
 """
 
 from __future__ import annotations
@@ -30,7 +31,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 MINIPROGRAM = PROJECT_ROOT / "miniprogram"
 PAGES = MINIPROGRAM / "pages"
 UTILS = MINIPROGRAM / "utils"
-STYLES = MINIPROGRAM / "styles"
+APP_WXSS = MINIPROGRAM / "app.wxss"
 
 NAME_PAGE = PAGES / "name"
 ANALYZE_PAGE = PAGES / "analyze"
@@ -195,24 +196,67 @@ def test_hours_module_shared():
         assert "utils/hours" in js, f"{page}.js 没有用共用时辰模块"
 
 
-def test_sheet_styles_not_duplicated():
-    """弹层与下拉面板样式只在 styles/ 下写一份，页面用 @import 引用。"""
-    for name in ("date-sheet.wxss", "select-panel.wxss"):
-        assert (STYLES / name).exists(), f"缺少共用样式 styles/{name}"
+def test_sheet_styles_live_in_app_wxss():
+    """日期弹层与时辰下拉的样式必须写在 app.wxss。
+
+    这两块的全部观感都压在 `position: fixed` 上：样式没生效 → 弹层掉回文档流 →
+    出生日期点开只是「页面底部多出一长串年份」，用户看到的是「点了没反应」。
+    曾用 `@import "../../styles/x.wxss"` 共享，但 @import 是编译期行为，
+    页面样式表 / 构建链 / 预览器任一处没展开就会复现上面那个坏样子。
+    app.wxss 每页必加载，没有这层不确定性（2026-10-20 用户反馈后改）。
+    """
+    app = _read(APP_WXSS)
+    for selector in (
+        ".sheet-mask",
+        ".sheet {",
+        ".sheet-cols",
+        ".sheet-item",
+        ".select-trigger",
+        ".select-panel",
+    ):
+        assert selector in app, f"app.wxss 缺少 {selector} —— 浮层样式必须全局加载"
+
+    # 弹层高度要有上限，否则窄视口会顶满整屏
+    assert "max-height: 80vh" in app, ".sheet 没有高度上限，窄屏会顶满整屏"
 
     for page in ("name", "analyze"):
         wxss = _read(PAGES / page / f"{page}.wxss")
-        assert "../../styles/date-sheet.wxss" in wxss, f"{page}.wxss 没引用共用弹层样式"
-        assert "../../styles/select-panel.wxss" in wxss, f"{page}.wxss 没引用共用下拉样式"
-        # 页面里不该再定义一遍（出现即重复，改一处漏一处）
+        assert '@import "' not in wxss, f"{page}.wxss 又用了 @import：浮层样式改由 app.wxss 全局加载"
         for selector in (".sheet-mask", ".sheet-cols", ".sheet-item", ".select-trigger", ".select-panel"):
             assert selector not in wxss, (
-                f"{page}.wxss 又自己写了一份 {selector}：应与 styles/ 下的共用样式保持一致"
+                f"{page}.wxss 又自己写了一份 {selector}：应与 app.wxss 保持一致"
             )
 
 
+def test_hour_dropdown_is_in_flow_so_it_cannot_cover_date_row():
+    """时辰下拉必须随内容下推，不能浮在上方。
+
+    实测：面板向上展开时正好压住「出生日期」那一行，点日期的点击会落到
+    `select-option` 上 —— 用户以为没反应，其实被悄悄改了时辰。向下开又会顶出
+    屏幕底部被裁。只有随内容下推，上下都不遮。
+    """
+    app = _read(APP_WXSS)
+    m = re.search(r"^\.select-panel\s*\{(.*?)^\}", app, re.S | re.M)
+    assert m, "app.wxss 找不到 .select-panel 定义"
+    block = m.group(1)
+    assert "position: absolute" not in block and "position:absolute" not in block, (
+        ".select-panel 又改成浮层了：它会盖住上方字段，点日期会命中选项"
+    )
+    assert "bottom: 100%" not in block, ".select-panel 不要向上展开（会压住日期行）"
+
+    for page in ("name", "analyze"):
+        js = _read(PAGES / page / f"{page}.js")
+        # 开日期弹层的那个函数里必须先收起下拉（数据区里的同名默认值不算）
+        entry = "openDateSheet(mode)" if page == "name" else "onOpenBirthDate()"
+        fm = re.search(re.escape(entry) + r"\s*\{", js)
+        assert fm, f"{page}.js 找不到开弹层的入口 {entry}"
+        assert "hourOpen: false" in js[fm.end() : fm.end() + 700], (
+            f"{page}.js 开弹层时没有先收起时辰下拉"
+        )
+
+
 def test_preview_runner_inlines_wxss_import():
-    """预览器必须能把 @import 内联掉，否则共用样式在预览里整段丢失。"""
+    """预览器必须能把 @import 内联掉（目前页面已不用 @import，留作兜底）。"""
     runner = _read(PROJECT_ROOT / "tools" / "preview" / "runner.js")
     assert "inlineWxssImports" in runner, "预览运行时不再展开 WXSS 的 @import"
     index = _read(PROJECT_ROOT / "tools" / "preview" / "index.html")

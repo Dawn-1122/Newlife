@@ -60,6 +60,8 @@ Page({
   onOpenBirthDate() {
     const now = new Date()
     this.setData({
+      // 开日期弹层前先收起时辰下拉，否则它的面板浮在上面挡住日期行
+      hourOpen: false,
       sheet: ds.build({
         value: this.data.birthDate,
         // 释名多是给已经出生的孩子或自己算，默认今天最省事

@@ -291,9 +291,194 @@ button::after {
   color: var(--ink-3);
 }
 
-/* ── 浮层投影 ── */
-/* 规范②要求阴影只写在这里；下拉面板的布局在 styles/select-panel.wxss。
-   浮层需要比卡片更重的投影，才能从表单里「浮起来」。 */
+/* ══════════════════════════════════════════════════════════
+   浮层：日期弹层 / 时辰下拉
+   ──────────────────────────────────────────────────────────
+   为什么放在 app.wxss 而不是页面 styles/ 里再 @import：
+   这两个浮层的**全部**观感都压在 position:fixed 上。一旦样式没生效，
+   弹层就掉回文档流 —— 出生日期点开只是「页面底部多出一长串年份」，
+   看起来像点了没反应。@import 属于编译期行为，页面样式表、构建工具、
+   预览器三者谁少展开一次，用户就看到这个坏样子。app.wxss 每页必加载，
+   没有这层不确定性；代价只是这两个组件类名全站唯一。
+   ══════════════════════════════════════════════════════════ */
+
+.sheet-mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 100;
+  background: rgba(22, 24, 26, 0.42);
+  display: flex;
+  align-items: flex-end;
+}
+
+.sheet {
+  width: 100%;
+  /* 兜底：无论 rpx 怎么换算、视口多矮，都不许把整屏顶满 */
+  max-height: 80vh;
+  background: var(--card);
+  border-top: 1rpx solid var(--line-strong);
+  padding-bottom: 30rpx;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 26rpx 40rpx;
+  border-bottom: 1rpx solid var(--line);
+}
+
+.sheet-title {
+  font-size: 28rpx;
+  color: var(--ink);
+  letter-spacing: 2rpx;
+}
+
+.sheet-act {
+  font-size: 27rpx;
+  color: var(--ink-3);
+  padding: 6rpx 8rpx;
+}
+
+.sheet-ok {
+  color: var(--cinnabar);
+}
+
+/* 年 / 月 / 日 三个列头，与下面三列对齐 */
+.sheet-units {
+  display: flex;
+  padding: 14rpx 0 6rpx;
+}
+
+.sheet-unit {
+  flex: 1;
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--ink-3);
+  letter-spacing: 2rpx;
+}
+
+.sheet-cols {
+  display: flex;
+  height: 400rpx;
+}
+
+.sheet-col {
+  flex: 1;
+  height: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sheet-item {
+  height: 76rpx;
+  line-height: 76rpx;
+  text-align: center;
+  font-size: 30rpx;
+  color: var(--ink-2);
+}
+
+.sheet-item.on {
+  color: var(--cinnabar);
+  background: var(--cinnabar-bg);
+  font-weight: 500;
+}
+
+/* ── 点开式下拉（时辰等单列选择） ── */
+/* 为什么不用原生 <picker mode="selector">：预览环境里原生 picker 点不开。
+   这里换成「点一行 → 就地展开一列」，只用 view / scroll-view。
+
+   展开方式刻意选了「随内容往下推」，而不是浮在页面上的浮层：
+   浮层要不向上盖住上方的「出生日期」行（点了会命中面板，等于悄悄替用户选时辰），
+   要不下沉出屏幕底部被裁掉。随内容下推则上下都不遮，代价只是页面变长。 */
+
+.select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 18rpx 24rpx;
+  border: 1rpx solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--card);
+}
+
+.select-value {
+  font-size: 30rpx;
+  color: var(--ink);
+  letter-spacing: 1rpx;
+}
+
+/* 右端小三角：展开时朝上 */
+.select-caret {
+  display: inline-block;
+  width: 12rpx;
+  height: 12rpx;
+  margin-top: -8rpx;
+  border-right: 2rpx solid var(--ink-3);
+  border-bottom: 2rpx solid var(--ink-3);
+  transform: rotate(45deg);
+  transition: transform 0.2s, margin-top 0.2s;
+}
+
+.select-caret.up {
+  margin-top: 4rpx;
+  transform: rotate(-135deg);
+}
+
 .select-panel {
+  margin-top: 8rpx;
+  background: var(--card);
+  border: 1rpx solid var(--line-strong);
+  border-radius: var(--r-sm);
+  /* 投影按规范②集中在 app.wxss；浮层要比卡片重，才能从表单里「浮起来」 */
   box-shadow: 0 12rpx 30rpx rgba(22, 24, 26, 0.14);
+  overflow: hidden;
+}
+
+/* 12 个时辰不必全都露出来，六格高度够了，面板越高页面被推得越远 */
+.select-scroll {
+  height: 460rpx;
+}
+
+.select-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 24rpx;
+  border-bottom: 1rpx solid var(--line);
+}
+
+.select-option:last-child {
+  border-bottom: none;
+}
+
+.select-option-name {
+  font-family: var(--serif);
+  font-size: 30rpx;
+  color: var(--ink-2);
+  letter-spacing: 2rpx;
+}
+
+.select-option-span {
+  font-size: 22rpx;
+  color: var(--ink-3);
+  letter-spacing: 1rpx;
+}
+
+.select-option.on {
+  background: var(--cinnabar-bg);
+}
+
+.select-option.on .select-option-name {
+  color: var(--cinnabar);
+  font-weight: 500;
+}
+
+.select-option.on .select-option-span {
+  color: var(--cinnabar);
 }

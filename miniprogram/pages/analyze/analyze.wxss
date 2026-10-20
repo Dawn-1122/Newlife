@@ -1,8 +1,6 @@
 /* 释名 · 填姓名（可选补生辰） */
 
-/* 日期弹层与下拉面板与「起名」页共用，避免两处各写一份走样 */
-@import "../../styles/date-sheet.wxss";
-@import "../../styles/select-panel.wxss";
+/* 日期弹层与时辰下拉的样式在 app.wxss（全局必加载，不靠 @import） */
 
 .header {
   text-align: center;
