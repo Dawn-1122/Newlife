@@ -118,6 +118,7 @@
     <block wx:if="{{sheet.kind === 'hour'}}">
       <view class="sheet-cols sheet-cols-hour">
         <scroll-view class="sheet-col" scroll-y scroll-into-view="{{sheet.hourAnchor}}" scroll-with-animation>
+          <view class="sheet-pad"></view>
           <view
             class="sheet-item sheet-item-hour {{sheet.hour === index ? 'on' : ''}}"
             wx:for="{{hours}}"
@@ -129,6 +130,7 @@
             <text class="sheet-item-name">{{item.label}}时</text>
             <text class="sheet-item-span">{{item.span}}</text>
           </view>
+          <view class="sheet-pad"></view>
         </scroll-view>
       </view>
       <text class="sheet-note">不确定就选个大概，时辰只影响五行配比</text>
@@ -143,6 +145,7 @@
 
       <view class="sheet-cols">
         <scroll-view class="sheet-col" scroll-y scroll-into-view="{{sheet.yearAnchor}}" scroll-with-animation>
+          <view class="sheet-pad"></view>
           <view
             class="sheet-item {{sheet.year === item ? 'on' : ''}}"
             wx:for="{{sheet.years}}"
@@ -151,9 +154,11 @@
             bindtap="onPickYear"
             data-v="{{item}}"
           >{{item}}</view>
+          <view class="sheet-pad"></view>
         </scroll-view>
 
         <scroll-view class="sheet-col" scroll-y scroll-into-view="{{sheet.monthAnchor}}" scroll-with-animation>
+          <view class="sheet-pad"></view>
           <view
             class="sheet-item {{sheet.month === item ? 'on' : ''}}"
             wx:for="{{sheet.months}}"
@@ -162,9 +167,11 @@
             bindtap="onPickMonth"
             data-v="{{item}}"
           >{{item}}</view>
+          <view class="sheet-pad"></view>
         </scroll-view>
 
         <scroll-view class="sheet-col" scroll-y scroll-into-view="{{sheet.dayAnchor}}" scroll-with-animation>
+          <view class="sheet-pad"></view>
           <view
             class="sheet-item {{sheet.day === item ? 'on' : ''}}"
             wx:for="{{sheet.days}}"
@@ -173,6 +180,7 @@
             bindtap="onPickDay"
             data-v="{{item}}"
           >{{item}}</view>
+          <view class="sheet-pad"></view>
         </scroll-view>
       </view>
     </block>

@@ -664,12 +664,24 @@ async function runPicker() {
   console.log('[probe]   · 弹层已打开')
   out.sheetOpen = (await evaluate("document.querySelectorAll('.sheet-mask').length")) === 1
   out.colCount = await evaluate("document.querySelectorAll('.sheet-col').length")
+  // 数列里的 .sheet-item，不是 children（首尾各有一块 .sheet-pad 衬垫）
   out.dayCountBefore = await evaluate(
-    "(function(){var c=document.querySelectorAll('.sheet-col')[2];return c?c.children.length:0})()"
+    "(function(){var c=document.querySelectorAll('.sheet-col')[2];return c?c.querySelectorAll('.sheet-item').length:0})()"
   )
   // 弹层开着的样子要留档：这一屏出过「弹层掉回文档流」的事故，肉眼可查最省事。
   // 用 raw 模式：撑高 .screen 会把 fixed 弹层带到长页面底部，那是假象。
   await screenshot('date-sheet-open', { raw: true })
+
+  // 1.5) 打开时选中项应落在列正中 —— 首尾衬垫就是为了让「今年」「今天」
+  //      这种端点项也能居中，而不是贴在最底边
+  out.centerOffset = await evaluate(
+    "(function(){var c=document.querySelectorAll('.sheet-col');" +
+      "return Array.prototype.map.call(c,function(col){" +
+      "var on=col.querySelector('.sheet-item.on'); if(!on) return null;" +
+      "var rc=col.getBoundingClientRect(), ro=on.getBoundingClientRect();" +
+      "return Math.round(((ro.top+ro.bottom)/2)-((rc.top+rc.bottom)/2))})})()"
+  )
+  console.log('[probe]   · 选中项偏离列中心 = ' + JSON.stringify(out.centerOffset))
 
   // 2) 选 1994-05-20（先换年，大小月天数会跟着重算）
   out.pickYear = await pickInCol(0, 1994)
@@ -680,7 +692,7 @@ async function runPicker() {
   await sleep(500)
   console.log('[probe]   · 选年月日 = ' + out.pickYear + '/' + out.pickMonth + '/' + out.pickDay)
   out.dayCountAfter = await evaluate(
-    "(function(){var c=document.querySelectorAll('.sheet-col')[2];return c?c.children.length:0})()"
+    "(function(){var c=document.querySelectorAll('.sheet-col')[2];return c?c.querySelectorAll('.sheet-item').length:0})()"
   )
   out.onCount = await evaluate("document.querySelectorAll('.sheet-item.on').length")
   out.onText = await evaluate(
@@ -751,6 +763,8 @@ async function runPicker() {
     res.dateRowFound &&
     res.sheetOpen &&
     res.colCount === 3 &&
+    res.centerOffset.length === 3 &&
+    res.centerOffset.every((v) => v !== null && Math.abs(v) <= 3) &&
     res.pickYear === true &&
     res.pickMonth === true &&
     res.pickDay === true &&
@@ -967,6 +981,9 @@ for (const r of results) {
       console.log(
         `  选年月日=${p.pickYear}/${p.pickMonth}/${p.pickDay} 高亮格=${p.onCount} ` +
           `弹层关=${p.sheetClosed} 回填=${p.dateAfterPick}`
+      )
+      console.log(
+        `  默认落点居中度（0 为正中）= ${JSON.stringify(p.centerOffset)}`
       )
       console.log(
         `  时辰弹层：旧控件已移除=${p.hourLegacyGone} 行=${p.hourRowFound} ` +

@@ -229,11 +229,18 @@ def test_sheet_styles_live_in_app_wxss():
         ".sheet-cols-hour",
         ".sheet-item-hour",
         ".sheet-note",
+        ".sheet-pad",
     ):
         assert selector in app, f"app.wxss 缺少 {selector} —— 浮层样式必须全局加载"
 
     # 弹层高度要有上限，否则窄视口会顶满整屏
     assert "max-height: 80vh" in app, ".sheet 没有高度上限，窄屏会顶满整屏"
+
+    # 首尾衬垫：没有它，最后一项（今年）只能贴在最底边，往上拖也没有余量，
+    # 看起来就像「日期列表拖不动」；有了衬垫，「今天」才会落在列的正中间。
+    for page in ("name", "analyze"):
+        wxml = _read(PAGES / page / f"{page}.wxml")
+        assert 'class="sheet-pad"' in wxml, f"{page}.wxml 缺首尾衬垫，端点项无法居中"
 
     for page in ("name", "analyze"):
         wxss = _read(PAGES / page / f"{page}.wxss")

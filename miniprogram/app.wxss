@@ -374,6 +374,13 @@ button::after {
   -webkit-overflow-scrolling: touch;
 }
 
+/* 首尾衬垫：(400-76)/2 = 162rpx。
+   没有它，最后一项（今年）只能贴在最底边，往上拖也没有余量 —— 看起来像
+   「列表拖不动」。有了衬垫，今天总能落在列的正中间，上下都留出上下文。 */
+.sheet-pad {
+  height: 162rpx;
+}
+
 .sheet-item {
   height: 76rpx;
   line-height: 76rpx;
