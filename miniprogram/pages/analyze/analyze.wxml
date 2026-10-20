@@ -32,30 +32,11 @@
         <text class="field-arrow">›</text>
       </view>
 
-      <view class="form-item form-item-col">
-        <text class="form-label form-label-block">出生时辰</text>
-        <view class="select-wrap">
-          <view class="select-trigger" bindtap="onHourToggle">
-            <text class="select-value">{{hourText}}</text>
-            <text class="select-caret {{hourOpen ? 'up' : ''}}"></text>
-          </view>
-
-          <view class="select-panel" wx:if="{{hourOpen}}">
-            <scroll-view class="select-scroll" scroll-y>
-              <view
-                class="select-option {{hourIndex === index ? 'on' : ''}}"
-                wx:for="{{hours}}"
-                wx:key="label"
-                data-idx="{{index}}"
-                bindtap="onHourPick"
-              >
-                <text class="select-option-name">{{item.label}}时</text>
-                <text class="select-option-span">{{item.span}}</text>
-              </view>
-            </scroll-view>
-          </view>
-        </view>
-        <text class="form-hint hint-block">不确定就选个大概，时辰只影响五行配比</text>
+      <!-- 时辰与日期同一种表现形式：点一行 → 底部弹层选一列 → 确定回填 -->
+      <view class="form-item" bindtap="onOpenHour">
+        <text class="form-label">出生时辰</text>
+        <view class="picker-value">{{hourText}}</view>
+        <text class="field-arrow">›</text>
       </view>
     </block>
   </view>
@@ -67,7 +48,7 @@
   </view>
 </view>
 
-<!-- ── 自绘日期弹层（不依赖原生 picker） ── -->
+<!-- ── 自绘弹层：日期与时辰共用一套（不依赖原生 picker） ── -->
 <view class="sheet-mask" wx:if="{{sheet}}" bindtap="onSheetCancel">
   <view class="sheet" catchtap="noop">
     <view class="sheet-head">
@@ -76,6 +57,26 @@
       <text class="sheet-act sheet-ok" bindtap="onSheetConfirm">确定</text>
     </view>
 
+    <block wx:if="{{sheet.kind === 'hour'}}">
+      <view class="sheet-cols sheet-cols-hour">
+        <scroll-view class="sheet-col" scroll-y scroll-into-view="{{sheet.hourAnchor}}" scroll-with-animation>
+          <view
+            class="sheet-item sheet-item-hour {{sheet.hour === index ? 'on' : ''}}"
+            wx:for="{{hours}}"
+            wx:key="label"
+            id="h{{index}}"
+            bindtap="onPickHour"
+            data-idx="{{index}}"
+          >
+            <text class="sheet-item-name">{{item.label}}时</text>
+            <text class="sheet-item-span">{{item.span}}</text>
+          </view>
+        </scroll-view>
+      </view>
+      <text class="sheet-note">不确定就选个大概，时辰只影响五行配比</text>
+    </block>
+
+    <block wx:else>
     <view class="sheet-units">
       <text class="sheet-unit">年</text>
       <text class="sheet-unit">月</text>
@@ -116,5 +117,6 @@
         >{{item}}</view>
       </scroll-view>
     </view>
+    </block>
   </view>
 </view>

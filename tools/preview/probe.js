@@ -600,7 +600,7 @@ async function runBook() {
 async function runPicker() {
   label = 'date'
   const before = consoleLines.length
-  console.log('[probe] 验证自绘日期弹层与时辰格：点击 → 弹层 → 选年月日 → 回填 …')
+  console.log('[probe] 验证自绘弹层：日期三列 / 时辰单列，点击 → 弹层 → 选中 → 确定回填 …')
 
   // 每一步都是一次独立、同步的 evaluate，等待放在 Node 侧（sleep）。
   // 早先写成「一个 async IIFE 里连做十几步」，会把整串动作压进一次
@@ -696,26 +696,32 @@ async function runPicker() {
   )
   console.log('[probe]   · 回填 = ' + out.dateAfterPick + '（弹层已关=' + out.sheetClosed + '）')
 
-  // 4) 时辰：自绘下拉（原 12 格已废弃）。点行 → 展开 12 项 → 选第 4 项（卯时）→ 收起
-  out.hourGridGone = (await evaluate("document.querySelectorAll('.hour-cell').length")) === 0
-  out.hourTriggerFound = (await evaluate("document.querySelectorAll('[data-wb-h=\"onHourToggle\"]').length")) === 1
-  out.hourPanelClosedBefore =
-    (await evaluate("document.querySelectorAll('.select-panel').length")) === 0
-  console.log('[probe]   · 时辰触发区找到 = ' + out.hourTriggerFound)
-  await evaluate(`(function () { ${CLICK}; return clickEl(document.querySelector('[data-wb-h="onHourToggle"]')) })()`)
-  await sleep(600)
-  out.hourPanelOpen = (await evaluate("document.querySelectorAll('.select-panel').length")) === 1
-  out.hourOptionCount = await evaluate("document.querySelectorAll('.select-option').length")
-  console.log('[probe]   · 下拉已开 = ' + out.hourPanelOpen + '，选项数 = ' + out.hourOptionCount)
-  const hourShot = await screenshot('hour-select')
-  await evaluate(`(function () { ${CLICK}; return clickEl(document.querySelectorAll('.select-option')[3]) })()`)
+  // 4) 时辰：与日期同一个弹层。点行 → 弹层 → 选第 4 项（卯时）→ 确定 → 回填
+  out.hourLegacyGone =
+    (await evaluate("document.querySelectorAll('.hour-cell, .select-panel').length")) === 0
+  out.hourRowFound = (await evaluate("document.querySelectorAll('[data-wb-h=\"onOpenHour\"]').length")) === 1
+  console.log('[probe]   · 时辰行找到 = ' + out.hourRowFound)
+  await evaluate(`(function () { ${CLICK}; return clickEl(document.querySelector('[data-wb-h="onOpenHour"]')) })()`)
+  await sleep(700)
+  out.hourSheetOpen = (await evaluate("document.querySelectorAll('.sheet-mask').length")) === 1
+  out.hourSheetOneCol = (await evaluate("document.querySelectorAll('.sheet-cols-hour').length")) === 1
+  out.hourOptionCount = await evaluate("document.querySelectorAll('.sheet-item-hour').length")
+  out.hourTitle = await evaluate(
+    "(function(){var t=document.querySelector('.sheet-title');return t?t.innerText.trim():''})()"
+  )
+  console.log('[probe]   · 弹层已开 = ' + out.hourSheetOpen + '，单列 = ' + out.hourSheetOneCol +
+    '，选项数 = ' + out.hourOptionCount + '，标题 = ' + out.hourTitle)
+  const hourShot = await screenshot('hour-sheet', { raw: true })
+  await evaluate(`(function () { ${CLICK}; return clickEl(document.querySelectorAll('.sheet-item-hour')[3]) })()`)
+  await sleep(500)
+  await evaluate(`(function () { ${CLICK}; return clickEl(document.querySelector('[data-wb-h="onSheetConfirm"]')) })()`)
   await sleep(700)
   out.hourText = await evaluate(
-    "(function(){var v=document.querySelector('.select-value');return v?v.innerText.trim():''})()"
+    "(function(){var rows=document.querySelectorAll('[data-wb-h=\"onOpenHour\"]');" +
+      "var v=rows[0]&&rows[0].querySelector('.picker-value');return v?v.innerText.trim():''})()"
   )
-  out.hourPanelClosedAfter =
-    (await evaluate("document.querySelectorAll('.select-panel').length")) === 0
-  console.log('[probe]   · 选后时辰 = ' + out.hourText + '（下拉已收=' + out.hourPanelClosedAfter + '）')
+  out.hourSheetClosed = (await evaluate("document.querySelectorAll('.sheet-mask').length")) === 0
+  console.log('[probe]   · 选后时辰 = ' + out.hourText + '（弹层已关=' + out.hourSheetClosed + '）')
 
   // 5) 关掉八字 → 日期行应消失
   //    找挂了 onBaziToggle 的元素，而不是 .wb-switch —— 那个类名是 runner 给
@@ -750,17 +756,19 @@ async function runPicker() {
     res.pickDay === true &&
     res.sheetClosed &&
     res.dateAfterPick === '1994-05-20' &&
-    res.hourGridGone === true &&
-    res.hourTriggerFound === true &&
-    res.hourPanelOpen === true &&
+    res.hourLegacyGone === true &&
+    res.hourRowFound === true &&
+    res.hourSheetOpen === true &&
+    res.hourSheetOneCol === true &&
     res.hourOptionCount === 12 &&
+    res.hourTitle === '出生时辰' &&
     res.hourText === '卯时' &&
-    res.hourPanelClosedAfter === true &&
+    res.hourSheetClosed === true &&
     res.switchAfter === false &&
     res.dateRowHidden === true
   results.push({
-    page: '自绘日期弹层 / 时辰下拉',
-    note: '日期行 → 三列弹层 → 回填；时辰点开下拉选卯时；八字开关联动',
+    page: '自绘弹层（日期 / 时辰）',
+    note: '日期行 → 三列弹层 → 回填；时辰行 → 单列弹层 → 选卯时；八字开关联动',
     reached: !!pass,
     rep: {},
     issues,
@@ -961,9 +969,9 @@ for (const r of results) {
           `弹层关=${p.sheetClosed} 回填=${p.dateAfterPick}`
       )
       console.log(
-        `  时辰下拉：旧格已移除=${p.hourGridGone} 触发区=${p.hourTriggerFound} ` +
-          `展开=${p.hourPanelOpen} 选项数=${p.hourOptionCount} ` +
-          `选后=${p.hourText} 收起=${p.hourPanelClosedAfter}`
+        `  时辰弹层：旧控件已移除=${p.hourLegacyGone} 行=${p.hourRowFound} ` +
+          `弹层=${p.hourSheetOpen} 单列=${p.hourSheetOneCol} 选项数=${p.hourOptionCount} ` +
+          `标题=${p.hourTitle} 选后=${p.hourText} 关=${p.hourSheetClosed}`
       )
       console.log(
         `  八字开关：点前=${p.switchBefore} 点后=${p.switchAfter} 日期行已收起=${p.dateRowHidden}`

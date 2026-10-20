@@ -104,9 +104,9 @@ node tools/preview/probe.js --attach 9222 --all
   页面里 `e.detail.value` 为 `undefined` → `setData({surname: undefined})` → 整页重绘
   → 输入框被换掉 → 点一下就失焦。（`picker` / `switch` 是替身，在类型判断之前单独处理。）
 
-- **`<picker>` 在预览里点不开，页面已全部改成自绘**：日期用三列 `scroll-view`
-  （`utils/date-sheet.js` + `app.wxss` 里的 `.sheet-*`），时辰用点开式下拉
-  （`utils/hours.js` + `app.wxss` 里的 `.select-*`），行业等多选项用可点标签。
+- **`<picker>` 在预览里点不开，页面已全部改成自绘**：日期（三列 `scroll-view`）
+  与时辰（单列）共用同一套底部弹层（`utils/date-sheet.js` / `utils/hours.js`
+  + `app.wxss` 里的 `.sheet-*`），行业等多选项用可点标签。
   预览器仍保留 `<picker>` 替身（映射到原生 `select`/`date`），但**不要再往页面里加** ——
   `tests/test_profile_page.py` 里有一条测试会扫全站 wxml。
 - **浮层样式一律写在 `app.wxss`，不要放进页面再 `@import`**：日期弹层与时辰下拉

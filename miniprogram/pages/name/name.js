@@ -39,13 +39,12 @@ Page({
     birthDate: '',
     hourIndex: 8,
     hourText: hours.labelOf(8),
-    hourOpen: false, // 时辰下拉是否展开
     hours: HOURS,
     dueDate: '',
     rangeDays: api.DEFAULT_RANGE_DAYS,
     rangeOptions: api.RANGE_OPTIONS,
 
-    // 自绘日期弹层（null 表示未打开）
+    // 自绘弹层（null 表示未打开）；日期与时辰共用，靠 kind 区分画什么
     sheet: null,
 
     loading: false
@@ -81,36 +80,43 @@ Page({
   onBaziToggle() {
     const next = !this.data.useBazi
     // 关掉八字时保留已选日期：用户可能只是临时对比，不想丢掉填过的生辰
-    this.setData({ useBazi: next, hourOpen: false })
+    this.setData({ useBazi: next })
   },
 
   onBornTap(e) {
-    this.setData({ born: e.currentTarget.dataset.born === 'true', hourOpen: false })
+    this.setData({ born: e.currentTarget.dataset.born === 'true' })
   },
 
-  // 时辰：点「出生时辰」展开列表，点一项即选中并收起
-  onHourToggle() {
-    this.setData({ hourOpen: !this.data.hourOpen })
+  // 时辰与日期用同一个弹层：点一行 → 底部弹层选一列 → 确定回填
+  onOpenHour() {
+    this.setData({
+      sheet: {
+        kind: 'hour',
+        title: '出生时辰',
+        hour: this.data.hourIndex,
+        hourAnchor: 'h' + this.data.hourIndex
+      }
+    })
   },
 
-  onHourPick(e) {
+  onPickHour(e) {
     const idx = Number(e.currentTarget.dataset.idx)
-    this.setData({ hourIndex: idx, hourText: hours.labelOf(idx), hourOpen: false })
+    this.setData({
+      sheet: Object.assign({}, this.data.sheet, { hour: idx, hourAnchor: 'h' + idx })
+    })
   },
 
   onRangeTap(e) {
     this.setData({ rangeDays: Number(e.currentTarget.dataset.range) })
   },
 
-  // ── 日期弹层 ──
+  // ── 弹层（日期 / 时辰共用） ──
 
   openDateSheet(mode) {
     const isBirth = mode === 'birth'
     const now = new Date()
 
     this.setData({
-      // 开日期弹层前先收起时辰下拉，否则它的面板浮在上面挡住日期行
-      hourOpen: false,
       sheet: Object.assign(
         ds.build({
           value: isBirth ? this.data.birthDate : this.data.dueDate,
@@ -120,7 +126,8 @@ Page({
           maxYear: isBirth ? now.getFullYear() : now.getFullYear() + 2,
           title: isBirth ? '出生日期' : '预产期'
         }),
-        { mode: mode }
+        // kind 决定弹层里画三列日期还是单列时辰
+        { mode: mode, kind: 'date' }
       )
     })
   },
@@ -152,6 +159,14 @@ Page({
   onSheetConfirm() {
     const sheet = this.data.sheet
     if (!sheet) return
+    if (sheet.kind === 'hour') {
+      this.setData({
+        hourIndex: sheet.hour,
+        hourText: hours.labelOf(sheet.hour),
+        sheet: null
+      })
+      return
+    }
     const text = ds.format(sheet)
     if (sheet.mode === 'birth') this.setData({ birthDate: text, sheet: null })
     else this.setData({ dueDate: text, sheet: null })

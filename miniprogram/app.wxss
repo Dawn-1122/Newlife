@@ -388,97 +388,44 @@ button::after {
   font-weight: 500;
 }
 
-/* ── 点开式下拉（时辰等单列选择） ── */
-/* 为什么不用原生 <picker mode="selector">：预览环境里原生 picker 点不开。
-   这里换成「点一行 → 就地展开一列」，只用 view / scroll-view。
+/* 时辰用同一个弹层：只占一列，居中，左「子时」右「23:00–01:00」。
+   宽度收窄而不是铺满，否则一行只有两个字太空旷。 */
+.sheet-cols-hour {
+  justify-content: center;
+}
 
-   展开方式刻意选了「随内容往下推」，而不是浮在页面上的浮层：
-   浮层要不向上盖住上方的「出生日期」行（点了会命中面板，等于悄悄替用户选时辰），
-   要不下沉出屏幕底部被裁掉。随内容下推则上下都不遮，代价只是页面变长。 */
+.sheet-cols-hour .sheet-col {
+  flex: 0 0 420rpx;
+}
 
-.select-trigger {
+.sheet-item-hour {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-sizing: border-box;
-  padding: 18rpx 24rpx;
-  border: 1rpx solid var(--line-strong);
-  border-radius: var(--r-sm);
-  background: var(--card);
+  padding: 0 30rpx;
 }
 
-.select-value {
-  font-size: 30rpx;
-  color: var(--ink);
-  letter-spacing: 1rpx;
-}
-
-/* 右端小三角：展开时朝上 */
-.select-caret {
-  display: inline-block;
-  width: 12rpx;
-  height: 12rpx;
-  margin-top: -8rpx;
-  border-right: 2rpx solid var(--ink-3);
-  border-bottom: 2rpx solid var(--ink-3);
-  transform: rotate(45deg);
-  transition: transform 0.2s, margin-top 0.2s;
-}
-
-.select-caret.up {
-  margin-top: 4rpx;
-  transform: rotate(-135deg);
-}
-
-.select-panel {
-  margin-top: 8rpx;
-  background: var(--card);
-  border: 1rpx solid var(--line-strong);
-  border-radius: var(--r-sm);
-  /* 投影按规范②集中在 app.wxss；浮层要比卡片重，才能从表单里「浮起来」 */
-  box-shadow: 0 12rpx 30rpx rgba(22, 24, 26, 0.14);
-  overflow: hidden;
-}
-
-/* 12 个时辰不必全都露出来，六格高度够了，面板越高页面被推得越远 */
-.select-scroll {
-  height: 460rpx;
-}
-
-.select-option {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20rpx 24rpx;
-  border-bottom: 1rpx solid var(--line);
-}
-
-.select-option:last-child {
-  border-bottom: none;
-}
-
-.select-option-name {
+.sheet-item-hour .sheet-item-name {
   font-family: var(--serif);
-  font-size: 30rpx;
-  color: var(--ink-2);
   letter-spacing: 2rpx;
 }
 
-.select-option-span {
+.sheet-item-hour .sheet-item-span {
   font-size: 22rpx;
   color: var(--ink-3);
   letter-spacing: 1rpx;
 }
 
-.select-option.on {
-  background: var(--cinnabar-bg);
+.sheet-item-hour.on .sheet-item-span {
+  color: var(--cinnabar);
 }
 
-.select-option.on .select-option-name {
-  color: var(--cinnabar);
-  font-weight: 500;
-}
-
-.select-option.on .select-option-span {
-  color: var(--cinnabar);
+/* 弹层底部的一句注解（目前只有时辰用到） */
+.sheet-note {
+  display: block;
+  padding-top: 18rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--ink-3);
+  letter-spacing: 1rpx;
 }

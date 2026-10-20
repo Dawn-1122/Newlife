@@ -136,17 +136,32 @@ def test_name_page_placeholders_have_no_examples():
     assert 'placeholder="选填"' in wxml
 
 
-def test_hour_is_a_tap_select_not_a_grid():
-    """时辰是点开式下拉，不是 12 个格子铺在页面上。"""
+def test_hour_uses_the_same_sheet_as_date():
+    """时辰与出生日期是同一种表现形式：点一行 → 底部弹层 → 确定回填。
+
+    用户 2026-10-20 明确要求「时辰列表的表现形式跟出生日期保持一致」。
+    别再改回 12 格平铺，也别改回行内下拉 —— 下拉向上开必盖住日期行、
+    向下开必被屏幕底裁掉，两种都出过「点了没反应」。
+    """
     for page in ("name", "analyze"):
         wxml = _read(PAGES / page / f"{page}.wxml")
         js = _read(PAGES / page / f"{page}.js")
-        assert "hour-grid" not in wxml and "hour-cell" not in wxml, (
-            f"{page}.wxml 又用了 12 格时辰：用户要求改成点击下拉"
-        )
-        assert "select-panel" in wxml, f"{page}.wxml 缺少下拉面板"
-        assert "onHourToggle" in wxml and "onHourPick" in wxml, f"{page}.wxml 缺少下拉的展开/选中"
-        assert "hourOpen" in js, f"{page}.js 没有维护下拉展开状态 hourOpen"
+
+        # 行内不能再有格子或下拉
+        for legacy in ("hour-grid", "hour-cell", "select-panel", "select-trigger", "hourOpen"):
+            assert legacy not in wxml, f"{page}.wxml 还留着旧的时辰控件 {legacy}"
+
+        # 入口与日期行同款：整行可点 + 右端 › + 同一个弹层
+        assert 'bindtap="onOpenHour"' in wxml, f"{page}.wxml 的时辰行没有开弹层"
+        assert 'class="field-arrow"' in wxml, f"{page}.wxml 缺少右端箭头，和日期行不一致"
+        assert "sheet.kind === 'hour'" in wxml, f"{page}.wxml 的弹层没有时辰分支"
+        assert 'bindtap="onPickHour"' in wxml, f"{page}.wxml 缺少时辰选中"
+
+        # 同一个 sheet 状态机，确定时按 kind 分流
+        assert "onOpenHour" in js and "onPickHour" in js, f"{page}.js 缺少时辰弹层处理器"
+        assert "kind: 'hour'" in js, f"{page}.js 打开时辰弹层时没标 kind"
+        confirm = js[js.index("onSheetConfirm") : js.index("onSheetConfirm") + 600]
+        assert "sheet.kind === 'hour'" in confirm, f"{page}.js 确定时没有按 kind 分流时辰"
 
 
 def test_bazi_switch_is_a_square_ink_block():
@@ -197,7 +212,7 @@ def test_hours_module_shared():
 
 
 def test_sheet_styles_live_in_app_wxss():
-    """日期弹层与时辰下拉的样式必须写在 app.wxss。
+    """日期弹层与时辰弹层的样式必须写在 app.wxss。
 
     这两块的全部观感都压在 `position: fixed` 上：样式没生效 → 弹层掉回文档流 →
     出生日期点开只是「页面底部多出一长串年份」，用户看到的是「点了没反应」。
@@ -211,8 +226,9 @@ def test_sheet_styles_live_in_app_wxss():
         ".sheet {",
         ".sheet-cols",
         ".sheet-item",
-        ".select-trigger",
-        ".select-panel",
+        ".sheet-cols-hour",
+        ".sheet-item-hour",
+        ".sheet-note",
     ):
         assert selector in app, f"app.wxss 缺少 {selector} —— 浮层样式必须全局加载"
 
@@ -222,37 +238,10 @@ def test_sheet_styles_live_in_app_wxss():
     for page in ("name", "analyze"):
         wxss = _read(PAGES / page / f"{page}.wxss")
         assert '@import "' not in wxss, f"{page}.wxss 又用了 @import：浮层样式改由 app.wxss 全局加载"
-        for selector in (".sheet-mask", ".sheet-cols", ".sheet-item", ".select-trigger", ".select-panel"):
+        for selector in (".sheet-mask", ".sheet-cols", ".sheet-item", ".sheet-cols-hour", ".sheet-item-hour"):
             assert selector not in wxss, (
                 f"{page}.wxss 又自己写了一份 {selector}：应与 app.wxss 保持一致"
             )
-
-
-def test_hour_dropdown_is_in_flow_so_it_cannot_cover_date_row():
-    """时辰下拉必须随内容下推，不能浮在上方。
-
-    实测：面板向上展开时正好压住「出生日期」那一行，点日期的点击会落到
-    `select-option` 上 —— 用户以为没反应，其实被悄悄改了时辰。向下开又会顶出
-    屏幕底部被裁。只有随内容下推，上下都不遮。
-    """
-    app = _read(APP_WXSS)
-    m = re.search(r"^\.select-panel\s*\{(.*?)^\}", app, re.S | re.M)
-    assert m, "app.wxss 找不到 .select-panel 定义"
-    block = m.group(1)
-    assert "position: absolute" not in block and "position:absolute" not in block, (
-        ".select-panel 又改成浮层了：它会盖住上方字段，点日期会命中选项"
-    )
-    assert "bottom: 100%" not in block, ".select-panel 不要向上展开（会压住日期行）"
-
-    for page in ("name", "analyze"):
-        js = _read(PAGES / page / f"{page}.js")
-        # 开日期弹层的那个函数里必须先收起下拉（数据区里的同名默认值不算）
-        entry = "openDateSheet(mode)" if page == "name" else "onOpenBirthDate()"
-        fm = re.search(re.escape(entry) + r"\s*\{", js)
-        assert fm, f"{page}.js 找不到开弹层的入口 {entry}"
-        assert "hourOpen: false" in js[fm.end() : fm.end() + 700], (
-            f"{page}.js 开弹层时没有先收起时辰下拉"
-        )
 
 
 def test_preview_runner_inlines_wxss_import():
