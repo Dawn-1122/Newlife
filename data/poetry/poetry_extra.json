@@ -1,0 +1,503 @@
+{
+ "version": "1.0",
+ "note": "名字感补库：从诗经/楚辞/汉魏古诗/唐诗里挑「两字可直接作名」的句子。原有 873 条出处的字对经第三道闸（pair_taste）审定后仅 102 个可用，全局只能出约 69 个名字，换一批第 5 批即枯竭。本文件按「先确认能作名、再挂出处」的顺序反向补库——不追求收诗量，只收能出名字的句子。每条 recommend_chars 含字对用字，gender 多为「中」以便男女两条路径都能用。",
+ "total": 62,
+ "poems": [
+  {
+   "id": "poem_x001", "source": "诗经", "title": "周南·桃夭", "author": "佚名", "dynasty": "周",
+   "text": "桃之夭夭，灼灼其华", "original_text": null,
+   "citation": "《诗经·周南·桃夭》",
+   "recommend_chars": ["灼", "华", "夭"],
+   "emotion": "积极", "imagery": ["春华", "明艳"], "gender": "女",
+   "scene": "以盛开的桃花喻女子芳华正盛", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x002", "source": "诗经", "title": "邶风·静女", "author": "佚名", "dynasty": "周",
+   "text": "静女其姝，俟我于城隅", "original_text": null,
+   "citation": "《诗经·邶风·静女》",
+   "recommend_chars": ["静", "姝"],
+   "emotion": "积极", "imagery": ["娴静", "美好"], "gender": "女",
+   "scene": "写静女娴美之态", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x003", "source": "诗经", "title": "卫风·淇奥", "author": "佚名", "dynasty": "周",
+   "text": "有匪君子，如切如磋，如琢如磨", "original_text": null,
+   "citation": "《诗经·卫风·淇奥》",
+   "recommend_chars": ["如", "琢", "磨", "磋"],
+   "emotion": "积极", "imagery": ["修养", "琢磨"], "gender": "男",
+   "scene": "以治玉喻君子修身精益求精", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x004", "source": "诗经", "title": "卫风·淇奥", "author": "佚名", "dynasty": "周",
+   "text": "如金如锡，如圭如璧", "original_text": null,
+   "citation": "《诗经·卫风·淇奥》",
+   "recommend_chars": ["圭", "璧", "锡"],
+   "emotion": "积极", "imagery": ["端方", "温润"], "gender": "男",
+   "scene": "以圭璧喻君子德性温润端方", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x005", "source": "诗经", "title": "卫风·硕人", "author": "佚名", "dynasty": "周",
+   "text": "手如柔荑，肤如凝脂", "original_text": null,
+   "citation": "《诗经·卫风·硕人》",
+   "recommend_chars": ["柔", "荑", "凝"],
+   "emotion": "积极", "imagery": ["柔美", "洁净"], "gender": "女",
+   "scene": "写女子手柔肤润之姿", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x006", "source": "诗经", "title": "卫风·木瓜", "author": "佚名", "dynasty": "周",
+   "text": "投我以木桃，报之以琼瑶", "original_text": null,
+   "citation": "《诗经·卫风·木瓜》",
+   "recommend_chars": ["琼", "瑶"],
+   "emotion": "积极", "imagery": ["美玉", "厚报"], "gender": "女",
+   "scene": "以美玉相报，喻情意深重", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x007", "source": "诗经", "title": "卫风·木瓜", "author": "佚名", "dynasty": "周",
+   "text": "投我以木瓜，报之以琼琚", "original_text": null,
+   "citation": "《诗经·卫风·木瓜》",
+   "recommend_chars": ["琼", "琚"],
+   "emotion": "积极", "imagery": ["佩玉", "情意"], "gender": "中",
+   "scene": "以佩玉相赠，喻永以为好", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x008", "source": "诗经", "title": "郑风·女曰鸡鸣", "author": "佚名", "dynasty": "周",
+   "text": "琴瑟在御，莫不静好", "original_text": null,
+   "citation": "《诗经·郑风·女曰鸡鸣》",
+   "recommend_chars": ["静", "好", "琴"],
+   "emotion": "积极", "imagery": ["和乐", "安宁"], "gender": "女",
+   "scene": "写夫妇相守、岁月静好", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x009", "source": "诗经", "title": "郑风·有女同车", "author": "佚名", "dynasty": "周",
+   "text": "有女同车，颜如舜华", "original_text": null,
+   "citation": "《诗经·郑风·有女同车》",
+   "recommend_chars": ["舜", "华"],
+   "emotion": "积极", "imagery": ["木槿", "美颜"], "gender": "女",
+   "scene": "以木槿之花喻女子容颜", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x010", "source": "诗经", "title": "郑风·山有扶苏", "author": "佚名", "dynasty": "周",
+   "text": "山有扶苏，隰有荷华", "original_text": null,
+   "citation": "《诗经·郑风·山有扶苏》",
+   "recommend_chars": ["扶", "苏", "荷"],
+   "emotion": "积极", "imagery": ["茂木", "清丽"], "gender": "男",
+   "scene": "以山中扶苏之木起兴", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x011", "source": "诗经", "title": "郑风·子衿", "author": "佚名", "dynasty": "周",
+   "text": "青青子衿，悠悠我心", "original_text": null,
+   "citation": "《诗经·郑风·子衿》",
+   "recommend_chars": ["子", "衿", "悠"],
+   "emotion": "中性", "imagery": ["学子", "思慕"], "gender": "男",
+   "scene": "以学子衣领起兴，写思慕之情", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x012", "source": "诗经", "title": "郑风·子衿", "author": "佚名", "dynasty": "周",
+   "text": "青青子佩，悠悠我思", "original_text": null,
+   "citation": "《诗经·郑风·子衿》",
+   "recommend_chars": ["子", "佩"],
+   "emotion": "中性", "imagery": ["佩玉", "思慕"], "gender": "中",
+   "scene": "以佩玉代指所思之人", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x013", "source": "诗经", "title": "郑风·出其东门", "author": "佚名", "dynasty": "周",
+   "text": "虽则如云，匪我思存", "original_text": null,
+   "citation": "《诗经·郑风·出其东门》",
+   "recommend_chars": ["思", "存"],
+   "emotion": "中性", "imagery": ["专情", "思念"], "gender": "中",
+   "scene": "谓游女虽众，非我所念", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x014", "source": "诗经", "title": "郑风·野有蔓草", "author": "佚名", "dynasty": "周",
+   "text": "有美一人，清扬婉兮", "original_text": null,
+   "citation": "《诗经·郑风·野有蔓草》",
+   "recommend_chars": ["清", "扬", "婉"],
+   "emotion": "积极", "imagery": ["清朗", "柔婉"], "gender": "女",
+   "scene": "写佳人眉目清朗、姿态柔婉", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x015", "source": "诗经", "title": "小雅·鹿鸣", "author": "佚名", "dynasty": "周",
+   "text": "呦呦鹿鸣，食野之苹", "original_text": null,
+   "citation": "《诗经·小雅·鹿鸣》",
+   "recommend_chars": ["鹿", "鸣", "苹"],
+   "emotion": "积极", "imagery": ["嘉宾", "和乐"], "gender": "中",
+   "scene": "宴饮嘉宾之乐", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x016", "source": "诗经", "title": "小雅·鹤鸣", "author": "佚名", "dynasty": "周",
+   "text": "鹤鸣于九皋，声闻于天", "original_text": null,
+   "citation": "《诗经·小雅·鹤鸣》",
+   "recommend_chars": ["鹤", "鸣", "皋"],
+   "emotion": "积极", "imagery": ["高远", "清声"], "gender": "男",
+   "scene": "鹤鸣深泽而声闻于天，喻贤者不隐", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x017", "source": "诗经", "title": "小雅·斯干", "author": "佚名", "dynasty": "周",
+   "text": "如竹苞矣，如松茂矣", "original_text": null,
+   "citation": "《诗经·小雅·斯干》",
+   "recommend_chars": ["松", "茂", "竹"],
+   "emotion": "积极", "imagery": ["繁茂", "坚固"], "gender": "男",
+   "scene": "以竹松之茂喻家族兴盛", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x018", "source": "诗经", "title": "小雅·天保", "author": "佚名", "dynasty": "周",
+   "text": "如月之恒，如日之升", "original_text": null,
+   "citation": "《诗经·小雅·天保》",
+   "recommend_chars": ["月", "恒", "升"],
+   "emotion": "积极", "imagery": ["恒久", "上升"], "gender": "中",
+   "scene": "祝颂福寿如日月长明", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x019", "source": "诗经", "title": "小雅·车舝", "author": "佚名", "dynasty": "周",
+   "text": "高山仰止，景行行止", "original_text": null,
+   "citation": "《诗经·小雅·车舝》",
+   "recommend_chars": ["景", "行", "仰"],
+   "emotion": "积极", "imagery": ["仰慕", "大道"], "gender": "男",
+   "scene": "喻德行高洁，令人仰慕效法", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x020", "source": "诗经", "title": "小雅·菁菁者莪", "author": "佚名", "dynasty": "周",
+   "text": "菁菁者莪，在彼中阿", "original_text": null,
+   "citation": "《诗经·小雅·菁菁者莪》",
+   "recommend_chars": ["菁", "莪", "阿"],
+   "emotion": "积极", "imagery": ["茂盛", "育才"], "gender": "中",
+   "scene": "以莪蒿茂盛喻育才之乐", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x021", "source": "诗经", "title": "小雅·庭燎", "author": "佚名", "dynasty": "周",
+   "text": "夜如何其？夜未央", "original_text": null,
+   "citation": "《诗经·小雅·庭燎》",
+   "recommend_chars": ["未", "央"],
+   "emotion": "中性", "imagery": ["长夜", "未尽"], "gender": "中",
+   "scene": "夜未尽而勤于政事", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x022", "source": "诗经", "title": "大雅·思齐", "author": "佚名", "dynasty": "周",
+   "text": "思齐大任，文王之母", "original_text": null,
+   "citation": "《诗经·大雅·思齐》",
+   "recommend_chars": ["思", "齐"],
+   "emotion": "积极", "imagery": ["庄敬", "修身"], "gender": "中",
+   "scene": "称颂文王之母庄敬贤德", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x023", "source": "诗经", "title": "大雅·棫朴", "author": "佚名", "dynasty": "周",
+   "text": "倬彼云汉，为章于天", "original_text": null,
+   "citation": "《诗经·大雅·棫朴》",
+   "recommend_chars": ["云", "汉", "章"],
+   "emotion": "积极", "imagery": ["银河", "光华"], "gender": "男",
+   "scene": "以银河光华喻文采昭著", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x024", "source": "诗经", "title": "大雅·烝民", "author": "佚名", "dynasty": "周",
+   "text": "吉甫作诵，穆如清风", "original_text": null,
+   "citation": "《诗经·大雅·烝民》",
+   "recommend_chars": ["穆", "清", "风"],
+   "emotion": "积极", "imagery": ["和穆", "清朗"], "gender": "男",
+   "scene": "谓诗风和穆如清风化育", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x025", "source": "诗经", "title": "鲁颂·泮水", "author": "佚名", "dynasty": "周",
+   "text": "思乐泮水，薄采其芹", "original_text": null,
+   "citation": "《诗经·鲁颂·泮水》",
+   "recommend_chars": ["采", "芹", "泮"],
+   "emotion": "积极", "imagery": ["学宫", "采撷"], "gender": "中",
+   "scene": "泮宫之乐，喻入学问道", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x026", "source": "诗经", "title": "大雅·假乐", "author": "佚名", "dynasty": "周",
+   "text": "假乐君子，显显令德", "original_text": null,
+   "citation": "《诗经·大雅·假乐》",
+   "recommend_chars": ["令", "德", "显"],
+   "emotion": "积极", "imagery": ["美德", "显扬"], "gender": "男",
+   "scene": "称颂君子美德昭显", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x027", "source": "楚辞", "title": "离骚", "author": "屈原", "dynasty": "战国",
+   "text": "名余曰正则兮，字余曰灵均", "original_text": null,
+   "citation": "《楚辞·离骚》",
+   "recommend_chars": ["灵", "均", "则"],
+   "emotion": "积极", "imagery": ["高洁", "持平"], "gender": "男",
+   "scene": "屈原自述名字之义，取公正均平", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x028", "source": "楚辞", "title": "离骚", "author": "屈原", "dynasty": "战国",
+   "text": "前望舒使先驱兮，后飞廉使奔属", "original_text": null,
+   "citation": "《楚辞·离骚》",
+   "recommend_chars": ["望", "舒", "廉"],
+   "emotion": "积极", "imagery": ["月神", "开道"], "gender": "中",
+   "scene": "望舒为月御，喻引路前行", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x029", "source": "楚辞", "title": "离骚", "author": "屈原", "dynasty": "战国",
+   "text": "路漫漫其修远兮，吾将上下而求索", "original_text": null,
+   "citation": "《楚辞·离骚》",
+   "recommend_chars": ["修", "远", "索"],
+   "emotion": "积极", "imagery": ["求索", "长远"], "gender": "男",
+   "scene": "前路漫长而仍上下求索", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x030", "source": "楚辞", "title": "离骚", "author": "屈原", "dynasty": "战国",
+   "text": "纷吾既有此内美兮，又重之以修能", "original_text": null,
+   "citation": "《楚辞·离骚》",
+   "recommend_chars": ["修", "能", "美"],
+   "emotion": "积极", "imagery": ["内美", "才能"], "gender": "男",
+   "scene": "既有内在之美，又加之以才具", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x031", "source": "楚辞", "title": "离骚", "author": "屈原", "dynasty": "战国",
+   "text": "芳与泽其杂糅兮，唯昭质其犹未亏", "original_text": null,
+   "citation": "《楚辞·离骚》",
+   "recommend_chars": ["昭", "质", "芳"],
+   "emotion": "积极", "imagery": ["明洁", "本质"], "gender": "中",
+   "scene": "虽杂处而不损其明洁本质", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x032", "source": "楚辞", "title": "离骚", "author": "屈原", "dynasty": "战国",
+   "text": "佩缤纷其繁饰兮，芳菲菲其弥章", "original_text": null,
+   "citation": "《楚辞·离骚》",
+   "recommend_chars": ["芳", "菲", "章"],
+   "emotion": "积极", "imagery": ["芬芳", "盛美"], "gender": "女",
+   "scene": "佩饰缤纷，香气弥盛", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x033", "source": "楚辞", "title": "九歌·云中君", "author": "屈原", "dynasty": "战国",
+   "text": "浴兰汤兮沐芳，华采衣兮若英", "original_text": null,
+   "citation": "《楚辞·九歌·云中君》",
+   "recommend_chars": ["沐", "芳", "若", "英"],
+   "emotion": "积极", "imagery": ["沐浴", "华彩"], "gender": "女",
+   "scene": "以兰汤沐浴、华衣若花写洁美", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x034", "source": "楚辞", "title": "九歌·湘君", "author": "屈原", "dynasty": "战国",
+   "text": "美要眇兮宜修", "original_text": null,
+   "citation": "《楚辞·九歌·湘君》",
+   "recommend_chars": ["宜", "修", "眇"],
+   "emotion": "积极", "imagery": ["秀美", "修饰"], "gender": "女",
+   "scene": "写神女容仪秀美合度", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x035", "source": "楚辞", "title": "九歌·湘君", "author": "屈原", "dynasty": "战国",
+   "text": "采芳洲兮杜若，将以遗兮下女", "original_text": null,
+   "citation": "《楚辞·九歌·湘君》",
+   "recommend_chars": ["杜", "若", "芳", "洲"],
+   "emotion": "积极", "imagery": ["香草", "赠远"], "gender": "女",
+   "scene": "采香草以赠远方之人", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x036", "source": "楚辞", "title": "九歌·少司命", "author": "屈原", "dynasty": "战国",
+   "text": "绿叶兮素华，芳菲菲兮袭予", "original_text": null,
+   "citation": "《楚辞·九歌·少司命》",
+   "recommend_chars": ["素", "华", "叶"],
+   "emotion": "积极", "imagery": ["素净", "芬芳"], "gender": "女",
+   "scene": "绿叶白花，香气袭人", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x037", "source": "楚辞", "title": "九歌·东君", "author": "屈原", "dynasty": "战国",
+   "text": "青云衣兮白霓裳", "original_text": null,
+   "citation": "《楚辞·九歌·东君》",
+   "recommend_chars": ["云", "衣", "霓"],
+   "emotion": "积极", "imagery": ["云霓", "飘逸"], "gender": "女",
+   "scene": "以云为衣、以霓为裳", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x038", "source": "楚辞", "title": "九章·橘颂", "author": "屈原", "dynasty": "战国",
+   "text": "秉德无私，参天地兮", "original_text": null,
+   "citation": "《楚辞·九章·橘颂》",
+   "recommend_chars": ["秉", "德", "参"],
+   "emotion": "积极", "imagery": ["公正", "无私"], "gender": "男",
+   "scene": "持德无私，可与天地并立", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x039", "source": "楚辞", "title": "九章·橘颂", "author": "屈原", "dynasty": "战国",
+   "text": "绿叶素荣，纷其可喜兮", "original_text": null,
+   "citation": "《楚辞·九章·橘颂》",
+   "recommend_chars": ["素", "荣", "叶"],
+   "emotion": "积极", "imagery": ["素花", "可喜"], "gender": "中",
+   "scene": "橘树绿叶白花，繁盛可喜", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x040", "source": "楚辞", "title": "九章·涉江", "author": "屈原", "dynasty": "战国",
+   "text": "登昆仑兮食玉英", "original_text": null,
+   "citation": "《楚辞·九章·涉江》",
+   "recommend_chars": ["昆", "仑", "玉"],
+   "emotion": "积极", "imagery": ["高洁", "昆仑"], "gender": "男",
+   "scene": "登昆仑食玉英，喻志洁行高", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x041", "source": "汉魏古诗", "title": "古诗十九首·行行重行行", "author": "佚名", "dynasty": "汉",
+   "text": "胡马依北风，越鸟巢南枝", "original_text": null,
+   "citation": "《古诗十九首·行行重行行》",
+   "recommend_chars": ["南", "枝", "越"],
+   "emotion": "中性", "imagery": ["依恋", "南枝"], "gender": "中",
+   "scene": "鸟兽尚知恋故土", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x042", "source": "汉魏古诗", "title": "古诗十九首·迢迢牵牛星", "author": "佚名", "dynasty": "汉",
+   "text": "河汉清且浅，相去复几许", "original_text": null,
+   "citation": "《古诗十九首·迢迢牵牛星》",
+   "recommend_chars": ["河", "汉", "清", "浅"],
+   "emotion": "中性", "imagery": ["银河", "清浅"], "gender": "中",
+   "scene": "银河清浅而相隔难越", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x043", "source": "汉魏古诗", "title": "观沧海", "author": "曹操", "dynasty": "汉",
+   "text": "星汉灿烂，若出其里", "original_text": null,
+   "citation": "《观沧海》",
+   "recommend_chars": ["星", "汉", "灿"],
+   "emotion": "积极", "imagery": ["星河", "壮阔"], "gender": "男",
+   "scene": "写沧海吞吐星河之壮阔", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x044", "source": "汉魏古诗", "title": "观沧海", "author": "曹操", "dynasty": "汉",
+   "text": "树木丛生，百草丰茂", "original_text": null,
+   "citation": "《观沧海》",
+   "recommend_chars": ["丰", "茂", "木"],
+   "emotion": "积极", "imagery": ["繁茂", "生机"], "gender": "男",
+   "scene": "写岛上草木繁盛", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x045", "source": "汉魏古诗", "title": "洛神赋", "author": "曹植", "dynasty": "三国",
+   "text": "翩若惊鸿，婉若游龙", "original_text": null,
+   "citation": "《洛神赋》",
+   "recommend_chars": ["婉", "若", "鸿"],
+   "emotion": "积极", "imagery": ["轻盈", "婉转"], "gender": "女",
+   "scene": "写洛神体态轻盈婉转", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x046", "source": "汉魏古诗", "title": "洛神赋", "author": "曹植", "dynasty": "三国",
+   "text": "荣曜秋菊，华茂春松", "original_text": null,
+   "citation": "《洛神赋》",
+   "recommend_chars": ["华", "茂", "松", "荣"],
+   "emotion": "积极", "imagery": ["荣盛", "松菊"], "gender": "中",
+   "scene": "以秋菊春松喻容色荣盛", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x047", "source": "汉魏古诗", "title": "洛神赋", "author": "曹植", "dynasty": "三国",
+   "text": "践远游之文履，曳雾绡之轻裾", "original_text": null,
+   "citation": "《洛神赋》",
+   "recommend_chars": ["远", "游", "绡"],
+   "emotion": "中性", "imagery": ["远游", "轻裾"], "gender": "女",
+   "scene": "写神女步履轻盈", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x048", "source": "汉魏古诗", "title": "归园田居", "author": "陶渊明", "dynasty": "晋",
+   "text": "开荒南野际，守拙归园田", "original_text": null,
+   "citation": "《归园田居·其一》",
+   "recommend_chars": ["守", "拙", "田"],
+   "emotion": "中性", "imagery": ["守拙", "归隐"], "gender": "男",
+   "scene": "守其本拙，归耕田园", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x049", "source": "汉魏古诗", "title": "饮酒·其五", "author": "陶渊明", "dynasty": "晋",
+   "text": "山气日夕佳，飞鸟相与还", "original_text": null,
+   "citation": "《饮酒·其五》",
+   "recommend_chars": ["夕", "佳", "山"],
+   "emotion": "积极", "imagery": ["夕照", "归鸟"], "gender": "中",
+   "scene": "写山间夕景与归鸟", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x050", "source": "汉魏古诗", "title": "饮酒·其五", "author": "陶渊明", "dynasty": "晋",
+   "text": "采菊东篱下，悠然见南山", "original_text": null,
+   "citation": "《饮酒·其五》",
+   "recommend_chars": ["东", "篱", "悠", "南"],
+   "emotion": "中性", "imagery": ["东篱", "悠然"], "gender": "中",
+   "scene": "采菊东篱，悠然自得", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x051", "source": "汉魏古诗", "title": "归去来兮辞", "author": "陶渊明", "dynasty": "晋",
+   "text": "云无心以出岫，鸟倦飞而知还", "original_text": null,
+   "citation": "《归去来兮辞》",
+   "recommend_chars": ["云", "岫", "还"],
+   "emotion": "中性", "imagery": ["出岫", "知还"], "gender": "中",
+   "scene": "云出山岫、鸟倦知还，喻顺性而归", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x052", "source": "汉魏古诗", "title": "归去来兮辞", "author": "陶渊明", "dynasty": "晋",
+   "text": "登东皋以舒啸，临清流而赋诗", "original_text": null,
+   "citation": "《归去来兮辞》",
+   "recommend_chars": ["舒", "啸", "皋", "清"],
+   "emotion": "积极", "imagery": ["舒啸", "赋诗"], "gender": "男",
+   "scene": "登皋长啸、临流赋诗", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x053", "source": "汉魏古诗", "title": "晚登三山还望京邑", "author": "谢朓", "dynasty": "南朝",
+   "text": "余霞散成绮，澄江静如练", "original_text": null,
+   "citation": "《晚登三山还望京邑》",
+   "recommend_chars": ["成", "绮", "澄", "静"],
+   "emotion": "积极", "imagery": ["霞绮", "澄江"], "gender": "女",
+   "scene": "晚霞散如锦绮，江水澄静如练", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x054", "source": "唐诗", "title": "终南别业", "author": "王维", "dynasty": "唐",
+   "text": "行到水穷处，坐看云起时", "original_text": null,
+   "citation": "《终南别业》",
+   "recommend_chars": ["云", "起", "行"],
+   "emotion": "中性", "imagery": ["云起", "随缘"], "gender": "中",
+   "scene": "行至水尽而看云起，喻随缘自适", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x055", "source": "唐诗", "title": "望岳", "author": "杜甫", "dynasty": "唐",
+   "text": "造化钟神秀，阴阳割昏晓", "original_text": null,
+   "citation": "《望岳》",
+   "recommend_chars": ["钟", "秀", "神"],
+   "emotion": "积极", "imagery": ["神秀", "钟聚"], "gender": "男",
+   "scene": "写泰山聚天地神秀之气", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x056", "source": "唐诗", "title": "望岳", "author": "杜甫", "dynasty": "唐",
+   "text": "会当凌绝顶，一览众山小", "original_text": null,
+   "citation": "《望岳》",
+   "recommend_chars": ["凌", "绝", "顶"],
+   "emotion": "积极", "imagery": ["登临", "绝顶"], "gender": "男",
+   "scene": "誓登绝顶而小天下", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x057", "source": "唐诗", "title": "秋词", "author": "刘禹锡", "dynasty": "唐",
+   "text": "晴空一鹤排云上，便引诗情到碧霄", "original_text": null,
+   "citation": "《秋词·其一》",
+   "recommend_chars": ["碧", "霄", "鹤"],
+   "emotion": "积极", "imagery": ["碧霄", "凌云"], "gender": "中",
+   "scene": "鹤上晴空，诗情直抵碧霄", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x058", "source": "唐诗", "title": "春江花月夜", "author": "张若虚", "dynasty": "唐",
+   "text": "春江潮水连海平，海上明月共潮生", "original_text": null,
+   "citation": "《春江花月夜》",
+   "recommend_chars": ["潮", "生", "海", "平"],
+   "emotion": "积极", "imagery": ["潮生", "海平"], "gender": "中",
+   "scene": "春江潮起，月共潮生", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x059", "source": "唐诗", "title": "春江花月夜", "author": "张若虚", "dynasty": "唐",
+   "text": "江天一色无纤尘，皎皎空中孤月轮", "original_text": null,
+   "citation": "《春江花月夜》",
+   "recommend_chars": ["纤", "尘", "皎"],
+   "emotion": "中性", "imagery": ["澄澈", "皎月"], "gender": "女",
+   "scene": "江天澄澈，不染纤尘", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x060", "source": "唐诗", "title": "钱塘湖春行", "author": "白居易", "dynasty": "唐",
+   "text": "几处早莺争暖树，谁家新燕啄春泥", "original_text": null,
+   "citation": "《钱塘湖春行》",
+   "recommend_chars": ["暖", "树", "新", "燕"],
+   "emotion": "积极", "imagery": ["早莺", "新燕"], "gender": "女",
+   "scene": "写西湖早春莺燕之态", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x061", "source": "唐诗", "title": "滕王阁序", "author": "王勃", "dynasty": "唐",
+   "text": "潦水尽而寒潭清，烟光凝而暮山紫", "original_text": null,
+   "citation": "《滕王阁序》",
+   "recommend_chars": ["潭", "清", "烟"],
+   "emotion": "中性", "imagery": ["寒潭", "烟光"], "gender": "中",
+   "scene": "秋水尽而寒潭清澈", "tags": [], "provenance": "manual/extra"
+  },
+  {
+   "id": "poem_x062", "source": "唐诗", "title": "滕王阁序", "author": "王勃", "dynasty": "唐",
+   "text": "穷且益坚，不坠青云之志", "original_text": null,
+   "citation": "《滕王阁序》",
+   "recommend_chars": ["益", "坚", "青", "志"],
+   "emotion": "积极", "imagery": ["坚志", "青云"], "gender": "男",
+   "scene": "处境愈穷而志愈坚", "tags": [], "provenance": "manual/extra"
+  }
+ ]
+}

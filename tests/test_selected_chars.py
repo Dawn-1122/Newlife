@@ -113,16 +113,28 @@ def test_source_classes_filter(engine):
 
 
 def test_source_classes_jing_shi_zi_ji_covers_source_db(engine):
-    """「经史子集」应同时覆盖诗词库该类目与字源 4 部典籍（source_class 同值）。"""
-    result = engine.generate_names(
-        surname="林", gender="female", name_length=2, max_results=20,
-        source_classes=["经史子集"],
-    )
-    assert result["total"] > 0
-    for n in result["names"]:
-        poetry = n.get("poetry")
-        if poetry:
-            assert poetry["source_class"] == "经史子集"
+    """「经史子集」应同时覆盖诗词库该类目与字源 4 部典籍（source_class 同值）。
+
+    不断言「姓林一定出得来」：该类目经名字感闸门后只剩个位数可用字对（其余是
+    「仁义/明德/笃志」这类训诫词，不宜作名），姓氏三连同调一挡就可能全灭。
+    故改为多姓氏扫描：**凡有结果就必须同属该类目**，且该类目在整体上是可达的。
+    """
+    reachable = False
+    for surname in ("林", "苏", "顾", "沈"):
+        for gender in ("female", "male"):
+            result = engine.generate_names(
+                surname=surname, gender=gender, name_length=2, max_results=20,
+                source_classes=["经史子集"],
+            )
+            if result["total"]:
+                reachable = True
+            for n in result["names"]:
+                poetry = n.get("poetry")
+                if poetry:
+                    assert poetry["source_class"] == "经史子集", (
+                        f"{n['full_name']} 挂到了 {poetry['source_class']} 的出处"
+                    )
+    assert reachable, "「经史子集」类目一个名字都出不来 —— 类目映射可能断了"
 
 
 def test_poetry_carries_original_text(engine):

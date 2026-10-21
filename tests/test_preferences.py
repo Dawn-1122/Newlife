@@ -74,19 +74,27 @@ def test_preference_changes_source_recommendation(engine):
 
 
 def test_preference_changes_generated_names(engine):
-    """选「勇敢」vs「美丽」→ 生成名字应显著不同。"""
+    """选「勇敢」vs「美丽」→ **展示出来的**那一批名字应显著不同。
+
+    按展示口径（一次 6 个）断言，而不是按 max_results=30：引擎会把全部候选都返回，
+    而某个姓氏在名字感闸门后可用的名字可能只有二三十个——此时两次调用返回的是
+    同一批名字，只是排序不同，集合重合度天然接近 100%。界面一次只给 6 个，
+    「偏好有没有用」取决于这 6 个换不换，故以此为准。
+    """
     a = engine.generate_names(
         "李", "male", 2018, 5, 10, 12, 0,
-        name_length=2, max_results=30, meanings=["bravery"],
+        name_length=2, max_results=6, meanings=["bravery"],
     )
     b = engine.generate_names(
         "李", "male", 2018, 5, 10, 12, 0,
-        name_length=2, max_results=30, meanings=["beauty"],
+        name_length=2, max_results=6, meanings=["beauty"],
     )
     na = [n["full_name"] for n in a["names"]]
     nb = [n["full_name"] for n in b["names"]]
+    assert na and nb, "两种偏好都应有结果"
     overlap = len(set(na) & set(nb))
     assert overlap < len(na) * 0.6, f"偏好未生效：名字重叠 {overlap}/{len(na)}"
+    assert set(na[:3]) - set(nb[:3]), "前三名完全一致 —— 偏好没有影响排序"
 
 
 def test_new_meaning_works(engine):

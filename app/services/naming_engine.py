@@ -14,8 +14,10 @@
 scores.overall 语义变更 = 韵味分（主排序依据）；scores.phonetics/wuge/bazi 退化为展示值。
 """
 
+import json
 import random
 from collections import defaultdict
+from pathlib import Path
 from typing import Optional
 from app.services.bazi_engine import BaziEngine
 from app.services.char_database import CharDatabase
@@ -144,6 +146,44 @@ class NamingEngine:
         self._provenance_char_set: Optional[set[str]] = None
         # 字 → 该字「有语境义项」的最佳出处（回退用，与输入无关）
         self._sense_entry_cache: dict[str, Optional[dict]] = {}
+        # 字对「名字感」分级（人工审定，见 scripts/pair_taste.py）
+        self.pair_taste = self._load_pair_taste()
+
+    # ── 名字感分级（第三道闸，数据在 data/poetry/pair_taste.json） ──
+    # 前两道闸（pair_annotator / pair_review）判的是「像不像诗里的好词」，
+    # 取向是古典雅正——pair_review 甚至把「银河/雪海/青天/暗香/花月」写进保护名单，
+    # 而这正是用户觉得「土」的那一批。第三道闸改判「愿不愿意写在出生证明上」：
+    #   5 = 优先（静姝/望舒/清扬）  4 = 可用（素月/幽意）
+    #   3 = 兜底（清溪/月霜这类景物直取）  1 = 屏蔽（春风/明月/翠凤/瑞祥）
+    # 1 分在组合阶段直接不出；5/4 分在抽样权重里加分，让默认结果先给好名字。
+    # 文件缺失时整体降级为「不分级」（全部按 3 分），不影响出名字。
+    TASTE_BONUS = 4.0          # 抽样权重里每档名字感的加分（5 分比 3 分高 8）
+    # 同一批里同一个字最多出现几次。语料里「清」系字对密集，不设限时一批 6 个能出
+    # 三个「清」；设 2 之后仍保留「清扬/清浅」这类正常重复，只掐掉明显堆叠。
+    CHAR_REPEAT_CAP = 2
+    _TASTE_FILE = Path(__file__).resolve().parents[2] / "data" / "poetry" / "pair_taste.json"
+
+    @classmethod
+    def _load_pair_taste(cls) -> dict[str, int]:
+        try:
+            raw = json.loads(cls._TASTE_FILE.read_text(encoding="utf-8"))
+            scores = raw.get("scores") or {}
+            return {k: int(v) for k, v in scores.items() if isinstance(v, (int, float))}
+        except (OSError, ValueError, TypeError):
+            return {}
+
+    def _pair_taste(self, a: str, b: str) -> int:
+        """字对名字感（**语序敏感**）。
+
+        「幽韵」可用不代表「韵幽」可用——原句语序与倒序分别定级，否则倒序白拿
+        正序的分数（实测漏出过「韵幽」「标清」「汉星」）。倒序未单独定级即按屏蔽
+        处理；正序仍可出，不伤产能。
+
+        分级文件缺失时降级为 3（不分级），而不是让整个引擎哑掉。
+        """
+        if not self.pair_taste:
+            return 3
+        return self.pair_taste.get(a + b, 1)
 
     def generate_names(
         self,
@@ -603,6 +643,9 @@ class NamingEngine:
         def weight_of(n: dict) -> float:
             """层内抽样权重 = 韵味分 + 八字相关加分（随输入变化 → 抗常客）。"""
             w = n["scores"]["yunwei"] + yong_bonus(n)
+            # 名字感：5 分比 3 分高 2×TASTE_BONUS（默认 16），让好名字先浮上来；
+            # 1 分已在组合阶段屏蔽，这里只需处理 3/4/5 三档
+            w += self.TASTE_BONUS * (n.get("_taste", 3) - 3)
             if self.STRATIFY_COVER_BONUS and xi_wuxing:
                 covered = {
                     c.get("wuxing") for c in n.get("chars_info", [])
@@ -624,16 +667,38 @@ class NamingEngine:
                 return
             w = weight or weight_of
             t = temp if temperature is None else temperature
-            avail.sort(key=lambda x: -w(x))
             cap = max(
                 int(k * self.STRATIFY_POOL_FACTOR), self.STRATIFY_POOL_MIN
             )  # 扩大参与抽样的候选池，避免总是同样的高分区
-            window = self._banded_window(avail[:cap], n)
-            for g in NamingEngine._weighted_pick(
-                window, n, t, weight_of=w
-            ):
+
+            # 同批用字去重：语料里「清」系字对特别多（清扬/清浅/清润/清晓…），不加
+            # 约束时一批 6 个能出三个「清」，观感像系统只会拼一个字。约束必须**逐字
+            # 施加**——先筛一遍再由 _weighted_pick 一次选 n 个是无效的（窗口里两个
+            # 「清」各自只占 1 次，选完就变 3 次）。
+            used: dict[str, int] = defaultdict(int)
+            for p in picked:
+                for ch in (p.get("given_name") or ""):
+                    used[ch] += 1
+            target = len(picked) + n
+            while len(picked) < target:
+                cands = [
+                    x for x in avail
+                    if id(x) not in picked_ids
+                    and all(
+                        used[ch] < self.CHAR_REPEAT_CAP
+                        for ch in (x.get("given_name") or "")
+                    )
+                ]
+                if not cands:
+                    break
+                cands.sort(key=lambda x: -w(x))
+                g = NamingEngine._weighted_pick(
+                    self._banded_window(cands[:cap], 1), 1, t, weight_of=w
+                )[0]
                 picked_ids.add(id(g))
                 picked.append(g)
+                for ch in (g.get("given_name") or ""):
+                    used[ch] += 1
 
         # 1) 偏好硬分流
         has_pref = bool(meanings or (style and style in STYLE_OPTIONS))
@@ -895,7 +960,10 @@ class NamingEngine:
         取不到搭档时返回 None，调用方跳过该次尝试，不再退回机械拼接。
         """
         char = c1["char"]
-        partners = self.poetry_db.approved_partners(char)
+        partners = [
+            p for p in self.poetry_db.approved_partners(char)
+            if self._pair_taste(char, p) > 1     # 屏蔽档不值得占一次尝试
+        ]
         if not partners:
             return None
         allowed = {c["char"]: c for c in candidate_chars}
@@ -1078,8 +1146,13 @@ class NamingEngine:
                 xiyong_wuxing, gender, name_length, blacklist, meanings
             )
         }
-        partner_index = {ch: set(self.poetry_db.approved_partners(ch)) & set(pool)
-                         for ch in pool}
+        partner_index = {
+            ch: {
+                p for p in self.poetry_db.approved_partners(ch)
+                if p in pool and self._pair_taste(ch, p) > 1
+            }
+            for ch in pool
+        }
 
         # 3. 门槛层（与 _pass_gate 同源）：三连同调 + 音律 + 五格 + 姓氏谐音/本义 + 忌神
         def gate_ok(chars_info: list[dict]) -> Optional[str]:
@@ -1148,17 +1221,26 @@ class NamingEngine:
                         by_char[ch] = ci
                 annotated = entry.get("name_pairs") or []
                 known = entry.get("name_pairs_known", bool(annotated))
+                # 与 _compose_names 同源：先按出处/音韵定字序，再判名字感。
+                # 表里说「这个字出得来名字」，实际生成就必须出得来——所以这里不能
+                # 只查正序，而要复现生成时真正采用的那一序。
+                def pair_ok(a: str, b: str) -> bool:
+                    first, second = self._order_two_chars(entry, by_char[a], by_char[b])
+                    return self._pair_taste(first["char"], second["char"]) > 1
+
                 if annotated:
                     pair_list = [
                         tuple(p) for p in annotated
-                        if all(ch in by_char for ch in p)
+                        if all(ch in by_char for ch in p) and pair_ok(p[0], p[1])
                     ]
                 elif known:
                     pair_list = []      # 语义层已判定此出处无宜作名的组合
                 else:
                     chars = list(by_char)
                     pair_list = [
-                        (a, b) for i, a in enumerate(chars) for b in chars[i + 1:]
+                        (a, b)
+                        for i, a in enumerate(chars) for b in chars[i + 1:]
+                        if pair_ok(a, b)
                     ]
                 for a, b in pair_list:
                     first, second = self._order_two_chars(entry, by_char[a], by_char[b])
@@ -1172,6 +1254,11 @@ class NamingEngine:
                     if p == ch:
                         continue
                     for first, second in self._order_candidates(ci, pool[p]):
+                        # 与随机组合路径同源：屏蔽档不许占位。缺这一步时「云汉」的
+                        # 搭档会以「汉云」（未定级=屏蔽）的语序记进字表，用户点到
+                        # 「云」却拿不到名字。
+                        if self._pair_taste(first["char"], second["char"]) <= 1:
+                            continue
                         gn = gate_ok([first, second])
                         if gn:
                             record([ch, p], gn)
@@ -1950,6 +2037,12 @@ class NamingEngine:
         def emit(name_data: dict, tier: str) -> None:
             """入库：打 tier + 先字命中数（让「含更多所选字」的名字在同分时靠前）。"""
             name_data["_tier"] = tier
+            if "_taste" not in name_data:
+                # 字辈 / 随机组合 / 单字名等未显式标注的路径统一在这里兜底
+                given = name_data.get("given_name") or ""
+                name_data["_taste"] = (
+                    self._pair_taste(given[0], given[1]) if len(given) >= 2 else 3
+                )
             if selected_set:
                 name_data["_selected_hits"] = sum(
                     1 for ch in name_data["given_name"] if ch in selected_set
@@ -1968,6 +2061,7 @@ class NamingEngine:
         if gen_char:
             gen_ci = self.char_db.get_char(gen_char)
             if gen_ci and gen_char not in blacklist:
+                rows = []
                 for ci in candidate_chars:
                     ch = ci["char"]
                     if ch == gen_char:
@@ -1989,7 +2083,13 @@ class NamingEngine:
                         surname, given_name, chars_info, entry, bazi_result
                     )
                     if name_data:
-                        emit(name_data, "R")
+                        rows.append(name_data)
+                # 名字感闸门在字辈模式下**软执行**：辈字由家族锁定，用户无从换字，
+                # 若把屏蔽档全砍掉可能一个字都不剩（该模式整块失效）。故只在一批里
+                # 还有可用项时才丢弃屏蔽档，全灭时退回全量。
+                keep = [n for n in rows if self._pair_taste(*n["given_name"]) > 1]
+                for name_data in (keep or rows):
+                    emit(name_data, "R")
             return names
 
         def compose_from_entry(entry: dict, tier: str) -> None:
@@ -2073,7 +2173,10 @@ class NamingEngine:
                         if not pair_allowed(pair[0], pair[1]):
                             continue
                         i, j = index_of[pair[0]], index_of[pair[1]]
-                        pairs.append((COHESION_RANK.get("annotated", 0), min(i, j), max(i, j)))
+                        pairs.append((
+                            -self._pair_taste(pair[0], pair[1]),   # 名字感优先
+                            COHESION_RANK.get("annotated", 0), min(i, j), max(i, j),
+                        ))
                 elif annotated_known:
                     # 语义层已判定「此出处无适合作名的两字组合」——尊重判断，不机械拼接
                     pairs = []
@@ -2085,13 +2188,20 @@ class NamingEngine:
                             kind = self.yunwei._cohesion_kind(
                                 valid_chars[i]["char"], valid_chars[j]["char"], entry
                             )
-                            pairs.append((COHESION_RANK.get(kind, 9), i, j))
-                pairs.sort(key=lambda t: (t[0], t[1], t[2]))
+                            pairs.append((
+                                -self._pair_taste(valid_chars[i]["char"], valid_chars[j]["char"]),
+                                COHESION_RANK.get(kind, 9), i, j,
+                            ))
+                pairs.sort(key=lambda t: (t[0], t[1], t[2], t[3]))
 
-                for _, i, j in pairs:
+                for _, _, i, j in pairs:
                     c1, c2 = valid_chars[i], valid_chars[j]
                     # 字序决定：原文语序优先，其次音韵（治「颠倒一下更好」）
                     first, second = self._order_two_chars(entry, c1, c2)
+                    # 名字感屏蔽档：春风/明月/翠凤/瑞祥 这类，组合阶段就不出
+                    taste = self._pair_taste(first["char"], second["char"])
+                    if taste <= 1:
+                        continue
                     # 姓氏结合：三连同调（全平/全仄）提前跳过
                     if self.surname_fit.tri_tone_conflict(
                         surname, [first["char"], second["char"]]
@@ -2105,6 +2215,7 @@ class NamingEngine:
                         surname, given_name, [first, second], entry, bazi_result
                     )
                     if name_data:
+                        name_data["_taste"] = taste
                         emit(name_data, tier)
 
         # 策略1：同源组名，按 tier 预算式（A → B → C），tier 内随机 shuffle + 总量封顶
@@ -2168,6 +2279,11 @@ class NamingEngine:
                 # 同一次尝试：主序优先；主序被重复/门槛挡住时，再试同分的另一序
                 for first, second, given_name in cands:
                     if given_name in seen_names:
+                        continue
+                    # 名字感屏蔽档：随机组合路径也要拦（否则「凤翠」「彩金」会绕过字对闸门）
+                    if name_length == 2 and self._pair_taste(
+                        first["char"], second["char"]
+                    ) <= 1:
                         continue
                     seen_names.add(given_name)
 

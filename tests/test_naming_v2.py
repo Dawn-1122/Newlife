@@ -238,22 +238,59 @@ def test_compose_annotated_entry_only_emits_pairs(engine):
 
     这是「不要单纯抠两个字」的落点：若退回全交叉，「原句成词但不宜作名」的
     配对（圣人/壮心）会重新漏出，而语义判断只有标注能提供。
+
+    取「标注里还有名字感可用字对」的出处，且按性别试到出得来为止：
+    第三道闸（pair_taste）与性别字表都可能让单条出处在某个性别下全灭，
+    那是预期行为（见 test_banned_pairs_emit_nothing），不是组合器坏了。
     """
-    entry = next(
+    entries = [
         p for p in engine.poetry_db._poems
         if p.get("name_pairs") and len(p.get("recommend_chars") or []) >= 3
-    )
-    allowed = {frozenset(p) for p in entry["name_pairs"]}
+        and any(engine._pair_taste(*pair) > 1 for pair in p["name_pairs"])
+    ]
+    assert entries, "语料里应当存在名字感可用的标注出处"
 
-    names = engine._compose_names(
-        "苏", [], [(entry, "A")], "female", 2,
-    )
-    assert names, "有标注的出处应至少产出一个名字"
+    hit = None
+    for entry in entries:
+        for gender in ("female", "male"):
+            names = engine._compose_names("苏", [], [(entry, "A")], gender, 2)
+            if names:
+                hit = (entry, names)
+                break
+        if hit:
+            break
+    assert hit, "标注出处一条都出不来名字 —— 组合器或闸门有系统性故障"
+    entry, names = hit
+    allowed = {frozenset(p) for p in entry["name_pairs"]}
     for n in names:
         if n["scores"]["yunwei_detail"].get("same_source"):
             assert frozenset(n["given_name"]) in allowed, (
                 f"{n['given_name']} 不在标注字对内 —— 全交叉漏出了"
             )
+
+
+def test_banned_pairs_emit_nothing(engine):
+    """名字感屏蔽档（1 分）的字对：出处再「有典」也不出名字。
+
+    这是「诗句里的雅 ≠ 名字里的雅」的硬约束。反例：银河/明月/春风 出自好诗、
+    标注也通过，但写进出生证明就是土——第三道闸的意义就在于否决这类组合。
+    """
+    banned = [
+        p for p in engine.poetry_db._poems
+        if p.get("name_pairs")
+        and all(engine._pair_taste(*pair) <= 1 for pair in p["name_pairs"])
+    ]
+    assert banned, "语料里应当存在整条出处都被屏蔽的样本（否则闸门可能失效）"
+    entry = banned[0]
+    names = engine._compose_names("苏", [], [(entry, "A")], "female", 2)
+    emitted = {
+        n["given_name"] for n in names
+        if n["scores"]["yunwei_detail"].get("same_source")
+    }
+    for given in emitted:
+        assert engine._pair_taste(*given) > 1, (
+            f"{given} 属屏蔽档却从出处组合漏出"
+        )
 
 
 def test_compose_with_selected_chars_must_contain(engine):
