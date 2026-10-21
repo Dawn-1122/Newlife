@@ -234,6 +234,29 @@ EXTRA_REV = {
     "存思": 3, "茂松": 3, "清穆": 3, "佳夕": 3, "修宜": 3,
 }
 
+# 第一批扩库（poetry_extra2.json：诗经 37 / 楚辞 12 / 乐府 8）新增字对的定级。
+# 扩库时的取舍：只收「一条 4~8 字短句能挖出 1~2 个可作名字对」的，不按条数凑。
+EXTRA2 = {
+    # 4 分
+    "采苹": 4, "匪石": 4, "柏舟": 4, "履霜": 4, "清涟": 4, "采苓": 4,
+    "栖迟": 4, "舒窈": 4, "淑仪": 4, "载阳": 4, "德音": 4, "朝宗": 4,
+    "翰飞": 4, "启明": 4, "长庚": 4, "振鹭": 4, "鸢飞": 4, "燕翼": 4,
+    "琼芳": 4, "石兰": 4, "杜衡": 4, "荷衣": 4, "芳馨": 4, "切云": 4,
+    "德泽": 4, "若飞": 4, "纨素": 4,
+    # 3 分（兜底）
+    "唐棣": 3, "照临": 3, "凯风": 3, "秉心": 3, "采萧": 3, "闲闲": 3,
+    "熠耀": 3, "湛露": 3, "采芑": 3, "履冰": 3, "采绿": 3, "白华": 3,
+    "雪霏": 3, "乐胥": 3, "友声": 3, "师尹": 3, "思文": 3, "如璋": 3,
+    "白圭": 3, "桑柔": 3, "蕙带": 3, "宝璐": 3, "安翔": 3, "长友": 3,
+    "春兰": 3, "登霞": 3, "王乔": 3, "金兰": 3, "飞鸿": 3, "知意": 3,
+    "磐石": 3,
+}
+
+EXTRA2_REV = {
+    "鸿飞": 4, "素纨": 3, "芳琼": 3, "兰石": 3, "馨芳": 3, "兰春": 3,
+    "飞翰": 3, "飞鸢": 3, "涟清": 3, "仪淑": 3, "翔安": 3,
+}
+
 
 def build_taste(out: Path) -> None:
     """产出 pair_taste.json：TOP→5、GOOD→4、OK→3，其余一律 1（默认屏蔽）。
@@ -254,10 +277,12 @@ def build_taste(out: Path) -> None:
             scores[w] = 3
         elif w in EXTRA:
             scores[w] = EXTRA[w]
+        elif w in EXTRA2:
+            scores[w] = EXTRA2[w]
         else:
             scores[w] = 1
     # 倒序：显式定级覆盖（可能与某个正序同名，冲突要报出来）
-    for w, s in {**REV, **EXTRA_REV}.items():
+    for w, s in {**REV, **EXTRA_REV, **EXTRA2_REV}.items():
         if w in scores and scores[w] != s:
             print(f"[taste] 警告：{w} 正序 {scores[w]} 分与倒序 {s} 分冲突，以倒序为准")
         scores[w] = s
@@ -280,7 +305,7 @@ def build_taste(out: Path) -> None:
     contradict = BAN_EXTRA & (TOP | GOOD | OK)
     if contradict:
         print(f"[taste] 警告：既在屏蔽样例又在白名单 {sorted(contradict)}")
-    stray = (TOP | GOOD | OK | set(EXTRA)) - set(words)
+    stray = (TOP | GOOD | OK | set(EXTRA) | set(EXTRA2)) - set(words)
     if stray:
         print(f"[taste] 警告：定级了语料里不存在的字对 {sorted(stray)}")
     for s, names in ((5, TOP), (4, GOOD), (3, OK)):

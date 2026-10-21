@@ -161,6 +161,9 @@ class NamingEngine:
     # 同一批里同一个字最多出现几次。语料里「清」系字对密集，不设限时一批 6 个能出
     # 三个「清」；设 2 之后仍保留「清扬/清浅」这类正常重复，只掐掉明显堆叠。
     CHAR_REPEAT_CAP = 2
+    # 偏好命中池最多占整批的份额。窄风格下命中池常常只有七八个名字，全给它就等于
+    # 每次「换一批」都在同一小撮里排列组合（见 take 处的注释）。
+    PREF_QUOTA_RATIO = 0.65
     _TASTE_FILE = Path(__file__).resolve().parents[2] / "data" / "poetry" / "pair_taste.json"
 
     @classmethod
@@ -693,7 +696,10 @@ class NamingEngine:
                     break
                 cands.sort(key=lambda x: -w(x))
                 g = NamingEngine._weighted_pick(
-                    self._banded_window(cands[:cap], 1), 1, t, weight_of=w
+                    # 带宽必须按「本批要几个」算，不能按 1 算：_banded_window 的
+                    # need = n × STRATIFY_BAND_MIN_FACTOR，n=1 会把窗口压到最高分
+                    # 那几名，于是每次换一批都回到同一批名字（实测唯一名 32→20）。
+                    self._banded_window(cands[:cap], n), 1, t, weight_of=w
                 )[0]
                 picked_ids.add(id(g))
                 picked.append(g)
@@ -713,9 +719,14 @@ class NamingEngine:
                     """偏好层权重：韵味 + 命中项数加成（命中越多越靠前）。"""
                     return weight_of(n) + self.PREF_HIT_BONUS * hits_of[id(n)]
 
+                # 偏好池**不许吃满整批**：命中池可能只有七八个名字（风格越窄越小），
+                # 若把 k 个名额全给它，每次「换一批」就是这七八个的排列组合，
+                # 扩库进来的名字永远轮不到（实测某输入连翻 12 批只出 14 个）。
+                # 留两三席给非命中池，偏好照样看得见，池子也能转动。
+                quota = max(2, round(k * self.PREF_QUOTA_RATIO))
                 take(
                     pref_pool,
-                    min(k, TARGET_MIN),
+                    min(k, quota, TARGET_MIN),
                     weight=pref_weight,
                     temperature=self.PREF_TEMPERATURE,
                 )

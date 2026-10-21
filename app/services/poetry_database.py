@@ -26,15 +26,14 @@ class PoetryDatabase:
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
         poems = list(data["poems"])
-        # 名字感补库（data/poetry/poetry_extra.json）：原有语料的字对经第三道闸审定后
-        # 只剩 102 个可用，供给撑不住「换一批」。补库文件与主库同 schema，按追加处理，
-        # 便于整份回退（删文件即恢复原状）。
-        extra = path.parent / "poetry_extra.json"
-        if extra.exists():
+        # 名字感补库（data/poetry/poetry_extra*.json）：原有语料的字对经第三道闸审定后
+        # 只剩 102 个可用，供给撑不住「换一批」。补库文件与主库同 schema，按文件名
+        # 排序后追加（分批收，便于整份回退：删文件即恢复原状）。
+        for extra in sorted(path.parent.glob("poetry_extra*.json")):
             try:
                 poems.extend(json.loads(extra.read_text(encoding="utf-8")).get("poems") or [])
             except json.JSONDecodeError:
-                pass
+                continue
         self._poems = [self.normalize(p) for p in poems]
         self._attach_name_pairs()
         self._build_fullname_index()
