@@ -222,8 +222,25 @@ Page({
 
     this.setData({ loading: true })
     try {
-      // 复用原始请求参数重新调用；后端无固定 seed，天然得到不同候选
-      const result = await api.generateNames(params)
+      // 复用原始请求参数重新调用，并带上「已展示过的名字」：
+      // 后端没有固定 seed，不带排除名单时就等于重新掷骰子——高分池只有二三十个，
+      // 连翻两批必然把同一批名字抽回来（实测顾/男 三批全是清浅、素秋、清秋）。
+      // 只留最近 120 个，请求体不会越滚越大。
+      const shown = (app.globalData.shownNames || []).slice(-120)
+      const reqParams = Object.assign({}, params, { exclude_names: shown })
+      const result = await api.generateNames(reqParams)
+      if (!(result.names || []).length) {
+        // 池子翻完了：保留当前这批，不要把列表刷成空页，也不要记进名字本
+        wx.showToast({
+          title: result.fallback_note || '这一批已经翻完了，换个风格再试试',
+          icon: 'none',
+          duration: 2500
+        })
+        return
+      }
+      app.globalData.shownNames = shown.concat(
+        (result.names || []).map(function (n) { return n.given_name })
+      )
       // 换一批 = 新批次，深度寓意需重新解锁
       const batchId = Date.now()
       app.globalData.lastResult = result

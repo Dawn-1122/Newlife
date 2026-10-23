@@ -71,6 +71,7 @@ async def generate_names(request: NamingRequest):
         selected_chars=request.selected_chars,
         source_classes=request.source_classes,
         generational_char=request.generational_char,
+        exclude_names=request.exclude_names,
     )
 
     return NamingResponse(**result)

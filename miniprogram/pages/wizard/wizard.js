@@ -462,6 +462,11 @@ Page({
         app.globalData.lastResult = result
         app.globalData.lastParams = params
         app.globalData.lastBatchId = batchId
+        // 新一次起名：排除名单从这一批重新开始累计（不然上一轮的十几个名字会一直
+        // 被排除，换个风格也翻不出来）
+        app.globalData.shownNames = (result.names || []).map(function (n) {
+          return n.given_name
+        })
         this.saveRecord('postnatal', params, result, batchId)
         wx.navigateTo({ url: '/pages/result/result' })
       }

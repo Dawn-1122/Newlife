@@ -59,6 +59,9 @@ Page({
       app.globalData.lastParams = record.params
       // 批次号要带回去，否则深度寓意的解锁状态对不上
       app.globalData.lastBatchId = record.batchId || Date.now()
+      // 排除名单跟着切换：否则在这条记录里点「换一批」，被排除的是别的记录的名字
+      app.globalData.shownNames = ((record.payload && record.payload.names) || [])
+        .map(function (n) { return n.given_name })
       wx.navigateTo({ url: '/pages/result/result' })
       return
     }

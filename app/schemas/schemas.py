@@ -26,6 +26,14 @@ class NamingRequest(BaseModel):
     selected_chars: Optional[list[str]] = Field(None, description="用户点选的候选字（先字后出处）：语义为「名字必须含所选字」（任一位置）")
     source_classes: Optional[list[str]] = Field(None, description="出处类目限定（先出处后字），可多选: 诗经|楚辞|汉魏古诗|唐诗|五代词|宋词|清词|经史子集（字源 4 部典籍归入经史子集）")
     generational_char: Optional[str] = Field(None, max_length=1, description="字辈（可选，仅双字名生效）：固定出现在名字第二个字，硬约束")
+    exclude_names: Optional[list[str]] = Field(
+        None,
+        max_length=200,
+        description=(
+            "已展示过的名字（不含姓），仅用于「换一批」：命中的名字硬剔除，"
+            "避免每次重新抽样又把同一批高分名字抽回来。剔除后不足时按实际数量返回。"
+        ),
+    )
 
 
 class RecommendCharsRequest(BaseModel):

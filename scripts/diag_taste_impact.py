@@ -70,6 +70,36 @@ def run(seed: int = 20261021, batches: int = 12, per: int = 6) -> None:
     print(f"\n[唯一名字] {len(all_names)} 个")
 
 
+def refresh(batches: int = 12, per: int = 6) -> None:
+    """模拟前端「换一批」：累计排除已展示名字，看一个输入到底能翻出多少个不重复的名字。
+
+    这是用户真正感知的产能——run() 统计的是「12 批合起来去重后有多少个」，
+    但没带排除名单时，重复的名字会反复占名额；这里带 exclude_names，翻到空为止。
+    """
+    engine = NamingEngine()
+    random.seed(20261021)
+    total: set[str] = set()
+    print(f"[换一批] 带排除名单连翻 {batches} 批（每批 {per} 名）")
+    for surname, gender, style, meanings in INPUTS:
+        seen: list[str] = []
+        curve: list[int] = []
+        for _ in range(batches):
+            r = engine.generate_names(
+                surname=surname, gender=gender, name_length=2,
+                max_results=per, use_bazi=False, style=style,
+                meanings=meanings, exclude_names=seen,
+            )
+            got = [n["given_name"] for n in r["names"]]
+            if not got:
+                break
+            curve.append(len(got))
+            seen.extend(got)
+        total.update(seen)
+        print(f"  {surname}/{gender:<6s} style={str(style):<8s} "
+              f"每批 {curve} → 唯一 {len(seen)}")
+    print(f"\n[换一批·总计] {len(total)} 个不重复的名字")
+
+
 def pickable() -> None:
     engine = NamingEngine()
     for surname, gender in (("林", "female"), ("苏", "male")):
@@ -81,5 +111,7 @@ def pickable() -> None:
 if __name__ == "__main__":
     print("[产能] 同输入连翻 12 批（每批 6 名）")
     run()
+    print()
+    refresh()
     print()
     pickable()

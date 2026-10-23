@@ -209,6 +209,7 @@ class NamingEngine:
         selected_chars: Optional[list[str]] = None,
         source_classes: Optional[list[str]] = None,
         generational_char: Optional[str] = None,
+        exclude_names: Optional[list[str]] = None,
     ) -> dict:
         """
         生成名字候选列表
@@ -234,6 +235,10 @@ class NamingEngine:
                             取值为诗词 source（诗经/楚辞/唐诗/宋词/五代词/清词/汉魏古诗/经史子集）
                             或 source_class（同左，字源 4 部典籍归入「经史子集」）。
             generational_char: 字辈（可选，仅双字名生效）：固定出现在名字第二个字，硬约束。
+            exclude_names: 已展示过的名字（不含姓），「换一批」用：命中的名字硬剔除。
+                           没有它时「换一批」等同于重新掷一次骰子，高分池只有二三十个，
+                           连翻三批必然把同一批高分名字再抽回来（实测顾/男 elegant 三批
+                           里「清浅/素秋/清秋」各出现三次）。
 
         Returns:
             {"bazi": {...}, "names": [...], "total": int, "fallback_note": str|None}
@@ -245,6 +250,7 @@ class NamingEngine:
             style=style, meanings=meanings, avoid_chars=avoid_chars,
             target_min=target_min, selected_chars=selected_chars,
             source_classes=source_classes, generational_char=generational_char,
+            exclude_names=exclude_names,
         )
 
         fallback_note = None
@@ -256,10 +262,16 @@ class NamingEngine:
                 style=None, meanings=None, avoid_chars=avoid_chars,
                 target_min=target_min, selected_chars=selected_chars,
                 source_classes=source_classes, generational_char=generational_char,
+                exclude_names=exclude_names,
             )
             if len(fallback_names) > len(names):
                 names = fallback_names
                 fallback_note = "已尽量贴合偏好，其余按韵味评分补充"
+
+        if not names and exclude_names and not selected_chars:
+            # 排除名单把池子掏空：如实说「翻完了」，不要悄悄回退到已展示过的名字。
+            # 前端据此引导用户换风格/放宽偏好，比再给一遍同样的名字体面。
+            fallback_note = "这一批已经把合适的名字翻完了，换个风格或放宽偏好再试试"
 
         if selected_chars and not names:
             # 先字模式的显式降级，区分两种情况（前端据此给不同引导）：
@@ -303,6 +315,7 @@ class NamingEngine:
         selected_chars: Optional[list[str]] = None,
         source_classes: Optional[list[str]] = None,
         generational_char: Optional[str] = None,
+        exclude_names: Optional[list[str]] = None,
     ) -> tuple:
         """核心起名流程（八字 → 候选字 → 出处匹配 → 组名 → 门槛/韵味 → 排序/多样性/截取）。"""
         # 1. 八字分析（如提供生辰）
@@ -349,13 +362,18 @@ class NamingEngine:
         )
 
         # 4. 生成名字组合
+        #    「换一批」的排除名单在此生效：被排除的名字硬剔除。候选池按排除数量放大，
+        #    否则 6 个名额里剔掉 6 个就等于空手（池子本来只组到 cap 条）。
+        skip = {x for x in (exclude_names or []) if x}
         names = self._compose_names(
             surname, candidate_chars, provenance_matches,
             gender, name_length, bazi_result, blacklist, meanings,
-            target_min=target_min, pool_size=max_results,
+            target_min=target_min, pool_size=max_results + len(skip),
             selected_chars=selected_chars, source_classes=source_classes,
             generational_char=generational_char,
         )
+        if skip:
+            names = [n for n in names if n.get("given_name") not in skip]
 
         # 5. 韵味排序（韵味降序 → 喜用神 → 寓意 → 风格 tie-break）
         #    → 多样性重排 → 分层抽样（八字分层配额 + 偏好硬分流）→ 剥离内部标记
