@@ -148,6 +148,8 @@ class NamingEngine:
         self._sense_entry_cache: dict[str, Optional[dict]] = {}
         # 字对「名字感」分级（人工审定，见 scripts/pair_taste.py）
         self.pair_taste = self._load_pair_taste()
+        # 单字名的名字感分级（同一份文件的 single 段，判据见 _char_taste）
+        self.char_taste = self._load_char_taste()
 
     # ── 名字感分级（第三道闸，数据在 data/poetry/pair_taste.json） ──
     # 前两道闸（pair_annotator / pair_review）判的是「像不像诗里的好词」，
@@ -175,6 +177,16 @@ class NamingEngine:
         except (OSError, ValueError, TypeError):
             return {}
 
+    @classmethod
+    def _load_char_taste(cls) -> dict[str, int]:
+        """单字档位。文件里没有 `single` 段时返回空 dict（`_char_taste` 会降级为 3）。"""
+        try:
+            raw = json.loads(cls._TASTE_FILE.read_text(encoding="utf-8"))
+            single = raw.get("single") or {}
+            return {k: int(v) for k, v in single.items() if isinstance(v, (int, float))}
+        except (OSError, ValueError, TypeError):
+            return {}
+
     def _pair_taste(self, a: str, b: str) -> int:
         """字对名字感（**语序敏感**）。
 
@@ -187,6 +199,20 @@ class NamingEngine:
         if not self.pair_taste:
             return 3
         return self.pair_taste.get(a + b, 1)
+
+    def _char_taste(self, ch: str) -> int:
+        """单字名的名字感（`single` 表）。
+
+        单字原先没有过闸：`_pair_taste` 只认两个字，单字路径直接给默认 3 分，于是
+        「瑰/甘/垂/蓬/汗/鸦」这类不是名字的字能直接出（实测 350 个可生成单字名里
+        约四成不该出）。单字判据与字对略有不同——**一个字要独自立得住**，不能靠
+        搭档衬托，所以是独立的一张表，不共用字对分数。
+
+        表缺失时降级为 3，与 `_pair_taste` 同策。
+        """
+        if not self.char_taste:
+            return 3
+        return self.char_taste.get(ch, 1)
 
     def generate_names(
         self,
@@ -268,7 +294,16 @@ class NamingEngine:
                 names = fallback_names
                 fallback_note = "已尽量贴合偏好，其余按韵味评分补充"
 
-        if not names and exclude_names and not selected_chars:
+        # 先出处模式的空结果兜底：先前这里会返回 0 个名字且 fallback_note 仍是 None，
+        # 前端只能显示一句「暂无结果」，用户根本不知道是类目选得不对、还是条件太窄。
+        # 类目没材料是硬原因，优先于「翻完了」——后者会把原因误判成翻页翻过头。
+        source_note = None
+        if not names and source_classes and not selected_chars:
+            source_note = self._source_classes_note(source_classes, gender)
+
+        if source_note:
+            fallback_note = source_note
+        elif not names and exclude_names and not selected_chars:
             # 排除名单把池子掏空：如实说「翻完了」，不要悄悄回退到已展示过的名字。
             # 前端据此引导用户换风格/放宽偏好，比再给一遍同样的名字体面。
             fallback_note = "这一批已经把合适的名字翻完了，换个风格或放宽偏好再试试"
@@ -294,6 +329,62 @@ class NamingEngine:
             "total": len(names),
             "fallback_note": fallback_note,
         }
+
+    def _source_classes_note(self, source_classes: list[str], gender: str) -> str:
+        """先出处模式返回 0 个名字时的说明。
+
+        先前该模式下空结果一律给 `fallback_note=None`，前端只剩一句「暂无结果」，
+        用户既不知道这类典故本来就少，也不知道该动类目还是动姓氏。这里按材料量分三种
+        说清楚下一步该动什么：
+
+        ① 这一类一条可作名字的典故都没有 —— 收录缺口；
+        ② 有收录，但适合作名字的条目对本性别为零 —— 性别口径不合；
+        ③ 有可用条目，仍一个名字都没组出来 —— 字句本身不合用（名字感屏蔽档、
+           谐音、三连同调等门槛拦下）。此档**不把锅甩给姓氏**：实测「五代词」
+           150 条里字对多为闺阁套语，属语料性质问题，与姓氏无关。
+
+        Args:
+            source_classes: 用户限定的类目（可多选，来自请求体）。
+            gender: male / female，用于复现生成时真正采用的性别口径。
+
+        Returns:
+            直接可展示给用户的中文说明（永不为 None，调用方已确认结果为空）。
+        """
+        wanted = set(source_classes)
+        label = "、".join(source_classes)
+
+        def count(entries: list[dict]) -> int:
+            """数「本类目里、有推荐字、且非哀伤」的条目。"""
+            n = 0
+            for entry in entries:
+                if not (
+                    entry.get("source") in wanted
+                    or entry.get("source_class") in wanted
+                ):
+                    continue
+                if not entry.get("recommend_chars"):
+                    continue
+                if NamingEngine._is_sad_poem(entry):
+                    continue
+                n += 1
+            return n
+
+        total = count(
+            list(self.poetry_db.get_all()) + list(self.source_db.get_all())
+        )
+        usable = count(
+            list(self.poetry_db.get_by_gender(gender))
+            + list(self.source_db.get_by_gender(gender))
+        )
+
+        if not total:
+            return f"还没有收录「{label}」里可作名字的典故，换一类试试"
+        if not usable:
+            return f"「{label}」里还没有适合作名字的典故，换一类试试"
+        return (
+            f"「{label}」里的字句没能组出合适的名字，"
+            "换一类，或改用直接推荐"
+        )
 
     def _build_names(
         self,
@@ -2067,10 +2158,12 @@ class NamingEngine:
             """入库：打 tier + 先字命中数（让「含更多所选字」的名字在同分时靠前）。"""
             name_data["_tier"] = tier
             if "_taste" not in name_data:
-                # 字辈 / 随机组合 / 单字名等未显式标注的路径统一在这里兜底
+                # 字辈 / 随机组合 / 单字名等未显式标注的路径统一在这里兜底。
+                # 单字走 _char_taste：先前一律给 3 分，等于单字名整条路径不过闸。
                 given = name_data.get("given_name") or ""
                 name_data["_taste"] = (
-                    self._pair_taste(given[0], given[1]) if len(given) >= 2 else 3
+                    self._pair_taste(given[0], given[1]) if len(given) >= 2
+                    else self._char_taste(given)
                 )
             if selected_set:
                 name_data["_selected_hits"] = sum(
@@ -2156,7 +2249,11 @@ class NamingEngine:
             index_of = {c["char"]: i for i, c in enumerate(valid_chars)}
 
             if name_length == 1:
-                for ci in valid_chars:
+                # 单字名过第三道闸：屏蔽档直接不出（「瑰/甘/垂/蓬」这类不是名字的字
+                # 先前能一路出到结果页）。此处**不做兜底**——出处的推荐字若全被屏蔽，
+                # 就让这条出处不出单字名，由别的出处补；否则兜底会把屏蔽档又放回来。
+                gated = [c for c in valid_chars if self._char_taste(c["char"]) > 1]
+                for ci in gated:
                     given_name = ci["char"]
                     if given_name in seen_names:
                         continue
@@ -2278,6 +2375,11 @@ class NamingEngine:
                 [c for c in candidate_chars if c["char"] in selected_set]
                 if selected_set else candidate_chars
             )
+            if name_length == 1:
+                # 单字名的随机路径也要过闸，否则屏蔽档会从这条路人字形回来
+                # （策略 1 已过滤，但两条路各自独立取字）。同样不做兜底：
+                # 池子滤空就不走随机路径，宁可少几个名字也不放回屏蔽字。
+                base_pool = [c for c in base_pool if self._char_taste(c["char"]) > 1]
             budget = max(pool_size * self.RANDOM_BUDGET_FACTOR, 120)
             max_attempts = budget * 10
             attempts = 0
