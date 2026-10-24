@@ -357,6 +357,15 @@ EXTRA5 = {
     "逍遥": 3, "扶桑": 3, "飞扬": 3, "海若": 3, "廉洁": 3, "朱颜": 3,
 }
 
+# 清词复核：45 个字对里 41 个判了屏蔽，是全局最薄的一类（去重键修好后仍只出 4 个名）。
+# 逐个看下来，其中一批是「像词不像名」被一刀切误伤——花木/水泽一类的实物意象本就
+# 是传统取名路子，不该与「轻汗/斜照/长闲」同等对待。只提这一批，其余维持屏蔽。
+PROMOTE_CI = {
+    "青玉": 4, "湘雨": 4,
+    "玉兰": 3, "芙蓉": 3, "秋水": 3, "疏林": 3, "银涛": 3, "舜弦": 3,
+    "银杏": 3, "皎洁": 3,
+}
+
 # ── 单字名（name_length=1）的定级 ──────────────────────────────────────────
 # 单字名原先完全没有过闸：`_pair_taste` 只认两个字，单字路径直接给了默认 3 分，
 # 于是「瑰/甘/垂/蓬/汗/鸦」这类不是名字的字能直接出现在结果里（实测 8 组输入
@@ -454,6 +463,8 @@ def build_taste(out: Path) -> None:
             scores[w] = EXTRA4[w]
         elif w in EXTRA5:
             scores[w] = EXTRA5[w]
+        elif w in PROMOTE_CI:
+            scores[w] = PROMOTE_CI[w]
         else:
             scores[w] = 1
     # 倒序：显式定级覆盖（可能与某个正序同名，冲突要报出来）
@@ -493,7 +504,7 @@ def build_taste(out: Path) -> None:
     contradict = BAN_EXTRA & (TOP | GOOD | OK)
     if contradict:
         print(f"[taste] 警告：既在屏蔽样例又在白名单 {sorted(contradict)}")
-    stray = (TOP | GOOD | OK | set(EXTRA) | set(EXTRA2) | set(EXTRA3) | set(EXTRA4) | set(EXTRA5)) - set(words)
+    stray = (TOP | GOOD | OK | set(EXTRA) | set(EXTRA2) | set(EXTRA3) | set(EXTRA4) | set(EXTRA5) | set(PROMOTE_CI)) - set(words)
     if stray:
         print(f"[taste] 警告：定级了语料里不存在的字对 {sorted(stray)}")
     for s, names in ((5, TOP), (4, GOOD), (3, OK)):
