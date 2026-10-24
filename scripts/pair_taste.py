@@ -343,6 +343,20 @@ EXTRA4_REV = {
     "媚春": 3, "蝉鸣": 3, "啸吟": 3,
 }
 
+# 批次 4 扩库（poetry_extra5.json：楚辞 20 条）的定级。
+# 楚辞原是最薄的一类（71 对、12 个 5 分），但优质率 42.3% 仅次于诗经——
+# 不是语料差，是收得少。故按「一条 = 一个能直接作名的短句」补，不碰长歌名句。
+# 仅列新出现的字对：琳琅/未央/秋兰/幽篁/嘉树 在原语料里已有定级，不重复登记。
+EXTRA5 = {
+    # 5 分（2）：典故本身即名字，且不靠搭档衬托
+    "濯缨": 5, "怀瑾": 5,
+    # 4 分
+    "乐康": 4, "容与": 4, "辛夷": 4, "瑶华": 4, "相知": 4, "云旗": 4,
+    "云容": 4, "握瑜": 4, "湘灵": 4, "幼清": 4, "秀雅": 4, "英华": 4,
+    # 3 分（兜底：能读通，但作名偏虚或偏实）
+    "逍遥": 3, "扶桑": 3, "飞扬": 3, "海若": 3, "廉洁": 3, "朱颜": 3,
+}
+
 # ── 单字名（name_length=1）的定级 ──────────────────────────────────────────
 # 单字名原先完全没有过闸：`_pair_taste` 只认两个字，单字路径直接给了默认 3 分，
 # 于是「瑰/甘/垂/蓬/汗/鸦」这类不是名字的字能直接出现在结果里（实测 8 组输入
@@ -438,6 +452,8 @@ def build_taste(out: Path) -> None:
             scores[w] = EXTRA3[w]
         elif w in EXTRA4:
             scores[w] = EXTRA4[w]
+        elif w in EXTRA5:
+            scores[w] = EXTRA5[w]
         else:
             scores[w] = 1
     # 倒序：显式定级覆盖（可能与某个正序同名，冲突要报出来）
@@ -477,7 +493,7 @@ def build_taste(out: Path) -> None:
     contradict = BAN_EXTRA & (TOP | GOOD | OK)
     if contradict:
         print(f"[taste] 警告：既在屏蔽样例又在白名单 {sorted(contradict)}")
-    stray = (TOP | GOOD | OK | set(EXTRA) | set(EXTRA2) | set(EXTRA3) | set(EXTRA4)) - set(words)
+    stray = (TOP | GOOD | OK | set(EXTRA) | set(EXTRA2) | set(EXTRA3) | set(EXTRA4) | set(EXTRA5)) - set(words)
     if stray:
         print(f"[taste] 警告：定级了语料里不存在的字对 {sorted(stray)}")
     for s, names in ((5, TOP), (4, GOOD), (3, OK)):

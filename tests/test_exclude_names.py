@@ -55,10 +55,15 @@ def test_refresh_batches_never_repeat(engine):
 
 
 def test_emptied_pool_returns_note_not_repeats(engine):
-    """把池子翻空：宁可返回空 + 说明，也不能回退去给已排除的名字。"""
+    """把池子翻空：宁可返回空 + 说明，也不能回退去给已排除的名字。
+
+    批数上限给到 120：去重键改成 id 之后（见 `_entry_key`），候选池从 579 条
+    变成 1233 条，原先 30 批就耗尽的假设不再成立——这里不写死「第几批必须空」，
+    只要求「翻空的那一刻」行为正确，翻不空则说明池子比该样本的供给上限还大。
+    """
     seen: list[str] = []
     r = None
-    for _ in range(30):
+    for _ in range(120):
         r = _gen(engine, exclude_names=seen)
         got = [n["given_name"] for n in r["names"]]
         assert not (set(got) & set(seen))
@@ -66,7 +71,7 @@ def test_emptied_pool_returns_note_not_repeats(engine):
             break
         seen.extend(got)
 
-    assert not r["names"], "翻到第 30 批仍有结果，说明池子比预期大（测试前提变了）"
+    assert not r["names"], "翻到 120 批仍有结果，样本池远超供给上限（请加大上限）"
     assert r["fallback_note"], "掏空时应给出说明，不能静默返回空列表"
 
 

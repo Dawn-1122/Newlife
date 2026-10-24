@@ -453,17 +453,20 @@ class NamingEngine:
         )
 
         # 4. 生成名字组合
-        #    「换一批」的排除名单在此生效：被排除的名字硬剔除。候选池按排除数量放大，
-        #    否则 6 个名额里剔掉 6 个就等于空手（池子本来只组到 cap 条）。
+        #    「换一批」的排除名单在 emit() 里硬剔除（与 seen_names 同一处收口），
+        #    **不放大候选池**：放大是「先算完再剔」的补丁，而 cap 随 pool_size 线性
+        #    增长——实测 exclude=120 时延迟从 109ms 涨到 893ms（cap 600 → 5040）。
+        #    改为组合时跳过之后，cap 恒为 600，延迟不随排除名单长度变化。
         skip = {x for x in (exclude_names or []) if x}
         names = self._compose_names(
             surname, candidate_chars, provenance_matches,
             gender, name_length, bazi_result, blacklist, meanings,
-            target_min=target_min, pool_size=max_results + len(skip),
+            target_min=target_min, pool_size=max_results,
             selected_chars=selected_chars, source_classes=source_classes,
-            generational_char=generational_char,
+            generational_char=generational_char, exclude_given=skip,
         )
         if skip:
+            # emit() 已剔除；这里再滤一次是双保险，防止将来新增路径绕过 emit。
             names = [n for n in names if n.get("given_name") not in skip]
 
         # 5. 韵味排序（韵味降序 → 喜用神 → 寓意 → 风格 tie-break）
@@ -1503,6 +1506,20 @@ class NamingEngine:
             "dominant": tendency[0],
         }
 
+    @staticmethod
+    def _entry_key(entry: dict) -> tuple:
+        """出处条目的去重键 —— 按 id，**不按 (source, title)**。
+
+        一个篇目可以合法地贡献多个短句单元：《离骚》14 条、《浣溪沙》57 条、
+        《水调歌头》12 条，都是同篇下的不同句子，各有自己的推荐字与字对。
+        按篇名去重会把它们当成重复整条丢掉——实测全库 1233 条里有 654 条
+        （53%）从未进入候选，其中五代词 57 首《浣溪沙》只剩 1 首可出。
+        「五代词出不了名字」的真正原因在这里，而不是语料性质。
+
+        真正需要防的只有「同一条目被加载两次」，那用 id 就够。
+        """
+        return (entry.get("id") or "", entry.get("source"), entry.get("title"))
+
     def _available_source_entries(self, gender: str, blacklist: set) -> list[dict]:
         """收集所有可用来源（诗词 + 字源，排除哀伤、无可用推荐字）。"""
         entries: list[dict] = []
@@ -1512,7 +1529,7 @@ class NamingEngine:
         seen: set = set()
         result: list[dict] = []
         for entry in entries:
-            key = (entry["source"], entry["title"])
+            key = NamingEngine._entry_key(entry)
             if key in seen:
                 continue
             seen.add(key)
@@ -1836,7 +1853,7 @@ class NamingEngine:
         matched = []
         seen = set()
         for entry in entries:
-            key = (entry["source"], entry["title"])
+            key = NamingEngine._entry_key(entry)
             if key in seen:
                 continue
             seen.add(key)
@@ -2130,10 +2147,12 @@ class NamingEngine:
         selected_chars: Optional[list[str]] = None,
         source_classes: Optional[list[str]] = None,
         generational_char: Optional[str] = None,
+        exclude_given: Optional[set] = None,
     ) -> list[dict]:
         """组合生成名字（预算式 + tier 标记）。"""
         names = []
         seen_names = set()
+        exclude_given = exclude_given or set()
         blacklist = blacklist or set()
         selected_set = set(selected_chars) if selected_chars else None
         source_wanted = set(source_classes) if source_classes else None
@@ -2156,11 +2175,15 @@ class NamingEngine:
 
         def emit(name_data: dict, tier: str) -> None:
             """入库：打 tier + 先字命中数（让「含更多所选字」的名字在同分时靠前）。"""
+            given = name_data.get("given_name") or ""
+            # 「换一批」的排除名单在这里收口：所有产出路径（同源/随机/单字/字辈）
+            # 都要经过 emit，在这一处剔除比在调用方逐路过滤可靠。
+            if given in exclude_given:
+                return
             name_data["_tier"] = tier
             if "_taste" not in name_data:
                 # 字辈 / 随机组合 / 单字名等未显式标注的路径统一在这里兜底。
                 # 单字走 _char_taste：先前一律给 3 分，等于单字名整条路径不过闸。
-                given = name_data.get("given_name") or ""
                 name_data["_taste"] = (
                     self._pair_taste(given[0], given[1]) if len(given) >= 2
                     else self._char_taste(given)
