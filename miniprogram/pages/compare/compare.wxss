@@ -1,0 +1,301 @@
+/* 对比 · 山水泼墨
+   窄幅页头 + 一张细线对照表 + 表下散句。
+   不用卡片堆叠：对照表本身就是一张表，再包卡片会多一层边框。 */
+
+.page {
+  min-height: 100vh;
+  padding: 0 30rpx 80rpx;
+  box-sizing: border-box;
+}
+
+/* ── 页头 ── */
+.cmp-head {
+  padding: 40rpx 10rpx 0;
+}
+
+.cmp-title {
+  font-family: var(--serif);
+  font-size: 48rpx;
+  letter-spacing: 8rpx;
+  color: var(--ink);
+}
+
+.cmp-sub {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  line-height: 1.7;
+  color: var(--ink-3);
+}
+
+.cmp-birth {
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  color: var(--ochre);
+}
+
+/* ── 输入 ── */
+.cmp-input-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 32rpx;
+}
+
+.cmp-input {
+  flex: 1;
+  height: 84rpx;
+  padding: 0 24rpx;
+  font-size: 30rpx;
+  letter-spacing: 2rpx;
+  color: var(--ink);
+  background: var(--card);
+  border: 1rpx solid var(--line);
+  border-radius: var(--r-sm);
+  box-sizing: border-box;
+}
+
+.cmp-placeholder {
+  color: var(--ink-3);
+  font-size: 26rpx;
+  letter-spacing: 0;
+}
+
+.cmp-add {
+  padding: 20rpx 32rpx;
+  font-size: 28rpx;
+  letter-spacing: 2rpx;
+  color: var(--card);
+  background: var(--cinnabar);
+  border-radius: var(--r-sm);
+}
+
+.cmp-add:active {
+  opacity: 0.85;
+}
+
+/* ── 已加入的名字 ── */
+.cmp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 24rpx;
+}
+
+.cmp-chip {
+  display: flex;
+  align-items: center;
+  border: 1rpx solid var(--line-strong);
+  border-radius: var(--r-sm);
+  padding: 6rpx 8rpx 6rpx 18rpx;
+  background: var(--card);
+}
+
+.cmp-chip-text {
+  font-family: var(--serif);
+  font-size: 28rpx;
+  letter-spacing: 2rpx;
+  color: var(--ink);
+}
+
+.cmp-chip-x {
+  padding: 0 12rpx;
+  font-size: 26rpx;
+  color: var(--ink-3);
+}
+
+.cmp-clear {
+  margin-left: auto;
+  font-size: 24rpx;
+  color: var(--cinnabar);
+}
+
+/* ── 空 / 加载 / 错误 ── */
+.cmp-empty {
+  padding: 100rpx 20rpx;
+  text-align: center;
+}
+
+.cmp-empty-title {
+  display: block;
+  font-family: var(--serif);
+  font-size: 32rpx;
+  letter-spacing: 4rpx;
+  color: var(--ink-2);
+}
+
+.cmp-empty-note {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  line-height: 1.8;
+  color: var(--ink-3);
+}
+
+.cmp-loading {
+  padding: 60rpx 0;
+  text-align: center;
+  font-size: 26rpx;
+  color: var(--ink-3);
+  letter-spacing: 2rpx;
+}
+
+.cmp-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 32rpx;
+  padding: 24rpx;
+  background: var(--cinnabar-bg);
+  border-radius: var(--r-sm);
+}
+
+.cmp-error-text {
+  flex: 1;
+  font-size: 24rpx;
+  line-height: 1.6;
+  color: var(--cinnabar);
+}
+
+.cmp-retry {
+  margin-left: 20rpx;
+  font-size: 26rpx;
+  color: var(--cinnabar);
+  text-decoration: underline;
+}
+
+/* ── 对照表 ── */
+.cmp-table {
+  margin-top: 40rpx;
+  border-top: 1rpx solid var(--line-strong);
+}
+
+.cmp-row {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1rpx solid var(--line);
+}
+
+.cmp-label {
+  flex: none;
+  width: 132rpx;
+  padding: 22rpx 0;
+  font-size: 22rpx;
+  line-height: 1.5;
+  color: var(--ink-3);
+  letter-spacing: 1rpx;
+}
+
+.cmp-cell {
+  flex: 1;
+  min-width: 0;
+  padding: 22rpx 8rpx 22rpx 14rpx;
+  border-left: 1rpx solid var(--line);
+}
+
+/* 表头：姓名单列一行，点进去看完整释名 */
+.cmp-row-head {
+  border-bottom: 1rpx solid var(--line-strong);
+}
+
+.cmp-name-cell {
+  padding-top: 26rpx;
+  padding-bottom: 20rpx;
+}
+
+.cmp-name-cell:active {
+  background: var(--paper-deep);
+}
+
+.cmp-name {
+  display: block;
+  font-family: var(--serif);
+  font-size: 34rpx;
+  letter-spacing: 2rpx;
+  color: var(--ink);
+  word-break: break-all;
+}
+
+.cmp-name-hint {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 20rpx;
+  color: var(--ink-3);
+}
+
+.cmp-main {
+  display: block;
+  font-size: 26rpx;
+  line-height: 1.5;
+  color: var(--ink);
+  word-break: break-word;
+}
+
+.cmp-sub {
+  display: block;
+  margin-top: 4rpx;
+  font-size: 21rpx;
+  line-height: 1.5;
+  color: var(--ink-3);
+  word-break: break-word;
+}
+
+/* ── 被拒绝的输入 ── */
+.cmp-rejected {
+  margin-top: 28rpx;
+  padding: 20rpx 24rpx;
+  background: var(--cinnabar-bg);
+  border-radius: var(--r-sm);
+}
+
+.cmp-rejected-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6rpx 0;
+}
+
+.cmp-rejected-name {
+  font-size: 24rpx;
+  color: var(--cinnabar);
+  letter-spacing: 1rpx;
+}
+
+.cmp-rejected-reason {
+  font-size: 22rpx;
+  color: var(--ochre);
+}
+
+/* ── 表下逐个说 ── */
+.cmp-words {
+  margin-top: 48rpx;
+}
+
+.cmp-words-title {
+  font-size: 26rpx;
+  letter-spacing: 4rpx;
+  color: var(--ink-2);
+  padding-left: 16rpx;
+  border-left: 6rpx solid var(--ink-2);
+  margin-bottom: 8rpx;
+}
+
+.cmp-word {
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid var(--line);
+}
+
+.cmp-word-name {
+  display: block;
+  font-family: var(--serif);
+  font-size: 30rpx;
+  letter-spacing: 3rpx;
+  color: var(--ink);
+}
+
+.cmp-word-text {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  line-height: 1.85;
+  color: var(--ink-2);
+}

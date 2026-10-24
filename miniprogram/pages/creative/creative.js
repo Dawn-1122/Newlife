@@ -64,17 +64,22 @@ Page({
     trait: '',      // 选中的性格特征 code（单选，再点取消）
     customDesc: '', // 自定义描述（填了走看广告解锁 AI 生成）
     isLLMPath: false,
+    // 广告位是否真的可用：决定按钮文案是「看广告解锁 AI」还是「生成名字」。
+    // 未开通时先说清楚，不能让用户以为点了能拿到 AI 结果
+    canWatchAd: false,
 
     // 共享输入 + 结果
     keywords: '',
     names: [],
     loading: false,
     generated: false,
-    llmSource: ''   // llm=AI 生成 / local=本地降级（仅角色分支）
+    llmSource: '',    // llm=AI 生成 / local=本地降级（仅角色分支）
+    fallbackNote: ''  // 降级说明（常驻显示在结果上方，不是一闪而过的 toast）
   },
 
   onLoad(options) {
     const mode = options && options.mode ? options.mode : 'netname'
+    this.setData({ canWatchAd: this._canWatchAd() })
     this._applyMode(mode)
   },
 
@@ -94,7 +99,8 @@ Page({
       kwLabel: KW_LABELS[mode] || '',
       placeholder,
       names: [],
-      generated: false
+      generated: false,
+      fallbackNote: ''
     })
     wx.setNavigationBarTitle({ title: meta.title })
   },
@@ -161,16 +167,31 @@ Page({
     return this.data.mode === 'netname' && this.data.subKind === 'role' && this._hasDesc()
   },
 
+  // 能不能真的走「看广告 → AI 生成」：广告位配了、宿主支持激励视频
+  _canWatchAd() {
+    return !!api.REWARDED_AD_UNIT_ID && !!wx.createRewardedVideoAd
+  },
+
   onGenerate() {
     if (this.data.loading) return
     if (this._isLLMPath()) {
-      this._watchAdThenGenerate()
+      if (this._canWatchAd()) {
+        this._watchAdThenGenerate()
+      } else {
+        // 广告位没配（或宿主不支持激励视频）时，过去只弹一句提示就结束：
+        // 用户越认真填描述，越什么都拿不到 —— 填得越对越像惩罚。
+        // 现在降级到本地词库先出名字，并说明描述这次没参与。
+        this._fallbackToLocal(
+          'AI 生成需要激励视频广告位，当前未开通。以下是本地词库生成的名字，自定义描述这次未参与。'
+        )
+      }
       return
     }
     this._generateLocal()
   },
 
-  _generateLocal() {
+  _generateLocal(options) {
+    const note = (options && options.note) || ''
     const d = this.data
     const params = { count: 18 }
 
@@ -199,7 +220,14 @@ Page({
     this.setData({ loading: true })
     api.creativeGenerate(params)
       .then(res => {
-        this.setData({ names: res.names || [], loading: false, generated: true, llmSource: '' })
+        this.setData({
+          names: res.names || [],
+          loading: false,
+          generated: true,
+          llmSource: '',
+          // 后端本地兜底也会给 fallback_note，一起显示，不丢信息
+          fallbackNote: note || res.fallback_note || ''
+        })
       })
       .catch(err => {
         this.setData({ loading: false })
@@ -207,34 +235,40 @@ Page({
       })
   },
 
+  // 任何一条「AI 走不通」的路径都收在这里：先出本地结果，再说清原因
+  _fallbackToLocal(note) {
+    this._generateLocal({ note: note })
+  },
+
   // 看激励视频广告 → 解锁 AI 生成（广告位配置驱动）
   _watchAdThenGenerate() {
     const adUnitId = api.REWARDED_AD_UNIT_ID
-    if (!adUnitId) {
-      wx.showToast({ title: '广告位未配置，暂无法解锁 AI 生成', icon: 'none' })
-      return
-    }
-    if (!wx.createRewardedVideoAd) {
-      wx.showToast({ title: '当前环境不支持激励视频广告', icon: 'none' })
-      return
-    }
-
     const rewarded = wx.createRewardedVideoAd({ adUnitId })
+
+    // onError 与 onClose 可能先后都触发；只认第一个，避免既降级又生成一轮
+    let settled = false
+    const once = (fn) => {
+      if (settled) return
+      settled = true
+      fn()
+    }
+    const adFailed = '广告没能加载出来。以下改用本地词库生成，自定义描述这次未参与。'
+
     rewarded.onError(err => {
       console.warn('激励视频加载失败', err)
-      wx.showToast({ title: '广告加载失败，请稍后再试', icon: 'none' })
+      once(() => this._fallbackToLocal(adFailed))
     })
     rewarded.onClose(res => {
       if (res && res.isEnded) {
-        this._generateLLM()
+        once(() => this._generateLLM())
       } else {
-        wx.showToast({ title: '看完广告才能解锁 AI 生成哦', icon: 'none' })
+        once(() => wx.showToast({ title: '看完广告才能解锁 AI 生成哦', icon: 'none' }))
       }
     })
     rewarded.show().catch(() => {
       rewarded.load()
         .then(() => rewarded.show())
-        .catch(() => wx.showToast({ title: '广告加载失败，请稍后再试', icon: 'none' }))
+        .catch(() => once(() => this._fallbackToLocal(adFailed)))
     })
   },
 
@@ -255,15 +289,17 @@ Page({
           names: res.names || [],
           loading: false,
           generated: true,
-          llmSource: res.source || ''
+          llmSource: res.source || '',
+          // 后端没配大模型时会降级本地并给 fallback_note；
+          // 常驻显示在结果上方，别让它随 toast 一闪而过
+          fallbackNote: res.fallback_note || ''
         })
-        if (res.fallback_note) {
-          wx.showToast({ title: res.fallback_note, icon: 'none', duration: 2500 })
-        }
       })
       .catch(err => {
+        // AI 这条路断了也别让用户空手：退回本地词库，说明原因
         this.setData({ loading: false })
-        wx.showToast({ title: (err && err.message) || '生成失败', icon: 'none' })
+        console.warn('AI 生成失败', err)
+        this._fallbackToLocal('AI 生成这次没成功。以下是本地词库生成的名字，自定义描述这次未参与。')
       })
   },
 

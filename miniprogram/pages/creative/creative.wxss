@@ -157,6 +157,28 @@
   color: var(--ochre);
 }
 
+/* 降级类的说明要更醒目一点：它改变的是「你将拿到什么」，不只是补充信息 */
+.form-hint-warn {
+  display: block;
+  margin-top: 14rpx;
+  padding: 14rpx 18rpx;
+  line-height: 1.7;
+  background: var(--paper-deep);
+  border-radius: var(--r-sm);
+}
+
+/* 结果上方的降级说明：常驻，不随 toast 消失 */
+.fallback-note {
+  margin-bottom: 24rpx;
+  padding: 18rpx 22rpx;
+  font-size: 23rpx;
+  line-height: 1.75;
+  color: var(--ochre);
+  background: var(--paper-deep);
+  border-left: 5rpx solid var(--ochre);
+  border-radius: var(--r-sm);
+}
+
 /* ── 主行动 ── */
 .foot {
   padding: 48rpx 40rpx 0;

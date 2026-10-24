@@ -214,14 +214,12 @@
   margin-top: 4rpx;
 }
 
-.wuge-luck {
+/* 天格由姓氏笔画决定，与名字无关，故只标一个灰字说明，不判吉凶 */
+.wuge-note {
   font-size: 22rpx;
   margin-top: 4rpx;
+  color: var(--ink-3);
 }
-
-.wuge-luck.luck-daji { color: var(--wx-mu); }
-.wuge-luck.luck-ji { color: var(--wx-mu); }
-.wuge-luck.luck-xiong { color: var(--cinnabar); }
 
 .wuge-desc {
   font-size: 26rpx;

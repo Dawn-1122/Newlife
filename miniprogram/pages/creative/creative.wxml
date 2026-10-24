@@ -124,7 +124,12 @@
           maxlength="300"
           auto-height
         />
-        <text class="form-hint" wx:if="{{isLLMPath}}">已填描述，生成将走「看广告解锁 AI」</text>
+        <!-- 广告位未开通时不能先说「看广告解锁」，那是给不出的承诺：
+             这里如实说清楚生成会走本地词库、描述不参与 -->
+        <text class="form-hint" wx:if="{{isLLMPath && canWatchAd}}">已填描述，生成将走「看广告解锁 AI」</text>
+        <text class="form-hint form-hint-warn" wx:if="{{isLLMPath && !canWatchAd}}">
+          AI 生成需要激励视频广告位，当前未开通。生成会用本地词库，自定义描述这次不参与。
+        </text>
       </view>
     </block>
 
@@ -145,12 +150,14 @@
 
   <view class="foot">
     <button class="btn-primary" bindtap="onGenerate" loading="{{loading}}">
-      {{loading ? '正在生成' : (isLLMPath ? '看广告解锁 AI 生成' : (generated ? '再生成一批' : '生成名字'))}}
+      {{loading ? '正在生成' : (isLLMPath && canWatchAd ? '看广告解锁 AI 生成' : (generated ? '再生成一批' : '生成名字'))}}
     </button>
   </view>
 
   <!-- 结果 -->
   <view class="results" wx:if="{{generated}}">
+    <!-- 降级说明常驻在结果上方，不用 toast：一旦一闪而过，用户会以为描述真的生效了 -->
+    <view class="fallback-note" wx:if="{{fallbackNote}}">{{fallbackNote}}</view>
     <view class="results-title">{{names.length}} 个名字{{llmSource === 'llm' ? ' · AI 生成' : ''}} · 点击即可复制</view>
     <view
       class="name-card"

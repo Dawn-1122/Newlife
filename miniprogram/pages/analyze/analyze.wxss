@@ -126,3 +126,28 @@
   font-size: 22rpx;
   color: var(--ink-3);
 }
+
+/* 副入口：不做成按钮 —— 主要动作只有一个（开始释名） */
+.compare-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8rpx;
+  padding: 24rpx 4rpx;
+  border-top: 1rpx solid var(--line);
+}
+
+.compare-entry:active {
+  opacity: 0.7;
+}
+
+.compare-entry-text {
+  font-size: 26rpx;
+  letter-spacing: 1rpx;
+  color: var(--ink-2);
+}
+
+.compare-entry-arrow {
+  font-size: 26rpx;
+  color: var(--ink-3);
+}

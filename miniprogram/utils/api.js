@@ -272,6 +272,16 @@ function analyzeName(params) {
 }
 
 /**
+ * 批量释名（测候选名 / 双名对比）
+ *
+ * 与 analyzeName 走后端同一条解析路径，同一个名字两处得分完全一致。
+ * 单项不合法不会整批失败：非法项进 rejected 并带原因，其余照常返回。
+ */
+function analyzeBatch(params) {
+  return request('/analyze/batch', 'POST', params)
+}
+
+/**
  * 创意起名（网名昵称 / 宠物 / 商业）
  *
  * kind 枚举与后端 CREATIVE_KINDS 镜像：
@@ -459,6 +469,7 @@ module.exports = {
   generateNames,
   prenatal,
   analyzeName,
+  analyzeBatch,
   creativeGenerate,
   llmGenerate,
   recommendChars,

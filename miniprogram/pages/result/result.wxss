@@ -105,6 +105,23 @@
   margin-top: 8rpx;
 }
 
+/* 时柱未填：不用「补一个数」的方式填满格子，而是如实说明没填 */
+.pillar-value.pillar-unknown {
+  font-size: 26rpx;
+  color: var(--ink-3);
+  letter-spacing: 2rpx;
+}
+
+.bazi-note {
+  margin-bottom: 20rpx;
+  padding: 14rpx 18rpx;
+  font-size: 22rpx;
+  line-height: 1.7;
+  color: var(--ochre);
+  background: var(--paper-deep);
+  border-radius: var(--r-sm);
+}
+
 .bazi-info {
   display: flex;
   flex-direction: column;

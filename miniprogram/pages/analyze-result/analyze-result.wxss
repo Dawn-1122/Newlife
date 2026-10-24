@@ -111,6 +111,25 @@
   margin-top: 8rpx;
 }
 
+/* 整体印象：一段话，行距放宽 —— 这是唯一一段需要「读」而不是「扫」的文字 */
+.verdict-text {
+  font-size: 28rpx;
+  line-height: 1.95;
+  color: var(--ink-2);
+  letter-spacing: 1rpx;
+}
+
+/* 时辰未填的说明：注解语气（赭黄），不与正文抢 */
+.bazi-note {
+  margin-top: 16rpx;
+  padding: 14rpx 18rpx;
+  font-size: 22rpx;
+  line-height: 1.7;
+  color: var(--ochre);
+  background: var(--paper-deep);
+  border-radius: var(--r-sm);
+}
+
 /* 五格 */
 .wuge-grid {
   display: flex;
@@ -136,14 +155,12 @@
   margin-top: 4rpx;
 }
 
-.wuge-luck {
+/* 天格由姓氏笔画决定，与名字无关，故只标一个灰字说明，不判吉凶 */
+.wuge-note {
   font-size: 22rpx;
   margin-top: 4rpx;
+  color: var(--ink-3);
 }
-
-.wuge-luck.luck-daji { color: var(--wx-mu); }
-.wuge-luck.luck-ji { color: var(--wx-mu); }
-.wuge-luck.luck-xiong { color: var(--cinnabar); }
 
 .wuge-desc {
   font-size: 26rpx;

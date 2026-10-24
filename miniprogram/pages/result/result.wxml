@@ -36,8 +36,12 @@
           </view>
           <view class="pillar">
             <text class="pillar-label">时柱</text>
-            <text class="pillar-value">{{bazi.four_pillars.hour}}</text>
+            <text class="pillar-value" wx:if="{{hourKnown}}">{{bazi.four_pillars.hour}}</text>
+            <text class="pillar-value pillar-unknown" wx:else>未填</text>
           </view>
+        </view>
+        <view class="bazi-note" wx:if="{{!hourKnown}}">
+          时辰未填。排盘暂以午时代入，喜用神与五行比重会随时辰变，补上更准。
         </view>
         <view class="bazi-info">
           <text>日主: {{bazi.day_master}} ({{bazi.day_master_wuxing}})</text>

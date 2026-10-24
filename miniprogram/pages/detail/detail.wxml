@@ -1,9 +1,7 @@
 <wxs module="m">
   var wuxingMap = { '金': 'wx-jin', '木': 'wx-mu', '水': 'wx-shui', '火': 'wx-huo', '土': 'wx-tu' }
-  var luckMap = { '大吉': 'luck-daji', '吉': 'luck-ji', '凶': 'luck-xiong' }
   module.exports = {
-    wx: function(v) { return wuxingMap[v] || '' },
-    luck: function(v) { return luckMap[v] || '' }
+    wx: function(v) { return wuxingMap[v] || '' }
   }
 </wxs>
 <view class="container">
@@ -86,34 +84,33 @@
     </view>
   </view>
 
-  <!-- 五格数理 -->
+  <!-- 五格数理：只列笔画数理，不标吉凶。
+       天格＝姓笔画＋1，是常量（姓林恒 9、姓顾恒 14），与起什么名无关，
+       标成「凶」等于说「你的姓注定不吉」——既改不了也不是用户选的。
+       吉凶只留给后端做硬门槛（人格+总格双凶才排除），不对外展示。 -->
   <view class="card">
     <view class="section-title">五格数理</view>
     <view class="wuge-grid">
       <view class="wuge-item">
         <text class="wuge-name">天格</text>
         <text class="wuge-num">{{name.wuge.tian_ge.value}}</text>
-        <text class="wuge-luck {{m.luck(name.wuge.tian_ge.luck)}}">{{name.wuge.tian_ge.luck}}</text>
+        <text class="wuge-note">姓定</text>
       </view>
       <view class="wuge-item">
         <text class="wuge-name">人格</text>
         <text class="wuge-num">{{name.wuge.ren_ge.value}}</text>
-        <text class="wuge-luck {{m.luck(name.wuge.ren_ge.luck)}}">{{name.wuge.ren_ge.luck}}</text>
       </view>
       <view class="wuge-item">
         <text class="wuge-name">地格</text>
         <text class="wuge-num">{{name.wuge.di_ge.value}}</text>
-        <text class="wuge-luck {{m.luck(name.wuge.di_ge.luck)}}">{{name.wuge.di_ge.luck}}</text>
       </view>
       <view class="wuge-item">
         <text class="wuge-name">外格</text>
         <text class="wuge-num">{{name.wuge.wai_ge.value}}</text>
-        <text class="wuge-luck {{m.luck(name.wuge.wai_ge.luck)}}">{{name.wuge.wai_ge.luck}}</text>
       </view>
       <view class="wuge-item">
         <text class="wuge-name">总格</text>
         <text class="wuge-num">{{name.wuge.zong_ge.value}}</text>
-        <text class="wuge-luck {{m.luck(name.wuge.zong_ge.luck)}}">{{name.wuge.zong_ge.luck}}</text>
       </view>
     </view>
     <view class="wuge-desc">{{name.wuge.description}}</view>

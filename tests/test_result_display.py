@@ -5,6 +5,8 @@
 2. **页内不复述导航栏标题**：去图之后若页内还写着同样四个字，重复感依旧。
 3. **分数以「推荐值」呈现**：刻度由 utils/score.js 从韵味原分折算（原因见该文件顶部），
    页面只认 `item.recommend`，不再直接印 `scores.overall`。
+   注意适用范围：只有**结果页**（还在挑名字）显示推荐值；
+   名字本的收藏（已经选定）不显示 —— 见 `test_book_does_not_grade_saved_names`。
 """
 
 from __future__ import annotations
@@ -90,23 +92,42 @@ def test_page_heading_does_not_repeat_nav_title():
 # 3. 推荐值
 # --------------------------------------------------------------------------- #
 
-def test_result_and_book_render_recommend_value():
-    for page in ("result", "history"):
-        wxml = _read(PAGES / page / f"{page}.wxml")
-        assert "推荐值" in wxml, f"{page}.wxml 的徽章少了「推荐值」前缀"
-        assert "item.recommend" in wxml, f"{page}.wxml 没在读 item.recommend"
-        assert "scores.overall" not in wxml, (
-            f"{page}.wxml 仍直接印 scores.overall（原分只用于排序，展示要走 score.js）"
-        )
+def test_result_render_recommend_value():
+    """结果页仍按「推荐值」展示（刻度见 utils/score.js）。"""
+    wxml = _visible(_read(PAGES / "result" / "result.wxml"))
+    assert "推荐值" in wxml, "result.wxml 的徽章少了「推荐值」前缀"
+    assert "item.recommend" in wxml, "result.wxml 没在读 item.recommend"
+    assert "scores.overall" not in wxml, (
+        "result.wxml 仍直接印 scores.overall（原分只用于排序，展示要走 score.js）"
+    )
 
 
 def test_pages_compute_recommend_via_score_util():
-    for page in ("result", "history"):
-        js = _read(PAGES / page / f"{page}.js")
-        assert "require('../../utils/score')" in js, (
-            f"{page}.js 没引 utils/score —— 新旧记录会各用一把尺子"
-        )
-        assert "score.badge(" in js, f"{page}.js 没调用 score.badge()"
+    js = _read(PAGES / "result" / "result.js")
+    assert "require('../../utils/score')" in js, (
+        "result.js 没引 utils/score —— 新旧记录会各用一把尺子"
+    )
+    assert "score.badge(" in js, "result.js 没调用 score.badge()"
+
+
+def test_book_does_not_grade_saved_names():
+    """名字本的收藏**不再**折算推荐值（2026-10-24 产品评审 P1-3）。
+
+    理由两条，都要留住：
+    1. 产品原则「评分只作推荐分、不作等级分」。收藏 = 用户已经选定的名字，
+       选定之后再给它打一个分数，等于在他自己的选择上又压一层评判；
+    2. 收藏项只存了 `overall` 原分，而结果页显示的是折算后的推荐值 ——
+       两处并排就成了一把尺子量两次、给出两个数，谁也解释不清。
+
+    要改回「显示分数」之前，先回答上面两条怎么办。
+    """
+    wxml = _visible(_read(PAGES / "history" / "history.wxml"))
+    js = _read(PAGES / "history" / "history.js")
+
+    assert "推荐值" not in wxml, "history.wxml 又出现了「推荐值」"
+    assert "item.recommend" not in wxml, "history.wxml 又在读 item.recommend"
+    assert "score.badge" not in js, "history.js 又调用了 score.badge()"
+    assert "utils/score" not in js, "history.js 又引了 utils/score"
 
 
 def _run_node(expr: str) -> str:

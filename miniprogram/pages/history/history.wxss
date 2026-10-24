@@ -123,6 +123,21 @@
   color: var(--ink);
 }
 
+/* 「对比」：文字按钮，不做实心 —— 页面的主角是名字，不是操作 */
+.fav-compare {
+  font-size: 24rpx;
+  color: var(--ink-2);
+  letter-spacing: 2rpx;
+  border: 1rpx solid var(--line-strong);
+  border-radius: var(--r-sm);
+  padding: 4rpx 18rpx;
+}
+
+.fav-compare:active {
+  color: var(--cinnabar);
+  border-color: var(--cinnabar);
+}
+
 .fav-pinyin {
   margin-top: 6rpx;
   font-size: 24rpx;
@@ -133,6 +148,15 @@
   margin-top: 12rpx;
   font-size: 24rpx;
   color: var(--ink-2);
+}
+
+/* ── 列表底部说明（上限与合并规则）── */
+.list-note {
+  margin-top: 32rpx;
+  font-size: 22rpx;
+  line-height: 1.8;
+  color: var(--ink-3);
+  text-align: center;
 }
 
 /* ── 空状态 ── */

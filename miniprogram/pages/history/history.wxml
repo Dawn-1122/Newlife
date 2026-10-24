@@ -45,6 +45,12 @@
       <text class="empty-title">还没有起名记录</text>
       <text class="empty-note">起的每一批名字都会自动收进这里，方便回头再看</text>
     </view>
+
+    <!-- 上限说明：不同参数各算一条，翻批不占新位置。
+         写出来是为了让「旧的被清掉」有据可查，不是突然消失。 -->
+    <view class="list-note" wx:if="{{records.length}}">
+      <text>同一次起名翻多批会并成一条 · 最多保留 {{recordLimit}} 条，超出自动清理最早的</text>
+    </view>
   </view>
 
   <!-- ── 收藏 ── -->
@@ -58,7 +64,9 @@
     >
       <view class="fav-head">
         <text class="fav-name">{{item.full_name}}</text>
-        <view class="score-badge {{item.tier}}"><text class="score-label">推荐值</text><text class="score-num">{{item.recommend}}</text></view>
+        <!-- 收藏 = 已经选定的名字。按产品原则（评分只作推荐分、不作等级分），
+             这里不再显示「推荐值」；只留一个进对比的入口。 -->
+        <text class="fav-compare" catchtap="onFavCompare" data-name="{{item.full_name}}">对比</text>
       </view>
 
       <view class="fav-pinyin">{{item.pinyinText}}</view>

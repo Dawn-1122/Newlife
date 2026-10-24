@@ -90,6 +90,8 @@
   font-size: 28rpx;
   font-weight: 500;
   color: var(--ink);
+  /* 名字靠左，干支与「未填」标记靠右 */
+  margin-right: auto;
 }
 
 .pillar-ganzhi {
@@ -97,6 +99,28 @@
   font-weight: 500;
   color: var(--ink);
   letter-spacing: 4rpx;
+}
+
+/* 时柱未填：干支仍显示（那是内部代入的值），但标出来不当作已知事实 */
+.pillar-mark {
+  margin-left: 12rpx;
+  font-size: 20rpx;
+  letter-spacing: 1rpx;
+  color: var(--ink-3);
+  border: 1rpx solid var(--line-strong);
+  border-radius: var(--r-sm);
+  padding: 2rpx 10rpx;
+}
+
+/* 时辰未填的说明：注解语气，压住四柱上方 */
+.bazi-note {
+  margin-bottom: 20rpx;
+  padding: 14rpx 18rpx;
+  font-size: 22rpx;
+  line-height: 1.7;
+  color: var(--ochre);
+  background: var(--paper-deep);
+  border-radius: var(--r-sm);
 }
 
 .gan-zhi-row {

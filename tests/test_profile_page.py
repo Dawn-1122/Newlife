@@ -202,13 +202,19 @@ def test_date_sheet_data_layer_shared():
 def test_hours_module_shared():
     assert (UTILS / "hours.js").exists(), "缺少共用时辰模块 utils/hours.js"
     src = _read(UTILS / "hours.js")
-    # 十二时辰，且子时落在 23 点（跨日那一条最容易写错）
-    assert src.count("label:") == 12, "十二时辰不是 12 项"
+    # 十二时辰 + 一个「不清楚」选项（2026-10-24 产品评审 P1-4：
+    # 此前默认索引 8 = 申时，用户没动过那一栏，页面就把申时当成他给的事实排进四柱）
+    assert src.count("label:") == 13, "时辰选项应为 12 个真实时辰 + 1 个「不清楚」"
     assert "hour: 23" in src, "子时没有落在 23 点"
+    assert "UNKNOWN_INDEX" in src, "「不清楚」没有独立索引（老记录的 0-11 索引会错位）"
 
     for page in ("name", "analyze"):
         js = _read(PAGES / page / f"{page}.js")
         assert "utils/hours" in js, f"{page}.js 没有用共用时辰模块"
+        # 默认值必须是「不清楚」，不能是某个具体时辰
+        assert "hourIndex: hours.UNKNOWN_INDEX" in js, (
+            f"{page}.js 的时辰默认值不是「不清楚」—— 用户没填就会被当成填了"
+        )
 
 
 def test_sheet_styles_live_in_app_wxss():

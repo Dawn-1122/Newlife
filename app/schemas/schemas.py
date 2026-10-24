@@ -57,9 +57,37 @@ class NameAnalysisRequest(BaseModel):
     year: Optional[int] = Field(None, ge=1900, le=2100)
     month: Optional[int] = Field(None, ge=1, le=12)
     day: Optional[int] = Field(None, ge=1, le=31)
-    hour: Optional[int] = Field(12, ge=0, le=23)
+    # None = 用户没给时辰（「不清楚」）。内部按午时排盘保证可算，
+    # 但响应里 hour_known=false，页面不展示时柱 —— 不能把默认值当用户事实
+    hour: Optional[int] = Field(None, ge=0, le=23, description="出生时；不传表示时辰未知")
     minute: Optional[int] = Field(0, ge=0, le=59)
     gender: Optional[str] = Field(None, pattern="^(male|female)$")
+
+
+class BatchAnalysisRequest(BaseModel):
+    """批量释名请求（测候选名 / 双名对比）"""
+    names: list[str] = Field(
+        ..., min_length=1, max_length=5,
+        description="待测姓名列表，每项 2-10 字，最多 5 个（重复项自动去重）",
+    )
+    year: Optional[int] = Field(None, ge=1900, le=2100)
+    month: Optional[int] = Field(None, ge=1, le=12)
+    day: Optional[int] = Field(None, ge=1, le=31)
+    hour: Optional[int] = Field(None, ge=0, le=23, description="出生时；不传表示时辰未知")
+    minute: Optional[int] = Field(0, ge=0, le=59)
+    gender: Optional[str] = Field(None, pattern="^(male|female)$")
+
+
+class BatchAnalysisResponse(BaseModel):
+    """批量释名响应"""
+    items: list[dict] = Field(
+        default_factory=list, description="逐个姓名的完整解析，结构同 /analyze"
+    )
+    rejected: list[dict] = Field(
+        default_factory=list,
+        description='未通过校验的输入 [{"name": "x", "reason": "..."}]（不影响其余项）',
+    )
+    hour_known: bool = Field(True, description="时辰是否为用户真实提供")
 
 
 class PrenatalRequest(BaseModel):

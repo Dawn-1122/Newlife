@@ -21,7 +21,8 @@ const share = require('../../utils/share')
 const ds = require('../../utils/date-sheet')
 const hours = require('../../utils/hours')
 
-const HOURS = hours.HOURS
+// 12 个真实时辰 + 「不清楚」（见 utils/hours.js 顶部注释）
+const HOURS = hours.HOUR_OPTIONS
 
 Page({
   data: {
@@ -37,8 +38,9 @@ Page({
     useBazi: false,
     born: true, // 仅 useBazi 时有意义：已出生 / 未出生
     birthDate: '',
-    hourIndex: 8,
-    hourText: hours.labelOf(8),
+    // 默认「不清楚」：没填过就不该把内部默认时辰当成用户给的事实
+    hourIndex: hours.UNKNOWN_INDEX,
+    hourText: hours.labelOf(hours.UNKNOWN_INDEX),
     hours: HOURS,
     dueDate: '',
     rangeDays: api.DEFAULT_RANGE_DAYS,
@@ -235,7 +237,10 @@ Page({
         draft.year = Number(parts[0])
         draft.month = Number(parts[1])
         draft.day = Number(parts[2])
-        draft.hour = hours.hourOf(this.data.hourIndex)
+        // 时辰未知就不传 hour：后端内部仍要一个时刻才能排盘，
+        // 但结果页会注明「时柱未填」，不把默认值当成用户给的事实
+        const hour = hours.hourOf(this.data.hourIndex)
+        if (hour !== null) draft.hour = hour
       }
 
       app.globalData.draftParams = draft

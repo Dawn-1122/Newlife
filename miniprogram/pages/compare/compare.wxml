@@ -1,0 +1,87 @@
+<!-- 对比 · 测候选名 / 双名对比
+     一张对照表 + 表下「逐个说」。
+     对照表只放能并排比的事实（读音、五行、音律、笔画、出处、生辰匹配），
+     不放五格吉凶、也不放推荐分 —— 两列数字一左一右，就变成评级了。 -->
+<view class="page">
+  <view class="cmp-head">
+    <view class="cmp-title">并排看</view>
+    <view class="cmp-sub">同一个生辰下，把候选名放在一起，比读音、用字与出处。</view>
+    <view class="cmp-birth" wx:if="{{birthText}}">生辰 {{birthText}}</view>
+  </view>
+
+  <!-- 输入：一次可粘多个，空格 / 逗号 / 顿号都当分隔符 -->
+  <view class="cmp-input-row">
+    <input
+      class="cmp-input"
+      value="{{input}}"
+      placeholder="输入姓名，多个用空格隔开"
+      placeholder-class="cmp-placeholder"
+      confirm-type="done"
+      bindinput="onInput"
+      bindconfirm="onAddTap"
+    />
+    <view class="cmp-add" bindtap="onAddTap">加入</view>
+  </view>
+
+  <view class="cmp-chips" wx:if="{{names.length}}">
+    <view class="cmp-chip" wx:for="{{names}}" wx:key="*this">
+      <text class="cmp-chip-text">{{item}}</text>
+      <text class="cmp-chip-x" catchtap="onRemoveTap" data-name="{{item}}">×</text>
+    </view>
+    <text class="cmp-clear" catchtap="onClearTap">清空</text>
+  </view>
+
+  <view class="cmp-empty" wx:if="{{!names.length}}">
+    <text class="cmp-empty-title">还没有要比的名字</text>
+    <text class="cmp-empty-note">输入两三个名字；也可以到「名字本」的收藏里点「对比」加进来。</text>
+  </view>
+
+  <view class="cmp-loading" wx:if="{{loading}}">正在逐个对照…</view>
+
+  <view class="cmp-error" wx:if="{{loadError}}">
+    <text class="cmp-error-text">{{loadError}}</text>
+    <text class="cmp-retry" bindtap="onRetry">重试</text>
+  </view>
+
+  <!-- 对照表：列 = 名字，行 = 维度 -->
+  <view class="cmp-table" wx:if="{{rows.length && !loading}}">
+    <view class="cmp-row cmp-row-head">
+      <view class="cmp-label"></view>
+      <view
+        class="cmp-cell cmp-name-cell"
+        wx:for="{{items}}"
+        wx:key="full_name"
+        bindtap="onOpenDetail"
+        data-index="{{index}}"
+      >
+        <text class="cmp-name">{{item.full_name}}</text>
+        <text class="cmp-name-hint">看详情</text>
+      </view>
+    </view>
+
+    <view class="cmp-row" wx:for="{{rows}}" wx:key="key" wx:for-item="row">
+      <view class="cmp-label">{{row.label}}</view>
+      <view class="cmp-cell" wx:for="{{row.cells}}" wx:key="k" wx:for-item="cell">
+        <text class="cmp-main">{{cell.main}}</text>
+        <text class="cmp-sub" wx:if="{{cell.sub}}">{{cell.sub}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 没通过校验的输入：单独说清楚，不影响其余项 -->
+  <view class="cmp-rejected" wx:if="{{rejected.length}}">
+    <view class="cmp-rejected-item" wx:for="{{rejected}}" wx:key="name">
+      <text class="cmp-rejected-name">{{item.name}}</text>
+      <text class="cmp-rejected-reason">{{item.reason}}</text>
+    </view>
+  </view>
+
+  <!-- 表下逐个说：定性的话各自成句，不摆在一起比大小 -->
+  <view class="cmp-words" wx:if="{{verdicts.length}}">
+    <view class="cmp-words-title">逐个说</view>
+    <view class="cmp-word" wx:for="{{verdicts}}" wx:key="name">
+      <text class="cmp-word-name">{{item.name}}</text>
+      <text class="cmp-word-text">{{item.text}}</text>
+    </view>
+  </view>
+</view>

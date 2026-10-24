@@ -1,6 +1,7 @@
 const api = require('../../utils/api')
 const namebook = require('../../utils/namebook')
 const share = require('../../utils/share')
+const track = require('../../utils/track')
 
 Page({
   data: {
@@ -121,6 +122,7 @@ Page({
       return
     }
     this.setData({ fav: !!ret.added })
+    track.track(track.TRACK.favToggle, { added: ret.added ? 'yes' : 'no' })
     wx.showToast({ title: ret.added ? '已收藏' : '已取消收藏', icon: 'none' })
   },
 

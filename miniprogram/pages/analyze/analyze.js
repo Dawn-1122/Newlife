@@ -21,9 +21,11 @@ Page({
     useBazi: false,
     gender: 'male',
     birthDate: '',
-    hourIndex: 8,
-    hourText: hours.labelOf(8),
-    hours: hours.HOURS,
+    // 默认「不清楚」：不知道出生时辰是常态，此前默认申时会把内部取值
+    // 当成用户给的事实排进四柱（见 utils/hours.js 顶部注释）
+    hourIndex: hours.UNKNOWN_INDEX,
+    hourText: hours.labelOf(hours.UNKNOWN_INDEX),
+    hours: hours.HOUR_OPTIONS,
 
     // 自绘弹层（null 表示未打开）；日期与时辰共用，靠 kind 区分画什么
     sheet: null,
@@ -141,7 +143,10 @@ Page({
       params.year = Number(parts[0])
       params.month = Number(parts[1])
       params.day = Number(parts[2])
-      params.hour = hours.hourOf(this.data.hourIndex)
+      // 时辰未知时不传 hour：后端按 hour_known=false 处理，
+      // 不拿内部默认的午时冒充用户填的值
+      const hour = hours.hourOf(this.data.hourIndex)
+      if (hour !== null) params.hour = hour
     }
 
     this.setData({ loading: true })
@@ -150,17 +155,38 @@ Page({
       const app = getApp()
       app.globalData.analyzeResult = result
       app.globalData.lastParams = params
-      // 收进「名字本」（本机存储）；存失败只提示，不阻断查看结果
-      const saved = namebook.addRecord(namebook.buildRecord('analyze', params, result, 0))
-      if (!saved.ok) {
-        wx.showToast({ title: saved.error, icon: 'none' })
-      }
+      // 收进「名字本」（本机存储）；存失败或清理旧记录只提示，不阻断查看结果
+      namebook.notifySave(namebook.addRecord(namebook.buildRecord('analyze', params, result, 0)))
       wx.navigateTo({ url: '/pages/analyze-result/analyze-result' })
     } catch (err) {
       wx.showToast({ title: (err && err.message) || '测评失败，请重试', icon: 'none' })
     } finally {
       this.setData({ loading: false })
     }
+  },
+
+  /**
+   * 手上不止一个名字：进对比页逐个测、并排看。
+   *
+   * 这里填好的生辰一并带过去（对比页不再重复问一遍日期，也不多做一套弹层）；
+   * 时辰选「不清楚」时不带 hour，后端按 hour_known=false 处理。
+   */
+  onCompareTap() {
+    const app = getApp()
+    if (this.data.useBazi && this.data.birthDate) {
+      const parts = this.data.birthDate.split('-')
+      const hour = hours.hourOf(this.data.hourIndex)
+      app.globalData.compareBirth = {
+        year: Number(parts[0]),
+        month: Number(parts[1]),
+        day: Number(parts[2]),
+        hour: hour,
+        hourUnknown: hour === null
+      }
+    } else {
+      app.globalData.compareBirth = null
+    }
+    wx.navigateTo({ url: '/pages/compare/compare' })
   },
 
   onShareAppMessage: share.defaultShare,

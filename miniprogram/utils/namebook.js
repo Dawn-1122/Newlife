@@ -17,8 +17,10 @@
  *    页面调用方一行都不用改 —— 所以落盘细节全部收在这里，
  *    页面里一律通过本模块读写，不要直接碰 `wx.setStorageSync`。
  * 2. **容量。** 微信限制：单个 key ≤ 1MB，单小程序总量 ≤ 10MB。
- *    实测一次起名返回约 39KB（20 个候选），故记录按「条数 + 字节数」双上限保留，
- *    超出丢最旧的（见 `trim`）。字节数按 UTF-8 实算，中文按 3 字节计。
+ *    实测一次起名返回约 39KB（20 个候选）。同一次起名翻多批**合并成一条**
+ *    （见 `paramsKey` / `mergeInto`），不按批次叠记录；整体再由「条数 + 字节数」
+ *    双上限兜住，超出时丢最旧的，并把 `dropped` 回传给页面 —— 不再静默丢弃。
+ *    字节数按 UTF-8 实算，中文按 3 字节计。
  * 3. **写失败不静默。** 存储写满时 `wx.setStorageSync` 会抛错，
  *    本模块一律捕获并返回 `{ ok: false, error }`，由页面弹提示 —— 不能装作存上了。
  */
@@ -28,10 +30,23 @@ const RECORD_KEY = 'mt_records_v1'
 const FAV_KEY = 'mt_favs_v1'
 
 // 保留上限
-const RECORD_LIMIT = 10 // 一次起名 ≈ 39KB，10 批 ≈ 520KB（远低于单 key 1MB）
+//
+// RECORD_LIMIT 从 10 提到 20，配合下面的「按参数合并」：
+// 一次起名翻 5 批只占 1 条记录，20 条才够装下不同条件的多次起名。
+// 总字节仍由 RECORD_MAX_BYTES 兜住（单 key ≤ 1MB 是微信硬限）。
+const RECORD_LIMIT = 20
 const FAV_LIMIT = 60 // 单名 ≈ 1.8KB，60 个 ≈ 110KB
 const RECORD_MAX_BYTES = 620 * 1024
 const FAV_MAX_BYTES = 200 * 1024
+
+// 合并后的单条记录最多留多少候选名（约 6 批 × 20）。
+// 再往后就丢最旧批次的名字 —— 否则「同一次起名」可以无限翻，把单条记录撑到超限。
+const MERGE_MAX_NAMES = 120
+
+// 参与「同一次起名」判定的参数：这些键不同就是不同的起名，不能合并
+// exclude_names 是「换一批」的排除名单，每批都不一样，必须排除在指纹之外
+const KEY_IGNORE = { exclude_names: true }
+
 
 // 记录类型 → 展示名（历史列表用）
 const KIND_LABEL = {
@@ -85,12 +100,18 @@ function byteLen(text) {
 }
 
 // 双上限裁剪：先按条数截断，再按字节数从尾部丢，直到进预算
+//
+// 返回 dropped 是重点：早期版本这里静默 pop，用户翻了十几批之后最早的记录
+// 无声无息消失，也不知道什么时候没的。调用方拿 dropped 才能说一句
+// 「名字本已满，最早的 N 条已清理」。
 function trim(list, limit, maxBytes) {
   const kept = list.slice(0, limit)
+  let dropped = list.length - kept.length
   while (kept.length > 1 && byteLen(JSON.stringify(kept)) > maxBytes) {
     kept.pop()
+    dropped++
   }
-  return kept
+  return { kept: kept, dropped: dropped }
 }
 
 // --------------------------------------------------------------------------- //
@@ -135,8 +156,76 @@ const STYLE_SHORT = {
 }
 
 // --------------------------------------------------------------------------- //
-// 记录（一批结果）
+// 记录（一次起名 = 一条，多批合并）
 // --------------------------------------------------------------------------- //
+
+/**
+ * 参数指纹：判断两次结果是否属于「同一次起名」。
+ *
+ * 起名是「提交条件 → 拿到一批名字 → 换一批 → 再换一批」的循环，
+ * 换一批并不改变条件。早期版本每批都写一条新记录，于是同一次起名翻 10 批
+ * 就把 RECORD_LIMIT 占满，把孕期参考、释名、别的条件的起名统统挤掉 ——
+ * 用户看到的只是「上次那批名字不见了」。
+ *
+ * 指纹按「键名排序 + 值」拼串，数组排序后拼，保证同样条件得到同样的串。
+ * exclude_names（换一批的排除名单）每批都不同，必须排除在指纹之外。
+ */
+function paramsKey(kind, params) {
+  const p = params || {}
+  const parts = []
+  Object.keys(p).sort().forEach(function (k) {
+    if (KEY_IGNORE[k]) return
+    let v = p[k]
+    if (v === undefined || v === null || v === '') return
+    if (Array.isArray(v)) v = v.slice().sort().join(',')
+    parts.push(k + '=' + String(v))
+  })
+  return kind + '|' + parts.join('&')
+}
+
+/**
+ * 由 payload / params 算出列表要显示的标题、副标题、候选名摘要。
+ * 合并之后要按合并结果重算，所以拆成独立函数而不是塞在 buildRecord 里。
+ */
+function describeRecord(record) {
+  const kind = record.kind
+  const params = record.params || {}
+  const result = record.payload || {}
+  const batches = record.batches || 1
+
+  record.chips = []
+
+  if (kind === 'postnatal') {
+    const names = result.names || []
+    // 只留前 8 个进列表摘要，整份结果仍完整存在 payload 里
+    record.chips = names.slice(0, 8).map(function (n) {
+      return { text: n.full_name, score: (n.scores && n.scores.overall) || 0 }
+    })
+    record.title = (params.surname || '') + ' · ' + genderText(params.gender) +
+      ' · ' + (params.name_length === 1 ? '单字名' : '双字名')
+    const style = styleText(params.style)
+    record.subtitle = '共 ' + names.length + ' 个候选' +
+      (batches > 1 ? ' · 翻 ' + batches + ' 批' : '') +
+      (style ? ' · ' + style : '')
+  } else if (kind === 'prenatal') {
+    const stable = (result.suggestion && result.suggestion.stable_wuxing) || []
+    const safeChars = (result.suggestion && result.suggestion.safe_chars) || []
+    record.chips = safeChars.slice(0, 10).map(function (c) {
+      return { text: c, score: 0 }
+    })
+    record.title = (params.surname || '') + ' · 预产期 ' + (params.due_date || '未设置')
+    record.subtitle = '浮动 ±' + (params.range_days || 0) + ' 天' +
+      (batches > 1 ? ' · 存 ' + batches + ' 次' : '') +
+      (stable.length ? ' · 稳定五行 ' + stable.join('、') : '')
+  } else {
+    const score = (result.phonetics && result.phonetics.score) || 0
+    record.title = result.full_name || params.full_name || ''
+    record.subtitle = '音律 ' + score + ' 分' +
+      (batches > 1 ? ' · 查 ' + batches + ' 次' : '')
+  }
+
+  return record
+}
 
 /**
  * 把一次请求的结果整理成「名字本」里的一条记录。
@@ -154,60 +243,141 @@ function buildRecord(kind, params, result, batchId) {
     id: 'rec_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
     kind: kind,
     kindLabel: KIND_LABEL[kind] || '记录',
+    key: paramsKey(kind, params),
     createdAt: Date.now(),
+    updatedAt: Date.now(),
+    batches: 1,
     params: params || {},
     batchId: batchId || 0,
-    payload: result,
-    chips: []
+    payload: result
   }
 
-  if (kind === 'postnatal') {
-    const names = (result && result.names) || []
-    // 只留前 8 个进列表摘要，整份结果仍完整存在 payload 里
-    record.chips = names.slice(0, 8).map(function (n) {
-      return { text: n.full_name, score: (n.scores && n.scores.overall) || 0 }
-    })
-    record.title = (params.surname || '') + ' · ' + genderText(params.gender) +
-      ' · ' + (params.name_length === 1 ? '单字名' : '双字名')
-    const style = styleText(params.style)
-    record.subtitle = '共 ' + names.length + ' 个候选' + (style ? ' · ' + style : '')
-  } else if (kind === 'prenatal') {
-    const stable = (result && result.suggestion && result.suggestion.stable_wuxing) || []
-    const safeChars = (result && result.suggestion && result.suggestion.safe_chars) || []
-    record.chips = safeChars.slice(0, 10).map(function (c) {
-      return { text: c, score: 0 }
-    })
-    record.title = (params.surname || '') + ' · 预产期 ' + (params.due_date || '未设置')
-    record.subtitle = '浮动 ±' + (params.range_days || 0) + ' 天' +
-      (stable.length ? ' · 稳定五行 ' + stable.join('、') : '')
-  } else {
-    const score = (result && result.phonetics && result.phonetics.score) || 0
-    record.title = (result && result.full_name) || (params.full_name || '')
-    record.subtitle = '音律 ' + score + ' 分'
-  }
+  return describeRecord(record)
+}
 
-  return record
+// 按 id 去重合并（前者优先，用于「新一批在前、旧批次在后」）
+function unionBy(first, second, idOf) {
+  const seen = {}
+  const out = []
+  first.concat(second).forEach(function (item) {
+    const id = idOf(item)
+    if (!id || seen[id]) return
+    seen[id] = true
+    out.push(item)
+  })
+  return out
 }
 
 /**
- * 新增一条记录（最新的排最前，超出上限丢最旧）。
- * @returns {{ok: boolean, record?: object, error?: string}}
+ * 把新一批并进旧记录。
+ *
+ * 为什么留 union 而不是只留最新一批：名字本的用途是「回头还能找到那个名字」，
+ * 只留最新一批等于前几批的名字虽然存了却点不进去 —— 从列表点开恢复上下文时，
+ * 结果页只认 payload。合并后 payload.names 是全量，点进去能看到这次起名的所有名字，
+ * 「换一批」的排除名单也自然是全量，不会把翻过的名字再抽回来。
+ */
+function mergeInto(old, incoming) {
+  const out = Object.assign({}, old)
+  out.updatedAt = Date.now()
+  out.batches = (old.batches || 1) + 1
+  // 批次号跟最新一批走：深度寓意的解锁键按批次存，恢复时要对得上最后一批
+  out.batchId = incoming.batchId || old.batchId
+  // 同指纹下参数应完全一致，取新的更稳妥（旧记录可能是更早版本的字段集）
+  out.params = incoming.params || old.params
+
+  if (incoming.kind === 'postnatal') {
+    const prevNames = (old.payload && old.payload.names) || []
+    const nextNames = (incoming.payload && incoming.payload.names) || []
+    const names = unionBy(nextNames, prevNames, function (n) {
+      return n && n.full_name
+    })
+    // 八字 / 喜用神同参数下一致，以最新一批为底；候选换成累计去重后的列表
+    out.payload = Object.assign({}, incoming.payload, {
+      names: names.slice(0, MERGE_MAX_NAMES)
+    })
+  } else if (incoming.kind === 'prenatal') {
+    const prevChars = (old.payload && old.payload.suggestion && old.payload.suggestion.safe_chars) || []
+    const nextChars = (incoming.payload && incoming.payload.suggestion && incoming.payload.suggestion.safe_chars) || []
+    const safeChars = unionBy(nextChars, prevChars, function (c) { return c })
+    out.payload = Object.assign({}, incoming.payload, {
+      suggestion: Object.assign({}, (incoming.payload || {}).suggestion, {
+        safe_chars: safeChars
+      })
+    })
+  } else {
+    // 释名：同一个名字重复查，结论不变，只记次数
+    out.payload = incoming.payload
+  }
+
+  return describeRecord(out)
+}
+
+/**
+ * 新增一条记录。同一次起名（参数指纹相同）翻多批时合并进原记录，不新增一条。
+ *
+ * @returns {{ok: boolean, record?: object, merged?: boolean, dropped?: number, error?: string}}
+ *   dropped = 本次因为超出上限被清掉的旧记录条数（早期版本静默丢弃，用户不知情）
  */
 function addRecord(record) {
   if (!record || !record.id) {
     return { ok: false, error: '记录内容为空，未保存' }
   }
-  const list = [record].concat(readList(RECORD_KEY).filter(function (r) {
-    return r.id !== record.id
-  }))
-  const res = writeList(RECORD_KEY, trim(list, RECORD_LIMIT, RECORD_MAX_BYTES))
-  return Object.assign({ record: record }, res)
+
+  const key = record.key || paramsKey(record.kind, record.params)
+  record.key = key
+
+  const prev = readList(RECORD_KEY)
+  const rest = []
+  let old = null
+  prev.forEach(function (r) {
+    if (!old && r.key === key) {
+      old = r
+    } else {
+      rest.push(r)
+    }
+  })
+
+  const next = old ? mergeInto(old, record) : record
+  const trimmed = trim([next].concat(rest), RECORD_LIMIT, RECORD_MAX_BYTES)
+  const res = writeList(RECORD_KEY, trimmed.kept)
+
+  return Object.assign({
+    record: next,
+    merged: !!old,
+    dropped: trimmed.dropped
+  }, res)
 }
+
 
 function listRecords() {
   return readList(RECORD_KEY).map(function (r) {
     return Object.assign({}, r, { createdText: formatTime(r.createdAt) })
   })
+}
+
+/**
+ * 把 addRecord 的结果翻译成给用户的提示（写失败 / 清理了旧记录）。
+ *
+ * 「记录被清理」这件事只在这里说一次：三个调用点各写一套迟早会漂移，
+ * 而静默丢记录正是这次要修的问题，不能留着任何一条路径不说。
+ *
+ * @returns {boolean} 是否弹出了提示（调用方据此决定要不要再弹自己的成功提示）
+ */
+function notifySave(ret) {
+  if (!ret) return false
+  if (!ret.ok) {
+    wx.showToast({ title: ret.error || '保存失败', icon: 'none' })
+    return true
+  }
+  if (ret.dropped > 0) {
+    wx.showToast({
+      title: '名字本已满，清理了 ' + ret.dropped + ' 条最早记录',
+      icon: 'none',
+      duration: 2600
+    })
+    return true
+  }
+  return false
 }
 
 function getRecord(id) {
@@ -282,8 +452,9 @@ function toggleFav(name, params, batchId) {
     data: name
   }
 
-  const added = writeList(FAV_KEY, trim([entry].concat(list), FAV_LIMIT, FAV_MAX_BYTES))
-  return Object.assign({ added: true }, added)
+  const trimmed = trim([entry].concat(list), FAV_LIMIT, FAV_MAX_BYTES)
+  const added = writeList(FAV_KEY, trimmed.kept)
+  return Object.assign({ added: true, dropped: trimmed.dropped }, added)
 }
 
 function listFavs() {
@@ -317,11 +488,14 @@ function clearFavs() {
 module.exports = {
   RECORD_LIMIT,
   FAV_LIMIT,
+  MERGE_MAX_NAMES,
   KIND_LABEL,
   formatTime,
   pinyinOf,
+  paramsKey,
   buildRecord,
   addRecord,
+  notifySave,
   listRecords,
   getRecord,
   removeRecord,

@@ -8,6 +8,7 @@ from fastapi import APIRouter, HTTPException, Response
 from app.schemas.schemas import (
     NamingRequest, NamingResponse,
     NameAnalysisRequest, ApiResponse,
+    BatchAnalysisRequest, BatchAnalysisResponse,
     PrenatalRequest, PrenatalResponse,
     MeaningRequest, MeaningResponse,
     RecommendCharsRequest, RecommendCharsResponse,
@@ -17,12 +18,14 @@ from app.schemas.schemas import (
     CreativeRequest, CreativeResponse,
     CreativeLLMRequest, CreativeLLMResponse,
 )
+from app.core.names import is_valid_full_name
 from app.services.naming_engine import NamingEngine
 from app.services.char_database import CharDatabase
 from app.services.poetry_database import PoetryDatabase
 from app.services.bazi_engine import BaziEngine
 from app.services.phonetics import PhoneticsScorer
 from app.services.wuge import WugeScorer
+from app.services.name_analyzer import analyze_full_name
 from app.services.prenatal_engine import PrenatalEngine
 from app.services.creative_service import CreativeNamingService
 from app.services.wx_qrcode import (
@@ -239,102 +242,69 @@ async def prenatal(request: PrenatalRequest):
 @router.post("/analyze")
 async def analyze_name(request: NameAnalysisRequest):
     """
-    名字解析
+    名字解析（释名）
 
     输入完整姓名，返回五行、音律、五格、寓意等分析。
-    如提供生辰，还会分析八字匹配度。
+    如提供生辰，还会分析八字匹配度；不提供时辰时 `hour_known=false`，
+    时柱不参与展示（内部按午时排盘保证可算，但不当成用户给的事实）。
     """
-    full_name = request.full_name.strip()
-    if len(full_name) < 2:
-        raise HTTPException(status_code=400, detail="姓名至少2个字")
+    ok, reason = is_valid_full_name(request.full_name)
+    if not ok:
+        raise HTTPException(status_code=400, detail=reason)
 
-    # 拆分姓和名
-    # 简化处理：第一个字为姓，其余为名
-    # 实际应考虑复姓
-    compound_surnames = ["欧阳", "司马", "上官", "诸葛", "皇甫", "令狐", "慕容", "公孙", "尉迟"]
-    surname = ""
-    given_name = ""
-    for cs in compound_surnames:
-        if full_name.startswith(cs):
-            surname = cs
-            given_name = full_name[len(cs):]
-            break
-    if not surname:
-        surname = full_name[0]
-        given_name = full_name[1:]
+    # 解析逻辑全部收在 services/name_analyzer.py：
+    # 批量对比接口走同一条路径，保证同一个名字两处得分一致
+    return analyze_full_name(
+        request.full_name,
+        year=request.year,
+        month=request.month,
+        day=request.day,
+        hour=request.hour,
+        minute=request.minute,
+        gender=request.gender,
+    )
 
-    char_db = CharDatabase()
-    phonetics = PhoneticsScorer()
-    wuge_scorer = WugeScorer()
 
-    # 字信息
-    chars_info = []
-    for c in given_name:
-        info = char_db.get_char(c)
-        if info:
-            chars_info.append({
-                "char": info["char"],
-                "pinyin": info["pinyin"],
-                "wuxing": info["wuxing"],
-                "kangxi_strokes": info["kangxi_strokes"],
-                "meaning": info["meaning"],
-                "shuowen": info.get("shuowen", ""),
-                "detail": info.get("detail", ""),
-            })
-        else:
-            chars_info.append({
-                "char": c,
-                "pinyin": "",
-                "wuxing": "未知",
-                "kangxi_strokes": 0,
-                "meaning": "字库中暂无此字信息",
-            })
+@router.post("/analyze/batch", response_model=BatchAnalysisResponse)
+async def analyze_batch(request: BatchAnalysisRequest):
+    """
+    批量释名（测候选名 / 双名对比）
 
-    # 音律
-    phonetics_result = phonetics.analyze(full_name)
+    一次最多 5 个姓名，逐个走与 `/analyze` 完全相同的解析。
+    单项不合法只跳过那一项（进 `rejected` 并给出原因），不让整批失败 ——
+    用户粘 5 个名字，不该因为第 3 个写错就什么都看不到。
+    """
+    items: list[dict] = []
+    rejected: list[dict] = []
+    seen: set[str] = set()
 
-    # 五格
-    try:
-        wuge_result = wuge_scorer.calculate(surname, given_name)
-    except Exception:
-        wuge_result = {"total_score": 0, "description": "数理计算异常"}
+    for raw in request.names:
+        name = (raw or "").strip()
+        if not name:
+            continue
+        if name in seen:
+            continue
+        seen.add(name)
 
-    # 八字匹配（如提供生辰）
-    bazi_match = None
-    if request.year and request.month and request.day:
-        bazi = BaziEngine.generate_bazi(
-            request.year, request.month, request.day,
-            request.hour if request.hour is not None else 12,
-            request.minute if request.minute is not None else 0,
-            request.gender or "male"
-        )
-        xiyong = bazi["xiyong"]["xi_wuxing"]
-        matched = sum(1 for ci in chars_info if ci.get("wuxing") in xiyong)
-        bazi_match = {
-            "bazi": bazi,
-            "match_score": 60 + int(matched / max(len(chars_info), 1) * 40),
-            "matched_wuxing": [ci["wuxing"] for ci in chars_info if ci.get("wuxing") in xiyong],
-        }
+        ok, reason = is_valid_full_name(name)
+        if not ok:
+            rejected.append({"name": name, "reason": reason})
+            continue
 
-    # 诗词出处
-    poetry_db = PoetryDatabase()
-    poetry_matches = []
-    for ci in chars_info:
-        poems = poetry_db.get_by_char(ci["char"])
-        for p in poems:
-            if p not in poetry_matches:
-                poetry_matches.append(p)
+        items.append(analyze_full_name(
+            name,
+            year=request.year,
+            month=request.month,
+            day=request.day,
+            hour=request.hour,
+            minute=request.minute,
+            gender=request.gender,
+        ))
 
     return {
-        "full_name": full_name,
-        "surname": surname,
-        "given_name": given_name,
-        "chars_info": chars_info,
-        "phonetics": phonetics_result,
-        "wuge": wuge_result,
-        "bazi_match": bazi_match,
-        "poetry": poetry_matches[0] if poetry_matches else None,
-        "poetry_list": poetry_matches[:3],
+        "items": items,
+        "rejected": rejected,
+        "hour_known": request.hour is not None,
     }
 
 

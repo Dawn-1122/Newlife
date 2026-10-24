@@ -5,18 +5,21 @@
 // 用户回不到「上次那批名字」，也留不住看中的那个名字。
 // 落盘逻辑全在 utils/namebook.js（本地存储，单机、可离线）。
 //
-// 本页只做两件事：
+// 本页只做三件事：
 //   1. 记录 → 把该批结果放回 globalData，再跳回原来的结果页（结果页只认 globalData）
 //   2. 收藏 → 设置 selectedName 后进详情页，与从结果页点进去是同一条路径
+//   3. 收藏项「对比」→ 加进待比名单（utils/compare.js），够两个就跳对比页
 const namebook = require('../../utils/namebook')
+const compare = require('../../utils/compare')
 const share = require('../../utils/share')
-const score = require('../../utils/score')
 
 Page({
   data: {
     tab: 'records',
     records: [],
-    favs: []
+    favs: [],
+    // 上限写进页面：用户知道「最多存多少」才会明白为什么旧的会被清掉
+    recordLimit: namebook.RECORD_LIMIT
   },
 
   onLoad() {
@@ -31,11 +34,10 @@ Page({
   refresh() {
     this.setData({
       records: namebook.listRecords(),
-      // 收藏项只存了 overall 原分，展示用的推荐值在读的时候算，
-      // 这样旧记录和新记录是同一把尺子（换算见 utils/score.js）
-      favs: namebook.listFavs().map(function (f) {
-        return Object.assign({}, f, score.badge(f.overall))
-      })
+      // 收藏 = 用户已经选定的名字。按产品原则（评分只作推荐分、不作等级分），
+      // 这里不再折算「推荐值」：选定之后再给它打一个分数，等于在用户的选择上
+      // 又压了一层评判，既没有意义也不礼貌。要看依据就点进详情页。
+      favs: namebook.listFavs()
     })
   },
 
@@ -126,6 +128,35 @@ Page({
       wx.showToast({ title: '已取消收藏', icon: 'none' })
     }
     this.refresh()
+  },
+
+  /**
+   * 把收藏的名字加入对比。
+   *
+   * 为什么从这里进：收藏是「已经选到最后的几个」，正是最需要并排看的时刻。
+   * 队列在 utils/compare.js（跨页面共享），加满 3 个就不再接受 ——
+   * 满了提示「先去掉一个」，不静默替换已加入的那个。
+   */
+  onFavCompare(e) {
+    const name = e.currentTarget.dataset.name
+    const ret = compare.add(name)
+
+    if (!ret.ok) {
+      wx.showToast({
+        title: ret.full
+          ? '最多并排 ' + compare.MAX + ' 个，先去掉一个'
+          : (ret.error || '没能加入对比'),
+        icon: 'none'
+      })
+      return
+    }
+
+    const count = (ret.names || []).length
+    if (count < 2) {
+      wx.showToast({ title: '已加入，再挑一个就能对照', icon: 'none' })
+      return
+    }
+    wx.navigateTo({ url: '/pages/compare/compare' })
   },
 
   onClearTap() {

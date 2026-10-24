@@ -1,9 +1,7 @@
 <wxs module="m">
   var wuxingMap = { '金': 'wx-jin', '木': 'wx-mu', '水': 'wx-shui', '火': 'wx-huo', '土': 'wx-tu' }
-  var luckMap = { '大吉': 'luck-daji', '吉': 'luck-ji', '凶': 'luck-xiong' }
   module.exports = {
-    wx: function(v) { return wuxingMap[v] || '' },
-    luck: function(v) { return luckMap[v] || '' }
+    wx: function(v) { return wuxingMap[v] || '' }
   }
 </wxs>
 <view class="container">
@@ -11,6 +9,14 @@
   <view class="card name-display">
     <view class="name-main">{{result.full_name}}</view>
     <view class="name-pinyin">{{pinyinText}}</view>
+  </view>
+
+  <!-- 整体印象：先用一段话把下面五块收住，再列依据。
+       文案由后端生成（app/services/name_verdict.py），换端时口径一致；
+       只描述已算出的事实，不判吉凶、不预测。 -->
+  <view class="card verdict-card" wx:if="{{verdict}}">
+    <view class="section-title">整体印象</view>
+    <view class="verdict-text">{{verdict}}</view>
   </view>
 
   <!-- 用字解析 -->
@@ -45,34 +51,30 @@
     <view class="phon-desc">{{result.phonetics.description}}</view>
   </view>
 
-  <!-- 五格数理 -->
+  <!-- 五格数理：只列笔画数理，不标吉凶（理由同 detail 页：天格由姓氏决定） -->
   <view class="card">
     <view class="section-title">五格数理</view>
     <view class="wuge-grid">
       <view class="wuge-item">
         <text class="wuge-name">天格</text>
         <text class="wuge-num">{{result.wuge.tian_ge.value}}</text>
-        <text class="wuge-luck {{m.luck(result.wuge.tian_ge.luck)}}">{{result.wuge.tian_ge.luck}}</text>
+        <text class="wuge-note">姓定</text>
       </view>
       <view class="wuge-item">
         <text class="wuge-name">人格</text>
         <text class="wuge-num">{{result.wuge.ren_ge.value}}</text>
-        <text class="wuge-luck {{m.luck(result.wuge.ren_ge.luck)}}">{{result.wuge.ren_ge.luck}}</text>
       </view>
       <view class="wuge-item">
         <text class="wuge-name">地格</text>
         <text class="wuge-num">{{result.wuge.di_ge.value}}</text>
-        <text class="wuge-luck {{m.luck(result.wuge.di_ge.luck)}}">{{result.wuge.di_ge.luck}}</text>
       </view>
       <view class="wuge-item">
         <text class="wuge-name">外格</text>
         <text class="wuge-num">{{result.wuge.wai_ge.value}}</text>
-        <text class="wuge-luck {{m.luck(result.wuge.wai_ge.luck)}}">{{result.wuge.wai_ge.luck}}</text>
       </view>
       <view class="wuge-item">
         <text class="wuge-name">总格</text>
         <text class="wuge-num">{{result.wuge.zong_ge.value}}</text>
-        <text class="wuge-luck {{m.luck(result.wuge.zong_ge.luck)}}">{{result.wuge.zong_ge.luck}}</text>
       </view>
     </view>
     <view class="wuge-desc">{{result.wuge.description}}</view>
@@ -88,6 +90,10 @@
     <view class="phon-row" wx:if="{{matchedWuxingText}}">
       <text class="phon-label">喜用神补益</text>
       <text class="phon-value">{{matchedWuxingText}}</text>
+    </view>
+    <!-- 时辰没填就不该被当成填了：排盘内部按午时代入，这里如实说明 -->
+    <view class="bazi-note" wx:if="{{!hourKnown}}">
+      时辰未填。排盘暂以午时代入，喜用神与匹配度会随时辰变，补上更准。
     </view>
   </view>
 

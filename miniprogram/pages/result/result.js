@@ -2,6 +2,7 @@ const api = require('../../utils/api')
 const share = require('../../utils/share')
 const namebook = require('../../utils/namebook')
 const score = require('../../utils/score')
+const track = require('../../utils/track')
 
 // 结果页风格筛选条：全部 + 8 个风格（与后端 STYLE_OPTIONS 同源，见 utils/api.js）
 const styleFilters = [{ code: '', name: '全部' }].concat(
@@ -60,6 +61,8 @@ Page({
     xiyongText: '',
     wuxingList: [],
     wuxingFilter: '',
+    // 时辰是否用户真填过；false 时时柱显示「未填」，排盘按午时代入并注明
+    hourKnown: true,
     styleFilter: '',
     sourceFilter: '',
     charFilter: '',
@@ -112,6 +115,11 @@ Page({
       ? result.bazi.xiyong.xi_wuxing.join('、')
       : ''
 
+    // 时辰是不是用户真的填过：没填时排盘内部按午时代入，
+    // 页面不能把「午时」当成他给的事实展示（见 utils/hours.js 注释）
+    const params = getApp().globalData.lastParams || {}
+    const hourKnown = params.hour !== undefined && params.hour !== null
+
     // 给每个名字加上拼音展示文本，作为全量候选池
     const allNames = (result.names || []).map(function (n) {
       n.pinyinText = (n.phonetics && n.phonetics.pinyins) ? n.phonetics.pinyins.join(' · ') : ''
@@ -125,6 +133,7 @@ Page({
       allNames: allNames,
       xiyongText: xiyongText,
       wuxingList: wuxingList,
+      hourKnown: hourKnown,
       fallbackNote: result.fallback_note || '',
       // 候选变了，筛选项随之重建
       sourceFilters: buildSourceFilters(allNames),
@@ -249,15 +258,24 @@ Page({
       this.setData({ wuxingFilter: '', styleFilter: '', sourceFilter: '', charFilter: '' })
       this.renderResult(result)
 
-      // 每一批都收进「名字本」，否则「换一批」出来的好名字看完就没了
+      // 每一批都收进「名字本」：同一次起名的多批会并进同一条记录
+      // （合并规则见 utils/namebook.js 的 paramsKey），不会把别的记录挤掉
       const saved = namebook.addRecord(
         namebook.buildRecord('postnatal', params, result, batchId)
       )
       if (!saved.ok) {
         wx.showToast({ title: saved.error, icon: 'none' })
+      } else if (saved.dropped > 0) {
+        wx.showToast({
+          title: '已换一批（名字本已满，清理 ' + saved.dropped + ' 条最早记录）',
+          icon: 'none',
+          duration: 2600
+        })
       } else {
-        wx.showToast({ title: '已换一批', icon: 'none' })
+        // merged=true 说明这一批并进了本次起名的那条记录，而不是新开一条
+        wx.showToast({ title: saved.merged ? '已换一批 · 并入本次记录' : '已换一批', icon: 'none' })
       }
+      track.track(track.TRACK.namingRefresh)
     } catch (err) {
       wx.showToast({ title: (err && err.message) || '换一批失败，请重试', icon: 'none' })
     } finally {
@@ -324,6 +342,7 @@ Page({
     }
     this.setData({ favIds: namebook.favMap() })
     this.applyFilter()
+    track.track(track.TRACK.favToggle, { added: ret.added ? 'yes' : 'no' })
     wx.showToast({ title: ret.added ? '已收藏' : '已取消收藏', icon: 'none' })
   },
 

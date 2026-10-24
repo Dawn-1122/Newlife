@@ -122,7 +122,7 @@
             bindtap="onPickHour"
             data-idx="{{index}}"
           >
-            <text class="sheet-item-name">{{item.label}}时</text>
+            <text class="sheet-item-name">{{item.name}}</text>
             <text class="sheet-item-span">{{item.span}}</text>
           </view>
           <view class="sheet-pad"></view>

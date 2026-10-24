@@ -1,6 +1,7 @@
 const api = require('../../utils/api')
 const share = require('../../utils/share')
 const namebook = require('../../utils/namebook')
+const track = require('../../utils/track')
 
 // 起名第二步（也是最后一步）：定偏好 → 选路径 → 生成。
 //
@@ -454,6 +455,11 @@ Page({
         app.globalData.prenatalResult = result
         app.globalData.lastParams = params
         this.saveRecord('prenatal', params, result, 0)
+        track.track(track.TRACK.namingSubmit, {
+          kind: 'prenatal',
+          style: params.style || 'none',
+          bazi: 'no'
+        })
         wx.navigateTo({ url: '/pages/prenatal-result/prenatal-result' })
       } else {
         const result = await api.generateNames(params)
@@ -468,6 +474,12 @@ Page({
           return n.given_name
         })
         this.saveRecord('postnatal', params, result, batchId)
+        // 本地埋点（不上传，见 utils/track.js）：只记次数与粗维度
+        track.track(track.TRACK.namingSubmit, {
+          kind: 'postnatal',
+          style: params.style || 'none',
+          bazi: params.year ? 'yes' : 'no'
+        })
         wx.navigateTo({ url: '/pages/result/result' })
       }
     } catch (err) {
@@ -478,12 +490,10 @@ Page({
   },
 
   // 收进「名字本」（本机存储，见 utils/namebook.js）。
-  // 存失败只提示、不阻断 —— 结果已经拿到了，不该因为存不下就看不成。
+  // 存失败、或因满清理了旧记录都只提示、不阻断 —— 结果已经拿到了，
+  // 不该因为存不下就不让看。
   saveRecord(kind, params, result, batchId) {
-    const ret = namebook.addRecord(namebook.buildRecord(kind, params, result, batchId))
-    if (!ret.ok) {
-      wx.showToast({ title: ret.error, icon: 'none' })
-    }
+    namebook.notifySave(namebook.addRecord(namebook.buildRecord(kind, params, result, batchId)))
   },
 
   onShareAppMessage: share.defaultShare,

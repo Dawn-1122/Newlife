@@ -9,6 +9,7 @@
     "pages/prenatal-result/prenatal-result",
     "pages/analyze/analyze",
     "pages/analyze-result/analyze-result",
+    "pages/compare/compare",
     "pages/result/result",
     "pages/detail/detail",
     "pages/share/share",

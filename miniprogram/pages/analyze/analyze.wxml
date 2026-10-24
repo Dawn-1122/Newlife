@@ -43,6 +43,12 @@
 
   <button class="btn-primary" bindtap="onSubmit" loading="{{loading}}">开始释名</button>
 
+  <!-- 手上不止一个名字：并排看（同一张表，逐个测） -->
+  <view class="compare-entry" bindtap="onCompareTap">
+    <text class="compare-entry-text">手上不止一个名字？并排看看</text>
+    <text class="compare-entry-arrow">›</text>
+  </view>
+
   <view class="footer-note">
     <text>生辰为可选，提供后可分析八字匹配度</text>
   </view>
@@ -69,13 +75,13 @@
             bindtap="onPickHour"
             data-idx="{{index}}"
           >
-            <text class="sheet-item-name">{{item.label}}时</text>
+            <text class="sheet-item-name">{{item.name}}</text>
             <text class="sheet-item-span">{{item.span}}</text>
           </view>
           <view class="sheet-pad"></view>
         </scroll-view>
       </view>
-      <text class="sheet-note">不确定就选个大概，时辰只影响五行配比</text>
+      <text class="sheet-note">不确定就选「不清楚」，这一项不参与推断</text>
     </block>
 
     <block wx:else>
