@@ -32,6 +32,7 @@ import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
+sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
 
 from app.core.meaning_culture import (
     CHAR_VIRTUE_NOTES,
@@ -107,6 +108,27 @@ def test_culture_chars_are_in_candidate_pool(candidate_pool):
         if outside:
             offenders[code] = "".join(outside)
     assert not offenders, f"这些字不在语料候选池里：{offenders}"
+
+
+def test_culture_chars_are_usable_not_blacklisted():
+    """
+    字表里不许有「引擎永远不会用」的字（凶字 ∪ blacklist.json）。
+
+    「在 recommend_chars 里」还不够：语料可以推荐它，但 R3 会在组名前拦下。
+    留在表里只会让契合点多一条永远不触发的规则 ——
+    这次抓到两处：tranquil 含「虚」（黑名单）、resilient 含「寒」（luck=凶）。
+    """
+    from poetry_utils import load_blacklist
+
+    bad = load_blacklist()
+    offenders = {
+        code: "".join(c for c in chars if c in bad)
+        for code, chars in MEANING_CULTURE_CHARS.items()
+    }
+    offenders = {k: v for k, v in offenders.items() if v}
+    assert not offenders, (
+        f"这些期许字表的字永远不会出现在名字里（凶字/黑名单）：{offenders}"
+    )
 
 
 def test_notes_are_attached_to_real_chars():

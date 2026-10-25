@@ -34,6 +34,7 @@ import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
+sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
 
 from app.core.meaning_culture import (
     STYLE_CULTURE_CHARS,
@@ -150,6 +151,30 @@ def test_style_chars_are_in_candidate_pool(candidate_pool):
         if outside:
             offenders[code] = "".join(outside)
     assert not offenders, f"这些字不在语料候选池里：{offenders}"
+
+
+def test_style_chars_are_usable_not_blacklisted():
+    """
+    字族里不许有「引擎永远不会用」的字（凶字 ∪ blacklist.json）。
+
+    「在 recommend_chars 里」还不够：语料可以推荐「虚」，但 R3 会把它拦在组名之前。
+    它在字族里只会让「契合点」多一条永远不会触发的死规则 ——
+    这次就是这么抓到的（zen 原本含「虚」）。
+
+    黑名单走 scripts/poetry_utils.load_blacklist（与入库 Gate 的 R3 同一个函数），
+    避免测试和门禁各用一份口径。
+    """
+    from poetry_utils import load_blacklist
+
+    bad = load_blacklist()
+    offenders = {
+        code: "".join(c for c in chars if c in bad)
+        for code, chars in STYLE_CULTURE_CHARS.items()
+    }
+    offenders = {k: v for k, v in offenders.items() if v}
+    assert not offenders, (
+        f"这些字族的字永远不会出现在名字里（凶字/黑名单）：{offenders}"
+    )
 
 
 def test_style_notes_exist_and_say_how_not_whether():

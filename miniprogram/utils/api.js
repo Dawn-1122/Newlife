@@ -23,7 +23,7 @@ const STYLE_OPTIONS = [
   { code: 'warm', name: '温润内敛', short: '温润', chars: '温柔和厚敦敬宁静素润穆恭谨雅', note: '多用温、柔、和、厚这类不张扬的字' },
   { code: 'elegant', name: '清朗俊逸', short: '清朗', chars: '朗清爽霄鹤云飞扬俊秀', note: '多用朗、爽、飞、扬这类带光感的字' },
   { code: 'plain', name: '质朴厚重', short: '质朴', chars: '实厚土田谷桑麻真素质', note: '多用土、田、桑、麻这类贴着地面的字' },
-  { code: 'zen', name: '空灵禅意', short: '空灵', chars: '空虚幽静月云松竹苔石泉', note: '多用云、月、苔、石这类留白的字' }
+  { code: 'zen', name: '空灵禅意', short: '空灵', chars: '空幽静月云松竹苔石泉', note: '多用云、月、苔、石这类留白的字' }
 ]
 
 // 取某个气质的字族（未知 code 返回空串，调用方据此跳过筛选）
