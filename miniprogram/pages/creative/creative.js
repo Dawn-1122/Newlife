@@ -2,6 +2,7 @@
 // mode 参数由起名类型选择页传入：netname | pet | business。
 const api = require('../../utils/api')
 const share = require('../../utils/share')
+const rewardAd = require('../../utils/reward-ad')
 
 const NETNAME_SUBTABS = [
   { code: 'platform', name: '平台名称', ph: '比如：摄影师、爱喝咖啡、养三只猫' },
@@ -169,7 +170,7 @@ Page({
 
   // 能不能真的走「看广告 → AI 生成」：广告位配了、宿主支持激励视频
   _canWatchAd() {
-    return !!api.REWARDED_AD_UNIT_ID && !!wx.createRewardedVideoAd
+    return rewardAd.canWatch()
   },
 
   onGenerate() {
@@ -241,34 +242,14 @@ Page({
   },
 
   // 看激励视频广告 → 解锁 AI 生成（广告位配置驱动）
+  // 播放与失败收口都在 utils/reward-ad.js，这里只决定「失败之后怎么办」
   _watchAdThenGenerate() {
-    const adUnitId = api.REWARDED_AD_UNIT_ID
-    const rewarded = wx.createRewardedVideoAd({ adUnitId })
-
-    // onError 与 onClose 可能先后都触发；只认第一个，避免既降级又生成一轮
-    let settled = false
-    const once = (fn) => {
-      if (settled) return
-      settled = true
-      fn()
-    }
-    const adFailed = '广告没能加载出来。以下改用本地词库生成，自定义描述这次未参与。'
-
-    rewarded.onError(err => {
-      console.warn('激励视频加载失败', err)
-      once(() => this._fallbackToLocal(adFailed))
-    })
-    rewarded.onClose(res => {
-      if (res && res.isEnded) {
-        once(() => this._generateLLM())
-      } else {
-        once(() => wx.showToast({ title: '看完广告才能解锁 AI 生成哦', icon: 'none' }))
-      }
-    })
-    rewarded.show().catch(() => {
-      rewarded.load()
-        .then(() => rewarded.show())
-        .catch(() => once(() => this._fallbackToLocal(adFailed)))
+    rewardAd.watch({
+      onReward: () => this._generateLLM(),
+      onCancel: () => wx.showToast({ title: '看完广告才能解锁 AI 生成哦', icon: 'none' }),
+      onFail: () => this._fallbackToLocal(
+        '广告没能加载出来。以下改用本地词库生成，自定义描述这次未参与。'
+      )
     })
   },
 

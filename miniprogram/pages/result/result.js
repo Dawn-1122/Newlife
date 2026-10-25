@@ -3,6 +3,8 @@ const share = require('../../utils/share')
 const namebook = require('../../utils/namebook')
 const score = require('../../utils/score')
 const track = require('../../utils/track')
+const quota = require('../../utils/quota')
+const rewardAd = require('../../utils/reward-ad')
 
 // 结果页风格筛选条：全部 + 8 个风格（与后端 STYLE_OPTIONS 同源，见 utils/api.js）
 const styleFilters = [{ code: '', name: '全部' }].concat(
@@ -76,6 +78,13 @@ Page({
     // 已收藏的全名映射 { 全名: true }，供每张卡片显示收藏态
     favIds: {},
 
+    // ── 换一批配额（见 utils/quota.js）──
+    quotaLeft: 0,        // 今天还能换几次
+    quotaExhausted: false,
+    shareLeft: 0,        // 今天还能靠转发领几次
+    adLeft: 0,           // 今天还能靠看广告领几次
+    canWatchAd: false,   // 广告位是否已开通（未开通时按钮明说）
+
     wuxingFilters: [
       { code: '', name: '全部' },
       { code: '金', name: '金' },
@@ -98,7 +107,20 @@ Page({
       return
     }
 
+    this.syncQuota()
     this.renderResult(result)
+  },
+
+  // 把配额状态搬进 data：按钮文案与补次数面板都看这一份
+  syncQuota() {
+    const q = quota.status()
+    this.setData({
+      quotaLeft: q.remaining,
+      quotaExhausted: q.remaining <= 0,
+      shareLeft: q.shareLeft,
+      adLeft: q.adLeft,
+      canWatchAd: q.canWatchAd
+    })
   },
 
   renderResult(result) {
@@ -221,6 +243,17 @@ Page({
   async onRefresh() {
     if (this.data.loading) return
 
+    // 配额先拦一道：没次数就别发请求（省一次网络往返，也让「次数」成为看得见的规则）
+    if (!quota.canRefresh()) {
+      this.syncQuota()
+      wx.showToast({
+        title: '今天的换一批用完了，转发或看广告可加次数',
+        icon: 'none',
+        duration: 2600
+      })
+      return
+    }
+
     const app = getApp()
     const params = app.globalData.lastParams
 
@@ -254,6 +287,9 @@ Page({
       const batchId = Date.now()
       app.globalData.lastResult = result
       app.globalData.lastBatchId = batchId
+      // 真拿到新名字了才扣次数：翻完了（空结果）不扣，那是池子的问题不是用户的
+      quota.consume()
+      this.syncQuota()
       // 换一批后重置筛选，展示全新候选
       this.setData({ wuxingFilter: '', styleFilter: '', sourceFilter: '', charFilter: '' })
       this.renderResult(result)
@@ -346,8 +382,58 @@ Page({
     wx.showToast({ title: ret.added ? '已收藏' : '已取消收藏', icon: 'none' })
   },
 
-  // 结果页是一批名字，分享其中单个会以偏概全，故落到起名入口
-  onShareAppMessage: share.namingShare,
+  // ── 补次数：转发 / 看广告 ──
+
+  /**
+   * 转发 +1 次换一批。
+   *
+   * 发放在**点开转发面板时**，不等分享成功：微信在多处基础库里不再可靠触发
+   * 分享成功回调，与其做个时灵时不灵的判定，不如承认它不精确 ——
+   * 每天最多领 3 次把这个洞兜住了（见 utils/quota.js 顶部）。
+   *
+   * 这里只负责返回分享内容；发放奖励与提示放在 _grantShareBonus()。
+   * 不只是为了分工好看：微信只认 title/path/imageUrl/promise 四个字段，
+   * 其余键（连提示语的 icon 也算）写在返回值旁边，看代码的人会误以为
+   * 它们会随分享一起生效。
+   */
+  onShareAppMessage() {
+    this._grantShareBonus()
+    // 结果页是一批名字，分享其中单个会以偏概全，故落到起名入口
+    return share.namingShare()
+  },
+
+  /** 转发奖励发放 + 界面反馈（从 onShareAppMessage 里拆出来的副作用） */
+  _grantShareBonus() {
+    const ret = quota.grantByShare()
+    if (!ret.ok) return
+    this.syncQuota()
+    wx.showToast({ title: '已加 1 次换一批', icon: 'none' })
+  },
+
+  onWatchAdTap() {
+    if (!quota.canWatchAd()) {
+      wx.showToast({ title: '广告位还没开通，先用转发加次数', icon: 'none', duration: 2400 })
+      return
+    }
+
+    const self = this
+    rewardAd.watch({
+      onReward() {
+        const ret = quota.grantByAd()
+        self.syncQuota()
+        wx.showToast({
+          title: ret.ok ? '已加 1 次换一批' : '今天的广告次数已领完',
+          icon: 'none'
+        })
+      },
+      onCancel() {
+        wx.showToast({ title: '看完广告才能加次数', icon: 'none' })
+      },
+      onFail() {
+        wx.showToast({ title: '广告没能加载出来，先转发获取吧', icon: 'none' })
+      }
+    })
+  },
 
   onShareTimeline: share.namingTimeline
 })

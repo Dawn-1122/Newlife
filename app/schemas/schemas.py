@@ -16,7 +16,16 @@ class NamingRequest(BaseModel):
     hour: Optional[int] = Field(12, ge=0, le=23, description="出生时")
     minute: Optional[int] = Field(0, ge=0, le=59, description="出生分")
     name_length: int = Field(2, ge=1, le=2, description="名字字数（1或2）")
-    max_results: int = Field(20, ge=1, le=50, description="最大返回数量")
+    max_results: int = Field(20, ge=1, le=50, description="最大返回数量（前端每批取 6 个）")
+    shuffle: bool = Field(
+        True,
+        description=(
+            "最终摆盘顺序是否打乱。默认 true = 抽卡式，抽到什么排什么；"
+            "false = 按韵味分降序（榜单语义，脚本与评测用）。"
+            "**只改顺序不改选谁**：门槛、分层配额、抽样权重完全一致，"
+            "所以打乱不会让弱名漏进来。"
+        ),
+    )
     use_bazi: bool = Field(True, description="是否使用八字分析")
     use_poetry: bool = Field(True, description="是否使用诗词典故")
     style: Optional[str] = Field(None, description="风格偏好: classic|modern|grand|fresh|warm|elegant|plain|zen")

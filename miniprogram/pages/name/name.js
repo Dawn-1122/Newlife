@@ -24,6 +24,10 @@ const hours = require('../../utils/hours')
 // 12 个真实时辰 + 「不清楚」（见 utils/hours.js 顶部注释）
 const HOURS = hours.HOUR_OPTIONS
 
+// 每批返回几个名字。放在这里而不是散在请求里：换一批沿用同一份 params，
+// 改一处就全变；将来要做「一批 8 个」也只动这一行。
+const BATCH_SIZE = 6
+
 Page({
   data: {
     // ── 公共字段（与八字无关）──
@@ -218,7 +222,9 @@ Page({
         surname: surname,
         gender: this.data.gender,
         name_length: this.data.nameLength,
-        max_results: 50,
+        // 每批 6 个：一批三个太多看不过来，六个刚好看完还得再翻；
+        // 引擎那边 shuffle 默认开，所以这 6 个不按分数排队（抽卡感）
+        max_results: BATCH_SIZE,
         use_bazi: useBazi,
         use_poetry: true,
         // 展示用字段（提交时会剥离，不透传给后端）

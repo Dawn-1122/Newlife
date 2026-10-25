@@ -236,6 +236,7 @@ class NamingEngine:
         source_classes: Optional[list[str]] = None,
         generational_char: Optional[str] = None,
         exclude_names: Optional[list[str]] = None,
+        shuffle: bool = False,
     ) -> dict:
         """
         生成名字候选列表
@@ -265,6 +266,10 @@ class NamingEngine:
                            没有它时「换一批」等同于重新掷一次骰子，高分池只有二三十个，
                            连翻三批必然把同一批高分名字再抽回来（实测顾/男 elegant 三批
                            里「清浅/素秋/清秋」各出现三次）。
+            shuffle: 最终摆盘顺序是否打乱（默认 False = 韵味降序，供脚本/评测使用）。
+                     **只改顺序，不改选谁**：门槛、分层配额、抽样权重全部照旧，
+                     所以「打乱」不会让弱名漏进来，只是不再把高分名字排在前面。
+                     API 侧默认 True（产品要抽卡感，见 NamingRequest.shuffle）。
 
         Returns:
             {"bazi": {...}, "names": [...], "total": int, "fallback_note": str|None}
@@ -276,7 +281,7 @@ class NamingEngine:
             style=style, meanings=meanings, avoid_chars=avoid_chars,
             target_min=target_min, selected_chars=selected_chars,
             source_classes=source_classes, generational_char=generational_char,
-            exclude_names=exclude_names,
+            exclude_names=exclude_names, shuffle=shuffle,
         )
 
         fallback_note = None
@@ -288,7 +293,7 @@ class NamingEngine:
                 style=None, meanings=None, avoid_chars=avoid_chars,
                 target_min=target_min, selected_chars=selected_chars,
                 source_classes=source_classes, generational_char=generational_char,
-                exclude_names=exclude_names,
+                exclude_names=exclude_names, shuffle=shuffle,
             )
             if len(fallback_names) > len(names):
                 names = fallback_names
@@ -407,6 +412,7 @@ class NamingEngine:
         source_classes: Optional[list[str]] = None,
         generational_char: Optional[str] = None,
         exclude_names: Optional[list[str]] = None,
+        shuffle: bool = False,
     ) -> tuple:
         """核心起名流程（八字 → 候选字 → 出处匹配 → 组名 → 门槛/韵味 → 排序/多样性/截取）。"""
         # 1. 八字分析（如提供生辰）
@@ -476,7 +482,7 @@ class NamingEngine:
         names = self._stratified_sample(
             names, max_results,
             yong_wuxing=yong_wuxing, xi_wuxing=xiyong_wuxing,
-            meanings=meanings, style=style,
+            meanings=meanings, style=style, shuffle=shuffle,
         )
         for n in names:
             n.pop("_tier", None)
@@ -716,6 +722,7 @@ class NamingEngine:
         meanings: Optional[list[str]] = None,
         style: Optional[str] = None,
         temperature: Optional[float] = None,
+        shuffle: bool = False,
     ) -> list[dict]:
         """分层抽样（最终截取阶段；P3 主排序改造，替代整体加权采样）。
 
@@ -728,7 +735,11 @@ class NamingEngine:
         3) 层内权重 = 韵味分 + 用神命中加分（随八字变化）→ 兼顾质量、多样、抗常客。
         4) 某层不足时名额顺延给其余层；无八字信息时退化为单一池加权采样。
 
-        结果按韵味分降序返回（观感：高分在前）。
+        返回顺序：
+        - shuffle=False（默认）：韵味分降序（脚本/评测要可复现的榜单）。
+        - shuffle=True：打乱。**抽到什么排什么**——产品要的是抽卡感，
+          按分数排队等于每次都在告诉用户「后面几个是将就的」，
+          而后面的名字其实同样过了全部门槛。见 `generate_names` 同名参数说明。
         """
         if not names:
             return names
@@ -739,7 +750,8 @@ class NamingEngine:
         names = self._cohesion_window(names, k)
         if len(names) <= k:
             sampled = list(names)
-            random.shuffle(sampled)
+            if shuffle:
+                random.shuffle(sampled)
             return sampled
 
         k = min(k, len(names))
@@ -871,7 +883,11 @@ class NamingEngine:
                     picked_ids.add(id(n))
                     picked.append(n)
 
-        picked.sort(key=lambda n: -n["scores"]["yunwei"])
+        # 4) 摆盘：默认按韵味降序（榜单语义）；shuffle 时打乱，只改顺序不改选谁
+        if shuffle:
+            random.shuffle(picked)
+        else:
+            picked.sort(key=lambda n: -n["scores"]["yunwei"])
         return picked
 
     def _rank_by_yunwei(

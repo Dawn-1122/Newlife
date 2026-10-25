@@ -75,6 +75,8 @@ async def generate_names(request: NamingRequest):
         source_classes=request.source_classes,
         generational_char=request.generational_char,
         exclude_names=request.exclude_names,
+        # 抽卡式摆盘：抽到什么排什么，不按推荐分从高到低排队
+        shuffle=request.shuffle,
     )
 
     return NamingResponse(**result)

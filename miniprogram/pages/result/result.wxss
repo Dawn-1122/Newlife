@@ -332,3 +332,53 @@
 .home-btn {
   margin-top: 0;
 }
+
+/* ── 补次数面板（今天的换一批用完之后才出现）──
+   刻意比主按钮低一级：这一屏的主角是名字，补次数是旁支。
+   所以给纸底 + 细边 + 小字，不做成第二个主行动。 */
+.quota-panel {
+  margin-top: 24rpx;
+  padding: 26rpx 28rpx;
+  background: var(--paper-deep);
+  border: 1rpx solid var(--line);
+  border-radius: var(--r-md);
+}
+
+.quota-title {
+  font-family: var(--serif);
+  font-size: 28rpx;
+  letter-spacing: 2rpx;
+  color: var(--ink);
+}
+
+.quota-sub {
+  margin-top: 8rpx;
+  font-size: 23rpx;
+  line-height: 1.7;
+  color: var(--ochre);
+}
+
+.quota-btn {
+  margin-top: 18rpx;
+  padding: 20rpx 24rpx;
+  background: var(--card);
+  border: 1rpx solid var(--line-strong);
+  border-radius: 999rpx;
+  font-size: 25rpx;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink);
+  text-align: center;
+}
+
+.quota-btn:active {
+  background: var(--paper);
+}
+
+/* 广告位未开通 / 今日已领完：仍然可点，点了会说清原因。
+   不用灰掉的禁用态 —— 一个点不动的块不会告诉用户为什么点不动。 */
+.quota-btn-off {
+  background: transparent;
+  border-color: var(--line);
+  color: var(--ink-3);
+}
