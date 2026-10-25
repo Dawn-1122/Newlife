@@ -120,77 +120,21 @@
   flex-shrink: 0;
 }
 
-/* 建议 */
-.stable-row {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-  margin-bottom: 20rpx;
-}
-
-.stable-label {
-  font-size: 26rpx;
-  color: var(--ink-3);
-}
-
-.stable-value {
-  font-size: 30rpx;
-  font-weight: 500;
-  color: var(--ink);
-}
-
-.safe-label {
-  display: block;
-  font-size: 26rpx;
-  color: var(--ink-3);
-  margin-bottom: 12rpx;
-}
-
-.safe-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx;
-}
-
-.safe-item {
-  width: 30%;
-  background: var(--paper);
-  border-radius: 4rpx;
-  padding: 16rpx;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4rpx;
-}
-
-.safe-char {
-  font-size: 40rpx;
-  font-weight: 500;
-  color: var(--ink);
-}
-
-.safe-meta {
-  font-size: 22rpx;
-  color: var(--ink-2);
-}
-
-.safe-meaning {
-  font-size: 22rpx;
-  color: var(--ink-2);
-  text-align: center;
-}
-
-.note {
-  margin-top: 20rpx;
-  padding: 20rpx;
-  background: var(--paper-deep);
-  border-radius: 4rpx;
+/* 卡片说明文字 */
+.card-desc {
   font-size: 24rpx;
-  color: var(--ochre);
+  color: var(--ink-2);
   line-height: 1.7;
+  margin-bottom: 24rpx;
 }
 
 .btn-primary {
   margin-top: 10rpx;
+}
+
+.foot-tip {
+  font-size: 24rpx;
+  color: var(--ochre);
+  line-height: 1.7;
+  padding: 0 8rpx 24rpx;
 }

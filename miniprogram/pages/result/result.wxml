@@ -163,24 +163,24 @@
        广告位未开通时不做成可点的样子 —— 给不出的承诺不如不提。 -->
   <view class="bottom-dock">
     <view class="quota-panel" wx:if="{{quotaExhausted}}">
-      <view class="quota-title">今天的换一批用完了</view>
-      <view class="quota-sub">转发给朋友，或看一段广告，都能再加 1 次。每天各可领 3 次。</view>
+      <view class="quota-title">今天的 {{quotaFree}} 批看完了</view>
+      <view class="quota-sub">起名和换一批各算 1 批，每天的次数第二天重置。转发 +{{shareBonus}} 批，看广告 +{{adBonus}} 批。</view>
 
       <button
         class="quota-btn"
         open-type="share"
         disabled="{{shareLeft <= 0}}"
-      >{{shareLeft > 0 ? '转发给朋友 +1 次（今日还可领 ' + shareLeft + ' 次）' : '今天的转发次数已领完，明天再来'}}</button>
+      >{{shareLeft > 0 ? '转发给朋友 +' + shareBonus + ' 批（今日还可领 ' + shareLeft + ' 次）' : '今天的转发次数已领完，明天再来'}}</button>
 
       <button
         class="quota-btn {{canEarnAd ? '' : 'quota-btn-off'}}"
         bindtap="onWatchAdTap"
-      >{{!canWatchAd ? '看广告 +1 次（广告位未开通）' : (adLeft > 0 ? '看广告 +1 次（今日还可领 ' + adLeft + ' 次）' : '今天的广告次数已领完，明天再来')}}</button>
+      >{{!canWatchAd ? '看广告 +' + adBonus + ' 批（广告位未开通）' : (adLeft > 0 ? '看广告 +' + adBonus + ' 批（今日还可领 ' + adLeft + ' 次）' : '今天的广告次数已领完，明天再来')}}</button>
     </view>
 
     <view class="footer-actions">
       <button class="btn-secondary refresh-btn" bindtap="onRefresh" loading="{{loading}}" disabled="{{loading}}">
-        {{quotaLeft > 0 ? '换一批 · 剩 ' + quotaLeft + ' 次' : '换一批（今天的已用完）'}}
+        {{quotaLeft > 0 ? '换一批 · 今天还剩 ' + quotaLeft + ' 批' : '换一批（今天的用完了）'}}
       </button>
       <button class="btn-primary home-btn" bindtap="onBackHome">返回首页</button>
     </view>

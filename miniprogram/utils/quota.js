@@ -1,10 +1,12 @@
 /**
- * 换一批配额（每天 3 次，用完靠转发 / 看广告补）
+ * 起名批次额度（每天 9 批，用完靠转发 / 看广告补）
  *
- * ── 为什么是「按天」而不是「每次起名 3 次」──
- * 「每次起名给 3 次」看着更贴合直觉，但只要用户回上一页重新提交，额度就重置了，
- * 而重新提交比转发快得多 —— 按天算才不会来回翻页就反复回满，
- * 而且一句话能讲清（「今天还能换 3 次」）。
+ * ── 为什么是「一个池子」而不是「换一批 3 次」──
+ * 早先按「每次起名送 3 次换一批」算，问题有两个：
+ *   1. 文案只能写「今天的换一批用完了」，可换一批其实不跟这一天绑定，读着自相矛盾；
+ *   2. 用户回上一页重新提交就又是一批新的，比转发快得多 —— 额度拦不住任何人。
+ * 现在起名与换一批**共用同一个池**（各扣 1 批）：一句话能讲清（「今天还能看 9 批」），
+ * 重新生成也要扣，额度才真的是一道门。
  *
  * ── 为什么不做成账号额度 ──
  * 现在没有付费墙，配额只是软约束：清缓存能重置，但清缓存同时会丢名字本，
@@ -29,12 +31,14 @@ const rewardAd = require('./reward-ad')
 
 const KEY = 'mt_quota_v1'
 
-// 每天免费换一批次数
-const FREE_PER_DAY = 3
-// 转发每天最多补几次
-const SHARE_BONUS_CAP = 3
-// 看广告每天最多补几次
-const AD_BONUS_CAP = 3
+// 每天免费批次数（一次起名或一次换一批各扣 1）
+const FREE_PER_DAY = 9
+// 转发一次补几批 / 每天最多领几次
+const SHARE_BONUS = 3
+const SHARE_TIMES_CAP = 2
+// 看广告一次补几批 / 每天最多领几次
+const AD_BONUS = 3
+const AD_TIMES_CAP = 2
 
 function todayKey() {
   const d = new Date()
@@ -98,8 +102,11 @@ function status() {
     free: FREE_PER_DAY,
     used: state.used,
     remaining: remainingOf(state),
-    shareLeft: Math.max(0, SHARE_BONUS_CAP - state.shareCount),
-    adLeft: Math.max(0, AD_BONUS_CAP - state.adCount),
+    // “还能领几次”而不是“还能领几批”：按钮上写次数，领一次 +3 批
+    shareLeft: Math.max(0, SHARE_TIMES_CAP - state.shareCount),
+    adLeft: Math.max(0, AD_TIMES_CAP - state.adCount),
+    shareBonus: SHARE_BONUS,
+    adBonus: AD_BONUS,
     canWatchAd: canWatchAd()
   }
 }
@@ -124,23 +131,23 @@ function consume() {
 }
 
 /**
- * 转发奖励 +1 次。
+ * 转发奖励 +3 批。
  * @returns {{ok: boolean, added?: number, remaining?: number, reason?: string}}
  *   reason='capped' 表示今天转发奖励已领完（不是出错）
  */
 function grantByShare() {
   const state = read()
-  if (state.shareCount >= SHARE_BONUS_CAP) {
+  if (state.shareCount >= SHARE_TIMES_CAP) {
     return { ok: false, reason: 'capped', remaining: remainingOf(state) }
   }
   state.shareCount += 1
-  state.shareBonus += 1
+  state.shareBonus += SHARE_BONUS
   write(state)
-  return { ok: true, added: 1, remaining: remainingOf(state) }
+  return { ok: true, added: SHARE_BONUS, remaining: remainingOf(state) }
 }
 
 /**
- * 广告奖励 +1 次。广告位未开通时返回 reason='ad_unavailable'。
+ * 广告奖励 +3 批。广告位未开通时返回 reason='ad_unavailable'。
  * @returns {{ok: boolean, added?: number, remaining?: number, reason?: string}}
  */
 function grantByAd() {
@@ -148,13 +155,13 @@ function grantByAd() {
     return { ok: false, reason: 'ad_unavailable', remaining: remainingOf(read()) }
   }
   const state = read()
-  if (state.adCount >= AD_BONUS_CAP) {
+  if (state.adCount >= AD_TIMES_CAP) {
     return { ok: false, reason: 'capped', remaining: remainingOf(state) }
   }
   state.adCount += 1
-  state.adBonus += 1
+  state.adBonus += AD_BONUS
   write(state)
-  return { ok: true, added: 1, remaining: remainingOf(state) }
+  return { ok: true, added: AD_BONUS, remaining: remainingOf(state) }
 }
 
 /** 广告能力是否可用（与 utils/reward-ad.js 共用同一判定，避免两处口径不一致） */
@@ -171,13 +178,15 @@ function canWatchAd() {
  */
 function canEarnByAd() {
   if (!canWatchAd()) return false
-  return AD_BONUS_CAP - read().adCount > 0
+  return AD_TIMES_CAP - read().adCount > 0
 }
 
 module.exports = {
   FREE_PER_DAY,
-  SHARE_BONUS_CAP,
-  AD_BONUS_CAP,
+  SHARE_BONUS,
+  SHARE_TIMES_CAP,
+  AD_BONUS,
+  AD_TIMES_CAP,
   status,
   canRefresh,
   consume,

@@ -123,144 +123,6 @@
   color: var(--paper);
 }
 
-/* ── 路径卡 ── */
-.path-row {
-  display: flex;
-  justify-content: space-between;
-}
-
-.path-card {
-  width: 32%;
-  box-sizing: border-box;
-  padding: 26rpx 20rpx;
-  background: var(--card);
-  border: 1rpx solid var(--line);
-  border-radius: var(--r-md);
-}
-
-.path-card.active {
-  border-color: var(--ink);
-}
-
-.path-name {
-  font-family: var(--serif);
-  font-size: 30rpx;
-  font-weight: 500;
-  letter-spacing: 3rpx;
-  color: var(--ink);
-}
-
-.path-desc {
-  margin-top: 10rpx;
-  font-size: 22rpx;
-  line-height: 1.5;
-  color: var(--ink-3);
-}
-
-/* ── 可选字表 ── */
-.pick-hint {
-  padding: 24rpx 0;
-  font-size: 24rpx;
-  line-height: 1.6;
-  color: var(--ink-3);
-}
-
-.pick-stat {
-  font-size: 23rpx;
-  letter-spacing: 2rpx;
-  color: var(--ink-2);
-  margin-bottom: 24rpx;
-}
-
-.pick-warn {
-  margin-bottom: 24rpx;
-  padding: 18rpx 22rpx;
-  border: 1rpx solid var(--ochre);
-  border-radius: var(--r-sm);
-  font-size: 22rpx;
-  line-height: 1.5;
-  color: var(--ochre);
-}
-
-.pick-warn-act {
-  margin-left: 12rpx;
-  color: var(--cinnabar);
-  text-decoration: underline;
-}
-
-/* 每行 5 格：5 × w + 5 × 10rpx = 100% → w = (100% − 50rpx) / 5 */
-.char-grid {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.char-cell {
-  width: calc((100% - 50rpx) / 5);
-  box-sizing: border-box;
-  margin: 0 10rpx 10rpx 0;
-  padding: 16rpx 0 14rpx;
-  text-align: center;
-  background: var(--card);
-  border: 1rpx solid var(--line);
-  border-radius: var(--r-sm);
-}
-
-.char-cell.active {
-  border-color: var(--cinnabar);
-  background: var(--cinnabar-bg);
-}
-
-.char-glyph {
-  font-family: var(--serif);
-  font-size: 34rpx;
-  line-height: 1.2;
-  color: var(--ink);
-}
-
-.char-cell.active .char-glyph {
-  color: var(--cinnabar);
-}
-
-.char-sub {
-  margin-top: 6rpx;
-  font-size: 22rpx;
-  line-height: 1.2;
-  color: var(--ink-3);
-}
-
-.more {
-  margin-top: 12rpx;
-  padding: 20rpx 0;
-  text-align: center;
-  font-size: 24rpx;
-  letter-spacing: 2rpx;
-  color: var(--ink-2);
-  border-top: 1rpx solid var(--line);
-}
-
-.picked-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 24rpx;
-  padding-top: 24rpx;
-  border-top: 1rpx solid var(--line);
-}
-
-.picked-text {
-  font-family: var(--serif);
-  font-size: 30rpx;
-  letter-spacing: 6rpx;
-  color: var(--cinnabar);
-}
-
-.picked-clear {
-  font-size: 23rpx;
-  letter-spacing: 2rpx;
-  color: var(--ink-3);
-  text-decoration: underline;
-}
-
 /* ── 避讳字 ── */
 .avoid {
   margin: 32rpx 40rpx 0;
@@ -314,4 +176,34 @@
   font-size: 23rpx;
   letter-spacing: 2rpx;
   color: var(--ink-3);
+}
+
+/* 批次用完：把转发入口直接放在主行动下面，别让用户点进去再被拦在结果页 */
+.quota-row {
+  margin-top: 20rpx;
+  padding: 20rpx 24rpx;
+  background: var(--paper-deep);
+  border: 1rpx solid var(--line);
+  border-radius: var(--r-md);
+  text-align: center;
+}
+
+.quota-row-text {
+  display: block;
+  font-size: 24rpx;
+  color: var(--ochre);
+  letter-spacing: 1rpx;
+}
+
+.quota-row-btn {
+  margin-top: 14rpx;
+  padding: 16rpx 0;
+  background: var(--card);
+  border: 1rpx solid var(--line-strong);
+  border-radius: 999rpx;
+  font-size: 25rpx;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink);
+  text-align: center;
 }

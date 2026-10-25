@@ -1,63 +1,44 @@
 """
-预产期起名引擎（孕期参考 / 范围建议）
+预产期历法参考引擎（孕期范围 / 五行分布）
 
 核心思路：预产期未出生、时辰未知，无法精确排盘，因此不做确定性排盘，
 而是以预产期为中心遍历 `[due_date - range_days, due_date + range_days]` 每一天，
-每天用固定 `hour=12`（午时）调用近似版 `BaziEngine.generate_bazi`，
-聚合「日主五行」与「喜用神五行」的频次，归一化为概率分布。
+每天用固定 `hour=12`（午时）调用 `BaziEngine.generate_bazi`，
+数出「日柱天干五行」各出现多少天，归一化为占比。
+
+合规口径（2026-10-25）：只出历法事实与计数，不预测命理、不提供建议。
+所以这里不计算喜用神分布，也不产出「稳定五行 / 候选字 / 结论文案」——
+给未出生的孩子推断喜用五行，本身就是预测命理。
 """
 
 from collections import Counter
 from datetime import datetime, timedelta
-from typing import Optional
 
 from app.core.constants import (
     WUXING_LIST,
-    NEGATIVE_CHARS,
     DEFAULT_RANGE_DAYS,
     DIZHI_WUXING,
 )
-from app.core.naming_options import (
-    STYLE_OPTIONS,
-    MEANING_OPTIONS,
-    MEANING_KEYWORD_WEIGHT,
-    IMAGERY_WEIGHT,
-)
 from app.services.bazi_engine import BaziEngine
-from app.services.char_database import CharDatabase
 
 
 class PrenatalEngine:
-    """预产期起名引擎"""
-
-    # 稳定五行概率阈值：喜用神分布中概率 >= 该值的五行才纳入建议
-    STABLE_WUXING_THRESHOLD = 0.15
-    # 每个稳定五行取的安全候选字数量上限
-    SAFE_CHARS_PER_WUXING = 6
+    """预产期历法参考引擎"""
 
     def __init__(self):
         self.bazi = BaziEngine()
-        self.char_db = CharDatabase()
 
     def generate(
         self,
         due_date: str,
         range_days: int = DEFAULT_RANGE_DAYS,
-        gender: str = "male",
-        style: Optional[str] = None,
-        meanings: Optional[list[str]] = None,
-        avoid_chars: Optional[list[str]] = None,
     ) -> dict:
         """
-        生成预产期起名建议
+        生成预产期范围的历法参考
 
         Args:
             due_date: 预产期，格式 YYYY-MM-DD
             range_days: 前后浮动天数，取值 0|3|7|14
-            gender: male / female
-            style: 风格偏好 code（影响 safe_chars 字筛选排序）
-            meanings: 期望寓意 code 列表（影响 safe_chars 字筛选排序）
-            avoid_chars: 避讳字列表，硬剔除
 
         Returns:
             {
@@ -67,28 +48,13 @@ class PrenatalEngine:
                 "certain": {"shengxiao": str, "month_ganzhi": str, "month_wuxing": str},
                 "probabilistic": {
                     "day_master_wuxing_dist": {五行: 0~1},
-                    "xiyong_wuxing_dist": {五行: 0~1},
-                },
-                "suggestion": {
-                    "stable_wuxing": [str, ...],
-                    "safe_chars": [{...}, ...],
-                    "note": str,
                 },
             }
         """
         due = self._parse_date(due_date)
 
         dates = self._sample_dates(due, range_days)
-        day_master_dist, xiyong_dist = self._aggregate(dates, gender)
-
-        certain = self._build_certain(due)
-        stable_wuxing = self._pick_stable_wuxing(xiyong_dist)
-        safe_chars = self._build_safe_chars(
-            stable_wuxing, gender, style, meanings, avoid_chars
-        )
-        note = self._build_note(
-            due, range_days, certain, xiyong_dist, stable_wuxing
-        )
+        day_master_dist = self._aggregate(dates)
 
         return {
             "due_date": due.strftime("%Y-%m-%d"),
@@ -97,15 +63,9 @@ class PrenatalEngine:
                 "start": dates[0].strftime("%Y-%m-%d"),
                 "end": dates[-1].strftime("%Y-%m-%d"),
             },
-            "certain": certain,
+            "certain": self._build_certain(due),
             "probabilistic": {
                 "day_master_wuxing_dist": day_master_dist,
-                "xiyong_wuxing_dist": xiyong_dist,
-            },
-            "suggestion": {
-                "stable_wuxing": stable_wuxing,
-                "safe_chars": safe_chars,
-                "note": note,
             },
         }
 
@@ -124,34 +84,19 @@ class PrenatalEngine:
         """生成采样日期列表 [due - range_days ... due + range_days]"""
         return [due + timedelta(days=offset) for offset in range(-range_days, range_days + 1)]
 
-    def _aggregate(self, dates, gender: str):
+    def _aggregate(self, dates) -> dict:
         """
-        遍历每天采样排盘，聚合日主/喜用神五行频次，归一化为概率分布。
+        遍历每天采样排盘，数出日柱天干五行的出现天数，归一化为占比。
 
-        day_master_dist 分母 = 采样天数；
-        xiyong_dist 分母 = 喜用神总票数（身强身弱喜神个数不同，不能简单除以天数）。
+        分母 = 采样天数。这是纯计数，不含任何「哪种五行更好」的判断。
         """
-        day_master_counter = Counter()
-        xiyong_counter = Counter()
-        total_xi_votes = 0
+        counter = Counter()
 
         for d in dates:
-            bazi = self.bazi.generate_bazi(
-                d.year, d.month, d.day, hour=12, minute=0, gender=gender
-            )
-            day_master_counter[bazi["day_master_wuxing"]] += 1
-            for w in bazi["xiyong"]["xi_wuxing"]:
-                xiyong_counter[w] += 1
-                total_xi_votes += 1
+            bazi = self.bazi.generate_bazi(d.year, d.month, d.day, hour=12, minute=0)
+            counter[bazi["day_master_wuxing"]] += 1
 
-        day_master_dist = {
-            w: (day_master_counter.get(w, 0) / len(dates)) for w in WUXING_LIST
-        }
-        xiyong_dist = {
-            w: (xiyong_counter.get(w, 0) / total_xi_votes if total_xi_votes else 0.0)
-            for w in WUXING_LIST
-        }
-        return day_master_dist, xiyong_dist
+        return {w: (counter.get(w, 0) / len(dates)) for w in WUXING_LIST}
 
     # ── 确定性结果 ──
 
@@ -165,107 +110,3 @@ class PrenatalEngine:
             "month_ganzhi": month_ganzhi,
             "month_wuxing": DIZHI_WUXING.get(month_zhi, "未知"),
         }
-
-    # ── 建议生成 ──
-
-    def _pick_stable_wuxing(self, xiyong_dist: dict) -> list[str]:
-        """喜用神分布中概率最高且 >= 阈值的 Top2 五行"""
-        ranked = sorted(
-            xiyong_dist.items(), key=lambda kv: kv[1], reverse=True
-        )
-        stable = [w for w, p in ranked if p >= self.STABLE_WUXING_THRESHOLD]
-        return stable[:2]
-
-    def _build_safe_chars(
-        self,
-        stable_wuxing: list[str],
-        gender: str,
-        style: Optional[str] = None,
-        meanings: Optional[list[str]] = None,
-        avoid_chars: Optional[list[str]] = None,
-    ) -> list[dict]:
-        """
-        稳定五行对应的吉字候选（每个五行取 <=6 个，luck==吉 且性别匹配、非负面字）。
-
-        偏好强加权：寓意/风格命中的字排前（寓意命中权重大于意象命中），避讳字硬剔除。
-        """
-        blacklist = set(NEGATIVE_CHARS)
-        if avoid_chars:
-            for item in avoid_chars:
-                if item:
-                    blacklist.update(list(item))
-
-        safe_chars = []
-        for wuxing in stable_wuxing:
-            # 取足量候选池，偏好排序后再截取上限，保证偏好能影响最终推荐
-            pool = self.char_db.get_lucky_by_wuxing(wuxing, gender, limit=50)
-            scored = []
-            for c in pool:
-                if c["char"] in blacklist:
-                    continue
-                score = self._pref_score(
-                    c.get("meaning", "") or "", style, meanings
-                )
-                scored.append((c, score))
-            scored.sort(key=lambda x: -x[1])
-            for c, _score in scored[: self.SAFE_CHARS_PER_WUXING]:
-                safe_chars.append({
-                    "char": c["char"],
-                    "pinyin": c["pinyin"],
-                    "wuxing": c["wuxing"],
-                    "kangxi_strokes": c["kangxi_strokes"],
-                    "meaning": c.get("meaning", ""),
-                    "luck": c.get("luck", ""),
-                })
-        return safe_chars
-
-    @staticmethod
-    def _pref_score(
-        text: str, style: Optional[str], meanings: Optional[list[str]]
-    ) -> int:
-        """按寓意/风格关键词对文本（字义）打分；寓意命中权重 > 意象命中权重"""
-        if not text:
-            return 0
-        score = 0
-        if meanings:
-            for m in meanings:
-                opt = MEANING_OPTIONS.get(m)
-                if not opt:
-                    continue
-                for kw in opt.get("keywords", []):
-                    if kw in text:
-                        score += MEANING_KEYWORD_WEIGHT
-        if style and style in STYLE_OPTIONS:
-            opt = STYLE_OPTIONS[style]
-            for kw in opt.get("imagery_keywords", []):
-                if kw in text:
-                    score += IMAGERY_WEIGHT
-        return score
-
-    def _build_note(
-        self,
-        due: "datetime.date",
-        range_days: int,
-        certain: dict,
-        xiyong_dist: dict,
-        stable_wuxing: list[str],
-    ) -> str:
-        """组装面向用户的说明文案（含免责声明）"""
-        start = (due - timedelta(days=range_days)).strftime("%m/%d")
-        end = (due + timedelta(days=range_days)).strftime("%m/%d")
-
-        top_parts = []
-        for w in stable_wuxing:
-            pct = int(round(xiyong_dist.get(w, 0.0) * 100))
-            top_parts.append(f"{w}{pct}%")
-
-        stable_text = "、".join(stable_wuxing) if stable_wuxing else "综合"
-        top_text = "、".join(top_parts) if top_parts else "暂无明显倾向"
-
-        return (
-            f"预产期附近（{start}~{end}）出生，生肖为{certain['shengxiao']}，"
-            f"月柱{certain['month_ganzhi']}属{certain['month_wuxing']}。"
-            f"喜用神五行以{stable_text}概率最高（{top_text}），"
-            f"建议名字优先用{stable_text}属性字，避开忌神对应的过强五行。"
-            f"数据为孕期范围参考，出生后可精确起名复核。"
-        )

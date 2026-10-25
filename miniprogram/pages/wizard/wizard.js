@@ -2,23 +2,18 @@ const api = require('../../utils/api')
 const share = require('../../utils/share')
 const namebook = require('../../utils/namebook')
 const track = require('../../utils/track')
+const quota = require('../../utils/quota')
 
-// 起名第二步（也是最后一步）：定偏好 → 选路径 → 生成。
+// 起名第二步（也是最后一步）：定偏好 → 生成。
 //
 // 两个偏好维度的**作用域各不相同**，不要混着理解：
-//   气质 8（单选）   → 后端 style：来源偏好 + 意象关键词 + 选字倾向
+//   气质 8（单选）   → 后端 style：整批里至少一半名字出自该气质的典籍（硬名额）
 //   期许 14（≤3）    → 后端 meanings：选字硬前置 + 排序；按 7 个方向分块渲染
 //
-// 意象（字形部首族）**不再是用户输入**：它是名字读出来之后用户「感受到」的画面，
-// 属于产出侧——只在字卡上挂个小标签展示，不让父母一开始就勾「我要草木字」。
-//
-// 三条路径：
-//   直接推荐 → 按偏好直接出名字
-//   先字后典 → 先挑喜欢的字，再溯其出处（selected_chars 硬约束）
-//   先典后字 → 先圈定典籍，再从中择字（source_classes 硬约束）
+// 「取名之法」那三条路径（直接推荐 / 先字后典 / 先典后字）已下线：
+// 两条要用户先做一件他还没能力判断的事（从 300 多个裸字里挑、判断哪部典籍合适），
+// 而出处偏好本来就该由「气质」承担。现在只有一条路：按期许与气质直接荐名。
 const MEANING_MAX = api.MEANING_MAX_SELECT || 3
-const PICK_MAX = 3          // 「先字后典」最多选几个字
-const CHAR_PAGE = 48        // 字表一次渲染多少个（全量 200+ 会撑爆 wxml 节点数）
 
 Page({
   data: {
@@ -34,37 +29,18 @@ Page({
     meaningCount: 0,
     meaningMax: MEANING_MAX,
 
-    // 路径
-    paths: [
-      { code: 'direct', name: '直接推荐', desc: '按你的期许与气质，直接荐名' },
-      { code: 'chars', name: '先字后典', desc: '先挑喜欢的字，再溯其出处' },
-      { code: 'sources', name: '先典后字', desc: '先定典籍，再从中择字' }
-    ],
-    path: 'direct',
-
-    // 先字后典：字表
-    pickLoading: false,
-    pickLoaded: false,
-    pickStale: false,       // 偏好变了 → 字表需要重新载入
-    pickTotal: 0,           // 池内字数
-    pickFeasible: 0,        // 本姓真组得出名字的字数
-    charView: [],           // 当前渲染的字（分页）
-    charFiltered: 0,        // 过滤后的总数
-    charVisible: CHAR_PAGE,
-    pickedCount: 0,
-    pickedText: '',
-    pickMax: PICK_MAX,
-
-    // 先典后字
-    sources: [],
-    sourceCount: 0,
-
     // 避讳
     avoidChars: '',
     avoidOpen: false,
 
     // 字辈（只读展示：从资料页带过来，位置=第二个字）
     genChar: '',
+
+    // 今日批次（起名与换一批共用，见 utils/quota.js）
+    quotaLeft: 0,
+    quotaFree: 0,
+    shareLeft: 0,
+    shareBonus: 3,
 
     loading: false
   },
@@ -75,36 +51,48 @@ Page({
     const tab = app.globalData.draftTab ||
       (this.draft.due_date ? 'prenatal' : 'postnatal')
 
-    // 回填：从结果页「调整偏好」返回时 draft 里带着上次的 style/meanings/...
-    this.picked = {}                                  // 先字已选（不进 data，避免大数组 setData）
-    this.charAtoms = []                               // 字表全量
-
-    if (this.draft.selected_chars) {
-      this.draft.selected_chars.forEach(function (ch) {
-        this.picked[ch] = true
-      }.bind(this))
-    }
-
-    // 回填路径：从结果页「调整偏好」返回时必须停在原来那条路上。
-    // 否则 draft 里带着 selected_chars/source_classes，界面却停在「直接推荐」，
-    // 一提交就被静默丢掉——用户会以为「我选的字没生效」。
-    let path = 'direct'
-    if (tab !== 'prenatal') {
-      if (this.draft.selected_chars) path = 'chars'
-      else if (this.draft.source_classes) path = 'sources'
-    }
-
+    // 回填：从结果页「调整偏好」返回时 draft 里带着上次的 style/meanings
     const view = this.buildView({
       tab: tab,
       styleCode: this.draft.style || '',
-      meaningCodes: (this.draft.meanings || []).slice(),
-      sourceCodes: (this.draft.source_classes || []).slice()
+      meaningCodes: (this.draft.meanings || []).slice()
     })
-    view.path = path
     view.genChar = this.draft.generational_char || ''
     this.setData(view)
+  },
 
-    if (path === 'chars') this.loadPickable()
+  onShow() {
+    // 每次回到这一页都刷一次：用户可能刚在结果页转发领过批次
+    this.syncQuota()
+  },
+
+  syncQuota() {
+    const q = quota.status()
+    this.setData({
+      quotaLeft: q.remaining,
+      quotaFree: q.free,
+      shareLeft: q.shareLeft,
+      shareBonus: q.shareBonus
+    })
+  },
+
+  // 批次用完时，页面上直接给转发入口（open-type="share" 会走 onShareAppMessage）
+  onShareAppMessage() {
+    this._grantShareBonus()
+    return share.defaultShare()
+  },
+
+  /**
+   * 转发奖励发放 + 界面反馈（从 onShareAppMessage 里拆出来的副作用）。
+   *
+   * 必须拆：onShareAppMessage 的返回值只允许 title/path/imageUrl/promise，
+   * 方法体里任何 `xxx:` 都会被 tests/test_share_policy.py 判成「返回了不支持的字段」。
+   */
+  _grantShareBonus() {
+    const ret = quota.grantByShare()
+    if (!ret.ok) return
+    this.syncQuota()
+    wx.showToast({ title: '已加 ' + ret.added + ' 批', icon: 'none' })
   },
 
   // ── 视图组装（一次 setData 铺满；数组项一律复制成新对象，
@@ -112,7 +100,6 @@ Page({
 
   buildView(state) {
     const meaningCodes = state.meaningCodes || []
-    const sourceCodes = state.sourceCodes || []
 
     const styles = api.STYLE_OPTIONS.map(function (o) {
       return {
@@ -137,25 +124,13 @@ Page({
       return { code: g.code, title: g.title, subtitle: g.subtitle, meanings: meanings }
     })
 
-    const sources = api.SOURCE_CLASSES.map(function (name) {
-      return {
-        code: name,
-        name: name,
-        selected: sourceCodes.indexOf(name) >= 0
-      }
-    })
-
     return {
       tab: state.tab,
       metaText: this.buildMeta(state.tab),
       styles: styles,
       styleCode: state.styleCode || '',
       meaningGroups: meaningGroups,
-      meaningCount: meaningCodes.length,
-      sources: sources,
-      sourceCount: sources.filter(function (s) { return s.selected }).length,
-      pickedCount: Object.keys(this.picked || {}).length,
-      pickedText: Object.keys(this.picked || {}).join(' ')
+      meaningCount: meaningCodes.length
     }
   },
 
@@ -170,7 +145,7 @@ Page({
     parts.push(this.draft.gender === 'female' ? '女孩' : '男孩')
     parts.push(this.draft.name_length === 1 ? '单字名' : '双字名')
     if (this.draft.generational_char) parts.push('辈字「' + this.draft.generational_char + '」')
-    if (this.draft.use_bazi) parts.push('已合八字')
+    if (this.draft.use_bazi) parts.push('已合出生历法')
     return parts.join(' · ')
   },
 
@@ -183,19 +158,16 @@ Page({
     return codes
   },
 
-  // 当前选中的典籍 codes
-  selectedCodes(key) {
-    return this.data[key].filter(function (x) { return x.selected })
-      .map(function (x) { return x.code })
-  },
-
   // ── 气质（单选，再点取消）──
 
   onStyleTap(e) {
     const code = e.currentTarget.dataset.code
     const next = this.data.styleCode === code ? '' : code
-    this.setData(this.mergeView({ styleCode: next }))
-    this.markPickStale()
+    this.setData(this.buildView({
+      tab: this.data.tab,
+      styleCode: next,
+      meaningCodes: this.selectedMeaningCodes()
+    }))
   },
 
   // ── 期许（≤3，跨组累计）──
@@ -225,174 +197,6 @@ Page({
       return n + g.meanings.filter(function (m) { return m.selected }).length
     }, 0)
     this.setData({ meaningGroups: meaningGroups, meaningCount: meaningCount })
-    this.markPickStale()
-  },
-
-  mergeView(over) {
-    const next = {
-      styleCode: 'styleCode' in over ? over.styleCode : this.data.styleCode
-    }
-    return this.buildView({
-      tab: this.data.tab,
-      styleCode: next.styleCode,
-      meaningCodes: this.selectedMeaningCodes(),
-      sourceCodes: this.selectedCodes('sources')
-    })
-  },
-
-  // ── 路径 ──
-
-  onPathTap(e) {
-    const code = e.currentTarget.dataset.code
-    if (code === this.data.path) return
-    this.setData({ path: code })
-    if (code === 'chars' && !this.data.pickLoaded) this.loadPickable()
-  },
-
-  // 偏好变了 → 字表作废（字表是按偏好算出来的，不重载会给出过期结果）。
-  // 停在「先字后典」时**自动重载**：原来只弹一行「偏好改过了，点此重载」，
-  // 用户改完气质回头看字表，发现字没变 —— 体感就是「选偏好没用」。
-  // 自觉点那行小字的人很少，所以这里直接重算，debounce 一下避免连点 3 个期许打 3 次请求。
-  markPickStale() {
-    if (!this.data.pickLoaded) return
-    this.setData({ pickStale: true })
-    if (this.data.path !== 'chars') return
-    if (this._pickTimer) clearTimeout(this._pickTimer)
-    const self = this
-    const reload = function () {
-      // 上一轮还在跑就再等一会：loadPickable 撞上 pickLoading 会直接返回，
-      // 那样这次改动就永远等不到新字表了
-      if (self.data.pickLoading) {
-        self._pickTimer = setTimeout(reload, 200)
-        return
-      }
-      self._pickTimer = null
-      self.loadPickable()
-    }
-    this._pickTimer = setTimeout(reload, 350)
-  },
-
-  onReloadPick() {
-    this.loadPickable()
-  },
-
-  // ── 先字后典：拉可选字表 ──
-
-  async loadPickable() {
-    if (this.data.pickLoading) return
-    const params = this.buildPickParams()
-    this.setData({ pickLoading: true })
-    try {
-      const res = await api.pickableChars(params)
-      this.charAtoms = (res.chars || []).map(function (c) {
-        return Object.assign({}, c)
-      })
-      this.pickMeta = {
-        total: res.total,
-        feasible: res.feasible
-      }
-      this.setData({ pickLoading: false, pickLoaded: true, pickStale: false })
-      this.sortAndRender()
-    } catch (err) {
-      this.setData({ pickLoading: false })
-      wx.showToast({
-        title: (err && err.message) || '字表加载失败，请重试',
-        icon: 'none'
-      })
-    }
-  },
-
-  buildPickParams() {
-    const p = {
-      surname: this.draft.surname,
-      gender: this.draft.gender || 'male',
-      name_length: this.draft.name_length || 2,
-      use_bazi: !!this.draft.use_bazi && !!this.draft.year
-    }
-    const style = this.data.styleCode
-    if (style) p.style = style
-    const meanings = this.selectedMeaningCodes()
-    if (meanings.length) p.meanings = meanings
-    if (this.draft.generational_char) p.generational_char = this.draft.generational_char
-    const avoid = this.parseAvoidChars()
-    if (avoid.length) p.avoid_chars = avoid
-    if (p.use_bazi) {
-      p.year = this.draft.year
-      p.month = this.draft.month
-      p.day = this.draft.day
-      p.hour = this.draft.hour
-    }
-    return p
-  },
-
-  // 排序：真能出多少名字优先（意象只作展示标签，不参与摆放）
-  sortAndRender() {
-    const list = this.charAtoms.slice()
-    list.sort(function (a, b) {
-      if (a.name_hits !== b.name_hits) return b.name_hits - a.name_hits
-      if (a.partner_count !== b.partner_count) return b.partner_count - a.partner_count
-      return a.char < b.char ? -1 : 1
-    })
-    const visible = Math.min(this.data.charVisible, list.length)
-    this.setData({
-      charFiltered: list.length,
-      // 只带渲染真正用到的字段：字表最多 200+ 格，多带一个字段就是白烧一次 setData
-      charView: list.slice(0, visible).map(function (c) {
-        return {
-          char: c.char,
-          name_hits: c.name_hits,
-          family: c.family || '',
-          picked: !!this.picked[c.char]
-        }
-      }.bind(this)),
-      pickTotal: this.pickMeta ? this.pickMeta.total : 0,
-      pickFeasible: this.pickMeta ? this.pickMeta.feasible : 0
-    })
-  },
-
-  onMoreChars() {
-    this.setData({ charVisible: this.data.charVisible + CHAR_PAGE })
-    this.sortAndRender()
-  },
-
-  // 单字点选：用路径式 setData 只更新这一格（整表重发会明显卡顿）
-  onCharTap(e) {
-    const idx = Number(e.currentTarget.dataset.idx)
-    const cell = this.data.charView[idx]
-    if (!cell) return
-
-    if (!cell.picked && Object.keys(this.picked).length >= PICK_MAX) {
-      wx.showToast({ title: '最多选 ' + PICK_MAX + ' 个字', icon: 'none' })
-      return
-    }
-    const next = !cell.picked
-    if (next) this.picked[cell.char] = true
-    else delete this.picked[cell.char]
-
-    const patch = {}
-    patch['charView[' + idx + '].picked'] = next
-    patch.pickedCount = Object.keys(this.picked).length
-    patch.pickedText = Object.keys(this.picked).join(' ')
-    this.setData(patch)
-  },
-
-  onClearPicked() {
-    this.picked = {}
-    this.setData({ pickedCount: 0, pickedText: '' })
-    this.sortAndRender()
-  },
-
-  // ── 先典后字 ──
-
-  onSourceTap(e) {
-    const code = e.currentTarget.dataset.code
-    const sources = this.data.sources.map(function (s) {
-      return Object.assign({}, s, { selected: s.code === code ? !s.selected : s.selected })
-    })
-    this.setData({
-      sources: sources,
-      sourceCount: sources.filter(function (s) { return s.selected }).length
-    })
   },
 
   // ── 避讳字 ──
@@ -416,14 +220,15 @@ Page({
   // ── 提交 ──
 
   async onSubmit() {
-    const path = this.data.tab === 'prenatal' ? 'direct' : this.data.path
-
-    if (path === 'chars' && !this.data.pickedCount) {
-      wx.showToast({ title: '先点几个字，或改用直接推荐', icon: 'none' })
-      return
-    }
-    if (path === 'sources' && !this.data.sourceCount) {
-      wx.showToast({ title: '先选典籍范围，或改用直接推荐', icon: 'none' })
+    // 起名也算 1 批（与换一批共用同一个池）。用完就拦在这里，
+    // 而不是放用户进去再告诉他不能换 —— 后者更让人难受。
+    if (!quota.canRefresh()) {
+      this.syncQuota()
+      wx.showToast({
+        title: '今天的免费批次用完了，转发给朋友可再加 ' + quota.SHARE_BONUS + ' 批',
+        icon: 'none',
+        duration: 2800
+      })
       return
     }
 
@@ -432,6 +237,10 @@ Page({
     // 剥离展示用字段，避免透传给后端
     delete params.birthDate
     delete params.hourText
+    // 「取名之法」下线后不再有硬约束路径：清掉旧 draft 里可能残留的字段，
+    // 否则从旧记录返回时会带着上一次的选字/典籍，界面上却看不到它们
+    delete params.selected_chars
+    delete params.source_classes
 
     // 气质 / 期许 → 后端既有入参
     const style = this.data.styleCode
@@ -453,23 +262,12 @@ Page({
       delete params.generational_char
     }
 
-    // 路径 → 硬约束
-    if (path === 'chars') {
-      params.selected_chars = Object.keys(this.picked)
-      delete params.source_classes
-    } else if (path === 'sources') {
-      params.source_classes = this.selectedCodes('sources')
-      delete params.selected_chars
-    } else {
-      delete params.selected_chars
-      delete params.source_classes
-    }
-
     const app = getApp()
     this.setData({ loading: true })
     try {
       if (this.data.tab === 'prenatal') {
         const result = await api.prenatal(params)
+        quota.consume()
         app.globalData.prenatalResult = result
         app.globalData.lastParams = params
         this.saveRecord('prenatal', params, result, 0)
@@ -481,6 +279,8 @@ Page({
         wx.navigateTo({ url: '/pages/prenatal-result/prenatal-result' })
       } else {
         const result = await api.generateNames(params)
+        // 拿到了才扣：请求失败不该白扣一批
+        quota.consume()
         // 每次起名 = 一个批次，深度寓意按批次单次解锁
         const batchId = Date.now()
         app.globalData.lastResult = result
@@ -504,6 +304,7 @@ Page({
       wx.showToast({ title: (err && err.message) || '起名失败，请重试', icon: 'none' })
     } finally {
       this.setData({ loading: false })
+      this.syncQuota()
     }
   },
 
@@ -513,8 +314,6 @@ Page({
   saveRecord(kind, params, result, batchId) {
     namebook.notifySave(namebook.addRecord(namebook.buildRecord(kind, params, result, batchId)))
   },
-
-  onShareAppMessage: share.defaultShare,
 
   onShareTimeline: share.defaultTimeline
 })

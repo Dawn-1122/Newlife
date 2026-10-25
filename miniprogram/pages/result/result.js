@@ -81,7 +81,10 @@ Page({
     quotaLeft: 0,        // 今天还能换几次
     quotaExhausted: false,
     shareLeft: 0,        // 今天还能靠转发领几次
+    shareBonus: 3,       // 转发一次补几批（文案里的 +N）
     adLeft: 0,           // 今天还能靠看广告领几次
+    adBonus: 3,          // 看一次广告补几批（文案里的 +N，与 shareBonus 是两套数）
+    quotaFree: 9,        // 每天免费批次数（起名与换一批共用）
     canWatchAd: false,   // 广告位是否已开通（未开通时按钮明说）
     canEarnAd: false,    // 现在点广告是不是真能拿到次数（未开通 / 今日领完都为 false）
 
@@ -118,7 +121,10 @@ Page({
       quotaLeft: q.remaining,
       quotaExhausted: q.remaining <= 0,
       shareLeft: q.shareLeft,
+      shareBonus: q.shareBonus,
       adLeft: q.adLeft,
+      adBonus: q.adBonus,
+      quotaFree: q.free,
       canWatchAd: q.canWatchAd,
       // 样式用「能不能拿到次数」而不是「广告能不能放」：额度领完时按钮也该暗下来，
       // 与尚未开通同一种视觉，别让它看着像还有戏
@@ -405,7 +411,7 @@ Page({
     const ret = quota.grantByShare()
     if (!ret.ok) return
     this.syncQuota()
-    wx.showToast({ title: '已加 1 次换一批', icon: 'none' })
+    wx.showToast({ title: '已加 ' + ret.added + ' 批', icon: 'none' })
   },
 
   onWatchAdTap() {
@@ -429,7 +435,7 @@ Page({
         const ret = quota.grantByAd()
         self.syncQuota()
         wx.showToast({
-          title: ret.ok ? '已加 1 次换一批' : '今天的广告次数已领完',
+          title: ret.ok ? '已加 ' + ret.added + ' 批' : '今天的广告次数已领完',
           icon: 'none'
         })
       },

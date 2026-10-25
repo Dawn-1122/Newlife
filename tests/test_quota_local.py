@@ -1,12 +1,15 @@
-"""换一批配额（miniprogram/utils/quota.js）行为约束。
+"""起名批次额度（miniprogram/utils/quota.js）行为约束。
 
-产品需求原话：「每次默认可以使用换一批的次数为3次，想更多换一批，需要转发或看广告。
-早期可能无法接入广告，预留接口，先通过转发裂变增加次数。」
+口径（2026-10-25 定）：**一个池子，每天 9 批**，起名与换一批各扣 1；
+转发一次 +3 批（每天最多领 2 次）、看广告一次 +3 批（同）。
+
+早先是「每次起名送 3 次换一批」，两个毛病：文案只能说「今天的换一批用完了」
+却又不跟这一天绑定；而且回上一页重新提交就又是一批新的，额度拦不住人。
 
 这里钉住的是**用户在页面上能感受到的规则**，不是实现细节：
-1. 每天 3 次免费，第 4 次点不动（返回 exhausted，不是静默多给）；
-2. 转发、看广告各最多补 3 次，补满后明确说「今天领完了」（capped），不假装成功；
-3. 广告位没配时不发放次数（ad_unavailable）—— 不能先给次数再想办法；
+1. 每天 9 批，第 10 次扣不动（返回 exhausted，不是静默多给）；
+2. 转发 / 广告各最多领 2 次，领满后明确说「今天领完了」（capped），不假装成功；
+3. 广告位没配时不发放（ad_unavailable）—— 不能先给批次再想办法；
 4. 跨天自动回到满额；读写存储失败都不许把用户卡死（读失败按满额、写失败静默）；
 5. 全程只落本机，不发任何请求。
 
@@ -54,20 +57,20 @@ const out = {}
 out.initial = q.status()
 out.canRefreshInitial = q.canRefresh()
 
-// ① 免费 3 次：连点 4 下，第 4 下必须被拦
+// ① 免费 9 批：连点 10 下，第 10 下必须被拦
 const consumes = []
-for (let i = 0; i < 4; i++) consumes.push(q.consume())
+for (let i = 0; i < 10; i++) consumes.push(q.consume())
 out.consumes = consumes
 out.afterFree = q.status()
 out.canRefreshAfterFree = q.canRefresh()
 
-// ② 广告位未配置：不许发次数
+// ② 广告位未配置：不许发批次
 out.adUnavailable = q.grantByAd()
 out.canEarnBeforeAd = q.canEarnByAd()
 
-// ③ 转发补 3 次，第 4 次 capped
+// ③ 转发每次 +3 批、每天最多领 2 次，第 3 次 capped
 const shares = []
-for (let i = 0; i < 4; i++) shares.push(q.grantByShare())
+for (let i = 0; i < 3; i++) shares.push(q.grantByShare())
 out.shares = shares
 out.afterShare = q.status()
 
@@ -79,7 +82,7 @@ wx.createRewardedVideoAd = function () {
 out.canWatchAfterEnable = q.canWatchAd()
 out.canEarnAfterEnable = q.canEarnByAd()
 const ads = []
-for (let i = 0; i < 4; i++) ads.push(q.grantByAd())
+for (let i = 0; i < 3; i++) ads.push(q.grantByAd())
 out.ads = ads
 out.afterAd = q.status()
 // 广告额度领完之后，页面必须能在放视频之前就拦住（别让人白看 30 秒）
@@ -87,12 +90,12 @@ out.canEarnAfterAdUsedUp = q.canEarnByAd()
 
 // ⑤ 额度用尽后 remaining 不许变负数
 const drain = []
-for (let i = 0; i < 7; i++) drain.push(q.consume())
+for (let i = 0; i < 13; i++) drain.push(q.consume())
 out.drain = drain
 out.afterDrain = q.status()
 
-// ⑥ 跨天：昨天用满 99 次，今天必须回到 3 次
-store['mt_quota_v1'] = { date: '2000-01-01', used: 99, shareBonus: 3, adBonus: 3, shareCount: 3, adCount: 3 }
+// ⑥ 跨天：昨天用满 99 批，今天必须回到 9 批
+store['mt_quota_v1'] = { date: '2000-01-01', used: 99, shareBonus: 6, adBonus: 6, shareCount: 2, adCount: 2 }
 out.afterRollover = q.status()
 
 // ⑦ 读失败：宁可多给一次，也不能让用户点不动
@@ -124,18 +127,19 @@ def out() -> dict:
     return json.loads(run.stdout)
 
 
-def test_daily_free_quota_is_three(out):
-    """每天 3 次免费，第 4 次点不动。"""
+def test_daily_free_quota_is_nine(out):
+    """每天 9 批（起名与换一批共用一个池），第 10 次扣不动。"""
     o = out["out"]
-    assert o["initial"]["free"] == 3
-    assert o["initial"]["remaining"] == 3
-    assert o["initial"]["shareLeft"] == 3
-    assert o["initial"]["adLeft"] == 3
+    assert o["initial"]["free"] == 9
+    assert o["initial"]["remaining"] == 9
+    assert o["initial"]["shareLeft"] == 2
+    assert o["initial"]["adLeft"] == 2
+    assert o["initial"]["shareBonus"] == 3
     assert o["canRefreshInitial"] is True
 
-    assert [c["ok"] for c in o["consumes"]] == [True, True, True, False]
-    assert [c["remaining"] for c in o["consumes"]] == [2, 1, 0, 0]
-    assert o["consumes"][3]["reason"] == "exhausted"
+    assert [c["ok"] for c in o["consumes"]] == [True] * 9 + [False]
+    assert [c["remaining"] for c in o["consumes"]] == list(range(8, -1, -1)) + [0]
+    assert o["consumes"][-1]["reason"] == "exhausted"
     assert o["canRefreshAfterFree"] is False
 
 
@@ -162,51 +166,52 @@ def test_can_earn_by_ad_false_once_daily_cap_used_up(out):
     assert o["canEarnAfterAdUsedUp"] is False
 
 
-def test_share_bonus_capped_at_three(out):
-    """转发每天最多补 3 次；补满后返回 capped，而不是假装成功。"""
+def test_share_bonus_adds_three_batches_and_caps_times(out):
+    """转发一次 +3 批、每天最多领 2 次；第 3 次返回 capped，而不是假装成功。"""
     o = out["out"]
-    assert [s["ok"] for s in o["shares"]] == [True, True, True, False]
-    assert o["shares"][3]["reason"] == "capped"
+    assert [s["ok"] for s in o["shares"]] == [True, True, False]
+    assert [s.get("added") for s in o["shares"][:2]] == [3, 3]
+    assert o["shares"][2]["reason"] == "capped"
     assert o["afterShare"]["shareLeft"] == 0
-    # 3 次免费已用完，补了 3 次 → 还剩 3 次
-    assert o["afterShare"]["remaining"] == 3
-    assert o["afterShare"]["used"] == 3
+    # 9 批已用完，领了 2 次共 +6 批 → 还剩 6 批
+    assert o["afterShare"]["remaining"] == 6
+    assert o["afterShare"]["used"] == 9
 
 
-def test_ad_bonus_capped_at_three_and_separate_from_share(out):
+def test_ad_bonus_separate_from_share(out):
     """广告额度与转发额度各算各的，互不挤占。"""
     o = out["out"]
     assert o["canWatchAfterEnable"] is True
-    assert [a["ok"] for a in o["ads"]] == [True, True, True, False]
-    assert o["ads"][3]["reason"] == "capped"
+    assert [a["ok"] for a in o["ads"]] == [True, True, False]
+    assert o["ads"][2]["reason"] == "capped"
     assert o["afterAd"]["adLeft"] == 0
-    assert o["afterAd"]["remaining"] == 6
-    # 总额度 = 3 免费 + 3 转发 + 3 广告
-    assert o["afterAd"]["used"] == 3
+    # 9 批用完 + 转发 +6 + 广告 +6
+    assert o["afterAd"]["remaining"] == 12
 
 
 def test_remaining_never_goes_negative(out):
     """额度用尽后继续点，计数不加、余量不为负。"""
     o = out["out"]
-    assert [d["ok"] for d in o["drain"]] == [True] * 6 + [False]
+    assert [d["ok"] for d in o["drain"]] == [True] * 12 + [False]
     assert o["drain"][-1]["reason"] == "exhausted"
     assert o["afterDrain"]["remaining"] == 0
-    assert o["afterDrain"]["used"] == 9
+    # 9 免费 + 6 转发 + 6 广告 = 21
+    assert o["afterDrain"]["used"] == 21
 
 
 def test_resets_on_new_day(out):
-    """跨天回到满额（用「昨天用满 99 次」验，避免把累加当成重置）。"""
+    """跨天回到满额（用「昨天用满 99 批」验，避免把累加当成重置）。"""
     o = out["out"]["afterRollover"]
     assert o["used"] == 0
-    assert o["remaining"] == 3
-    assert o["shareLeft"] == 3
-    assert o["adLeft"] == 3
+    assert o["remaining"] == 9
+    assert o["shareLeft"] == 2
+    assert o["adLeft"] == 2
 
 
 def test_storage_failures_never_block_the_user(out):
     """读失败按满额（宁可多给一次），写失败静默（额度不值得弹错误）。"""
     o = out["out"]
-    assert o["onReadError"]["remaining"] == 3
+    assert o["onReadError"]["remaining"] == 9
     assert o["writeThrew"] is False
 
 

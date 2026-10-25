@@ -100,23 +100,27 @@ class BatchAnalysisResponse(BaseModel):
 
 
 class PrenatalRequest(BaseModel):
-    """预产期起名请求（孕期参考/范围建议）"""
+    """
+    预产期历法参考请求
+
+    只收「预产期」和「浮动天数」——性别、寓意、风格对历法事实没有影响，
+    早期为「候选字推荐」保留过这几个字段，合规收敛后建议能力已下线。
+    """
     due_date: str = Field(..., description="预产期 YYYY-MM-DD")
     range_days: int = Field(7, description="预产期前后浮动天数，取值 0|3|7|14")
-    gender: Optional[str] = Field("male", pattern="^(male|female)$", description="性别，用于候选字推荐")
-    style: Optional[str] = Field(None, description="风格偏好: classic|modern|grand|fresh|warm|elegant|plain|zen")
-    meanings: Optional[list[str]] = Field(None, max_length=3, description="期望寓意（code 见 /chars 的 meanings 字段），最多3个，取值: wisdom|health|bravery|gentle|wealth|peace|talent|virtue|beauty|loyal|patriotic|tranquil|resilient|optimistic")
-    avoid_chars: Optional[list[str]] = Field(None, description="避讳字（单个汉字列表）")
 
 
 class PrenatalResponse(BaseModel):
-    """预产期起名响应"""
+    """
+    预产期历法参考响应
+
+    只有历法事实（生肖/月柱）与计数（日柱天干五行占比），没有建议字段。
+    """
     due_date: str
     range_days: int
     range: dict
     certain: dict
     probabilistic: dict
-    suggestion: dict
 
 
 class CharInfoResponse(BaseModel):

@@ -48,92 +48,11 @@
     </view>
   </view>
 
-  <!-- ③ 路径（未出生只有直接推荐：预产期给的是范围参考，不吃先字/先典） -->
-  <view class="block" wx:if="{{tab === 'postnatal'}}">
-    <view class="block-head">
-      <text class="block-title">取名之法</text>
-    </view>
-    <view class="path-row">
-      <view
-        class="path-card {{path === item.code ? 'active' : ''}}"
-        wx:for="{{paths}}"
-        wx:key="code"
-        bindtap="onPathTap"
-        data-code="{{item.code}}"
-      >
-        <view class="path-name">{{item.name}}</view>
-        <view class="path-desc">{{item.desc}}</view>
-      </view>
-    </view>
-  </view>
+  <!-- 取名之法（直接推荐/先字后典/先典后字）已下线：
+       三条路径里两条要用户先做一件他还没能力判断的事（挑 300 多个裸字、
+       判断哪部典籍合适），而出处偏好本来就该由「气质」承担。
+       现在只保留一条路：按期许与气质直接荐名。 -->
 
-  <!-- 路径 · 先字后典 -->
-  <view class="block" wx:if="{{tab === 'postnatal' && path === 'chars'}}">
-    <view class="block-head">
-      <text class="block-title">可选字</text>
-      <text class="block-tail" wx:if="{{pickLoaded}}">已选 {{pickedCount}}/{{pickMax}}</text>
-    </view>
-
-    <view class="pick-hint" wx:if="{{pickLoading}}">正在算这个姓氏下哪些字组得出名字…</view>
-
-    <block wx:elif="{{pickLoaded}}">
-      <view class="pick-stat">
-        池内 {{pickTotal}} 字 · 本姓组得出名字 {{pickFeasible}} 字
-        <text wx:if="{{genChar}}"> · 辈字「{{genChar}}」固定第二字</text>
-      </view>
-      <view class="pick-warn" wx:if="{{pickStale}}">
-        偏好改过了，字表还是上一版的。
-        <text class="pick-warn-act" bindtap="onReloadPick">重新载入</text>
-      </view>
-
-      <view class="char-grid">
-        <view
-          class="char-cell {{item.picked ? 'active' : ''}}"
-          wx:for="{{charView}}"
-          wx:key="char"
-          bindtap="onCharTap"
-          data-idx="{{index}}"
-        >
-          <view class="char-glyph">{{item.char}}</view>
-          <view class="char-sub">{{item.name_hits}} 名{{item.family ? ' · ' + item.family : ''}}</view>
-        </view>
-      </view>
-
-      <view class="more" wx:if="{{charFiltered > charVisible}}" bindtap="onMoreChars">
-        还有 {{charFiltered - charVisible}} 个 · 显示更多
-      </view>
-
-      <view class="picked-bar" wx:if="{{pickedCount}}">
-        <text class="picked-text">已选 {{pickedText}}</text>
-        <text class="picked-clear" bindtap="onClearPicked">清空</text>
-      </view>
-      <view class="block-note" wx:else>
-        每个字下面写着「这个姓氏下它能组出多少个名字」——只列真的能用的字。
-      </view>
-    </block>
-
-    <view class="pick-hint" wx:else>点「先字后典」后载入可选字。</view>
-  </view>
-
-  <!-- 路径 · 先典后字 -->
-  <view class="block" wx:if="{{tab === 'postnatal' && path === 'sources'}}">
-    <view class="block-head">
-      <text class="block-title">典籍范围</text>
-      <text class="block-tail">{{sourceCount}} 项</text>
-    </view>
-    <view class="tag-row">
-      <view
-        class="tag {{item.selected ? 'active' : ''}}"
-        wx:for="{{sources}}"
-        wx:key="code"
-        bindtap="onSourceTap"
-        data-code="{{item.code}}"
-      >{{item.name}}</view>
-    </view>
-    <view class="block-note">
-      名字只会从这里选的典籍里取。字源四部（周易/山海经/本草纲目/神农本草经）归在「经史子集」。
-    </view>
-  </view>
 
   <!-- 避讳字（低频，默认收起） -->
   <view class="avoid">
@@ -157,9 +76,16 @@
     <button class="btn-primary" bindtap="onSubmit" loading="{{loading}}">
       {{tab === 'prenatal' ? '查看孕期参考' : '生成名字'}}
     </button>
-    <view class="foot-note" wx:if="{{tab === 'prenatal'}}">预产期给的是范围参考，不用挑字</view>
-    <view class="foot-note" wx:elif="{{path === 'chars'}}">已选 {{pickedCount}} 个字，名字里会含其中之一</view>
-    <view class="foot-note" wx:elif="{{path === 'sources'}}">已选 {{sourceCount}} 类典籍</view>
+    <view class="foot-note" wx:if="{{tab === 'prenatal'}}">预产期给的是范围参考</view>
     <view class="foot-note" wx:else>什么都不选也行，会按韵味给出各方向的名字</view>
+
+    <!-- 今日批次（起名与换一批共用）。用完就在这里给转发入口，
+         不让用户点进去再被拦在结果页。 -->
+    <view class="quota-row" wx:if="{{quotaLeft <= 0}}">
+      <text class="quota-row-text">今天的 {{quotaFree}} 批用完了</text>
+      <button class="quota-row-btn" open-type="share" disabled="{{shareLeft <= 0}}"
+      >{{shareLeft > 0 ? '转发 +' + shareBonus + ' 批（还可领 ' + shareLeft + ' 次）' : '今天的转发次数已领完'}}</button>
+    </view>
+    <view class="foot-note" wx:else>今天还能看 {{quotaLeft}} 批（起名或换一批各算 1 批）</view>
   </view>
 </view>

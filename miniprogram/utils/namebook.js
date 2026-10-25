@@ -184,6 +184,21 @@ function paramsKey(kind, params) {
 }
 
 /**
+ * 从 {五行: 0~1} 里取占比最高的 n 项，拼成「木 33%、火 27%」这样的串。
+ * 只做降序取数，不判断好坏 —— 孕期记录只描述分布。
+ */
+function topWuxingText(dist, n) {
+  const list = Object.keys(dist || {}).map(function (k) {
+    return { name: k, pct: Math.round((dist[k] || 0) * 100) }
+  })
+  list.sort(function (a, b) { return b.pct - a.pct })
+  return list.slice(0, n)
+    .filter(function (it) { return it.pct > 0 })
+    .map(function (it) { return it.name + ' ' + it.pct + '%' })
+    .join('、')
+}
+
+/**
  * 由 payload / params 算出列表要显示的标题、副标题、候选名摘要。
  * 合并之后要按合并结果重算，所以拆成独立函数而不是塞在 buildRecord 里。
  */
@@ -208,15 +223,14 @@ function describeRecord(record) {
       (batches > 1 ? ' · 翻 ' + batches + ' 批' : '') +
       (style ? ' · ' + style : '')
   } else if (kind === 'prenatal') {
-    const stable = (result.suggestion && result.suggestion.stable_wuxing) || []
-    const safeChars = (result.suggestion && result.suggestion.safe_chars) || []
-    record.chips = safeChars.slice(0, 10).map(function (c) {
-      return { text: c, score: 0 }
-    })
+    // 合规口径：孕期只出历法统计，不出建议。所以这里也不再拼「稳定五行 / 候选字」，
+    // 改成把日柱天干五行里占比最高的两项写进副标题（纯计数，不做判断）。
+    const dist = (result.probabilistic && result.probabilistic.day_master_wuxing_dist) || {}
+    const top = topWuxingText(dist, 2)
     record.title = (params.surname || '') + ' · 预产期 ' + (params.due_date || '未设置')
     record.subtitle = '浮动 ±' + (params.range_days || 0) + ' 天' +
       (batches > 1 ? ' · 存 ' + batches + ' 次' : '') +
-      (stable.length ? ' · 稳定五行 ' + stable.join('、') : '')
+      (top ? ' · 日柱五行 ' + top : '')
   } else {
     const score = (result.phonetics && result.phonetics.score) || 0
     record.title = result.full_name || params.full_name || ''
@@ -296,14 +310,9 @@ function mergeInto(old, incoming) {
       names: names.slice(0, MERGE_MAX_NAMES)
     })
   } else if (incoming.kind === 'prenatal') {
-    const prevChars = (old.payload && old.payload.suggestion && old.payload.suggestion.safe_chars) || []
-    const nextChars = (incoming.payload && incoming.payload.suggestion && incoming.payload.suggestion.safe_chars) || []
-    const safeChars = unionBy(nextChars, prevChars, function (c) { return c })
-    out.payload = Object.assign({}, incoming.payload, {
-      suggestion: Object.assign({}, (incoming.payload || {}).suggestion, {
-        safe_chars: safeChars
-      })
-    })
+    // 孕期参考只出历法统计，同一组参数算出来的结果必然一样，没有可累加的东西
+    // （早期这里合并过 safe_chars 候选字，合规收敛后建议能力已下线）。
+    out.payload = incoming.payload
   } else {
     // 释名：同一个名字重复查，结论不变，只记次数
     out.payload = incoming.payload

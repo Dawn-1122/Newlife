@@ -214,10 +214,13 @@ async def name_meaning(request: MeaningRequest):
 @router.post("/prenatal", response_model=PrenatalResponse)
 async def prenatal(request: PrenatalRequest):
     """
-    预产期起名（孕期参考 / 范围建议）
+    预产期历法参考（孕期范围）
 
-    以预产期为中心 ±range_days 采样，聚合日主/喜用神五行概率分布，
-    返回确定性结果（生肖/月柱）+ 概率分布 + 起名建议（稳定五行 + 安全字）。
+    以预产期为中心 ±range_days 采样，逐日排盘后数出「日柱天干五行」的占比，
+    返回确定性历法结果（生肖/月柱）+ 五行分布统计。
+
+    合规口径：不预测命理、不提供建议 —— 所以不计算喜用神分布，
+    也不返回「稳定五行 / 候选字 / 结论文案」。
     """
     if request.range_days not in RANGE_OPTIONS:
         raise HTTPException(
@@ -230,10 +233,6 @@ async def prenatal(request: PrenatalRequest):
         result = engine.generate(
             due_date=request.due_date,
             range_days=request.range_days,
-            gender=request.gender or "male",
-            style=request.style,
-            meanings=request.meanings,
-            avoid_chars=request.avoid_chars,
         )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
