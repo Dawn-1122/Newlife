@@ -236,6 +236,52 @@
   line-height: 1.8;
 }
 
+/* 契合点：左侧竖线 + 逐字条目，与「细线分层」的版式一致 */
+.fit-block {
+  margin-top: 24rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid var(--line);
+}
+
+.fit-title {
+  font-size: 24rpx;
+  color: var(--ochre);
+  letter-spacing: 2rpx;
+  margin-bottom: 14rpx;
+}
+
+.fit-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 14rpx;
+}
+
+.fit-char {
+  font-family: var(--serif);
+  font-size: 40rpx;
+  line-height: 1.2;
+  color: var(--ink);
+  width: 60rpx;
+  flex-shrink: 0;
+}
+
+.fit-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.fit-titles {
+  font-size: 24rpx;
+  color: var(--ink-3);
+}
+
+.fit-note {
+  font-size: 24rpx;
+  color: var(--ink-2);
+  line-height: 1.7;
+}
+
 .actions {
   padding: 20rpx 0 60rpx;
 }

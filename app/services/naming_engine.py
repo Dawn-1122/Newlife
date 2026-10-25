@@ -44,6 +44,7 @@ from app.core.naming_options import (
     TARGET_MIN,
     COHESION_RANK,
 )
+from app.core.meaning_culture import culture_chars_for, culture_hits
 
 # 康熙部首异体归一化（单字名「说文解字」出处的 title 用主部首名，如 氵→水）。
 # 与 scripts/expand_source_shuowen.py 的 RADICAL_ALIAS 保持一致。
@@ -175,6 +176,19 @@ class NamingEngine:
     # 用户点「古风雅致」的意图是「给我这个味道的名字」，不是「排序时偏一点」，
     # 所以这里改成硬名额：先按出处取够一半，剩下的再交给用神与韵味。
     STYLE_SOURCE_RATIO = 0.5
+    # 选了期许（meanings）时，整批里**至少**这个比例的名字要含「期许文化记号」
+    # （字表见 app/core/meaning_culture.py）。
+    #
+    # 为什么不能只靠文本匹配：实测（林/男/1990-05-20）选「健康长寿」，
+    # Top6 里只有 2 个名字含与健康相关的字，而不选时是 0 个、40 个候选里有 6 个
+    # ——偏好确实改变了输出，但改变量小到用户看不出，更说不出理由。
+    # 根因是「健康」在中文名字里几乎不靠字义直说（没人叫「张健康」），
+    # 而是取松柏后凋、鹤寿千岁这类文化符号，与字库释义文本对不上。
+    # 所以这里和气质一样改成硬名额：先按文化记号取够一半，剩下的再交给文本偏好。
+    CULTURE_QUOTA_RATIO = 0.5
+    # 层内抽样里，一个「文化记号命中字」折算成多少韵味分。取 12 是因为
+    # PREF_HIT_BONUS=6：一个文化字 ≈ 两个文本命中，又不至于压过名字感（TASTE_BONUS 每档 4）。
+    CULTURE_HIT_BONUS = 12.0
     _TASTE_FILE = Path(__file__).resolve().parents[2] / "data" / "poetry" / "pair_taste.json"
 
     @classmethod
@@ -496,6 +510,11 @@ class NamingEngine:
         for n in names:
             n.pop("_tier", None)
             n.pop("_selected_hits", None)
+            # 契合点：这个选字为什么对得上你选的期许。
+            # 没有它，用户只能看到「松」却不知道松=长寿，选与不选在他眼里就没差别。
+            n["meaning_fit"] = culture_hits(
+                [c.get("char") for c in n.get("chars_info", [])], meanings
+            )
 
         return bazi_result, names
 
@@ -649,6 +668,17 @@ class NamingEngine:
                 STYLE_OPTIONS[style].get("imagery_keywords", []),
             )
         return hits
+
+    @staticmethod
+    def _culture_hit_count(name: dict, culture: set) -> int:
+        """名字里命中了几个「期许文化记号」字（见 app/core/meaning_culture.py）。
+
+        与 `_pref_hits` 的分工：那个走文本碰撞（字库释义 + 诗词意象标签），
+        这个走文化约定（松→长寿、鹤→高寿），不依赖字库是否写过释义。
+        """
+        if not culture:
+            return 0
+        return sum(1 for c in name.get("chars_info", []) if c.get("char") in culture)
 
     def _banded_window(self, window: list[dict], n: int) -> list[dict]:
         """对抽样窗口做质量带宽过滤（只保留「韵味 ≥ 窗口最高分 − 带宽」的名字）。
@@ -843,20 +873,49 @@ class NamingEngine:
         has_pref = bool(meanings or (style and style in STYLE_OPTIONS))
         if has_pref:
             hits_of = {id(n): self._pref_hits(n, meanings, style) for n in names}
-            pref_pool = [n for n in names if hits_of[id(n)] > 0]
+            culture = culture_chars_for(meanings)
+            culture_of = {id(n): self._culture_hit_count(n, culture) for n in names}
+            # 命中池的判定要把文化记号算进来：只认文本命中时，
+            # 「松鹤延年」这类名字可能一次都不在池里（诗词意象标签未必写「长寿」）。
+            pref_pool = [
+                n for n in names
+                if hits_of[id(n)] > 0 or culture_of[id(n)] > 0
+            ]
             pref_pool.sort(
-                key=lambda n: (-hits_of[id(n)], -n["scores"]["yunwei"])
+                key=lambda n: (
+                    -culture_of[id(n)], -hits_of[id(n)], -n["scores"]["yunwei"]
+                )
             )
             if pref_pool:
                 def pref_weight(n: dict) -> float:
                     """偏好层权重：韵味 + 命中项数加成（命中越多越靠前）。"""
-                    return weight_of(n) + self.PREF_HIT_BONUS * hits_of[id(n)]
+                    return (
+                        weight_of(n)
+                        + self.PREF_HIT_BONUS * hits_of[id(n)]
+                        + self.CULTURE_HIT_BONUS * culture_of[id(n)]
+                    )
 
                 # 偏好池**不许吃满整批**：命中池可能只有七八个名字（风格越窄越小），
                 # 若把 k 个名额全给它，每次「换一批」就是这七八个的排列组合，
                 # 扩库进来的名字永远轮不到（实测某输入连翻 12 批只出 14 个）。
                 # 留两三席给非命中池，偏好照样看得见，池子也能转动。
                 quota = max(2, round(k * self.PREF_QUOTA_RATIO))
+
+                # 1a) 期许文化记号优先取，且**从偏好配额里扣**，不额外抢气质/八字的名额。
+                #     这样「选了健康就能看到松鹤」与「选了古风就能看到诗经楚辞」
+                #     同时成立，不会互相挤掉（k=6 时实测：文化 3 + 其余偏好 1 + 气质 2）。
+                if culture_of and any(culture_of.values()):
+                    cpool = [n for n in pref_pool if culture_of[id(n)] > 0]
+                    q_culture = min(quota, max(2, round(k * self.CULTURE_QUOTA_RATIO)))
+                    before = len(picked)
+                    take(
+                        cpool,
+                        q_culture,
+                        weight=pref_weight,
+                        temperature=self.PREF_TEMPERATURE,
+                    )
+                    quota -= len(picked) - before
+
                 take(
                     pref_pool,
                     min(k, quota, TARGET_MIN),

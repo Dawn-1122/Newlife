@@ -14,6 +14,9 @@ Page({
     // 语境义项（免费）：各字在本出处语境下的取义
     ctxSenses: [],
 
+    // 契合点：这个选字为什么对得上所选的期许（文化记号，见后端 core/meaning_culture.py）
+    meaningFit: [],
+
     // 深度寓意（多层余味，分享解锁）
     unlocked: false,
     deepLoading: false,
@@ -60,10 +63,16 @@ Page({
     const unlocked = !!wx.getStorageSync('unlock_' + batchId)
     this.batchId = batchId
 
+    // 契合点：后端给的是期许 code，这里翻成中文名再上屏（wxml 里不做映射）
+    const meaningFit = (name.meaning_fit || []).map(f => Object.assign({}, f, {
+      titles: api.meaningNames(f.codes)
+    }))
+
     this.setData({
       name,
       pinyinText: name.phonetics.pinyins.join(' · '),
       ctxSenses,
+      meaningFit,
       unlocked,
       fav: namebook.isFav(name.full_name)
     })

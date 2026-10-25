@@ -227,6 +227,26 @@
   line-height: 1.5;
 }
 
+/* 契合点：细线分隔而不是加底色块 —— 卡片里再套一个色块会变成三层框，
+   与「去阴影、用细线分层」的版式原则相冲。 */
+.name-fit {
+  margin-top: 12rpx;
+  padding-top: 12rpx;
+  border-top: 1rpx solid var(--line);
+  font-size: 23rpx;
+  line-height: 1.6;
+}
+
+.fit-tag {
+  color: var(--ochre);
+  font-weight: 500;
+  margin-right: 8rpx;
+}
+
+.fit-text {
+  color: var(--ink-2);
+}
+
 .empty {
   text-align: center;
   padding: 100rpx 0;

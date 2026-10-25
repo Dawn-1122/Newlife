@@ -171,6 +171,14 @@ class NameResult(BaseModel):
     wuge: dict
     scores: dict
     meaning: str
+    meaning_fit: list[dict] = Field(
+        default_factory=list,
+        description=(
+            '这个选字为什么对得上所选的期许（文化记号，见 core/meaning_culture.py）'
+            '[{"char":"松","codes":["health"],"note":"《论语》岁寒，然后知松柏之后凋也"}]。'
+            "生成时未选期许则为空表。"
+        ),
+    )
 
 
 class NamingResponse(BaseModel):

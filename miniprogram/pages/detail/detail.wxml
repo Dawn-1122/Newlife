@@ -121,6 +121,18 @@
     <view class="section-title">寓意解读</view>
     <view class="meaning-text">{{name.meaning}}</view>
 
+    <!-- 契合点：选了期许时，逐个说明哪个字、为什么对得上 -->
+    <view class="fit-block" wx:if="{{meaningFit.length}}">
+      <view class="fit-title">契合你选的期许</view>
+      <view class="fit-row" wx:for="{{meaningFit}}" wx:key="char">
+        <text class="fit-char">{{item.char}}</text>
+        <view class="fit-body">
+          <text class="fit-titles">{{item.titles}}</text>
+          <text class="fit-note">{{item.note || '取这一字的寓意'}}</text>
+        </view>
+      </view>
+    </view>
+
     <!-- 深度寓意（多层余味，分享解锁后可见） -->
     <view class="deep-block" wx:if="{{unlocked}}">
       <view class="deep-title">深度寓意 · 余味</view>

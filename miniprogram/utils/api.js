@@ -88,6 +88,16 @@ const MEANING_GROUPS = [
 // 期许最多选几个（与后端 MEANING_MAX_SELECT 镜像）
 const MEANING_MAX_SELECT = 3
 
+// 期许 code → 中文名（一个名字可能同时对应多个期许，如「松」对应健康与坚韧）
+function meaningNames(codes) {
+  const list = codes || []
+  return MEANING_OPTIONS.filter(function (o) {
+    return list.indexOf(o.code) >= 0
+  }).map(function (o) {
+    return o.name
+  }).join('、')
+}
+
 // 出处类目（与后端 SOURCE_CLASSES 镜像）——「先出处后字」路径的 8 个选项，
 // 也是 /generate 的 source_classes 合法取值。字源 4 部典籍（周易/山海经/
 // 本草纲目/神农本草经）归入「经史子集」，选它会一并纳入。
@@ -485,6 +495,7 @@ module.exports = {
   MEANING_OPTIONS,
   MEANING_GROUPS,
   MEANING_MAX_SELECT,
+  meaningNames,
   SOURCE_CLASSES,
   RANGE_OPTIONS,
   DEFAULT_RANGE_DAYS,

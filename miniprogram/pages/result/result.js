@@ -210,7 +210,16 @@ Page({
     // 渲染项按收藏态复制一份：不直接改 allNames 里的对象，
     // 避免 wx:for 复用旧对象时收藏标记不刷新（setData 的差量只到数组这一层）
     const decorated = names.map(function (n) {
-      return Object.assign({}, n, { fav: !!favIds[n.full_name] })
+      const fit = n.meaning_fit || []
+      // 契合点：把「这个字为什么对得上你选的期许」摊在卡片上。
+      // 只取第一条 —— 卡片是速览，两条以上会把一句寓意挤成两行小字；
+      // 完整列表在详情页。
+      const first = fit[0]
+      return Object.assign({}, n, {
+        fav: !!favIds[n.full_name],
+        fitLine: first ? (first.char + '：' + (first.note || '取这一字的寓意')) : '',
+        fitTitle: first ? api.meaningNames(first.codes) : ''
+      })
     })
 
     this.setData({ names: decorated })
