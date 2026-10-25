@@ -129,6 +129,9 @@ Page({
       metaText: this.buildMeta(state.tab),
       styles: styles,
       styleCode: state.styleCode || '',
+      // 选中气质后给一句「这个气质用什么样的字」——用户挑标签时看不出差别，
+      // 一半原因是他不知道这个标签背后是什么；说清字族，选与不选的体感就成立了。
+      styleNote: api.styleNote(state.styleCode || ''),
       meaningGroups: meaningGroups,
       meaningCount: meaningCodes.length
     }

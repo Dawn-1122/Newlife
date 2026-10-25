@@ -179,6 +179,15 @@ class NameResult(BaseModel):
             "生成时未选期许则为空表。"
         ),
     )
+    style_fit: list[dict] = Field(
+        default_factory=list,
+        description=(
+            "这个选字为什么对得上所选的气质（字族，见 core/meaning_culture.py 的 "
+            'STYLE_CULTURE_CHARS）[{"char":"云","style":"zen",'
+            '"note":"多用云、月、苔、石这类留白的字"}]。'
+            "生成时未选气质则为空表。"
+        ),
+    )
 
 
 class NamingResponse(BaseModel):

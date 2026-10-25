@@ -133,6 +133,16 @@
       </view>
     </view>
 
+    <!-- 气质契合点：整批的调子落在哪几个字上（与期许分开说，
+         因为气质说明的是「风格」，期许说明的是「愿望」，不是一回事） -->
+    <view class="fit-block" wx:if="{{styleFit}}">
+      <view class="fit-title">契合你选的气质「{{styleFit.name}}」</view>
+      <view class="style-fit-row">
+        <text class="style-fit-chars">{{styleFit.chars}}</text>
+        <text class="fit-note">{{styleFit.note}}</text>
+      </view>
+    </view>
+
     <!-- 深度寓意（多层余味，分享解锁后可见） -->
     <view class="deep-block" wx:if="{{unlocked}}">
       <view class="deep-title">深度寓意 · 余味</view>

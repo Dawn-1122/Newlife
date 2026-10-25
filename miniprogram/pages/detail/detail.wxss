@@ -282,6 +282,23 @@
   line-height: 1.7;
 }
 
+/* 气质块：一行放下「命中用字 + 字族说明」。
+   说明对同一气质的每个字都一样，所以不做逐字条目，避免三行重复同一句话。 */
+.style-fit-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.style-fit-chars {
+  font-family: var(--serif);
+  font-size: 34rpx;
+  line-height: 1.4;
+  color: var(--ink);
+  margin-right: 16rpx;
+  letter-spacing: 4rpx;
+}
+
 .actions {
   padding: 20rpx 0 60rpx;
 }

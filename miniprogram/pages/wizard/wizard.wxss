@@ -72,8 +72,15 @@
   color: var(--ink-3);
 }
 
-/* ── 期许分组（7 个方向，每块一句人话 + 标签）── */
-.group {
+/* 选中气质后的字族说明：跟 .block-note 同一档字，但用暖色标出「这是你选的」 */
+.style-hint {
+  margin-top: 16rpx;
+  font-size: 22rpx;
+  line-height: 1.6;
+  color: var(--ochre);
+}
+
+/* ── 期许分组（7 个方向，每块一句人话 + 标签）── */.group {
   margin-top: 26rpx;
 }
 

@@ -191,9 +191,20 @@ Page({
       }
 
       if (styleFilter) {
-        // 一对多判定：一条出处可同时属于多个风格，命中任一即保留
-        const source = (n.poetry && n.poetry.source) || ''
-        if (api.getStyleCodes(source).indexOf(styleFilter) === -1) return false
+        // 按气质**字族**判定，与生成端同一把尺子（见 utils/api.js 的 chars 注释）。
+        // 早先按出处判：一段语料天然属于多个气质，用户选了「空灵禅意」再点「空灵」
+        // 反而会筛掉一半名字 —— 两处判定不同源，就成了自相矛盾的功能。
+        const family = api.styleFamily(styleFilter)
+        if (!family) return false
+        const chars = charsOf(n)
+        let hit = false
+        for (let i = 0; i < chars.length; i++) {
+          if (family.indexOf(chars[i]) >= 0) {
+            hit = true
+            break
+          }
+        }
+        if (!hit) return false
       }
 
       if (sourceFilter) {
@@ -210,15 +221,35 @@ Page({
     // 渲染项按收藏态复制一份：不直接改 allNames 里的对象，
     // 避免 wx:for 复用旧对象时收藏标记不刷新（setData 的差量只到数组这一层）
     const decorated = names.map(function (n) {
+      // 契合点：把「这个字为什么对得上你选的东西」摊在卡片上。
+      // 卡片只放一行 —— 期许优先，没有期许时退回气质：
+      //   期许是「某个愿望的落点」（松 → 岁寒后凋），比气质更具体；
+      //   气质是「整批的调子」（云、月 → 空灵），一句话就够。
+      // 两项都选了、又想知道全部理由的，去详情页。
       const fit = n.meaning_fit || []
-      // 契合点：把「这个字为什么对得上你选的期许」摊在卡片上。
-      // 只取第一条 —— 卡片是速览，两条以上会把一句寓意挤成两行小字；
-      // 完整列表在详情页。
-      const first = fit[0]
+      const sfit = n.style_fit || []
+      let fitLabel = ''
+      let fitTitle = ''
+      let fitLine = ''
+      if (fit.length) {
+        const first = fit[0]
+        fitLabel = '契合'
+        fitTitle = api.meaningNames(first.codes)
+        fitLine = first.char + '：' + (first.note || '取这一字的寓意')
+      } else if (sfit.length) {
+        const chars = sfit.map(function (f) { return f.char }).join('、')
+        fitLabel = '气质'
+        fitTitle = api.styleName(sfit[0].style)
+        // 气质说明对同一批名字都一样（「多用云、月、苔、石这类留白的字」），
+        // 逐张卡重复六遍就成了套话。卡片只回答「是哪几个字」，
+        // 说明放在详情页一次说清。
+        fitLine = chars + ' 取自这一路的字'
+      }
       return Object.assign({}, n, {
         fav: !!favIds[n.full_name],
-        fitLine: first ? (first.char + '：' + (first.note || '取这一字的寓意')) : '',
-        fitTitle: first ? api.meaningNames(first.codes) : ''
+        fitLabel: fitLabel,
+        fitTitle: fitTitle,
+        fitLine: fitLine
       })
     })
 

@@ -5,37 +5,43 @@
  * 小程序无共享包，需在此手工同步，改动时两处一起改。
  */
 
-// 风格枚举（与后端 STYLE_OPTIONS 镜像；sources 对应后端 source_preference）
+// 风格枚举（与后端 STYLE_OPTIONS 镜像）
 // short 用于结果页筛选条（2 字，避免 8 个筛选项挤出屏幕）
+//
+// chars 是「气质字族」，与后端 app/core/meaning_culture.py 的 STYLE_CULTURE_CHARS 一致；
+// note 是同一处 STYLE_CULTURE_NOTES 的一句话说明。
+//
+// 为什么不放 sources（出自诗经/楚辞/唐诗…）：气质原本按出处判定，但
+// 「古风雅致」会倒挂（选它 50%，不选 67%）—— 整个语料本来就是古典的，
+// 出处没有区分度，用户也读不出来。现在生成端按字族判，结果页筛选条必须
+// 用同一把尺子，否则「选了空灵禅意」再点「空灵」会筛掉一半。
 const STYLE_OPTIONS = [
-  { code: 'classic', name: '古风雅致', short: '古风', sources: ['诗经', '楚辞', '汉魏古诗', '五代词'] },
-  { code: 'modern', name: '现代简约', short: '现代', sources: ['唐诗', '宋词'] },
-  { code: 'grand', name: '大气沉稳', short: '大气', sources: ['经史子集', '汉魏古诗'] },
-  { code: 'fresh', name: '清新灵动', short: '清新', sources: ['诗经', '唐诗'] },
-  { code: 'warm', name: '温润内敛', short: '温润', sources: ['诗经', '经史子集', '五代词', '清词'] },
-  { code: 'elegant', name: '清朗俊逸', short: '清朗', sources: ['唐诗', '宋词', '五代词', '清词'] },
-  { code: 'plain', name: '质朴厚重', short: '质朴', sources: ['经史子集', '汉魏古诗'] },
-  { code: 'zen', name: '空灵禅意', short: '空灵', sources: ['唐诗', '宋词', '清词'] }
+  { code: 'classic', name: '古风雅致', short: '古风', chars: '玉兰竹菊琴书诗雅素文琼瑶瑾弦瑟佩清', note: '多用玉、兰、竹、琴、书这类书斋器物字' },
+  { code: 'modern', name: '现代简约', short: '现代', chars: '白初安乐可知时今微明然', note: '多用笔画简省、意思直白的字' },
+  { code: 'grand', name: '大气沉稳', short: '大气', chars: '山河海天宇岳坤鸿鹏霄汉星阔疆', note: '多用山河、岳坤、鹏鸿这类大开大合的字' },
+  { code: 'fresh', name: '清新灵动', short: '清新', chars: '风露春新溪柳莺燕花草叶雨晓晨苗', note: '多用草木、风雨、晨光这类有生气的字' },
+  { code: 'warm', name: '温润内敛', short: '温润', chars: '温柔和厚敦敬宁静素润穆恭谨雅', note: '多用温、柔、和、厚这类不张扬的字' },
+  { code: 'elegant', name: '清朗俊逸', short: '清朗', chars: '朗清爽霄鹤云飞扬俊秀', note: '多用朗、爽、飞、扬这类带光感的字' },
+  { code: 'plain', name: '质朴厚重', short: '质朴', chars: '实厚土田谷桑麻真素质', note: '多用土、田、桑、麻这类贴着地面的字' },
+  { code: 'zen', name: '空灵禅意', short: '空灵', chars: '空虚幽静月云松竹苔石泉', note: '多用云、月、苔、石这类留白的字' }
 ]
 
-// 出处 → 风格 codes 反向映射（由 STYLE_OPTIONS.sources 派生，勿手工维护）
-// 重要：这是一对多映射 —— 同一条出处可属于多个风格
-//（如「唐诗」同时属于 现代简约/清新灵动/清朗俊逸/空灵禅意）；
-// 因此结果页的风格筛选必须用「命中任一」判定，不能用单值归类。
-const SOURCE_STYLE_MAP = (function () {
-  const map = {}
-  STYLE_OPTIONS.forEach(function (opt) {
-    (opt.sources || []).forEach(function (source) {
-      if (!map[source]) map[source] = []
-      map[source].push(opt.code)
-    })
-  })
-  return map
-})()
+// 取某个气质的字族（未知 code 返回空串，调用方据此跳过筛选）
+function styleFamily(code) {
+  const found = STYLE_OPTIONS.filter(function (o) { return o.code === code })[0]
+  return (found && found.chars) || ''
+}
 
-// 取一条出处命中的全部风格 codes（无出处或出处不在映射内时返回空数组）
-function getStyleCodes(source) {
-  return SOURCE_STYLE_MAP[source] || []
+// 取某个气质的显示名（未知 code 原样返回，避免历史数据里的旧 code 显示成空）
+function styleName(code) {
+  const found = STYLE_OPTIONS.filter(function (o) { return o.code === code })[0]
+  return (found && found.name) || code || ''
+}
+
+// 取某个气质的字族说明（未选气质时返回空串，wxml 据此不渲染提示行）
+function styleNote(code) {
+  const found = STYLE_OPTIONS.filter(function (o) { return o.code === code })[0]
+  return (found && found.note) || ''
 }
 
 // 寓意枚举（与后端 MEANING_OPTIONS 镜像；code + name + group）
@@ -75,8 +81,8 @@ const MEANING_GROUPS = [
 // 只想从一片标签里挑出自己要的那几个感觉——像 B 站/小红书的兴趣画像一样。
 //
 // 两个维度的**作用域各不相同**，不要混着理解：
-//   气质（STYLE_OPTIONS，单选）  → 后端 style 参数：来源偏好 + 意象关键词 + 选字倾向
-//   期许（MEANING_OPTIONS，≤3）  → 后端 meanings 参数：选字硬前置 + 排序，按 MEANING_GROUPS 分块
+//   气质（STYLE_OPTIONS，单选）  → 后端 style 参数：气质字族占硬名额（出处只做同层加分）
+//   期许（MEANING_OPTIONS，≤3）  → 后端 meanings 参数：文化记号占硬名额 + 排序，按 MEANING_GROUPS 分块
 //
 // 意象（字形部首族：草木/水/玉/金…）**不再作为用户输入**：它是名字被读出来之后
 // 用户「感受到」的画面与余味，属于产出侧——挂在字卡与名字详情上展示，不让父母
@@ -490,8 +496,9 @@ module.exports = {
   shareQrcode,
   queryBazi,
   STYLE_OPTIONS,
-  SOURCE_STYLE_MAP,
-  getStyleCodes,
+  styleFamily,
+  styleName,
+  styleNote,
   MEANING_OPTIONS,
   MEANING_GROUPS,
   MEANING_MAX_SELECT,

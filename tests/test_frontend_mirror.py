@@ -13,6 +13,7 @@ from pathlib import Path
 
 import pytest
 
+from app.core.meaning_culture import STYLE_CULTURE_CHARS, STYLE_CULTURE_NOTES
 from app.core.naming_options import (
     MEANING_GROUPS,
     MEANING_MAX_SELECT,
@@ -43,7 +44,6 @@ def _load_frontend_enums() -> dict:
         "  styles: api.STYLE_OPTIONS,"
         "  meanings: api.MEANING_OPTIONS,"
         "  groups: api.MEANING_GROUPS,"
-        "  map: api.SOURCE_STYLE_MAP,"
         "  sources: api.SOURCE_CLASSES,"
         "  meaningMax: api.MEANING_MAX_SELECT"
         "}));"
@@ -75,28 +75,66 @@ def test_style_names_match_backend(frontend):
         )
 
 
-def test_style_source_preference_match_backend(frontend):
-    """每个风格的 sources 必须与后端 source_preference 完全一致。"""
+def test_style_family_chars_match_backend(frontend):
+    """
+    8 个气质的**字族**必须与后端 STYLE_CULTURE_CHARS 逐字一致。
+
+    这条比原来的 sources 校验更要紧：气质从「出处维度」改成「字族维度」后，
+    生成端按字族取名额、结果页筛选条也按字族过滤 —— 两处不同源就是
+    「选了空灵禅意，再点空灵筛选反而筛掉一半」的自相矛盾。
+    """
     for item in frontend["styles"]:
-        expected = STYLE_OPTIONS[item["code"]]["source_preference"]
-        assert item.get("sources") == expected, (
-            f"风格 {item['code']} 的 sources 与后端 source_preference 不一致"
+        expected = "".join(STYLE_CULTURE_CHARS[item["code"]])
+        assert item.get("chars") == expected, (
+            f"风格 {item['code']} 的字族与后端 STYLE_CULTURE_CHARS 不一致"
         )
 
 
-def test_source_style_map_is_reverse_of_backend(frontend):
-    """反向映射必须等于由后端 source_preference 反推的结果。"""
-    expected: dict[str, list[str]] = {}
-    for code, opt in STYLE_OPTIONS.items():
-        for source in opt["source_preference"]:
-            expected.setdefault(source, []).append(code)
-    assert frontend["map"] == expected
+def test_style_family_notes_match_backend(frontend):
+    """字族说明（用户在向导页/详情页读到的那句话）同样要同源。"""
+    for item in frontend["styles"]:
+        assert item.get("note") == STYLE_CULTURE_NOTES[item["code"]], (
+            f"风格 {item['code']} 的字族说明与后端不一致"
+        )
 
 
 def test_every_style_has_short_name(frontend):
     """结果页筛选条依赖 short，缺失会退化成 4 字长名而挤坏布局。"""
     for item in frontend["styles"]:
         assert item.get("short"), f"风格 {item['code']} 缺少 short 字段"
+
+
+def test_style_helpers_return_real_values():
+    """
+    api.js 的三个取值函数必须能用。
+
+    结果页筛选、卡片标签、详情页标题全靠它们；一旦返回 undefined，
+    筛选会静默变成「筛掉全部」（styleFamily 为空时直接 return false），
+    卡片标签变成「气质「undefined」」—— 页面不报错，只是看起来坏了。
+    """
+    if not _NODE:
+        pytest.skip("未找到 node，跳过前端枚举镜像测试")
+    script = (
+        "const api = require(process.argv[1]);"
+        "process.stdout.write(JSON.stringify({"
+        "  family: api.styleFamily('zen'),"
+        "  name: api.styleName('zen'),"
+        "  note: api.styleNote('zen'),"
+        "  unknownFamily: api.styleFamily('nope'),"
+        "  unknownName: api.styleName('nope')"
+        "}));"
+    )
+    out = subprocess.run(
+        [_NODE, "-e", script, str(API_JS)],
+        capture_output=True, text=True, timeout=30, check=True,
+    )
+    got = json.loads(out.stdout)
+    assert got["family"] == "".join(STYLE_CULTURE_CHARS["zen"])
+    assert got["name"] == STYLE_OPTIONS["zen"]["name"]
+    assert got["note"] == STYLE_CULTURE_NOTES["zen"]
+    # 未知 code：字族为空（调用方据此跳过筛选），名字原样回传（历史数据不至于显示空白）
+    assert got["unknownFamily"] == ""
+    assert got["unknownName"] == "nope"
 
 
 def test_schema_style_description_lists_all_codes():

@@ -149,10 +149,10 @@
 
         <view class="name-meaning">{{item.meaning}}</view>
 
-        <!-- 契合点：选了期许时，说明这个字为什么对得上它。
+        <!-- 契合点：说明这个字为什么对得上用户选的期许或气质。
              没有这一行，用户只看到「松」，不知道松=长寿 —— 选与不选在他眼里就没差别。 -->
         <view class="name-fit" wx:if="{{item.fitLine}}">
-          <text class="fit-tag">契合「{{item.fitTitle}}」</text>
+          <text class="fit-tag">{{item.fitLabel}}「{{item.fitTitle}}」</text>
           <text class="fit-text">{{item.fitLine}}</text>
         </view>
       </view>

@@ -44,7 +44,12 @@ from app.core.naming_options import (
     TARGET_MIN,
     COHESION_RANK,
 )
-from app.core.meaning_culture import culture_chars_for, culture_hits
+from app.core.meaning_culture import (
+    culture_chars_for,
+    culture_hits,
+    style_culture_chars,
+    style_hits,
+)
 
 # 康熙部首异体归一化（单字名「说文解字」出处的 title 用主部首名，如 氵→水）。
 # 与 scripts/expand_source_shuowen.py 的 RADICAL_ALIAS 保持一致。
@@ -167,15 +172,25 @@ class NamingEngine:
     # 偏好命中池最多占整批的份额。窄风格下命中池常常只有七八个名字，全给它就等于
     # 每次「换一批」都在同一小撮里排列组合（见 take 处的注释）。
     PREF_QUOTA_RATIO = 0.65
-    # 选了气质（style）时，整批里**至少**这个比例的名字要出自该气质的典籍。
+    # 选了气质（style）时，整批里**至少**这个比例的名字要命中所选气质的「字族」
+    # （字表见 app/core/meaning_culture.py 的 STYLE_CULTURE_CHARS）。
     #
-    # 为什么要设名额而不是只调权重：实测（林/男/1990-05-20）选「古风雅致」，
-    # 结果里出自诗经/楚辞/汉魏/五代词的比例是 49%，而**不选时是 58%** ——
-    # 气质偏好不但没起作用，还偏低。原因是 style 只在选池阶段做 tier 排序
-    # （_rank_poems），到最终分层抽样时又被韵味分与用神配额压平了。
-    # 用户点「古风雅致」的意图是「给我这个味道的名字」，不是「排序时偏一点」，
-    # 所以这里改成硬名额：先按出处取够一半，剩下的再交给用神与韵味。
-    STYLE_SOURCE_RATIO = 0.5
+    # 为什么从「出处」换成「字族」：原实现只按 STYLE_OPTIONS 的 source_preference
+    # 判定。实测（林/男/1990-05-20）8 个气质里 7 个有效，但「古风雅致」**倒挂**：
+    # 选它之后出自诗经/楚辞/汉魏/五代词的比例 50%，**不选时 67%** ——
+    # 这几部典籍本就占语料六成以上，硬名额反而把这 3 席让给了唐诗宋词。
+    # 不是权重问题，是「古风」在「出处」这个维度上没有区分度（整个语料都是古典的）。
+    # 字族是用户能直接感受的维度：空灵禅意出云/虚/苔/石，大气沉稳出山/河/岳/坤，
+    # 一眼能分开；「诗经还是唐诗」用户读不出来。
+    # 故主判据换成字族，出处降级为**同层内的加分**（只在字族命中者之间决定先后）。
+    STYLE_FAMILY_RATIO = 0.5
+    # 层内权重：每命中一个气质字族的字折多少韵味分。
+    # 与 CULTURE_HIT_BONUS 同量级（12）而不更高：气质管「整批的调子」，
+    # 期许管「某个愿望的落点」，两者都比文本命中（PREF_HIT_BONUS=6）重一档即可。
+    STYLE_FAMILY_HIT_BONUS = 12.0
+    # 同层内「出自该气质典籍」的加分。原 STYLE_SOURCE_RATIO 就是被这一条取代的，
+    # 降为 tie-break：只让同字族的名字里，出自对口典籍的几个更靠前，不再当入选门槛。
+    STYLE_SOURCE_BONUS = 6.0
     # 选了期许（meanings）时，整批里**至少**这个比例的名字要含「期许文化记号」
     # （字表见 app/core/meaning_culture.py）。
     #
@@ -514,6 +529,11 @@ class NamingEngine:
             # 没有它，用户只能看到「松」却不知道松=长寿，选与不选在他眼里就没差别。
             n["meaning_fit"] = culture_hits(
                 [c.get("char") for c in n.get("chars_info", [])], meanings
+            )
+            # 气质契合点：这批名字为什么对得上你选的气质（走字族，不走出处）。
+            # 与 meaning_fit 同构，前端可复用同一套展示；未选气质时为空表。
+            n["style_fit"] = style_hits(
+                [c.get("char") for c in n.get("chars_info", [])], style
             )
 
         return bazi_result, names
@@ -923,19 +943,47 @@ class NamingEngine:
                     temperature=self.PREF_TEMPERATURE,
                 )
 
-        # 1.5) 气质出处层：选了气质，就先按该气质的典籍取够一半名额。
-        # 只调权重不够 —— 到这一步排序已被韵味分与用神配额压平，实测选「古风」
-        # 反而比不选更少出古典出处（见 STYLE_SOURCE_RATIO 处的实测记录）。
+        # 1.5) 气质字族层：选了气质，就先按该气质的字族取够一半名额。
+        #
+        # 原实现按 source_preference（出自哪些典籍）判定，实测「古风雅致」倒挂
+        # （选 50% vs 不选 67%），原因见 STYLE_FAMILY_RATIO 处的记录。
+        # 现在字族是入选门槛，出处只在命中者之间做 tie-break；
+        # 字表与候选池完全错开时（理论上不该发生，由测试守住）退回出处判定，
+        # 保证「选了气质一定有反应」，不会静默退化成不选。
         remaining = k - len(picked)
         if remaining > 0 and style and style in STYLE_OPTIONS:
+            family = style_culture_chars(style)
             prefs = set(STYLE_OPTIONS[style].get("source_preference") or [])
-            style_pool = [
-                n for n in names
-                if (n.get("poetry") or {}).get("source") in prefs
-            ]
-            q_style = max(2, round(k * self.STYLE_SOURCE_RATIO))
+
+            def style_hits_of(n: dict) -> int:
+                """名字里命中了几个该气质的字族字。"""
+                return sum(
+                    1 for c in n.get("chars_info", []) if c.get("char") in family
+                )
+
+            def from_source(n: dict) -> bool:
+                return (n.get("poetry") or {}).get("source") in prefs
+
+            style_pool = [n for n in names if style_hits_of(n) > 0]
+            if not style_pool:
+                style_pool = [n for n in names if from_source(n)]
+
+            def style_weight(n: dict) -> float:
+                """层内权重：韵味 + 字族命中数 × 12 + 对口典籍 6。"""
+                return (
+                    weight_of(n)
+                    + self.STYLE_FAMILY_HIT_BONUS * style_hits_of(n)
+                    + (self.STYLE_SOURCE_BONUS if from_source(n) else 0.0)
+                )
+
+            q_style = max(2, round(k * self.STYLE_FAMILY_RATIO))
             if style_pool:
-                take(style_pool, min(remaining, q_style))
+                take(
+                    style_pool,
+                    min(remaining, q_style),
+                    weight=style_weight,
+                    temperature=self.PREF_TEMPERATURE,
+                )
 
         # 2) 八字分层配额
         remaining = k - len(picked)

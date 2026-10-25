@@ -68,11 +68,25 @@ Page({
       titles: api.meaningNames(f.codes)
     }))
 
+    // 气质契合点：一个字族说明 + 本名命中的字。
+    // 不做成逐字一行 —— 同一气质的说明对每个字都一样，逐行重复只是噪音。
+    // style code 挂在命中项上（见 core/meaning_culture.style_hits），
+    // 从名字本回看时不再依赖当初的请求参数。
+    const styleHits = name.style_fit || []
+    const styleFit = styleHits.length
+      ? {
+          name: api.styleName(styleHits[0].style),
+          note: styleHits[0].note,
+          chars: styleHits.map(f => f.char).join('、')
+        }
+      : null
+
     this.setData({
       name,
       pinyinText: name.phonetics.pinyins.join(' · '),
       ctxSenses,
       meaningFit,
+      styleFit,
       unlocked,
       fav: namebook.isFav(name.full_name)
     })

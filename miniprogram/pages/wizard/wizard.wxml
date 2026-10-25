@@ -46,6 +46,8 @@
         data-code="{{item.code}}"
       >{{item.name}}</view>
     </view>
+    <!-- 选中后说明这个气质用什么样的字：不解释，用户只能凭标签名猜 -->
+    <view class="style-hint" wx:if="{{styleNote}}">{{styleNote}}</view>
   </view>
 
   <!-- 取名之法（直接推荐/先字后典/先典后字）已下线：
