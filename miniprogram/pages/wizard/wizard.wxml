@@ -54,8 +54,9 @@
        现在只保留一条路：按期许与气质直接荐名。 -->
 
 
-  <!-- 避讳字（低频，默认收起） -->
-  <view class="avoid">
+  <!-- 避讳字（低频，默认收起）。孕期只出历法统计、不出名字，
+       避讳字对结果没有任何影响，所以这一块不出现。 -->
+  <view class="avoid" wx:if="{{tab !== 'prenatal'}}">
     <view class="avoid-toggle" bindtap="onToggleAvoid">
       <text class="avoid-toggle-text">有要避开的字</text>
       <text class="avoid-toggle-tail">{{avoidOpen ? '收起' : '展开'}}</text>
