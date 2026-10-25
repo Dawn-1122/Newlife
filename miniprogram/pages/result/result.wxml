@@ -12,11 +12,13 @@
       <text>{{fallbackNote}}</text>
     </view>
 
-    <!-- 八字排盘（默认折叠成一行，点开展开） -->
+    <!-- 出生历法信息（默认折叠成一行，点开展开）。
+         原叫「八字排盘」；按合规口径只展示历法事实与五行统计，
+         不再解释四柱含义、不预测命理（日主/身强身弱/喜用神已移除）。 -->
     <view class="card bazi-summary" wx:if="{{bazi}}">
       <view class="bazi-head" bindtap="onBaziToggle">
-        <view class="bazi-title">八字排盘</view>
-        <view class="bazi-sub" wx:if="{{!baziOpen}}">喜用神 · {{xiyongText}}</view>
+        <view class="bazi-title">出生历法信息</view>
+        <view class="bazi-sub" wx:if="{{!baziOpen}}">{{bazi.four_pillars.year}} {{bazi.four_pillars.month}} {{bazi.four_pillars.day}}{{hourKnown ? ' ' + bazi.four_pillars.hour : ''}}</view>
         <view class="bazi-more" catchtap="onBaziTap">查看详解 ›</view>
       </view>
 
@@ -41,11 +43,7 @@
           </view>
         </view>
         <view class="bazi-note" wx:if="{{!hourKnown}}">
-          时辰未填。排盘暂以午时代入，喜用神与五行比重会随时辰变，补上更准。
-        </view>
-        <view class="bazi-info">
-          <text>日主: {{bazi.day_master}} ({{bazi.day_master_wuxing}})</text>
-          <text>{{bazi.xiyong.strength_label}} · 喜用神: {{xiyongText}}</text>
+          时辰未填。时柱暂以午时代入，五行比重会随时辰变，补上后会重新排一次。
         </view>
         <view class="wuxing-bar">
           <view class="wuxing-item" wx:for="{{wuxingList}}" wx:key="name">

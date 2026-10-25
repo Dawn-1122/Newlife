@@ -249,9 +249,27 @@ Page({
     if (code === 'chars' && !this.data.pickLoaded) this.loadPickable()
   },
 
-  // 偏好变了 → 字表作废（字表是按偏好算出来的，不重载会给出过期结果）
+  // 偏好变了 → 字表作废（字表是按偏好算出来的，不重载会给出过期结果）。
+  // 停在「先字后典」时**自动重载**：原来只弹一行「偏好改过了，点此重载」，
+  // 用户改完气质回头看字表，发现字没变 —— 体感就是「选偏好没用」。
+  // 自觉点那行小字的人很少，所以这里直接重算，debounce 一下避免连点 3 个期许打 3 次请求。
   markPickStale() {
-    if (this.data.pickLoaded) this.setData({ pickStale: true })
+    if (!this.data.pickLoaded) return
+    this.setData({ pickStale: true })
+    if (this.data.path !== 'chars') return
+    if (this._pickTimer) clearTimeout(this._pickTimer)
+    const self = this
+    const reload = function () {
+      // 上一轮还在跑就再等一会：loadPickable 撞上 pickLoading 会直接返回，
+      // 那样这次改动就永远等不到新字表了
+      if (self.data.pickLoading) {
+        self._pickTimer = setTimeout(reload, 200)
+        return
+      }
+      self._pickTimer = null
+      self.loadPickable()
+    }
+    this._pickTimer = setTimeout(reload, 350)
   },
 
   onReloadPick() {

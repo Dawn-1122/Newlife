@@ -60,7 +60,6 @@ Page({
     bazi: null,
     allNames: [],
     names: [],
-    xiyongText: '',
     wuxingList: [],
     wuxingFilter: '',
     // 时辰是否用户真填过；false 时时柱显示「未填」，排盘按午时代入并注明
@@ -137,11 +136,7 @@ Page({
       }
     }
 
-    const xiyongText = result.bazi
-      ? result.bazi.xiyong.xi_wuxing.join('、')
-      : ''
-
-    // 时辰是不是用户真的填过：没填时排盘内部按午时代入，
+    // 时辰是不是用户真的填过：没填时内部按午时代入，
     // 页面不能把「午时」当成他给的事实展示（见 utils/hours.js 注释）
     const params = getApp().globalData.lastParams || {}
     const hourKnown = params.hour !== undefined && params.hour !== null
@@ -157,7 +152,6 @@ Page({
     this.setData({
       bazi: result.bazi,
       allNames: allNames,
-      xiyongText: xiyongText,
       wuxingList: wuxingList,
       hourKnown: hourKnown,
       fallbackNote: result.fallback_note || '',

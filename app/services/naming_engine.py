@@ -166,6 +166,15 @@ class NamingEngine:
     # 偏好命中池最多占整批的份额。窄风格下命中池常常只有七八个名字，全给它就等于
     # 每次「换一批」都在同一小撮里排列组合（见 take 处的注释）。
     PREF_QUOTA_RATIO = 0.65
+    # 选了气质（style）时，整批里**至少**这个比例的名字要出自该气质的典籍。
+    #
+    # 为什么要设名额而不是只调权重：实测（林/男/1990-05-20）选「古风雅致」，
+    # 结果里出自诗经/楚辞/汉魏/五代词的比例是 49%，而**不选时是 58%** ——
+    # 气质偏好不但没起作用，还偏低。原因是 style 只在选池阶段做 tier 排序
+    # （_rank_poems），到最终分层抽样时又被韵味分与用神配额压平了。
+    # 用户点「古风雅致」的意图是「给我这个味道的名字」，不是「排序时偏一点」，
+    # 所以这里改成硬名额：先按出处取够一半，剩下的再交给用神与韵味。
+    STYLE_SOURCE_RATIO = 0.5
     _TASTE_FILE = Path(__file__).resolve().parents[2] / "data" / "poetry" / "pair_taste.json"
 
     @classmethod
@@ -854,6 +863,20 @@ class NamingEngine:
                     weight=pref_weight,
                     temperature=self.PREF_TEMPERATURE,
                 )
+
+        # 1.5) 气质出处层：选了气质，就先按该气质的典籍取够一半名额。
+        # 只调权重不够 —— 到这一步排序已被韵味分与用神配额压平，实测选「古风」
+        # 反而比不选更少出古典出处（见 STYLE_SOURCE_RATIO 处的实测记录）。
+        remaining = k - len(picked)
+        if remaining > 0 and style and style in STYLE_OPTIONS:
+            prefs = set(STYLE_OPTIONS[style].get("source_preference") or [])
+            style_pool = [
+                n for n in names
+                if (n.get("poetry") or {}).get("source") in prefs
+            ]
+            q_style = max(2, round(k * self.STYLE_SOURCE_RATIO))
+            if style_pool:
+                take(style_pool, min(remaining, q_style))
 
         # 2) 八字分层配额
         remaining = k - len(picked)

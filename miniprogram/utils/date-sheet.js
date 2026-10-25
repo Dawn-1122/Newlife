@@ -111,7 +111,9 @@ function withMonth(sheet, month) {
 
 function withDay(sheet, day) {
   if (!sheet) return sheet
-  return Object.assign({}, sheet, { day: day })
+  // dayAnchor 必须跟着走：三列都是 `scroll-into-view="{{...Anchor}}"`，
+  // 锚点停在旧值上时，点完某一天弹层会自己滚回锚点（用户看到「点 21 号又跳回今天」）。
+  return Object.assign({}, sheet, { day: day, dayAnchor: 'd' + day })
 }
 
 function format(sheet) {

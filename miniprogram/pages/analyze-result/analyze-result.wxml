@@ -80,20 +80,21 @@
     <view class="wuge-desc">{{result.wuge.description}}</view>
   </view>
 
-  <!-- 八字匹配 -->
+  <!-- 五行匹配（原名「八字匹配」）：只说名字用字五行与出生五行的契合度，
+       不用「喜用神/补益」这类命理判断词，也不给吉凶结论 -->
   <view class="card" wx:if="{{result.bazi_match}}">
-    <view class="section-title">八字匹配</view>
+    <view class="section-title">五行匹配</view>
     <view class="phon-row">
       <text class="phon-label">匹配评分</text>
       <text class="phon-value">{{result.bazi_match.match_score}}分</text>
     </view>
     <view class="phon-row" wx:if="{{matchedWuxingText}}">
-      <text class="phon-label">喜用神补益</text>
+      <text class="phon-label">契合五行</text>
       <text class="phon-value">{{matchedWuxingText}}</text>
     </view>
-    <!-- 时辰没填就不该被当成填了：排盘内部按午时代入，这里如实说明 -->
+    <!-- 时辰没填就不该被当成填了：内部按午时代入，这里如实说明 -->
     <view class="bazi-note" wx:if="{{!hourKnown}}">
-      时辰未填。排盘暂以午时代入，喜用神与匹配度会随时辰变，补上更准。
+      时辰未填。时柱暂以午时代入，匹配度会随时辰变，补上后会重新算一次。
     </view>
   </view>
 

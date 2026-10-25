@@ -107,3 +107,40 @@ def test_new_meaning_works(engine):
     # 前若干来源应含「契合寓意」标记（命中偏好）
     hit = sum(1 for s in r["sources"] if "契合寓意" in (s.get("match_reason") or ""))
     assert hit > 0, "家国寓意应命中若干来源"
+
+
+def test_style_actually_changes_sources_in_batch(engine):
+    """选了气质，整批里出自该气质典籍的名字应过半。
+
+    ⚠️ 这条是 2026-10-25 的回归用例。此前 style 只在选池阶段做 tier 排序
+    （`_rank_poems`），到最终分层抽样已被韵味分与用神配额压平 ——
+    实测（林/男/1990-05-20）选「古风雅致」出自诗经/楚辞/汉魏/五代词的比例是 **49%**，
+    **不选反而是 58%**。用户点「古风雅致」的意图是「给我这个味道的名字」，
+    不是「排序时偏一点」，所以现在改成硬名额（STYLE_SOURCE_RATIO）。
+
+    断言按「展示口径」一次 6 个、多跑几批取均值，避免单批偶然。
+    """
+    def rate(style, runs=4, use_style=True):
+        """统计该气质偏好典籍的占比。use_style=False 时算「不选气质」的自然占比。"""
+        srcs = set(STYLE_OPTIONS[style]["source_preference"])
+        total = hit = 0
+        for _ in range(runs):
+            kwargs = {"style": style} if use_style else {}
+            r = engine.generate_names(
+                "林", "male", 1990, 5, 20, 10, 0, name_length=2, max_results=6, **kwargs
+            )
+            for n in r["names"]:
+                total += 1
+                if (n.get("poetry") or {}).get("source") in srcs:
+                    hit += 1
+        assert total, "没有结果，断言无意义"
+        return hit / total
+
+    # 三个「自然命中率明显偏低」的气质最能说明问题（古风本来就占多数，另算）
+    for style in ("grand", "zen", "warm"):
+        natural = rate(style, use_style=False)
+        styled = rate(style)
+        assert styled >= 0.5, f"{style} 只出了 {styled:.0%} 的偏好出处，气质没生效"
+        assert styled > natural + 0.1, (
+            f"{style}：选了 {styled:.0%} vs 不选 {natural:.0%}，提升不足 10pt"
+        )

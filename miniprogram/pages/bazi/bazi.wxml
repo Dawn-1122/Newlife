@@ -5,26 +5,22 @@
   }
 </wxs>
 <view class="container">
-  <!-- 头部总览 -->
+  <!-- 头部：只放历法事实。原来这里写「日主即代表『自己』的天干，是八字命局的核心」，
+       属于对四柱含义的解释，按合规要求移除。 -->
   <view class="card bazi-header" wx:if="{{bazi}}">
     <view class="header-row">
       <text class="header-date">{{bazi.lunar_date}}</text>
       <text class="header-shengxiao">生肖 · {{bazi.shengxiao}}</text>
     </view>
-    <view class="day-master">
-      <text class="dm-label">日主</text>
-      <text class="dm-value">{{bazi.day_master}}</text>
-      <text class="wuxing-tag {{m.wx(bazi.day_master_wuxing)}}">{{bazi.day_master_wuxing}}</text>
-    </view>
-    <view class="header-note">日主即代表「自己」的天干，是八字命局的核心</view>
+    <view class="header-note">干支纪年、纪月、纪日、纪时，是传统历法对时间的记法。</view>
   </view>
 
-  <!-- 四柱详解 -->
+  <!-- 四柱干支：只列干支与五行/阴阳属性（分类，不是判断），不解释各柱代表什么 -->
   <view class="card">
-    <view class="section-title">四柱详解</view>
+    <view class="section-title">四柱干支</view>
     <!-- 时辰没填：说清楚时柱是怎么来的，别让一行「戊午」冒充用户给的事实 -->
     <view class="bazi-note" wx:if="{{!hourKnown}}">
-      时辰未填，时柱暂以午时代入。它会带动藏干与五行比重，补上出生时辰后重新排一次更准。
+      时辰未填，时柱暂以午时代入。补上出生时辰后会重新排一次。
     </view>
     <view class="pillar-detail" wx:for="{{bazi.pillars_detail}}" wx:key="position">
       <view class="pillar-head">
@@ -37,12 +33,10 @@
         <view class="gz-block">
           <text class="gz-char">{{item.tian_gan}}</text>
           <text class="gz-tag {{m.wx(item.tian_gan_wuxing)}}">{{item.tian_gan_wuxing}} · {{item.tian_gan_yinyang}}</text>
-          <text class="gz-brief">{{item.tian_gan_brief}}</text>
         </view>
         <view class="gz-block">
           <text class="gz-char">{{item.di_zhi}}</text>
           <text class="gz-tag {{m.wx(item.di_zhi_wuxing)}}">{{item.di_zhi_wuxing}} · {{item.di_zhi_yinyang}}</text>
-          <text class="gz-brief">{{item.di_zhi_brief}}</text>
         </view>
       </view>
 
@@ -50,56 +44,18 @@
         <text class="canggan-label">藏干</text>
         <text class="canggan-value">{{item.cangganText}}</text>
       </view>
-
-      <view class="pillar-meaning">{{item.meaning}}</view>
-      <view class="gz-detail">
-        <text class="gz-detail-line">{{item.tian_gan_detail}}</text>
-        <text class="gz-detail-line">{{item.di_zhi_detail}}</text>
-      </view>
     </view>
   </view>
 
-  <!-- 五行详解 -->
+  <!-- 五行分布：只是把上面这些干支的五行标签数一遍，属于统计，不作强弱/喜忌判断 -->
   <view class="card">
-    <view class="section-title">五行详解</view>
+    <view class="section-title">五行分布</view>
     <view class="wuxing-detail" wx:for="{{bazi.wuxing_detail}}" wx:key="name">
       <view class="wuxing-head">
         <text class="wuxing-name wuxing-tag {{m.wx(item.name)}}">{{item.name}}</text>
         <text class="wuxing-percent">{{item.percent}}%</text>
-        <text class="wuxing-brief">{{item.brief}}</text>
-      </view>
-      <view class="wuxing-meta">
-        <text class="meta-item">五德 · {{item.nature}}</text>
-        <text class="meta-item">方位 · {{item.direction}}</text>
-        <text class="meta-item">季节 · {{item.season}}</text>
-        <text class="meta-item">颜色 · {{item.color}}</text>
-        <text class="meta-item">脏腑 · {{item.organ}}</text>
-      </view>
-      <view class="wuxing-detail-text">{{item.detail}}</view>
-    </view>
-  </view>
-
-  <!-- 喜用神详解 -->
-  <view class="card">
-    <view class="section-title">喜用神详解</view>
-    <view class="xiyong-strength">
-      <text class="strength-label">{{bazi.xiyong.strength_label}}</text>
-      <text class="strength-ratio">日主力量占比 {{bazi.xiyong.strength_ratio}}%</text>
-    </view>
-    <view class="xiyong-list">
-      <view class="xiyong-row">
-        <text class="xiyong-label">喜神</text>
-        <text class="xiyong-value">{{xiyongText}}</text>
-      </view>
-      <view class="xiyong-row">
-        <text class="xiyong-label">用神</text>
-        <text class="xiyong-value">{{bazi.xiyong.yong_wuxing}}</text>
-      </view>
-      <view class="xiyong-row" wx:if="{{jiyongText}}">
-        <text class="xiyong-label">忌神</text>
-        <text class="xiyong-value">{{jiyongText}}</text>
       </view>
     </view>
-    <view class="xiyong-explanation">{{bazi.xiyong.explanation}}</view>
+    <view class="bazi-note">占比按四柱天干、地支与藏干的五行计数折算。</view>
   </view>
 </view>
