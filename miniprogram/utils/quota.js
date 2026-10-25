@@ -162,6 +162,18 @@ function canWatchAd() {
   return rewardAd.canWatch()
 }
 
+/**
+ * 现在点「看广告」能不能真拿到次数 = 广告能放 && 今天还有广告额度。
+ *
+ * 这个判断必须由配额这边给出，不能让页面自己拼 `canWatchAd() && adLeft > 0`：
+ * 页面一旦只判一半，用户就会看完 30 秒视频才被告知「今天领完了」——
+ * 那是最差的一种反馈，而且改广告逻辑时两处必然漂移。
+ */
+function canEarnByAd() {
+  if (!canWatchAd()) return false
+  return AD_BONUS_CAP - read().adCount > 0
+}
+
 module.exports = {
   FREE_PER_DAY,
   SHARE_BONUS_CAP,
@@ -171,5 +183,6 @@ module.exports = {
   consume,
   grantByShare,
   grantByAd,
-  canWatchAd
+  canWatchAd,
+  canEarnByAd
 }

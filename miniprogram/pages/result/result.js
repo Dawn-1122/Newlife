@@ -84,6 +84,7 @@ Page({
     shareLeft: 0,        // 今天还能靠转发领几次
     adLeft: 0,           // 今天还能靠看广告领几次
     canWatchAd: false,   // 广告位是否已开通（未开通时按钮明说）
+    canEarnAd: false,    // 现在点广告是不是真能拿到次数（未开通 / 今日领完都为 false）
 
     wuxingFilters: [
       { code: '', name: '全部' },
@@ -119,7 +120,10 @@ Page({
       quotaExhausted: q.remaining <= 0,
       shareLeft: q.shareLeft,
       adLeft: q.adLeft,
-      canWatchAd: q.canWatchAd
+      canWatchAd: q.canWatchAd,
+      // 样式用「能不能拿到次数」而不是「广告能不能放」：额度领完时按钮也该暗下来，
+      // 与尚未开通同一种视觉，别让它看着像还有戏
+      canEarnAd: quota.canEarnByAd()
     })
   },
 
@@ -413,6 +417,15 @@ Page({
   onWatchAdTap() {
     if (!quota.canWatchAd()) {
       wx.showToast({ title: '广告位还没开通，先用转发加次数', icon: 'none', duration: 2400 })
+      return
+    }
+
+    // 今日广告次数已领完就别放视频了：让人看完 30 秒再说「领完了」是最差的一种反馈，
+    // 而这一栏又不能做成禁用态（广告位未开通时同样不可用，用户需要知道为什么点不动）。
+    // 能不能拿次数由 quota 统一判定，页面不要自己拼条件（见 utils/quota.js canEarnByAd）。
+    // 上面已经排除了「广告位未开通」，这里 !canEarnByAd() 只剩「今天的额度领完了」。
+    if (!quota.canEarnByAd()) {
+      wx.showToast({ title: '今天的广告次数已经领完，明天再来', icon: 'none', duration: 2400 })
       return
     }
 

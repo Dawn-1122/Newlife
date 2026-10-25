@@ -179,7 +179,7 @@
       >{{shareLeft > 0 ? '转发给朋友 +1 次（今日还可领 ' + shareLeft + ' 次）' : '今天的转发次数已领完，明天再来'}}</button>
 
       <button
-        class="quota-btn {{canWatchAd && adLeft > 0 ? '' : 'quota-btn-off'}}"
+        class="quota-btn {{canEarnAd ? '' : 'quota-btn-off'}}"
         bindtap="onWatchAdTap"
       >{{!canWatchAd ? '看广告 +1 次（广告位未开通）' : (adLeft > 0 ? '看广告 +1 次（今日还可领 ' + adLeft + ' 次）' : '今天的广告次数已领完，明天再来')}}</button>
     </view>

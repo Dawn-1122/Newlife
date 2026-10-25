@@ -63,6 +63,7 @@ out.canRefreshAfterFree = q.canRefresh()
 
 // ② 广告位未配置：不许发次数
 out.adUnavailable = q.grantByAd()
+out.canEarnBeforeAd = q.canEarnByAd()
 
 // ③ 转发补 3 次，第 4 次 capped
 const shares = []
@@ -76,10 +77,13 @@ wx.createRewardedVideoAd = function () {
   return { onError() {}, onClose() {}, show() { return Promise.resolve() }, load() { return Promise.resolve() } }
 }
 out.canWatchAfterEnable = q.canWatchAd()
+out.canEarnAfterEnable = q.canEarnByAd()
 const ads = []
 for (let i = 0; i < 4; i++) ads.push(q.grantByAd())
 out.ads = ads
 out.afterAd = q.status()
+// 广告额度领完之后，页面必须能在放视频之前就拦住（别让人白看 30 秒）
+out.canEarnAfterAdUsedUp = q.canEarnByAd()
 
 // ⑤ 额度用尽后 remaining 不许变负数
 const drain = []
@@ -143,6 +147,19 @@ def test_ad_does_not_grant_when_not_configured(out):
     assert o["adUnavailable"]["reason"] == "ad_unavailable"
     # 拒绝发放，额度不变
     assert o["adUnavailable"]["remaining"] == 0
+    # 广告放不出来时，也不该让页面走到「播视频」这一步
+    assert o["canEarnBeforeAd"] is False
+
+
+def test_can_earn_by_ad_false_once_daily_cap_used_up(out):
+    """广告额度领完后 canEarnByAd 立刻为 false —— 页面据此在放视频前就拦住。
+
+    这条守的是一个具体体验事故：按钮说「看广告 +1 次」，用户看完 30 秒
+    才被告知「今天的领完了」。判断放在 quota 里，页面不得自己拼条件。
+    """
+    o = out["out"]
+    assert o["canEarnAfterEnable"] is True
+    assert o["canEarnAfterAdUsedUp"] is False
 
 
 def test_share_bonus_capped_at_three(out):
