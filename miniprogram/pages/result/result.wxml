@@ -5,7 +5,7 @@
   }
 </wxs>
 
-<view class="page">
+<view class="page {{quotaExhausted ? 'page-with-sheet' : ''}}">
   <view class="container">
     <!-- 强加权降级提示 -->
     <view class="fallback-note" wx:if="{{fallbackNote}}">
@@ -157,17 +157,13 @@
     <view class="empty" wx:if="{{!names.length}}">
       <text>{{loading ? '加载中…' : '暂无结果，请调整筛选条件后重试'}}</text>
     </view>
+  </view>
 
-    <!-- 底部操作 -->
-    <view class="footer-actions">
-      <button class="btn-secondary refresh-btn" bindtap="onRefresh" loading="{{loading}}" disabled="{{loading}}">
-        {{quotaLeft > 0 ? '换一批 · 剩 ' + quotaLeft + ' 次' : '换一批（今天的已用完）'}}
-      </button>
-      <button class="btn-primary home-btn" bindtap="onBackHome">返回首页</button>
-    </view>
-
-    <!-- 次数用完：补次数（转发 / 看广告）。
-         广告位未开通时不做成可点的样子 —— 给不出的承诺不如不提。 -->
+  <!-- 底部操作坞：钉在屏幕底部，换一批永远在大拇指够得到的位置 ——
+       名字列表可以很长，按钮若跟着列表滚走，用户想换一批得先滑到底。
+       补次数面板从按钮**上方**展开，不遮住按钮本身；
+       广告位未开通时不做成可点的样子 —— 给不出的承诺不如不提。 -->
+  <view class="bottom-dock">
     <view class="quota-panel" wx:if="{{quotaExhausted}}">
       <view class="quota-title">今天的换一批用完了</view>
       <view class="quota-sub">转发给朋友，或看一段广告，都能再加 1 次。每天各可领 3 次。</view>
@@ -182,6 +178,13 @@
         class="quota-btn {{canEarnAd ? '' : 'quota-btn-off'}}"
         bindtap="onWatchAdTap"
       >{{!canWatchAd ? '看广告 +1 次（广告位未开通）' : (adLeft > 0 ? '看广告 +1 次（今日还可领 ' + adLeft + ' 次）' : '今天的广告次数已领完，明天再来')}}</button>
+    </view>
+
+    <view class="footer-actions">
+      <button class="btn-secondary refresh-btn" bindtap="onRefresh" loading="{{loading}}" disabled="{{loading}}">
+        {{quotaLeft > 0 ? '换一批 · 剩 ' + quotaLeft + ' 次' : '换一批（今天的已用完）'}}
+      </button>
+      <button class="btn-primary home-btn" bindtap="onBackHome">返回首页</button>
     </view>
   </view>
 </view>

@@ -2,7 +2,20 @@
 
 .page {
   min-height: 100vh;
-  padding-bottom: 60rpx;
+  /* 给固定操作坞留位置：不留的话最后一张名字卡会被压在坞下面
+     （坞高约 138rpx = 上下 20 + 按钮 98），这里多留一点余量。
+     先写一行不含 env() 的值：万一某个宿主不认 env()，整条 calc 会失效，
+     那时宁可少让一点，也不能一让让成 0。 */
+  padding-bottom: 180rpx;
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+/* 补次数面板展开时坞会变高，内容区要跟着多让出空间，
+   否则最后一张卡被面板压住、又滚不上来。 */
+.page-with-sheet {
+  padding-bottom: 560rpx;
+  padding-bottom: calc(560rpx + env(safe-area-inset-bottom));
 }
 
 .container {
@@ -317,11 +330,25 @@
   font-weight: 500;
 }
 
-/* 底部操作 */
+/* 底部操作坞 */
+.bottom-dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  /* 底部安全区：全面屏机器上不垫这一层，按钮会被 Home 条压住一半。
+     同样先给一行不含 env() 的兜底值，避免整条 calc 被判无效。 */
+  padding: 20rpx 40rpx 20rpx;
+  padding: 20rpx 40rpx calc(20rpx + env(safe-area-inset-bottom));
+  background: var(--paper);
+  border-top: 1rpx solid var(--line);
+  box-sizing: border-box;
+}
+
 .footer-actions {
   display: flex;
   gap: 20rpx;
-  margin-top: 10rpx;
 }
 
 .refresh-btn,
@@ -334,11 +361,12 @@
 }
 
 /* ── 补次数面板（今天的换一批用完之后才出现）──
-   刻意比主按钮低一级：这一屏的主角是名字，补次数是旁支。
-   所以给纸底 + 细边 + 小字，不做成第二个主行动。 */
+   它从按钮上方展开，是「贴着按钮的浮层」，不是页面末尾的一块内容：
+   用户刚点完那次没成功的换一批，眼睛就在按钮上，面板得在那里出现。
+   刻意比主按钮低一级 —— 这一屏的主角是名字，补次数是旁支。 */
 .quota-panel {
-  margin-top: 24rpx;
-  padding: 26rpx 28rpx;
+  margin-bottom: 20rpx;
+  padding: 24rpx 26rpx;
   background: var(--paper-deep);
   border: 1rpx solid var(--line);
   border-radius: var(--r-md);
