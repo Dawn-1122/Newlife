@@ -212,6 +212,115 @@ def test_no_meaning_means_no_fit(engine):
         assert all(not n.get("meaning_fit") for n in names)
 
 
+# --------------------------------------------------------------------------- #
+# 2b. 契合字要打散（同批不重复、换一批换字）
+# --------------------------------------------------------------------------- #
+
+def _fit_chars(batch: list) -> list:
+    """一批名字里的契合字（按出现次数，同一个字出现几次就有几个）。"""
+    return [f["char"] for n in batch for f in (n.get("meaning_fit") or [])]
+
+
+# 只拿「候选池够宽」的期许来守打散 —— 窄字表（忠义赤诚只有 心/秉 两个可用字）
+# 天然做不到不重复，那是语料问题，不是这条规则的问题（见 test_narrow_meanings_*）。
+WIDE_MEANINGS = ("gentle", "optimistic", "resilient", "tranquil", "beauty")
+NARROW_MEANINGS = ("loyal", "wealth")
+
+
+def test_same_batch_does_not_repeat_one_culture_char(engine):
+    """
+    一批六个名字里，同一个契合字不该出现在两个名字上。
+
+    改前实测：「仁厚善良」63 次契合字出现里「清」占 63%、「富贵荣华」是「玉」80%
+    —— 用户看不出「选了仁厚」与「没选」的区别，只看到系统偏爱一个字。
+    现在步骤 1a 逐个取、每次必须带新字，通用名额也硬让位。
+    """
+    dup = total = 0
+    for code in WIDE_MEANINGS:
+        for case in CASES:
+            for _ in range(2):
+                names = engine.generate_names(
+                    **case, name_length=2, max_results=6, meanings=[code]
+                )["names"]
+                chars = _fit_chars(names)
+                total += 1
+                if len(set(chars)) < len(chars):
+                    dup += 1
+    assert dup / total <= 0.2, (
+        f"{dup}/{total} 批里同一个契合字出现了两次以上 —— 打散没生效"
+    )
+
+
+def test_next_batch_prefers_chars_not_shown(engine):
+    """
+    「换一批」要换**字**，不能只换名字。
+
+    排除名单（exclude_names）剔的是名字，引擎会把它拆成字去扣分；
+    不做这件事时，连翻五批还是同一个「清」，只是配了不同的字。
+    实测宽字表期许的「新字占比」52%~73%，窄字表仍是 0%（没字可换）。
+    """
+    fresh = total = 0
+    for code in WIDE_MEANINGS:
+        for case in CASES:
+            first = engine.generate_names(
+                **case, name_length=2, max_results=6, meanings=[code]
+            )["names"]
+            first_chars = set(_fit_chars(first))
+            if not first_chars:
+                continue
+            shown = [n.get("given_name") for n in first]
+            second = engine.generate_names(
+                **case, name_length=2, max_results=6, meanings=[code],
+                exclude_names=shown,
+            )["names"]
+            second_chars = set(_fit_chars(second))
+            if not second_chars:
+                continue
+            total += 1
+            fresh += len(second_chars - first_chars) / len(second_chars)
+    assert total, "没有取到样本"
+    assert fresh / total >= 0.3, (
+        f"换一批后只有 {fresh / total:.0%} 的契合字是新的 —— "
+        f"排除名单没被用来换字，用户会觉得「换了名字没换味道」"
+    )
+
+
+def test_narrow_meanings_are_flagged_by_pool_size():
+    """
+    窄字表要能被**识别出来**，而不是假装打散成功。
+
+    「忠义赤诚」11 字表里只有 心/秉/忠 出得来，一批六个名字必然重复 ——
+    这是语料问题。这里把它钉成已知清单：将来补了语料、字表变宽，
+    这条会失败，提醒去更新清单与相关注释（而不是悄悄退化）。
+    """
+    usable = {}
+    for code in NARROW_MEANINGS:
+        # 可用字：语料里至少被 3 首诗推荐过的字
+        counts = {}
+        for name in _all_recommend_chars():
+            counts[name] = counts.get(name, 0) + 1
+        usable[code] = sum(
+            1 for c in MEANING_CULTURE_CHARS[code] if counts.get(c, 0) >= 3
+        )
+    assert usable["loyal"] <= 8, (
+        f"忠义赤诚的可用字变成 {usable['loyal']} 个了 —— 语料补过了，"
+        f"该把它从「窄」清单里移出来"
+    )
+
+
+def _all_recommend_chars() -> list:
+    poems: list = []
+    for name in ["poetry.json"] + [
+        f"poetry_extra{i}.json" for i in ["", "2", "3", "4", "5"]
+    ]:
+        path = POETRY_DIR / name
+        if not path.exists():
+            continue
+        data = json.loads(path.read_text(encoding="utf-8"))
+        poems += (data.get("poems") if isinstance(data, dict) else data) or []
+    return [c for p in poems for c in (p.get("recommend_chars") or [])]
+
+
 def test_different_meanings_give_different_char_families(engine):
     """
     不同期许要给**不同的字族**，而不是同一批名字换个顺序。

@@ -204,6 +204,18 @@ class NamingEngine:
     # 层内抽样里，一个「文化记号命中字」折算成多少韵味分。取 12 是因为
     # PREF_HIT_BONUS=6：一个文化字 ≈ 两个文本命中，又不至于压过名字感（TASTE_BONUS 每档 4）。
     CULTURE_HIT_BONUS = 12.0
+    # 同一批里，同一个期许契合字只能出现在**一个**名字上（见步骤 1a 的逐个取法）。
+    #
+    # 为什么要管：实测（林/李/王/陈，各 5 批）「仁厚善良」的契合字只有 63 次出现，
+    # 其中「清」占 63%、「素」占 20% —— 六个名字里两三个都带清，用户看不出
+    # 「选了仁厚」和「没选」的区别，只看到系统偏爱这一个字。
+    # 「忠义赤诚」是「心」58%、「富贵荣华」是「玉」80%，同一类问题。
+    # 这条是硬约束（不带新字的名字直接不进候选），不是调权重 ——
+    # 调权重压不住：清系名字又多又高分，权重怎么调它都还在窗口里。
+    # 「换一批」时，上一批已经用过的契合字要压多少分。取 18：
+    # 比 CULTURE_HIT_BONUS(12) 高，能抵掉一次命中加成让新字反超；
+    # 又不至于把老字彻底排除 —— 窄字表（忠义赤诚只有 7 个可用字）全用过后还得回得来。
+    CULTURE_REPEAT_PENALTY = 18.0
     _TASTE_FILE = Path(__file__).resolve().parents[2] / "data" / "poetry" / "pair_taste.json"
 
     @classmethod
@@ -517,10 +529,14 @@ class NamingEngine:
         #    → 多样性重排 → 分层抽样（八字分层配额 + 偏好硬分流）→ 剥离内部标记
         names = self._rank_by_yunwei(names, xiyong_wuxing, meanings, style)
         names = self._diversify(names, max_same_char=2)
+        # 「换一批」时，把排除名单拆成字：「清浅/清扬」被排除之后，
+        # 这一批就该少出「清」，而不是换个组合继续给「清」。
+        recent_chars = {ch for g in skip for ch in g} if skip else None
         names = self._stratified_sample(
             names, max_results,
             yong_wuxing=yong_wuxing, xi_wuxing=xiyong_wuxing,
             meanings=meanings, style=style, shuffle=shuffle,
+            recent_chars=recent_chars,
         )
         for n in names:
             n.pop("_tier", None)
@@ -700,6 +716,19 @@ class NamingEngine:
             return 0
         return sum(1 for c in name.get("chars_info", []) if c.get("char") in culture)
 
+    @staticmethod
+    def _culture_chars_of(name: dict, culture: set) -> set:
+        """名字命中**哪些**文化记号字（不是几个）。
+
+        打散要用集合而不是计数：需要判断「这个名字能不能带来一个新字」。
+        """
+        if not culture:
+            return set()
+        return {
+            c.get("char") for c in name.get("chars_info", [])
+            if c.get("char") in culture
+        }
+
     def _banded_window(self, window: list[dict], n: int) -> list[dict]:
         """对抽样窗口做质量带宽过滤（只保留「韵味 ≥ 窗口最高分 − 带宽」的名字）。
 
@@ -782,6 +811,7 @@ class NamingEngine:
         style: Optional[str] = None,
         temperature: Optional[float] = None,
         shuffle: bool = False,
+        recent_chars: Optional[set] = None,
     ) -> list[dict]:
         """分层抽样（最终截取阶段；P3 主排序改造，替代整体加权采样）。
 
@@ -907,13 +937,29 @@ class NamingEngine:
                 )
             )
             if pref_pool:
+                # 本批已经用掉的契合字（在 1a 里逐个累积，通用名额也要看这个集合）
+                used_in_batch: set = set()
+
                 def pref_weight(n: dict) -> float:
-                    """偏好层权重：韵味 + 命中项数加成（命中越多越靠前）。"""
-                    return (
+                    """偏好层权重：韵味 + 命中项数加成（命中越多越靠前）。
+
+                    两处扣分，都是为了「别一批里反复出现同一个字」：
+                    - 换一批时，上一批用过的字扣分（排除名单只剔名字、不剔字）；
+                    - 本批已经用过的字扣分（文化名额取完之后，剩下的通用名额也让路，
+                      否则第四个名字又把「清」带回来 —— 实测批 1 里就有两个清）。
+                    """
+                    culture_chars = self._culture_chars_of(n, culture)
+                    w = (
                         weight_of(n)
                         + self.PREF_HIT_BONUS * hits_of[id(n)]
                         + self.CULTURE_HIT_BONUS * culture_of[id(n)]
                     )
+                    w -= self.CULTURE_REPEAT_PENALTY * len(culture_chars & used_in_batch)
+                    if recent_chars:
+                        w -= self.CULTURE_REPEAT_PENALTY * len(
+                            culture_chars & recent_chars
+                        )
+                    return w
 
                 # 偏好池**不许吃满整批**：命中池可能只有七八个名字（风格越窄越小），
                 # 若把 k 个名额全给它，每次「换一批」就是这七八个的排列组合，
@@ -924,20 +970,49 @@ class NamingEngine:
                 # 1a) 期许文化记号优先取，且**从偏好配额里扣**，不额外抢气质/八字的名额。
                 #     这样「选了健康就能看到松鹤」与「选了古风就能看到诗经楚辞」
                 #     同时成立，不会互相挤掉（k=6 时实测：文化 3 + 其余偏好 1 + 气质 2）。
+                #
+                #     逐个取、不是一次取 q 个：每取一个就把它的契合字记进 used_in_batch，
+                #     下一个必须带**新字**，否则同一批里会出现三个「清」。
                 if culture_of and any(culture_of.values()):
                     cpool = [n for n in pref_pool if culture_of[id(n)] > 0]
                     q_culture = min(quota, max(2, round(k * self.CULTURE_QUOTA_RATIO)))
                     before = len(picked)
-                    take(
-                        cpool,
-                        q_culture,
-                        weight=pref_weight,
-                        temperature=self.PREF_TEMPERATURE,
-                    )
+                    while len(picked) - before < q_culture:
+                        fresh = [
+                            n for n in cpool
+                            if id(n) not in picked_ids
+                            and not (
+                                self._culture_chars_of(n, culture) <= used_in_batch
+                            )
+                        ]
+                        # 带新字的名字取完了，就退回普通候选把名额填满 ——
+                        # 宁可重复一个字，也不能让「选了期许却看不到契合点」。
+                        # 窄字表必然走到这一步（忠义赤诚可用字只有 心/秉 两个）。
+                        pool = fresh or cpool
+                        avail = [n for n in pool if id(n) not in picked_ids]
+                        if not avail:
+                            break
+                        had = len(picked)
+                        take(
+                            avail,
+                            1,
+                            weight=pref_weight,
+                            temperature=self.PREF_TEMPERATURE,
+                        )
+                        if len(picked) == had:
+                            break
+                        used_in_batch |= self._culture_chars_of(picked[-1], culture)
                     quota -= len(picked) - before
 
+                # 通用的那几个名额也让开本批已用的契合字 —— 加权扣分压不住
+                # 高频字（「玉」系名字比次优高三十多分，扣 18 还是它），
+                # 这一层必须是硬让位。取不到再回退，不让名额空着。
+                generic_pool = [
+                    n for n in pref_pool
+                    if not (self._culture_chars_of(n, culture) & used_in_batch)
+                ] or pref_pool
                 take(
-                    pref_pool,
+                    generic_pool,
                     min(k, quota, TARGET_MIN),
                     weight=pref_weight,
                     temperature=self.PREF_TEMPERATURE,
