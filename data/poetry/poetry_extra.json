@@ -359,7 +359,7 @@
    "id": "poem_x045", "source": "汉魏古诗", "title": "洛神赋", "author": "曹植", "dynasty": "三国",
    "text": "翩若惊鸿，婉若游龙", "original_text": null,
    "citation": "《洛神赋》",
-   "recommend_chars": ["婉", "若", "鸿"],
+   "recommend_chars": ["婉", "若", "鸿", "龙"],
    "emotion": "积极", "imagery": ["轻盈", "婉转"], "gender": "女",
    "scene": "写洛神体态轻盈婉转", "tags": [], "provenance": "manual/extra"
   },
